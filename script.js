@@ -718,6 +718,160 @@ document.querySelectorAll('.project-card').forEach(card => {
 });
 
 // ==========================================
+// AI TYPING EFFECT
+// ==========================================
+(function initAITyping() {
+    const typingElement = document.getElementById('ai-typing-text');
+    if (!typingElement) return;
+    
+    const phrases = [
+        'Building RAG systems...',
+        'Training LLM models...',
+        'Analyzing sentiment data...',
+        'Optimizing Azure infrastructure...',
+        'Deploying microservices...',
+        'Processing natural language...',
+        'Generating AI insights...',
+        'Automating workflows...',
+        'Scaling cloud resources...',
+        'Crafting intelligent solutions...'
+    ];
+    
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 80;
+    
+    function type() {
+        const currentPhrase = phrases[phraseIndex];
+        
+        if (isDeleting) {
+            typingElement.textContent = currentPhrase.substring(0, charIndex - 1);
+            charIndex--;
+            typingSpeed = 40;
+        } else {
+            typingElement.textContent = currentPhrase.substring(0, charIndex + 1);
+            charIndex++;
+            typingSpeed = 80;
+        }
+        
+        if (!isDeleting && charIndex === currentPhrase.length) {
+            isDeleting = true;
+            typingSpeed = 2000; // Pause at end
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            typingSpeed = 500; // Pause before next phrase
+        }
+        
+        setTimeout(type, typingSpeed);
+    }
+    
+    // Start typing after a short delay
+    setTimeout(type, 1000);
+})();
+
+// ==========================================
+// NEURAL NETWORK ANIMATION
+// ==========================================
+(function initNeuralNetwork() {
+    const canvas = document.getElementById('neural-canvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animationId;
+    
+    function resize() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        initParticles();
+    }
+    
+    function initParticles() {
+        particles = [];
+        const numParticles = Math.floor((canvas.width * canvas.height) / 15000);
+        
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2 + 1
+            });
+        }
+    }
+    
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw connections
+        ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
+        ctx.lineWidth = 1;
+        
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 150) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.globalAlpha = 1 - (distance / 150);
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        ctx.globalAlpha = 1;
+        
+        // Draw particles
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(99, 102, 241, 0.6)';
+            ctx.fill();
+            
+            // Update position
+            p.x += p.vx;
+            p.y += p.vy;
+            
+            // Bounce off walls
+            if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        });
+        
+        animationId = requestAnimationFrame(draw);
+    }
+    
+    // Initialize
+    resize();
+    draw();
+    
+    window.addEventListener('resize', () => {
+        cancelAnimationFrame(animationId);
+        resize();
+        draw();
+    });
+    
+    // Pause animation when not visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                draw();
+            } else {
+                cancelAnimationFrame(animationId);
+            }
+        });
+    });
+    
+    observer.observe(canvas);
+})();
+
+// ==========================================
 // AI CHATBOT - ZAIN'S ASSISTANT
 // ==========================================
 (function initChatbot() {

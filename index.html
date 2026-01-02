@@ -59,9 +59,9 @@
                 <li><a href="#home" class="nav-link active">Home</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
                 <li><a href="#skills" class="nav-link">Skills</a></li>
+                <li><a href="#ai-capabilities" class="nav-link"><i class="fas fa-brain"></i> AI</a></li>
                 <li><a href="#experience" class="nav-link">Experience</a></li>
                 <li><a href="#projects" class="nav-link">Projects</a></li>
-                <li><a href="#videos" class="nav-link">Videos</a></li>
                 <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
@@ -108,6 +108,18 @@
                     <span class="role-tag">Delivery Manager</span>
                     <span class="role-divider">•</span>
                     <span class="role-tag">Cloud Architect</span>
+                </div>
+                
+                <!-- AI Status Indicator -->
+                <div class="ai-status-bar">
+                    <div class="ai-status-indicator">
+                        <span class="ai-dot"></span>
+                        <span class="ai-label">AI Systems Active</span>
+                    </div>
+                    <div class="ai-typing">
+                        <span class="typing-text" id="ai-typing-text"></span>
+                        <span class="typing-cursor">|</span>
+                    </div>
                 </div>
                 
                 <h1 class="hero-title">
@@ -1052,69 +1064,208 @@
     <section class="youtube-showcase" id="videos">
         <div class="container">
             <div class="section-header">
-                <span class="section-tag">Video Content</span>
+                <span class="section-tag"><i class="fab fa-youtube"></i> Video Content</span>
                 <h2 class="section-title">My <span class="gradient-text">YouTube Channel</span></h2>
                 <p class="section-desc">Technical tutorials, demos, and insights on AI, .NET, Azure & more</p>
             </div>
             
             <div class="youtube-grid">
-                <div class="youtube-card featured">
+                <a href="https://www.youtube.com/watch?v=7pnIhBv2Fas" target="_blank" class="youtube-card featured">
                     <div class="youtube-thumbnail">
-                        <iframe src="https://www.youtube.com/embed/7pnIhBv2Fas" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <img src="https://img.youtube.com/vi/7pnIhBv2Fas/maxresdefault.jpg" alt="Video Tutorial">
+                        <div class="play-button">
+                            <i class="fab fa-youtube"></i>
+                        </div>
                     </div>
                     <div class="youtube-info">
                         <span class="youtube-badge"><i class="fas fa-star"></i> Featured</span>
                     </div>
-                </div>
+                </a>
                 
-                <div class="youtube-card">
+                <a href="https://www.youtube.com/watch?v=QZWxhyc1DSU" target="_blank" class="youtube-card">
                     <div class="youtube-thumbnail">
-                        <iframe src="https://www.youtube.com/embed/QZWxhyc1DSU" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <img src="https://img.youtube.com/vi/QZWxhyc1DSU/maxresdefault.jpg" alt="Video Tutorial">
+                        <div class="play-button">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://www.youtube.com/watch?v=cpqOpsObkZw" target="_blank" class="youtube-card">
+                    <div class="youtube-thumbnail">
+                        <img src="https://img.youtube.com/vi/cpqOpsObkZw/maxresdefault.jpg" alt="Video Tutorial">
+                        <div class="play-button">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://www.youtube.com/watch?v=JInlYted4-k" target="_blank" class="youtube-card">
+                    <div class="youtube-thumbnail">
+                        <img src="https://img.youtube.com/vi/JInlYted4-k/maxresdefault.jpg" alt="Video Tutorial">
+                        <div class="play-button">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://www.youtube.com/watch?v=PvzF8g8s670" target="_blank" class="youtube-card">
+                    <div class="youtube-thumbnail">
+                        <img src="https://img.youtube.com/vi/PvzF8g8s670/maxresdefault.jpg" alt="Video Tutorial">
+                        <div class="play-button">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://www.youtube.com/watch?v=aMjYjhXiqGA" target="_blank" class="youtube-card">
+                    <div class="youtube-thumbnail">
+                        <img src="https://img.youtube.com/vi/aMjYjhXiqGA/maxresdefault.jpg" alt="Video Tutorial">
+                        <div class="play-button">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://www.youtube.com/watch?v=LWatByP-fj8" target="_blank" class="youtube-card">
+                    <div class="youtube-thumbnail">
+                        <img src="https://img.youtube.com/vi/LWatByP-fj8/maxresdefault.jpg" alt="Video Tutorial">
+                        <div class="play-button">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://www.youtube.com/watch?v=eVBWVoKbPV8" target="_blank" class="youtube-card">
+                    <div class="youtube-thumbnail">
+                        <img src="https://img.youtube.com/vi/eVBWVoKbPV8/maxresdefault.jpg" alt="Video Tutorial">
+                        <div class="play-button">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="youtube-cta">
+                <a href="https://www.youtube.com/@zainabbastahir" target="_blank" class="btn btn-primary btn-glow">
+                    <i class="fab fa-youtube"></i>
+                    <span>Subscribe to My Channel</span>
+                </a>
+                <p class="subscriber-count"><i class="fas fa-users"></i> Join the community</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- AI Capabilities Section -->
+    <section class="ai-capabilities" id="ai-capabilities">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fas fa-robot"></i> AI Expertise</span>
+                <h2 class="section-title">Building The Future With <span class="gradient-text">Artificial Intelligence</span></h2>
+                <p class="section-desc">Transforming businesses with cutting-edge AI solutions</p>
+            </div>
+            
+            <div class="ai-grid">
+                <div class="ai-card" data-aos="fade-up">
+                    <div class="ai-icon-wrapper">
+                        <div class="ai-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="ai-pulse"></div>
+                    </div>
+                    <h3>RAG Systems</h3>
+                    <p>Retrieval-Augmented Generation for intelligent document search and knowledge base queries</p>
+                    <div class="ai-tech-tags">
+                        <span>Azure AI Search</span>
+                        <span>Vector DB</span>
+                        <span>Embeddings</span>
                     </div>
                 </div>
                 
-                <div class="youtube-card">
-                    <div class="youtube-thumbnail">
-                        <iframe src="https://www.youtube.com/embed/cpqOpsObkZw" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <div class="ai-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="ai-icon-wrapper">
+                        <div class="ai-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="ai-pulse"></div>
+                    </div>
+                    <h3>LLM Integration</h3>
+                    <p>Custom chatbots, content generation, and intelligent automation using large language models</p>
+                    <div class="ai-tech-tags">
+                        <span>Azure OpenAI</span>
+                        <span>GPT-4</span>
+                        <span>Semantic Kernel</span>
                     </div>
                 </div>
                 
-                <div class="youtube-card">
-                    <div class="youtube-thumbnail">
-                        <iframe src="https://www.youtube.com/embed/JInlYted4-k" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <div class="ai-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="ai-icon-wrapper">
+                        <div class="ai-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="ai-pulse"></div>
+                    </div>
+                    <h3>Predictive Analytics</h3>
+                    <p>ML-powered forecasting, trend analysis, and business intelligence dashboards</p>
+                    <div class="ai-tech-tags">
+                        <span>Azure ML</span>
+                        <span>Python</span>
+                        <span>Power BI</span>
                     </div>
                 </div>
                 
-                <div class="youtube-card">
-                    <div class="youtube-thumbnail">
-                        <iframe src="https://www.youtube.com/embed/PvzF8g8s670" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <div class="ai-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="ai-icon-wrapper">
+                        <div class="ai-icon">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <div class="ai-pulse"></div>
+                    </div>
+                    <h3>Sentiment Analysis</h3>
+                    <p>Customer feedback analysis, social media monitoring, and brand perception tracking</p>
+                    <div class="ai-tech-tags">
+                        <span>NLP</span>
+                        <span>Text Analytics</span>
+                        <span>Real-time</span>
                     </div>
                 </div>
                 
-                <div class="youtube-card">
-                    <div class="youtube-thumbnail">
-                        <iframe src="https://www.youtube.com/embed/aMjYjhXiqGA" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <div class="ai-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="ai-icon-wrapper">
+                        <div class="ai-icon">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <div class="ai-pulse"></div>
+                    </div>
+                    <h3>Copilot Studio</h3>
+                    <p>Building custom copilots and AI assistants for enterprise workflows and productivity</p>
+                    <div class="ai-tech-tags">
+                        <span>Microsoft Copilot</span>
+                        <span>Power Platform</span>
+                        <span>Agents</span>
                     </div>
                 </div>
                 
-                <div class="youtube-card">
-                    <div class="youtube-thumbnail">
-                        <iframe src="https://www.youtube.com/embed/LWatByP-fj8" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <div class="ai-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="ai-icon-wrapper">
+                        <div class="ai-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="ai-pulse"></div>
                     </div>
-                </div>
-                
-                <div class="youtube-card">
-                    <div class="youtube-thumbnail">
-                        <iframe src="https://www.youtube.com/embed/eVBWVoKbPV8" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <h3>Computer Vision</h3>
+                    <p>Image recognition, facial detection, document processing, and visual AI solutions</p>
+                    <div class="ai-tech-tags">
+                        <span>Azure Vision</span>
+                        <span>OCR</span>
+                        <span>Face API</span>
                     </div>
                 </div>
             </div>
             
-            <div class="youtube-cta">
-                <a href="https://www.youtube.com/@zainabbastahir" target="_blank" class="btn btn-outline">
-                    <i class="fab fa-youtube"></i>
-                    <span>Subscribe to My Channel</span>
-                </a>
+            <!-- AI Neural Network Animation -->
+            <div class="neural-network-bg">
+                <canvas id="neural-canvas"></canvas>
             </div>
         </div>
     </section>

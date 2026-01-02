@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initContactForm();
     initCursorGlow();
     initCounterAnimation();
+    initZainChatbot(); // Initialize chatbot
 });
 
 // ==========================================
@@ -874,7 +875,7 @@ document.querySelectorAll('.project-card').forEach(card => {
 // ==========================================
 // AI CHATBOT - ZAIN'S ASSISTANT
 // ==========================================
-(function initChatbot() {
+function initZainChatbot() {
     const chatbotToggle = document.getElementById('chatbot-toggle');
     const chatbotContainer = document.getElementById('chatbot-container');
     const chatbotClose = document.getElementById('chatbot-close');
@@ -884,7 +885,13 @@ document.querySelectorAll('.project-card').forEach(card => {
     const suggestionChips = document.querySelectorAll('.suggestion-chip');
     const chatNotification = document.querySelector('.chat-notification');
     
-    if (!chatbotToggle) return;
+    // Check if elements exist
+    if (!chatbotToggle || !chatbotContainer) {
+        console.log('Chatbot elements not found');
+        return;
+    }
+    
+    console.log('Chatbot initialized successfully!');
     
     // Zain's Knowledge Base
     const knowledgeBase = {
@@ -1163,7 +1170,10 @@ document.querySelectorAll('.project-card').forEach(card => {
             chatbotContainer.classList.remove('active');
         }
     });
-})();
+    
+    // Log that chatbot is ready
+    console.log('Zain AI Chatbot ready!');
+}
 
 // ==========================================
 // GALLERY LIGHTBOX

@@ -1809,5 +1809,144 @@
 
     <!-- Scripts -->
     <script src="script.js"></script>
+    
+    <!-- Chatbot Backup Initialization -->
+    <script>
+    // Ensure chatbot is initialized
+    window.addEventListener('load', function() {
+        const toggle = document.getElementById('chatbot-toggle');
+        const container = document.getElementById('chatbot-container');
+        const close = document.getElementById('chatbot-close');
+        const input = document.getElementById('chatbot-input');
+        const send = document.getElementById('chatbot-send');
+        const messages = document.getElementById('chatbot-messages');
+        const chips = document.querySelectorAll('.suggestion-chip');
+        const notification = document.querySelector('.chat-notification');
+        
+        if (!toggle || !container) return;
+        
+        // Toggle open/close
+        toggle.onclick = function(e) {
+            e.stopPropagation();
+            container.classList.toggle('active');
+            if (notification) notification.style.display = 'none';
+        };
+        
+        close.onclick = function() {
+            container.classList.remove('active');
+        };
+        
+        // Knowledge base
+        const info = {
+            name: "Zain Abbas Tahir",
+            title: "AI Technical Lead | Delivery Manager | Cloud Architect",
+            exp: "13+ years",
+            email: "zabbastahir@gmail.com",
+            linkedin: "https://www.linkedin.com/in/zainabbastahir/",
+            calendly: "https://calendly.com/zainabbastahir/30min",
+            location: "Kuala Lumpur, Malaysia",
+            current: "Technical Lead at Aventra Group (Nov 2025 - Present)",
+            previous: "Technical Lead at DHL IT Services (Sep 2022 - Oct 2025)",
+            ai: ["RAG", "LLMs", "Predictive AI", "Sentiment Analysis", "AI Foundry", "Copilot Studio", "Azure OpenAI"],
+            cloud: ["Microsoft Azure", "Service Bus", "Data Factory", "Kubernetes", "Docker", "Azure Functions"],
+            dev: [".NET Core", "Angular 17+", "Blazor", "React", "Microservices", "C#", "TypeScript"]
+        };
+        
+        // Smart response function
+        function getSmartResponse(msg) {
+            const m = msg.toLowerCase();
+            
+            if (/^(hi|hello|hey|greetings)/i.test(m)) {
+                return "👋 Hello! I'm Zain's AI Assistant. I can tell you about his skills, experience, projects, or how to hire him. What would you like to know?";
+            }
+            if (/ai|machine learning|rag|llm|chatbot|sentiment|predictive/i.test(m)) {
+                return "🧠 <strong>Zain's AI Expertise:</strong><br><br>• " + info.ai.join("<br>• ") + "<br><br>He builds intelligent systems using RAG, LLMs, and Azure AI to transform businesses!";
+            }
+            if (/azure|cloud|kubernetes|docker|infrastructure/i.test(m)) {
+                return "☁️ <strong>Cloud & Infrastructure:</strong><br><br>• " + info.cloud.join("<br>• ") + "<br><br>He's built enterprise-scale Azure infrastructure for companies like DHL.";
+            }
+            if (/\.net|dotnet|angular|blazor|react|frontend|backend|development/i.test(m)) {
+                return "💻 <strong>Development Skills:</strong><br><br>• " + info.dev.join("<br>• ") + "<br><br>With 13+ years of experience in full-stack development!";
+            }
+            if (/experience|work|job|career|company|dhl|aventra/i.test(m)) {
+                return "💼 <strong>Experience:</strong><br><br>📍 <strong>Current:</strong> " + info.current + "<br><br>📍 <strong>Previous:</strong> " + info.previous + "<br><br>Total: " + info.exp + " of professional experience!";
+            }
+            if (/contact|email|reach|linkedin/i.test(m)) {
+                return "📧 <strong>Contact Zain:</strong><br><br>• Email: <a href='mailto:" + info.email + "'>" + info.email + "</a><br>• LinkedIn: <a href='" + info.linkedin + "' target='_blank'>View Profile</a><br>• Schedule Call: <a href='" + info.calendly + "' target='_blank'>Book Meeting</a>";
+            }
+            if (/hire|hiring|consult|available|rate|service|freelance/i.test(m)) {
+                return "🤝 <strong>Hire Zain:</strong><br><br>1️⃣ <a href='" + info.calendly + "' target='_blank'>Schedule a Call</a><br>2️⃣ Email: " + info.email + "<br>3️⃣ <a href='" + info.linkedin + "' target='_blank'>Connect on LinkedIn</a><br><br>He offers AI/ML Solutions, Cloud Architecture, and Technical Consulting!";
+            }
+            if (/project|portfolio|built|developed/i.test(m)) {
+                return "🚀 <strong>Notable Projects:</strong><br><br>• Document Management System (.NET, Azure)<br>• AI Customer Support Bot (RAG, LLMs)<br>• Predictive Analytics Engine (Azure ML)<br>• Face Recognition Login (Computer Vision)<br>• E-Commerce Platform (Microservices)<br><br>Check out the Projects section for more!";
+            }
+            if (/skill|tech|expertise|know/i.test(m)) {
+                return "🎯 <strong>Zain's Expertise:</strong><br><br>🧠 AI: RAG, LLMs, Predictive AI<br>☁️ Cloud: Azure, Kubernetes, Docker<br>💻 Dev: .NET, Angular, Blazor<br>🚀 DevOps: CI/CD, Terraform, Azure DevOps<br>📊 Data: SQL Server, Cosmos DB, Redis";
+            }
+            if (/where|location|based|malaysia|remote/i.test(m)) {
+                return "📍 Zain is based in <strong>" + info.location + "</strong> and works with clients globally. He's experienced in both on-site and remote collaboration.";
+            }
+            if (/youtube|video|tutorial|channel/i.test(m)) {
+                return "🎬 Check out Zain's YouTube channel for technical tutorials on AI, .NET, Azure and more!<br><br><a href='https://www.youtube.com/@zainabbastahir' target='_blank'>Subscribe to Channel</a>";
+            }
+            if (/who|about|zain|tell me/i.test(m)) {
+                return "👤 <strong>" + info.name + "</strong><br>" + info.title + "<br><br>📍 " + info.location + "<br>💼 " + info.exp + " experience<br><br>He builds intelligent, scalable AI-powered systems!";
+            }
+            
+            return "🤔 I can help you with info about Zain. Try asking about:<br><br>• His AI & technical skills<br>• Work experience<br>• Projects<br>• How to hire/contact him<br><br>What would you like to know?";
+        }
+        
+        // Add message to chat
+        function addMsg(text, isUser) {
+            const div = document.createElement('div');
+            div.className = 'chat-message ' + (isUser ? 'user' : 'bot');
+            div.innerHTML = (isUser ? '' : '<div class="message-avatar"><img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain"></div>') + '<div class="message-content"><p>' + text + '</p></div>';
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        // Show typing
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'chat-message bot typing-msg';
+            div.innerHTML = '<div class="message-avatar"><img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain"></div><div class="message-content"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+            return div;
+        }
+        
+        // Handle send
+        function handleSend() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            
+            addMsg(msg, true);
+            input.value = '';
+            
+            const typing = showTyping();
+            
+            setTimeout(function() {
+                typing.remove();
+                addMsg(getSmartResponse(msg), false);
+            }, 600 + Math.random() * 600);
+        }
+        
+        // Send handlers
+        send.onclick = handleSend;
+        input.onkeypress = function(e) {
+            if (e.key === 'Enter') handleSend();
+        };
+        
+        // Suggestion chips
+        chips.forEach(function(chip) {
+            chip.onclick = function() {
+                input.value = chip.getAttribute('data-query');
+                handleSend();
+            };
+        });
+        
+        console.log('✅ Zain AI Chatbot Ready!');
+    });
+    </script>
 </body>
 </html>

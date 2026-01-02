@@ -1,0 +1,358 @@
+<!-- Enhanced Demo Showcase Section -->
+<!-- Replace the Projects section in index.html with this for richer demo presentation -->
+
+<section id="projects" class="section" style="background: var(--bg-secondary);">
+    <h2 class="section-title">Portfolio & Live Demos</h2>
+    <p class="section-subtitle">Interactive demonstrations of real-world solutions</p>
+    
+    <!-- Demo Showcase with Tabs -->
+    <div style="max-width: 1200px; margin: 3rem auto;">
+        <div class="demo-tabs" style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; justify-content: center;">
+            <button class="demo-tab active" data-tab="all">All Projects</button>
+            <button class="demo-tab" data-tab="web">Web Apps</button>
+            <button class="demo-tab" data-tab="desktop">Desktop</button>
+            <button class="demo-tab" data-tab="cloud">Cloud Solutions</button>
+        </div>
+
+        <div class="projects-grid">
+            <!-- Project 1: POS System -->
+            <div class="project-card fade-in" data-category="desktop">
+                <div class="project-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div style="text-align: center; color: white;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🛒</div>
+                        <div style="font-size: 1.5rem; font-weight: 600;">POS System</div>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">Point of Sale Software</h3>
+                    <p class="project-description">
+                        Complete POS solution with barcode support, inventory management, sales reporting, 
+                        debt tracking, and comprehensive analytics dashboard.
+                    </p>
+                    <div class="project-features" style="margin: 1rem 0;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-size: 0.9rem;">
+                            <div>✓ Barcode Reader Support</div>
+                            <div>✓ Inventory Management</div>
+                            <div>✓ Sales Reporting</div>
+                            <div>✓ Debt Management</div>
+                            <div>✓ User Management</div>
+                            <div>✓ Multi-user Support</div>
+                        </div>
+                    </div>
+                    <div class="project-tags">
+                        <span class="tag">.NET</span>
+                        <span class="tag">C#</span>
+                        <span class="tag">WinForms</span>
+                        <span class="tag">MySQL</span>
+                    </div>
+                    <div class="project-links" style="margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="showDemo('pos')" style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">View Demo</button>
+                        <a href="#" class="project-link">Case Study →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 2: Customer Management -->
+            <div class="project-card fade-in" data-category="web">
+                <div class="project-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div style="text-align: center; color: white;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">👥</div>
+                        <div style="font-size: 1.5rem; font-weight: 600;">CRM System</div>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">Customer Management & Reminder System</h3>
+                    <p class="project-description">
+                        Advanced CRM with automated reminder system, message sending capabilities, 
+                        customer segmentation, and communication tracking.
+                    </p>
+                    <div class="project-features" style="margin: 1rem 0;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-size: 0.9rem;">
+                            <div>✓ Automated Reminders</div>
+                            <div>✓ SMS/Email Integration</div>
+                            <div>✓ Customer Segmentation</div>
+                            <div>✓ Communication History</div>
+                        </div>
+                    </div>
+                    <div class="project-tags">
+                        <span class="tag">.NET</span>
+                        <span class="tag">SQL Server</span>
+                        <span class="tag">API Integration</span>
+                    </div>
+                    <div class="project-links" style="margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="showDemo('crm')" style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">View Demo</button>
+                        <a href="#" class="project-link">Case Study →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 3: URL Shortener -->
+            <div class="project-card fade-in" data-category="web">
+                <div class="project-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div style="text-align: center; color: white;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🔗</div>
+                        <div style="font-size: 1.5rem; font-weight: 600;">URL Shortener</div>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">URL Shortener & Analytics</h3>
+                    <p class="project-description">
+                        Professional URL shortening service with real-time click tracking, 
+                        geographic analytics, device detection, and custom domain support.
+                    </p>
+                    <div class="project-features" style="margin: 1rem 0;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-size: 0.9rem;">
+                            <div>✓ Click Analytics</div>
+                            <div>✓ Geographic Tracking</div>
+                            <div>✓ Custom Short URLs</div>
+                            <div>✓ QR Code Generation</div>
+                        </div>
+                    </div>
+                    <div class="project-tags">
+                        <span class="tag">.NET Core</span>
+                        <span class="tag">ASP.NET</span>
+                        <span class="tag">SQL Server</span>
+                        <span class="tag">Analytics</span>
+                    </div>
+                    <div class="project-links" style="margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="showDemo('url')" style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">View Demo</button>
+                        <a href="#" class="project-link">Case Study →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 4: Hospital Management -->
+            <div class="project-card fade-in" data-category="web">
+                <div class="project-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <div style="text-align: center; color: white;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🏥</div>
+                        <div style="font-size: 1.5rem; font-weight: 600;">Hospital System</div>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">Hospital Equipment Management</h3>
+                    <p class="project-description">
+                        Comprehensive equipment tracking system with maintenance scheduling, 
+                        inventory management, and compliance reporting for healthcare facilities.
+                    </p>
+                    <div class="project-tags">
+                        <span class="tag">.NET</span>
+                        <span class="tag">Web App</span>
+                        <span class="tag">Healthcare</span>
+                    </div>
+                    <div class="project-links" style="margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="showDemo('hospital')" style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">View Demo</button>
+                        <a href="#" class="project-link">Case Study →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 5: Document Management -->
+            <div class="project-card fade-in" data-category="cloud">
+                <div class="project-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <div style="text-align: center; color: white;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">📄</div>
+                        <div style="font-size: 1.5rem; font-weight: 600;">DMS</div>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">Document Management System</h3>
+                    <p class="project-description">
+                        Secure cloud-based document storage with role-based access control, 
+                        versioning, sharing, and email integration.
+                    </p>
+                    <div class="project-features" style="margin: 1rem 0;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-size: 0.9rem;">
+                            <div>✓ Role-Based Access</div>
+                            <div>✓ Version Control</div>
+                            <div>✓ Email Integration</div>
+                            <div>✓ Cloud Storage</div>
+                        </div>
+                    </div>
+                    <div class="project-tags">
+                        <span class="tag">.NET Core</span>
+                        <span class="tag">Azure</span>
+                        <span class="tag">MVC</span>
+                        <span class="tag">Blob Storage</span>
+                    </div>
+                    <div class="project-links" style="margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="showDemo('dms')" style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">View Demo</button>
+                        <a href="#" class="project-link">Case Study →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 6: YouTube Converter -->
+            <div class="project-card fade-in" data-category="web">
+                <div class="project-image" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                    <div style="text-align: center; color: white;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🎵</div>
+                        <div style="font-size: 1.5rem; font-weight: 600;">Media Converter</div>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">YouTube to MP3 Converter</h3>
+                    <p class="project-description">
+                        High-quality audio extraction from YouTube videos with batch processing, 
+                        quality selection, and progress tracking.
+                    </p>
+                    <div class="project-tags">
+                        <span class="tag">.NET Core</span>
+                        <span class="tag">MVC</span>
+                        <span class="tag">Media Processing</span>
+                    </div>
+                    <div class="project-links" style="margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="showDemo('converter')" style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">View Demo</button>
+                        <a href="#" class="project-link">Case Study →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Demo Modal -->
+<div id="demoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="background: var(--bg-primary); border-radius: 1rem; max-width: 90%; max-height: 90%; overflow: auto; position: relative; padding: 2rem;">
+        <button onclick="closeDemo()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-primary);">×</button>
+        <div id="demoContent">
+            <!-- Demo content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<style>
+    .demo-tab {
+        padding: 0.75rem 1.5rem;
+        border: 2px solid var(--border-color);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .demo-tab:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .demo-tab.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    [data-category] {
+        display: block;
+    }
+
+    [data-category].hidden {
+        display: none;
+    }
+</style>
+
+<script>
+    // Tab filtering
+    document.querySelectorAll('.demo-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Update active tab
+            document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Filter projects
+            const category = tab.dataset.tab;
+            document.querySelectorAll('.project-card').forEach(card => {
+                if (category === 'all') {
+                    card.classList.remove('hidden');
+                } else {
+                    if (card.dataset.category === category) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                }
+            });
+        });
+    });
+
+    // Demo modal functions
+    function showDemo(demoType) {
+        const modal = document.getElementById('demoModal');
+        const content = document.getElementById('demoContent');
+        
+        // Demo content based on type
+        const demos = {
+            pos: `
+                <h2 style="margin-bottom: 1rem;">Point of Sale System Demo</h2>
+                <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                    <p style="margin-bottom: 1rem;">This demo showcases the POS system capabilities:</p>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.5rem 0;">✓ Real-time inventory tracking</li>
+                        <li style="padding: 0.5rem 0;">✓ Barcode scanning integration</li>
+                        <li style="padding: 0.5rem 0;">✓ Sales reporting and analytics</li>
+                        <li style="padding: 0.5rem 0;">✓ Multi-user support with role management</li>
+                    </ul>
+                </div>
+                <div style="background: #f3f4f6; padding: 2rem; border-radius: 0.5rem; text-align: center;">
+                    <p style="margin-bottom: 1rem;">To view the full demo, please contact me for access credentials.</p>
+                    <a href="#contact" class="btn btn-primary" onclick="closeDemo()">Request Demo Access</a>
+                </div>
+                <!-- You can embed an iframe here: -->
+                <!-- <iframe src="your-demo-url" width="100%" height="600px" frameborder="0"></iframe> -->
+            `,
+            crm: `
+                <h2 style="margin-bottom: 1rem;">Customer Management System Demo</h2>
+                <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 0.5rem;">
+                    <p>CRM system with automated reminders and messaging capabilities.</p>
+                    <!-- Add your demo embed here -->
+                </div>
+            `,
+            url: `
+                <h2 style="margin-bottom: 1rem;">URL Shortener Demo</h2>
+                <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 0.5rem;">
+                    <p>Interactive URL shortening and analytics dashboard.</p>
+                    <!-- Add your demo embed here -->
+                </div>
+            `,
+            hospital: `
+                <h2 style="margin-bottom: 1rem;">Hospital Equipment Management Demo</h2>
+                <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 0.5rem;">
+                    <p>Equipment tracking and management system.</p>
+                    <!-- Add your demo embed here -->
+                </div>
+            `,
+            dms: `
+                <h2 style="margin-bottom: 1rem;">Document Management System Demo</h2>
+                <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 0.5rem;">
+                    <p>Cloud-based document storage and management.</p>
+                    <!-- Add your demo embed here -->
+                </div>
+            `,
+            converter: `
+                <h2 style="margin-bottom: 1rem;">YouTube to MP3 Converter Demo</h2>
+                <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 0.5rem;">
+                    <p>Media conversion tool demonstration.</p>
+                    <!-- Add your demo embed here -->
+                </div>
+            `
+        };
+
+        content.innerHTML = demos[demoType] || '<p>Demo coming soon!</p>';
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDemo() {
+        document.getElementById('demoModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close modal on outside click
+    document.getElementById('demoModal').addEventListener('click', (e) => {
+        if (e.target.id === 'demoModal') {
+            closeDemo();
+        }
+    });
+</script>

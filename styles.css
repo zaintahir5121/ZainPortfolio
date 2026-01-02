@@ -672,6 +672,87 @@ button {
     transform: translateY(-3px);
 }
 
+/* Featured LinkedIn Link */
+.social-link.linkedin-featured {
+    width: auto;
+    padding: 12px 20px;
+    gap: 10px;
+    background: #0A66C2;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.social-link.linkedin-featured:hover {
+    background: #004182;
+    transform: translateY(-3px);
+}
+
+.social-link.linkedin-featured span {
+    display: inline;
+}
+
+/* Profile Card Mini */
+.profile-card-mini {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    width: fit-content;
+}
+
+.profile-mini-img {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 3px solid var(--accent-primary);
+}
+
+.linkedin-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #0A66C2;
+    color: white;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: 14px;
+    transition: var(--transition-base);
+    text-decoration: none;
+}
+
+.linkedin-badge:hover {
+    background: #004182;
+    transform: translateY(-2px);
+    color: white;
+}
+
+.linkedin-badge i {
+    font-size: 18px;
+}
+
+@media (max-width: 768px) {
+    .social-link.linkedin-featured span {
+        display: none;
+    }
+    
+    .social-link.linkedin-featured {
+        width: 44px;
+        padding: 0;
+    }
+    
+    .profile-card-mini {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
 /* Hero Visual - Code Window */
 .hero-visual {
     position: relative;
@@ -1208,6 +1289,153 @@ section {
 
 .skill-card.animated .skill-progress {
     width: var(--skill-level, 0%);
+}
+
+/* Credly Badges Section */
+.credly-section {
+    margin-top: 60px;
+    text-align: center;
+}
+
+.credly-title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+}
+
+.credly-badges {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.credly-link {
+    text-decoration: none;
+}
+
+.credly-badge-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 30px 40px;
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    transition: var(--transition-base);
+}
+
+.credly-badge-placeholder:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-tertiary);
+    transform: translateY(-5px);
+}
+
+.credly-badge-placeholder i {
+    font-size: 48px;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.credly-badge-placeholder span {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Schedule Meeting CTA */
+.schedule-meeting-cta {
+    margin-top: 60px;
+    background: var(--accent-gradient);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.schedule-meeting-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+}
+
+.meeting-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.meeting-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.meeting-icon i {
+    font-size: 36px;
+    color: white;
+}
+
+.meeting-text {
+    text-align: left;
+}
+
+.meeting-text h3 {
+    font-size: 1.75rem;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.meeting-text p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+}
+
+.meeting-btn {
+    background: white !important;
+    color: var(--accent-primary) !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    padding: 16px 32px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.meeting-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    .meeting-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .meeting-text {
+        text-align: center;
+    }
+    
+    .schedule-meeting-cta {
+        padding: 30px 20px;
+    }
 }
 
 /* ==========================================
@@ -1993,6 +2221,68 @@ section {
 
 .footer-column a:hover {
     color: var(--accent-primary);
+}
+
+/* Visitor Stats */
+.visitor-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 24px 0;
+    margin-bottom: 24px;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.stat-item > i {
+    font-size: 24px;
+    color: var(--accent-primary);
+}
+
+.stat-item.online-indicator > i {
+    color: #22c55e;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+    .visitor-stats {
+        gap: 20px;
+    }
+    
+    .stat-item {
+        flex: 1 1 40%;
+        justify-content: center;
+    }
 }
 
 .footer-bottom {

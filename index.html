@@ -24,6 +24,24 @@
     
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Google Analytics - Replace GA_MEASUREMENT_ID with your actual ID -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XE5L1NZ3NV"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XE5L1NZ3NV'); // Your Google Analytics ID
+    </script>
+    
+    <!-- Microsoft Clarity for Heatmaps & Session Recording -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "YOUR_CLARITY_ID");
+    </script>
 </head>
 <body>
     <!-- Cursor Glow Effect -->
@@ -135,8 +153,9 @@
                 </div>
                 
                 <div class="hero-social">
-                    <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="social-link" aria-label="LinkedIn">
+                    <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="social-link linkedin-featured" aria-label="LinkedIn">
                         <i class="fab fa-linkedin-in"></i>
+                        <span>Connect on LinkedIn</span>
                     </a>
                     <a href="https://github.com/zainabbastahir" target="_blank" class="social-link" aria-label="GitHub">
                         <i class="fab fa-github"></i>
@@ -146,6 +165,14 @@
                     </a>
                     <a href="mailto:zabbastahir@gmail.com" class="social-link" aria-label="Email">
                         <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+                
+                <!-- Profile Card with LinkedIn -->
+                <div class="profile-card-mini">
+                    <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain Abbas Tahir" class="profile-mini-img">
+                    <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="linkedin-badge">
+                        <i class="fab fa-linkedin"></i> View LinkedIn Profile
                     </a>
                 </div>
             </div>
@@ -222,7 +249,7 @@
                 <div class="about-image">
                     <div class="image-wrapper">
                         <div class="image-frame">
-                            <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/1728886514463-768x1024.jpeg" alt="Zain Abbas Tahir">
+                            <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain Abbas Tahir">
                         </div>
                         <div class="image-decoration">
                             <div class="deco-line"></div>
@@ -1267,6 +1294,38 @@
                             <li><a href="https://zainabbastahir.com/wp-content/uploads/2025/02/ZainAbbasTahirCv_Tehnical_Lead-6.pdf" download>Download CV</a></li>
                             <li><a href="https://calendly.com/zainabbastahir/30min" target="_blank">Schedule Call</a></li>
                         </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Visitor Stats -->
+            <div class="visitor-stats">
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-content">
+                        <span class="stat-number" id="visitor-count">--</span>
+                        <span class="stat-label">Total Visitors</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-eye"></i>
+                    <div class="stat-content">
+                        <span class="stat-number" id="page-views">--</span>
+                        <span class="stat-label">Page Views</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-globe"></i>
+                    <div class="stat-content">
+                        <span class="stat-number" id="countries-count">50+</span>
+                        <span class="stat-label">Countries</span>
+                    </div>
+                </div>
+                <div class="stat-item online-indicator">
+                    <i class="fas fa-circle"></i>
+                    <div class="stat-content">
+                        <span class="stat-number" id="online-now">1</span>
+                        <span class="stat-label">Online Now</span>
                     </div>
                 </div>
             </div>

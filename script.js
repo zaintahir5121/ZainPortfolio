@@ -600,3 +600,119 @@ console.log(`
 'color: #a855f7; font-size: 14px;',
 'color: #10b981; font-size: 12px;'
 );
+
+// ==========================================
+// VISITOR TRACKING & ANALYTICS
+// ==========================================
+(function initVisitorStats() {
+    // Simple visitor counter using localStorage
+    const VISITOR_KEY = 'zat_visitor_id';
+    const VISIT_COUNT_KEY = 'zat_total_visits';
+    const PAGE_VIEWS_KEY = 'zat_page_views';
+    
+    // Generate unique visitor ID if not exists
+    if (!localStorage.getItem(VISITOR_KEY)) {
+        localStorage.setItem(VISITOR_KEY, 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+    }
+    
+    // Track page view
+    let pageViews = parseInt(localStorage.getItem(PAGE_VIEWS_KEY) || '0');
+    pageViews++;
+    localStorage.setItem(PAGE_VIEWS_KEY, pageViews.toString());
+    
+    // Track visit (session-based)
+    if (!sessionStorage.getItem('visited')) {
+        sessionStorage.setItem('visited', 'true');
+        let visits = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '0');
+        visits++;
+        localStorage.setItem(VISIT_COUNT_KEY, visits.toString());
+    }
+    
+    // Update display
+    const visitorCountEl = document.getElementById('visitor-count');
+    const pageViewsEl = document.getElementById('page-views');
+    const onlineNowEl = document.getElementById('online-now');
+    
+    if (visitorCountEl) {
+        // Animate counter
+        animateCounter(visitorCountEl, parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '1'));
+    }
+    
+    if (pageViewsEl) {
+        animateCounter(pageViewsEl, pageViews);
+    }
+    
+    if (onlineNowEl) {
+        // Simulate online users (1-3 for demo)
+        onlineNowEl.textContent = Math.floor(Math.random() * 3) + 1;
+    }
+    
+    function animateCounter(element, target) {
+        let current = 0;
+        const duration = 1500;
+        const increment = target / (duration / 16);
+        
+        function update() {
+            current += increment;
+            if (current < target) {
+                element.textContent = Math.floor(current);
+                requestAnimationFrame(update);
+            } else {
+                element.textContent = target;
+            }
+        }
+        
+        // Start animation when element is in view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    update();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+        
+        observer.observe(element);
+    }
+    
+    // Log analytics info
+    console.log('%c📊 Analytics Active', 'color: #22c55e; font-weight: bold;');
+    console.log('Visitor ID:', localStorage.getItem(VISITOR_KEY));
+    console.log('Total Visits:', localStorage.getItem(VISIT_COUNT_KEY));
+    console.log('Page Views:', pageViews);
+})();
+
+// ==========================================
+// ADVANCED ANALYTICS HELPER
+// ==========================================
+// This sends data to Google Analytics (if configured)
+function trackEvent(category, action, label) {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', action, {
+            'event_category': category,
+            'event_label': label
+        });
+    }
+}
+
+// Track important user interactions
+document.querySelectorAll('.btn-primary').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const label = this.textContent.trim();
+        trackEvent('CTA', 'click', label);
+    });
+});
+
+document.querySelectorAll('.social-link, .linkedin-badge').forEach(link => {
+    link.addEventListener('click', function() {
+        const label = this.getAttribute('aria-label') || 'Social Link';
+        trackEvent('Social', 'click', label);
+    });
+});
+
+document.querySelectorAll('.project-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const title = this.querySelector('h3')?.textContent || 'Project';
+        trackEvent('Portfolio', 'view_project', title);
+    });
+});

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You | Zain Abbas Tahir</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .thank-you-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .thank-you-content {
+            max-width: 600px;
+        }
+        .thank-you-icon {
+            width: 120px;
+            height: 120px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 32px;
+            animation: scaleIn 0.5s ease;
+        }
+        .thank-you-icon i {
+            font-size: 3rem;
+            color: white;
+        }
+        .thank-you-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        .thank-you-content p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+        .thank-you-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="thank-you-page">
+        <div class="thank-you-content">
+            <div class="thank-you-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h1>Thank You! 🎉</h1>
+            <p>Your message has been received successfully. I'll get back to you within 24 hours. In the meantime, feel free to connect with me on LinkedIn or schedule a call directly.</p>
+            <div class="thank-you-actions">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    <span>Back to Home</span>
+                </a>
+                <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="btn btn-outline">
+                    <i class="fab fa-linkedin"></i>
+                    <span>Connect on LinkedIn</span>
+                </a>
+                <a href="https://calendly.com/zainabbastahir/30min" target="_blank" class="btn btn-outline">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Schedule a Call</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto redirect after 10 seconds
+        setTimeout(function() {
+            window.location.href = '/';
+        }, 10000);
+    </script>
+</body>
+</html>

@@ -716,3 +716,71 @@ document.querySelectorAll('.project-card').forEach(card => {
         trackEvent('Portfolio', 'view_project', title);
     });
 });
+
+// ==========================================
+// GALLERY LIGHTBOX
+// ==========================================
+(function initLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.getElementById('lightbox-close');
+    const lightboxPrev = document.getElementById('lightbox-prev');
+    const lightboxNext = document.getElementById('lightbox-next');
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    
+    if (!lightbox || !galleryItems.length) return;
+    
+    let currentIndex = 0;
+    const images = Array.from(galleryItems).map(item => item.querySelector('img').src);
+    
+    function showImage(index) {
+        if (index < 0) index = images.length - 1;
+        if (index >= images.length) index = 0;
+        currentIndex = index;
+        lightboxImg.src = images[currentIndex];
+    }
+    
+    function openLightbox(index) {
+        currentIndex = index;
+        showImage(currentIndex);
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeLightbox() {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Click handlers for gallery items
+    galleryItems.forEach((item, index) => {
+        item.addEventListener('click', () => openLightbox(index));
+    });
+    
+    // Lightbox controls
+    if (lightboxClose) {
+        lightboxClose.addEventListener('click', closeLightbox);
+    }
+    
+    if (lightboxPrev) {
+        lightboxPrev.addEventListener('click', () => showImage(currentIndex - 1));
+    }
+    
+    if (lightboxNext) {
+        lightboxNext.addEventListener('click', () => showImage(currentIndex + 1));
+    }
+    
+    // Close on background click
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('active')) return;
+        
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+        if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+    });
+})();

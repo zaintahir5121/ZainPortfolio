@@ -395,26 +395,41 @@ function initContactForm() {
         submitBtn.innerHTML = '<span>Sending...</span><i class="fas fa-spinner fa-spin"></i>';
         submitBtn.disabled = true;
         
-        // Simulate form submission (replace with actual API call)
+        // Get form data
+        const formData = new FormData(contactForm);
+        
         try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Submit to Netlify Forms
+            const response = await fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            });
             
-            // Success
-            submitBtn.innerHTML = '<span>Message Sent!</span><i class="fas fa-check"></i>';
-            submitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
-            
-            // Reset form
-            contactForm.reset();
-            
-            // Reset button after delay
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.style.background = '';
-                submitBtn.disabled = false;
-            }, 3000);
+            if (response.ok) {
+                // Success
+                submitBtn.innerHTML = '<span>Message Sent!</span><i class="fas fa-check"></i>';
+                submitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
+                
+                // Reset form
+                contactForm.reset();
+                
+                // Optional: Redirect to thank you page
+                // window.location.href = '/thank-you.html';
+                
+                // Reset button after delay
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.style.background = '';
+                    submitBtn.disabled = false;
+                }, 3000);
+            } else {
+                throw new Error('Form submission failed');
+            }
             
         } catch (error) {
             // Error
+            console.error('Form error:', error);
             submitBtn.innerHTML = '<span>Error! Try Again</span><i class="fas fa-times"></i>';
             submitBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
             

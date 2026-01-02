@@ -1581,6 +1581,62 @@
         </div>
     </footer>
 
+    <!-- AI Chatbot Widget -->
+    <div class="chatbot-widget" id="chatbot-widget">
+        <button class="chatbot-toggle" id="chatbot-toggle" aria-label="Open chat">
+            <i class="fas fa-comments"></i>
+            <span class="chat-notification">1</span>
+        </button>
+        
+        <div class="chatbot-container" id="chatbot-container">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">
+                    <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain Abbas Tahir">
+                    <span class="online-status"></span>
+                </div>
+                <div class="chatbot-info">
+                    <h4>Chat with Zain's AI Assistant</h4>
+                    <span class="chatbot-status">Online • Ask me anything</span>
+                </div>
+                <button class="chatbot-close" id="chatbot-close" aria-label="Close chat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="chat-message bot">
+                    <div class="message-avatar">
+                        <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain">
+                    </div>
+                    <div class="message-content">
+                        <p>👋 Hi! I'm Zain's AI Assistant. I can answer questions about:</p>
+                        <ul class="quick-topics">
+                            <li>🧠 AI & Technical Skills</li>
+                            <li>💼 Work Experience</li>
+                            <li>🚀 Projects & Portfolio</li>
+                            <li>📧 How to Contact/Hire</li>
+                        </ul>
+                        <p>What would you like to know?</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chatbot-suggestions" id="chatbot-suggestions">
+                <button class="suggestion-chip" data-query="What are Zain's AI skills?">AI Skills</button>
+                <button class="suggestion-chip" data-query="Tell me about Zain's experience">Experience</button>
+                <button class="suggestion-chip" data-query="What projects has Zain worked on?">Projects</button>
+                <button class="suggestion-chip" data-query="How can I hire Zain?">Hire Zain</button>
+            </div>
+            
+            <div class="chatbot-input-area">
+                <input type="text" id="chatbot-input" placeholder="Ask about Zain's skills, experience, projects..." autocomplete="off">
+                <button class="chatbot-send" id="chatbot-send" aria-label="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Image Lightbox -->
     <div class="lightbox" id="lightbox">
         <button class="lightbox-close" id="lightbox-close" aria-label="Close lightbox">

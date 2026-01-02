@@ -718,6 +718,300 @@ document.querySelectorAll('.project-card').forEach(card => {
 });
 
 // ==========================================
+// AI CHATBOT - ZAIN'S ASSISTANT
+// ==========================================
+(function initChatbot() {
+    const chatbotToggle = document.getElementById('chatbot-toggle');
+    const chatbotContainer = document.getElementById('chatbot-container');
+    const chatbotClose = document.getElementById('chatbot-close');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotSend = document.getElementById('chatbot-send');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+    const suggestionChips = document.querySelectorAll('.suggestion-chip');
+    const chatNotification = document.querySelector('.chat-notification');
+    
+    if (!chatbotToggle) return;
+    
+    // Zain's Knowledge Base
+    const knowledgeBase = {
+        name: "Zain Abbas Tahir",
+        title: "AI Technical Lead | Delivery Manager | Cloud Architect",
+        experience: "13+ years",
+        location: "Kuala Lumpur, Malaysia",
+        email: "zabbastahir@gmail.com",
+        linkedin: "https://www.linkedin.com/in/zainabbastahir/",
+        github: "https://github.com/zainabbastahir",
+        youtube: "https://www.youtube.com/@zainabbastahir",
+        calendly: "https://calendly.com/zainabbastahir/30min",
+        website: "https://zainabbastahir.com",
+        
+        currentRole: {
+            company: "Aventra Group",
+            position: "Technical Lead",
+            period: "Nov 2025 - Present",
+            location: "Kuala Lumpur, Malaysia"
+        },
+        
+        previousRole: {
+            company: "DHL IT Services",
+            position: "Technical Lead",
+            period: "Sep 2022 - Oct 2025",
+            location: "Kuala Lumpur, Malaysia"
+        },
+        
+        aiSkills: ["RAG (Retrieval-Augmented Generation)", "Large Language Models (LLMs)", "Predictive AI", "Sentiment Analysis", "AI Foundry", "Data Fabric", "Copilot Studio", "Power Apps", "AI Search", "Agent AI", "Azure OpenAI", "Computer Vision"],
+        
+        cloudSkills: ["Microsoft Azure", "Service Bus", "Data Factory", "App Services", "Logic Apps", "Azure Functions", "Virtual Machines", "Key Vault", "API Management", "VNET", "Active Directory & RBAC", "Kubernetes", "Azure AKS", "Cosmos DB", "Redis Cache"],
+        
+        devSkills: [".NET / .NET Core", "ASP.NET MVC", "Web API", "Angular 17+", "Blazor", "React", "Microservices", "CQRS", "API Integration", "C#", "TypeScript", "Python"],
+        
+        devOpsSkills: ["CI/CD Pipelines", "Azure DevOps", "Terraform", "ARM Templates", "Bicep", "Docker", "TDD", "Code Refactoring", "Monitoring & Metrics", "Cost Management"],
+        
+        dataSkills: ["SQL Server", "EF Core", "Database Migrations", "Stored Procedures", "Triggers", "Event-Driven Design", "MongoDB", "Vector DB", "Cloud Search", "SEO"],
+        
+        projects: [
+            { name: "Document Management System", tech: ".NET Core, Azure, Angular", desc: "Enterprise-grade document management with role-based access" },
+            { name: "AI Customer Support Bot", tech: "Azure OpenAI, RAG, LLMs", desc: "Intelligent chatbot with sentiment analysis" },
+            { name: "Predictive Analytics Engine", tech: "Azure ML, Python, Power BI", desc: "ML-powered business forecasting system" },
+            { name: "POS System", tech: ".NET Core, Angular, SQL Server", desc: "Modern point of sale with inventory management" },
+            { name: "URL Shortener", tech: ".NET Core, Redis, Angular", desc: "Analytics-enabled link shortening service" },
+            { name: "Face Recognition Login", tech: "Azure AI, Computer Vision", desc: "Biometric authentication system" },
+            { name: "E-Commerce Platform", tech: "Microservices, Azure, Angular", desc: "Scalable multi-vendor marketplace" }
+        ],
+        
+        services: ["Custom Software Development", "AI/ML Solutions", "Cloud Architecture", "API Integration", "Technical Consulting", "Team Leadership", "DevOps Implementation", "System Optimization"],
+        
+        achievements: [
+            "Led teams of developers across multiple projects",
+            "Built AI-based Route Optimization System",
+            "Implemented RAG System for enhanced search",
+            "Managed Azure infrastructure for enterprise clients",
+            "Delivered 50+ successful projects"
+        ]
+    };
+    
+    // Response patterns
+    const responses = {
+        greeting: [
+            `Hello! I'm here to tell you about Zain Abbas Tahir - an ${knowledgeBase.title} with ${knowledgeBase.experience} of experience. What would you like to know?`,
+            `Hi there! 👋 I can help you learn about Zain's skills, experience, and projects. What interests you?`
+        ],
+        
+        skills: `Zain has expertise across multiple domains:\n\n🧠 **AI & Analytics:** ${knowledgeBase.aiSkills.slice(0, 5).join(', ')} and more\n\n☁️ **Cloud:** ${knowledgeBase.cloudSkills.slice(0, 5).join(', ')}\n\n💻 **Development:** ${knowledgeBase.devSkills.slice(0, 5).join(', ')}\n\n🚀 **DevOps:** ${knowledgeBase.devOpsSkills.slice(0, 4).join(', ')}`,
+        
+        aiSkills: `Zain specializes in cutting-edge AI technologies:\n\n• ${knowledgeBase.aiSkills.join('\n• ')}\n\nHe builds intelligent systems using RAG, LLMs, and predictive AI to transform business operations.`,
+        
+        experience: `**Current Role:**\n📍 ${knowledgeBase.currentRole.position} at ${knowledgeBase.currentRole.company}\n📅 ${knowledgeBase.currentRole.period}\n\n**Previous Role:**\n📍 ${knowledgeBase.previousRole.position} at ${knowledgeBase.previousRole.company}\n📅 ${knowledgeBase.previousRole.period}\n\nZain has ${knowledgeBase.experience} of professional experience leading development teams and building enterprise solutions.`,
+        
+        projects: `Here are some of Zain's notable projects:\n\n${knowledgeBase.projects.map(p => `🚀 **${p.name}**\n   Tech: ${p.tech}\n   ${p.desc}`).join('\n\n')}\n\nWant to know more about any specific project?`,
+        
+        contact: `You can reach Zain through:\n\n📧 Email: ${knowledgeBase.email}\n💼 LinkedIn: ${knowledgeBase.linkedin}\n📅 Schedule a call: ${knowledgeBase.calendly}\n🌐 Website: ${knowledgeBase.website}\n\nHe's available for consulting and full-time opportunities!`,
+        
+        hire: `Great choice! Here's how to hire Zain:\n\n1️⃣ **Schedule a Call:** ${knowledgeBase.calendly}\n2️⃣ **Email:** ${knowledgeBase.email}\n3️⃣ **LinkedIn:** ${knowledgeBase.linkedin}\n\nZain offers:\n• Custom Software Development\n• AI/ML Solutions\n• Cloud Architecture\n• Technical Consulting\n• Team Leadership`,
+        
+        location: `Zain is based in **${knowledgeBase.location}** and works with clients globally. He's experienced in both on-site and remote collaboration.`,
+        
+        azure: `Zain is an Azure expert with deep experience in:\n\n${knowledgeBase.cloudSkills.map(s => `• ${s}`).join('\n')}\n\nHe has built and managed enterprise-scale Azure infrastructure for companies like DHL.`,
+        
+        dotnet: `Zain has extensive .NET expertise:\n\n• .NET / .NET Core\n• ASP.NET MVC & Web API\n• Blazor & Entity Framework\n• Microservices Architecture\n• CQRS Pattern\n\nHe's been working with .NET for 13+ years!`,
+        
+        angular: `Zain is proficient in Angular (versions 13-18+) and has built numerous enterprise applications using:\n\n• Angular 17+\n• TypeScript\n• RxJS\n• NgRx\n• Material Design\n\nHe also works with React and Blazor for frontend development.`,
+        
+        youtube: `Check out Zain's YouTube channel for technical tutorials:\n\n🎬 ${knowledgeBase.youtube}\n\nHe shares content on AI, .NET, Azure, and software development best practices!`,
+        
+        services: `Zain offers the following services:\n\n${knowledgeBase.services.map(s => `✅ ${s}`).join('\n')}\n\nInterested? Schedule a consultation: ${knowledgeBase.calendly}`,
+        
+        about: `**${knowledgeBase.name}**\n${knowledgeBase.title}\n\n📍 ${knowledgeBase.location}\n💼 ${knowledgeBase.experience} of experience\n\nZain builds intelligent, scalable, and predictive systems using AI, Cloud, and modern development practices. He specializes in RAG, LLMs, Azure, and .NET technologies.`,
+        
+        fallback: `I can help you with information about Zain Abbas Tahir. Try asking about:\n\n• His AI & technical skills\n• Work experience\n• Projects & portfolio\n• How to hire/contact him\n• Specific technologies (Azure, .NET, Angular, etc.)\n\nWhat would you like to know?`
+    };
+    
+    // Intent detection
+    function detectIntent(message) {
+        const msg = message.toLowerCase();
+        
+        // Greetings
+        if (/^(hi|hello|hey|howdy|greetings|good morning|good afternoon|good evening)/i.test(msg)) {
+            return 'greeting';
+        }
+        
+        // AI Skills
+        if (/(ai|artificial intelligence|machine learning|ml|rag|llm|chatbot|nlp|sentiment|predictive|copilot|foundry)/i.test(msg)) {
+            return 'aiSkills';
+        }
+        
+        // Azure/Cloud
+        if (/(azure|cloud|aws|service bus|data factory|kubernetes|k8s|docker|devops|infrastructure)/i.test(msg)) {
+            return 'azure';
+        }
+        
+        // .NET
+        if (/(\.net|dotnet|c#|csharp|asp\.net|blazor|entity framework|ef core)/i.test(msg)) {
+            return 'dotnet';
+        }
+        
+        // Angular/Frontend
+        if (/(angular|react|frontend|front-end|typescript|javascript|ui|ux)/i.test(msg)) {
+            return 'angular';
+        }
+        
+        // Skills general
+        if (/(skill|technology|tech stack|expertise|know|proficient|capable|abilities)/i.test(msg)) {
+            return 'skills';
+        }
+        
+        // Experience
+        if (/(experience|work|job|career|company|companies|worked|employment|role|position|dhl|aventra)/i.test(msg)) {
+            return 'experience';
+        }
+        
+        // Projects
+        if (/(project|portfolio|work|built|developed|created|application|app|system)/i.test(msg)) {
+            return 'projects';
+        }
+        
+        // Contact
+        if (/(contact|email|reach|call|phone|linkedin|connect|social)/i.test(msg)) {
+            return 'contact';
+        }
+        
+        // Hire
+        if (/(hire|hiring|work with|engage|consult|freelance|available|cost|rate|price|service)/i.test(msg)) {
+            return 'hire';
+        }
+        
+        // Location
+        if (/(where|location|based|live|country|city|malaysia|remote)/i.test(msg)) {
+            return 'location';
+        }
+        
+        // YouTube
+        if (/(youtube|video|tutorial|channel|watch|subscribe)/i.test(msg)) {
+            return 'youtube';
+        }
+        
+        // Services
+        if (/(service|offer|provide|do you do|help with|assist)/i.test(msg)) {
+            return 'services';
+        }
+        
+        // About/Who
+        if (/(who|about|tell me|introduce|yourself|zain)/i.test(msg)) {
+            return 'about';
+        }
+        
+        return 'fallback';
+    }
+    
+    // Get response
+    function getResponse(message) {
+        const intent = detectIntent(message);
+        let response = responses[intent];
+        
+        if (Array.isArray(response)) {
+            response = response[Math.floor(Math.random() * response.length)];
+        }
+        
+        return response || responses.fallback;
+    }
+    
+    // Add message to chat
+    function addMessage(text, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+        
+        const avatarHtml = isUser ? '' : `
+            <div class="message-avatar">
+                <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain">
+            </div>
+        `;
+        
+        // Convert markdown-style formatting to HTML
+        let formattedText = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>')
+            .replace(/• /g, '&bull; ');
+        
+        messageDiv.innerHTML = `
+            ${avatarHtml}
+            <div class="message-content">
+                <p>${formattedText}</p>
+            </div>
+        `;
+        
+        chatbotMessages.appendChild(messageDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+    
+    // Show typing indicator
+    function showTyping() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message bot typing-message';
+        typingDiv.innerHTML = `
+            <div class="message-avatar">
+                <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain">
+            </div>
+            <div class="message-content">
+                <div class="typing-dots"><span></span><span></span><span></span></div>
+            </div>
+        `;
+        chatbotMessages.appendChild(typingDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        return typingDiv;
+    }
+    
+    // Handle send message
+    function handleSend() {
+        const message = chatbotInput.value.trim();
+        if (!message) return;
+        
+        addMessage(message, true);
+        chatbotInput.value = '';
+        
+        const typingIndicator = showTyping();
+        
+        // Simulate thinking time
+        setTimeout(() => {
+            typingIndicator.remove();
+            const response = getResponse(message);
+            addMessage(response);
+        }, 800 + Math.random() * 700);
+    }
+    
+    // Toggle chatbot
+    chatbotToggle.addEventListener('click', () => {
+        chatbotContainer.classList.toggle('active');
+        if (chatNotification) chatNotification.style.display = 'none';
+    });
+    
+    chatbotClose.addEventListener('click', () => {
+        chatbotContainer.classList.remove('active');
+    });
+    
+    // Send message
+    chatbotSend.addEventListener('click', handleSend);
+    chatbotInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleSend();
+    });
+    
+    // Suggestion chips
+    suggestionChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const query = chip.getAttribute('data-query');
+            chatbotInput.value = query;
+            handleSend();
+        });
+    });
+    
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+        if (!chatbotToggle.contains(e.target) && !chatbotContainer.contains(e.target)) {
+            chatbotContainer.classList.remove('active');
+        }
+    });
+})();
+
+// ==========================================
 // GALLERY LIGHTBOX
 // ==========================================
 (function initLightbox() {

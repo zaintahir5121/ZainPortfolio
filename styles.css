@@ -497,6 +497,27 @@ button {
     animation: pulse 2s ease-in-out infinite;
 }
 
+.hero-role {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.role-tag {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.role-divider {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
 .hero-title {
     font-size: clamp(40px, 5vw, 72px);
     font-weight: 800;

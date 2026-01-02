@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zain Abbas Tahir - Senior Software Engineer, AI/ML Expert, Cloud Solutions Architect with 13+ years of experience in .NET, Angular, Azure, and Microservices">
+    <title>Zain Abbas Tahir | Tech Lead & Cloud Solutions Architect</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">Zain<span class="accent">.</span></span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#experience" class="nav-link">Experience</a></li>
+                <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+                <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <a href="#contact" class="btn btn-primary">Hire Me</a>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-particles" id="particles"></div>
+        <div class="container hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    Available for consulting & full-time roles
+                </div>
+                <h1 class="hero-title">
+                    Hi, I'm <span class="gradient-text">Zain Abbas Tahir</span>
+                </h1>
+                <h2 class="hero-subtitle">
+                    Technical Lead & Cloud Solutions Architect
+                </h2>
+                <p class="hero-description">
+                    13+ years building intelligent, scalable systems with <span class="tech-highlight">.NET</span>, 
+                    <span class="tech-highlight">Angular</span>, <span class="tech-highlight">Azure</span>, and 
+                    <span class="tech-highlight">AI/ML</span>. I transform complex business problems into elegant, 
+                    enterprise-grade solutions.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">13+</span>
+                        <span class="stat-label">Years Experience</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">Projects Delivered</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Client Satisfaction</span>
+                    </div>
+                </div>
+                <div class="hero-cta">
+                    <a href="#contact" class="btn btn-primary btn-lg">
+                        <span>Let's Build Something Amazing</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                    <a href="#portfolio" class="btn btn-secondary btn-lg">
+                        <span>View My Work</span>
+                    </a>
+                </div>
+                <div class="hero-social">
+                    <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" rel="noopener" aria-label="LinkedIn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                    </a>
+                    <a href="https://github.com/zainabbastahir" target="_blank" rel="noopener" aria-label="GitHub">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                    <a href="mailto:zabbastahir@gmail.com" aria-label="Email">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="code-window">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="window-title">TechnicalLead.cs</div>
+                    </div>
+                    <div class="window-content">
+                        <pre><code><span class="code-keyword">public class</span> <span class="code-class">TechnicalLead</span>
+{
+    <span class="code-keyword">public</span> <span class="code-type">string</span> Name => <span class="code-string">"Zain Abbas Tahir"</span>;
+    <span class="code-keyword">public</span> <span class="code-type">int</span> Experience => <span class="code-number">13</span>;
+    
+    <span class="code-keyword">public</span> <span class="code-type">List&lt;string&gt;</span> Skills => <span class="code-keyword">new</span>
+    {
+        <span class="code-string">".NET Core"</span>, <span class="code-string">"Azure"</span>, <span class="code-string">"Angular"</span>,
+        <span class="code-string">"Microservices"</span>, <span class="code-string">"AI/ML"</span>,
+        <span class="code-string">"Docker"</span>, <span class="code-string">"Kubernetes"</span>
+    };
+    
+    <span class="code-keyword">public async</span> <span class="code-type">Task&lt;Solution&gt;</span> <span class="code-function">Solve</span>(<span class="code-type">Problem</span> challenge)
+    {
+        <span class="code-keyword">return await</span> <span class="code-function">BuildInnovativeSolution</span>(challenge);
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span></span>
+            Scroll to explore
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about section" id="about">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">About Me</span>
+                <h2 class="section-title">Building the Future with Code</h2>
+                <p class="section-description">
+                    A passionate engineer who transforms complex challenges into elegant solutions
+                </p>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Who I Am</h3>
+                    <p>
+                        I'm a <strong>Technical Lead</strong> with 13+ years of experience building enterprise-grade 
+                        solutions that scale. Currently leading development teams at Digihaul in Malaysia, I specialize 
+                        in architecting intelligent systems using <strong>.NET Core</strong>, <strong>Angular</strong>, 
+                        and <strong>Microsoft Azure</strong>.
+                    </p>
+                    <p>
+                        My journey has taken me from building AI-powered systems for emotional recognition to 
+                        architecting microservices handling millions of requests. I've worked with companies across 
+                        the globe, from startups to Fortune 500 enterprises.
+                    </p>
+                    <div class="about-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-icon">🚀</div>
+                            <div>
+                                <h4>Full-Stack Mastery</h4>
+                                <p>Expert in both frontend and backend technologies</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">☁️</div>
+                            <div>
+                                <h4>Cloud Architecture</h4>
+                                <p>Azure-certified with hands-on DevOps experience</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">🤖</div>
+                            <div>
+                                <h4>AI & Innovation</h4>
+                                <p>Built ML models for facial recognition and sentiment analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/workspace/ZainAbbasTahirCv_Technical_Lead.pdf" class="btn btn-primary" download>
+                        <span>Download CV</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </a>
+                </div>
+                <div class="about-skills">
+                    <h3>Technical Expertise</h3>
+                    <div class="skills-grid">
+                        <div class="skill-category">
+                            <h4>Backend</h4>
+                            <div class="skill-tags">
+                                <span class="skill-tag">.NET Core</span>
+                                <span class="skill-tag">C#</span>
+                                <span class="skill-tag">ASP.NET MVC</span>
+                                <span class="skill-tag">Web API</span>
+                                <span class="skill-tag">Entity Framework</span>
+                                <span class="skill-tag">Microservices</span>
+                                <span class="skill-tag">CQRS</span>
+                            </div>
+                        </div>
+                        <div class="skill-category">
+                            <h4>Frontend</h4>
+                            <div class="skill-tags">
+                                <span class="skill-tag">Angular 17</span>
+                                <span class="skill-tag">TypeScript</span>
+                                <span class="skill-tag">RxJS</span>
+                                <span class="skill-tag">HTML5/CSS3</span>
+                                <span class="skill-tag">JavaScript</span>
+                            </div>
+                        </div>
+                        <div class="skill-category">
+                            <h4>Cloud & DevOps</h4>
+                            <div class="skill-tags">
+                                <span class="skill-tag">Azure</span>
+                                <span class="skill-tag">Docker</span>
+                                <span class="skill-tag">Kubernetes</span>
+                                <span class="skill-tag">CI/CD</span>
+                                <span class="skill-tag">Azure DevOps</span>
+                            </div>
+                        </div>
+                        <div class="skill-category">
+                            <h4>Database</h4>
+                            <div class="skill-tags">
+                                <span class="skill-tag">SQL Server</span>
+                                <span class="skill-tag">CosmosDB</span>
+                                <span class="skill-tag">Redis</span>
+                                <span class="skill-tag">MongoDB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services section section-dark" id="services">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">What I Offer</span>
+                <h2 class="section-title">Services That Drive Results</h2>
+                <p class="section-description">
+                    Comprehensive solutions for your digital transformation journey
+                </p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"></polyline>
+                            <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Software Architecture & Development</h3>
+                    <p>Design and build scalable, maintainable enterprise applications using best practices and modern architecture patterns.</p>
+                    <ul>
+                        <li>Microservices Architecture</li>
+                        <li>Domain-Driven Design</li>
+                        <li>Clean Code & SOLID Principles</li>
+                        <li>Performance Optimization</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
+                        </svg>
+                    </div>
+                    <h3>API & Database Optimization</h3>
+                    <p>Create efficient, secure APIs and optimize database performance for high-traffic applications.</p>
+                    <ul>
+                        <li>RESTful API Design</li>
+                        <li>Query Optimization</li>
+                        <li>Caching Strategies</li>
+                        <li>Security Best Practices</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                        </svg>
+                    </div>
+                    <h3>Cloud & Azure Solutions</h3>
+                    <p>Architect and deploy cloud-native applications on Microsoft Azure with full DevOps integration.</p>
+                    <ul>
+                        <li>Azure Infrastructure Setup</li>
+                        <li>CI/CD Pipeline Configuration</li>
+                        <li>Container Orchestration</li>
+                        <li>Monitoring & Logging</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m5.4-13.4l-3 3m-5.4 0l-3 3m15.4 5.4l-6-3m-6 0l-6 3m15.4-7.8l-6 3m-6 0l-6 3"></path>
+                        </svg>
+                    </div>
+                    <h3>Code Refactoring & Best Practices</h3>
+                    <p>Transform legacy code into modern, maintainable solutions following industry standards.</p>
+                    <ul>
+                        <li>Legacy System Modernization</li>
+                        <li>Code Review & Audits</li>
+                        <li>Technical Debt Reduction</li>
+                        <li>Documentation</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                    </div>
+                    <h3>Full-Stack Web Development</h3>
+                    <p>Build modern, responsive web applications with cutting-edge frontend and backend technologies.</p>
+                    <ul>
+                        <li>Angular Applications</li>
+                        <li>.NET Core Backends</li>
+                        <li>Progressive Web Apps</li>
+                        <li>Responsive Design</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <h3>Technical Consulting & Leadership</h3>
+                    <p>Guide your team with expert technical leadership and strategic planning for complex projects.</p>
+                    <ul>
+                        <li>Technical Strategy</li>
+                        <li>Team Mentoring</li>
+                        <li>Architecture Review</li>
+                        <li>Project Management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section class="experience section" id="experience">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Career Journey</span>
+                <h2 class="section-title">Professional Experience</h2>
+                <p class="section-description">
+                    13+ years of building innovative solutions across the globe
+                </p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2022 - Present</div>
+                        <h3>Technical Lead</h3>
+                        <h4>Digihaul | Kuala Lumpur, Malaysia</h4>
+                        <ul>
+                            <li>Leading a team of 8+ developers in delivering enterprise-grade logistics solutions</li>
+                            <li>Architected microservices infrastructure on Azure handling 1M+ daily transactions</li>
+                            <li>Implemented CI/CD pipelines reducing deployment time by 70%</li>
+                            <li>Developed real-time tracking system using SignalR and Azure Service Bus</li>
+                            <li>Tech Stack: .NET Core, Angular 17, Azure, Kubernetes, Redis, CosmosDB</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2019 - 2022</div>
+                        <h3>Senior Software Engineer</h3>
+                        <h4>Tapcheck (Remote) | US-based, worked from Pakistan</h4>
+                        <ul>
+                            <li>Integrated 15+ payroll systems including ADP, Paychex, and Workday</li>
+                            <li>Built Angular 13 dashboards serving 100K+ active users</li>
+                            <li>Optimized API performance reducing response times by 60%</li>
+                            <li>Implemented OAuth 2.0 and JWT authentication across all services</li>
+                            <li>Tech Stack: ASP.NET Core, Angular, PostgreSQL, AWS</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2018 - 2019</div>
+                        <h3>Senior Software Engineer (AI/ML Focus)</h3>
+                        <h4>Umch | Kuala Lumpur, Malaysia</h4>
+                        <ul>
+                            <li>Developed facial recognition system with 95% accuracy using TensorFlow</li>
+                            <li>Built emotion detection API processing 10K+ images daily</li>
+                            <li>Created NLP chatbot reducing customer support workload by 40%</li>
+                            <li>Implemented automated food classification using transfer learning</li>
+                            <li>Tech Stack: Python, TensorFlow, .NET Core, Azure Cognitive Services</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2016 - 2018</div>
+                        <h3>Software Architect</h3>
+                        <h4>MTBC | Islamabad, Pakistan</h4>
+                        <ul>
+                            <li>Architected healthcare management system serving 500+ clinics</li>
+                            <li>Led migration from monolithic to microservices architecture</li>
+                            <li>Reduced system downtime from 15% to 0.5% through reliability improvements</li>
+                            <li>Mentored junior developers and conducted code reviews</li>
+                            <li>Tech Stack: .NET Framework, Angular 4, SQL Server, Azure</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section class="portfolio section section-dark" id="portfolio">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">My Work</span>
+                <h2 class="section-title">Featured Projects</h2>
+                <p class="section-description">
+                    Real-world solutions that make a difference
+                </p>
+            </div>
+            <div class="portfolio-filters">
+                <button class="filter-btn active" data-filter="all">All Projects</button>
+                <button class="filter-btn" data-filter="enterprise">Enterprise</button>
+                <button class="filter-btn" data-filter="ai">AI/ML</button>
+                <button class="filter-btn" data-filter="cloud">Cloud</button>
+                <button class="filter-btn" data-filter="web">Web Apps</button>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-card" data-category="enterprise cloud">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Logistics Management Platform</h3>
+                        <p>Enterprise-grade logistics solution handling 1M+ daily shipments with real-time tracking, automated routing, and predictive analytics.</p>
+                        <div class="portfolio-tags">
+                            <span>.NET Core</span>
+                            <span>Angular</span>
+                            <span>Azure</span>
+                            <span>Microservices</span>
+                        </div>
+                        <div class="portfolio-stats">
+                            <div class="stat">
+                                <span>1M+</span>
+                                <small>Daily Transactions</small>
+                            </div>
+                            <div class="stat">
+                                <span>99.9%</span>
+                                <small>Uptime</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-card" data-category="ai">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path>
+                                <path d="M8.5 8.5v.01"></path>
+                                <path d="M16 15.5v.01"></path>
+                                <path d="M12 12v.01"></path>
+                                <path d="M11 17v.01"></path>
+                                <path d="M7 14v.01"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>AI Emotion Recognition System</h3>
+                        <p>Real-time facial emotion detection using deep learning, processing 10K+ images daily for customer sentiment analysis.</p>
+                        <div class="portfolio-tags">
+                            <span>Python</span>
+                            <span>TensorFlow</span>
+                            <span>.NET Core</span>
+                            <span>Azure ML</span>
+                        </div>
+                        <div class="portfolio-stats">
+                            <div class="stat">
+                                <span>95%</span>
+                                <small>Accuracy</small>
+                            </div>
+                            <div class="stat">
+                                <span>10K+</span>
+                                <small>Daily Analysis</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-card" data-category="enterprise web">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Healthcare Management System</h3>
+                        <p>Comprehensive EHR solution serving 500+ clinics with patient management, scheduling, billing, and reporting.</p>
+                        <div class="portfolio-tags">
+                            <span>.NET MVC</span>
+                            <span>Angular</span>
+                            <span>SQL Server</span>
+                            <span>Azure</span>
+                        </div>
+                        <div class="portfolio-stats">
+                            <div class="stat">
+                                <span>500+</span>
+                                <small>Clinics</small>
+                            </div>
+                            <div class="stat">
+                                <span>HIPAA</span>
+                                <small>Compliant</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-card" data-category="enterprise cloud">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Payroll Integration Platform</h3>
+                        <p>Unified API platform integrating 15+ payroll systems including ADP, Paychex, and Workday for seamless payroll processing.</p>
+                        <div class="portfolio-tags">
+                            <span>ASP.NET Core</span>
+                            <span>PostgreSQL</span>
+                            <span>Redis</span>
+                            <span>AWS</span>
+                        </div>
+                        <div class="portfolio-stats">
+                            <div class="stat">
+                                <span>15+</span>
+                                <small>Integrations</small>
+                            </div>
+                            <div class="stat">
+                                <span>100K+</span>
+                                <small>Active Users</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-card" data-category="web">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <line x1="9" y1="15" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Document Management System</h3>
+                        <p>Enterprise document management with OCR, version control, automated workflows, and secure sharing capabilities.</p>
+                        <div class="portfolio-tags">
+                            <span>.NET Core</span>
+                            <span>Angular</span>
+                            <span>Azure Blob</span>
+                            <span>OCR</span>
+                        </div>
+                        <div class="portfolio-stats">
+                            <div class="stat">
+                                <span>5M+</span>
+                                <small>Documents</small>
+                            </div>
+                            <div class="stat">
+                                <span>256-bit</span>
+                                <small>Encryption</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-card" data-category="web ai">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>AI-Powered Chatbot Platform</h3>
+                        <p>Intelligent chatbot using NLP and machine learning, reducing customer support workload by 40% with 24/7 availability.</p>
+                        <div class="portfolio-tags">
+                            <span>Python</span>
+                            <span>.NET Core</span>
+                            <span>NLP</span>
+                            <span>Azure Bot</span>
+                        </div>
+                        <div class="portfolio-stats">
+                            <div class="stat">
+                                <span>40%</span>
+                                <small>Cost Reduction</small>
+                            </div>
+                            <div class="stat">
+                                <span>24/7</span>
+                                <small>Availability</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials section" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">What Clients Say</span>
+                <h2 class="section-title">Client Testimonials</h2>
+                <p class="section-description">
+                    Trusted by clients worldwide for delivering exceptional results
+                </p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        ★★★★★
+                    </div>
+                    <p class="testimonial-text">
+                        "Built precisely what we requested quickly and professionally. Zain's expertise in Azure and .NET Core was exactly what we needed for our enterprise migration."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-info">
+                            <h4>Chris F.</h4>
+                            <span>CTO, Tech Startup</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        ★★★★★
+                    </div>
+                    <p class="testimonial-text">
+                        "A++++ HIGHLY RECOMMENDED. Perfect customer service and attention. Lots of experience. I will be hiring again. Delivered a complex microservices architecture on time."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-info">
+                            <h4>William T.</h4>
+                            <span>Product Manager</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        ★★★★★
+                    </div>
+                    <p class="testimonial-text">
+                        "He is very quick in responding to my questions and delivery was done to meet the scope of the project in first round. Love to work with him again."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-info">
+                            <h4>Sreedhar K.</h4>
+                            <span>Engineering Manager</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        ★★★★★
+                    </div>
+                    <p class="testimonial-text">
+                        "Zain has exceptional ideas in .NET environment, awesome aptitudes in C#, ASP.NET and Databases. He is extremely eager about his work which is infectious."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-info">
+                            <h4>Abhilash Reddy Y.</h4>
+                            <span>Data Professional</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        ★★★★★
+                    </div>
+                    <p class="testimonial-text">
+                        "I worked with Zain in the same department. Technically he is very strong individual. He strives to learn and work on new things. I highly recommend Zain."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-info">
+                            <h4>Farrukh Naveed A.</h4>
+                            <span>Software Architect</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        ★★★★★
+                    </div>
+                    <p class="testimonial-text">
+                        "Easy to work with. Tried to help with after support as well. Will hire again. The Angular application he built exceeded our expectations."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-info">
+                            <h4>Fahra K.</h4>
+                            <span>Project Lead</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact section section-dark" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Get In Touch</span>
+                <h2 class="section-title">Let's Build Something Great Together</h2>
+                <p class="section-description">
+                    Have a project in mind? Let's discuss how I can help bring your vision to life
+                </p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Hire Me Through</h3>
+                    <div class="contact-options">
+                        <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="contact-option">
+                            <div class="option-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4>LinkedIn Direct</h4>
+                                <p>Connect for full-time roles</p>
+                            </div>
+                        </a>
+                        <a href="https://www.freelancer.com/u/anisf919" target="_blank" class="contact-option">
+                            <div class="option-icon">💼</div>
+                            <div>
+                                <h4>Freelancer.com</h4>
+                                <p>5-star rated developer</p>
+                            </div>
+                        </a>
+                        <a href="https://www.upwork.com/freelancers/~013b69c81fcb1ae708" target="_blank" class="contact-option">
+                            <div class="option-icon">🎯</div>
+                            <div>
+                                <h4>Upwork</h4>
+                                <p>Top-rated expert</p>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="contact-direct">
+                        <h3>Direct Contact</h3>
+                        <div class="contact-methods">
+                            <a href="mailto:zabbastahir@gmail.com" class="contact-method">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                                <span>zabbastahir@gmail.com</span>
+                            </a>
+                            <a href="https://wa.me/923125234235" target="_blank" class="contact-method">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                </svg>
+                                <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="availability-badge">
+                        <span class="status-dot"></span>
+                        <span>Available for new projects</span>
+                    </div>
+                </div>
+
+                <div class="contact-form-container">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="project">Project Type</label>
+                            <select id="project" name="project" required>
+                                <option value="">Select project type</option>
+                                <option value="full-time">Full-time Position</option>
+                                <option value="consulting">Consulting</option>
+                                <option value="web-app">Web Application</option>
+                                <option value="cloud">Cloud Migration</option>
+                                <option value="api">API Development</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Tell me about your project</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">
+                            <span>Send Message</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>Zain Abbas Tahir</h3>
+                    <p>Technical Lead | Cloud Solutions Architect</p>
+                    <p>Building intelligent, scalable systems that drive business growth</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#experience">Experience</a></li>
+                        <li><a href="#portfolio">Portfolio</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Get In Touch</h4>
+                    <p>Email: zabbastahir@gmail.com</p>
+                    <p>Location: Kuala Lumpur, Malaysia</p>
+                    <div class="footer-social">
+                        <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" aria-label="LinkedIn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                        </a>
+                        <a href="https://github.com/zainabbastahir" target="_blank" aria-label="GitHub">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Zain Abbas Tahir. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

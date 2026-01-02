@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="E-Commerce Platform - Multi-tenant marketplace with AI-powered recommendations and microservices architecture">
+    <title>E-Commerce Platform | Zain Abbas Tahir</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar scrolled" id="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-text">ZAT</span>
+                <span class="logo-dot"></span>
+            </a>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../index.html#about" class="nav-link">About</a></li>
+                <li><a href="../index.html#skills" class="nav-link">Skills</a></li>
+                <li><a href="../index.html#projects" class="nav-link active">Projects</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <a href="../index.html#contact" class="nav-cta">Hire Me</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Project Hero -->
+    <section class="project-hero">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Projects</span>
+            </a>
+            
+            <div class="project-hero-content">
+                <div class="project-meta">
+                    <span class="project-category">E-Commerce</span>
+                    <span class="project-year">2023</span>
+                </div>
+                
+                <h1 class="project-title">E-Commerce Platform</h1>
+                
+                <p class="project-subtitle">
+                    Scalable multi-tenant marketplace with AI-powered product recommendations, 
+                    real-time inventory sync, and microservices architecture on Azure.
+                </p>
+                
+                <div class="project-tags">
+                    <span class="tag">.NET Core</span>
+                    <span class="tag">Angular</span>
+                    <span class="tag">Azure</span>
+                    <span class="tag">Microservices</span>
+                    <span class="tag">AI</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Image -->
+    <section class="project-showcase">
+        <div class="container">
+            <div class="showcase-image">
+                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=700&fit=crop" alt="E-Commerce Platform">
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Details -->
+    <section class="project-details">
+        <div class="container">
+            <div class="details-grid">
+                <div class="details-main">
+                    <div class="detail-section">
+                        <h2>Project Overview</h2>
+                        <p>
+                            A comprehensive e-commerce solution designed for enterprise retailers 
+                            and multi-vendor marketplaces. The platform supports millions of products, 
+                            handles high-traffic sales events, and provides AI-powered personalization 
+                            to boost conversion rates.
+                        </p>
+                        <p>
+                            Built with a microservices architecture, each component scales independently, 
+                            ensuring optimal performance during peak loads like flash sales or holiday shopping.
+                        </p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h2>Key Features</h2>
+                        <ul class="feature-list">
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>AI Product Recommendations</strong>
+                                    <p>Personalized suggestions based on browsing history and purchase patterns</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Multi-Vendor Marketplace</strong>
+                                    <p>Support multiple sellers with individual storefronts and commission management</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Real-time Inventory</strong>
+                                    <p>Synchronized stock levels across all channels with automated reorder alerts</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Advanced Search</strong>
+                                    <p>Elasticsearch-powered search with filters, facets, and typo tolerance</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Payment Integration</strong>
+                                    <p>Multiple payment gateways including Stripe, PayPal, and local methods</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Order Management</strong>
+                                    <p>Complete order lifecycle with tracking, returns, and refunds</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h2>Technical Implementation</h2>
+                        <p>
+                            The platform uses a domain-driven design approach with separate bounded contexts 
+                            for catalog, ordering, inventory, and payments. Event-driven communication via 
+                            Azure Service Bus ensures loose coupling between services.
+                        </p>
+                        <div class="tech-stack">
+                            <div class="tech-item">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg" alt=".NET Core">
+                                <span>.NET Core</span>
+                            </div>
+                            <div class="tech-item">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg" alt="Angular">
+                                <span>Angular</span>
+                            </div>
+                            <div class="tech-item">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg" alt="Azure">
+                                <span>Azure</span>
+                            </div>
+                            <div class="tech-item">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" alt="Kubernetes">
+                                <span>Kubernetes</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h2>Architecture Highlights</h2>
+                        <ul class="architecture-list">
+                            <li><strong>Microservices:</strong> Catalog, Order, Inventory, Payment, Identity, and Notification services</li>
+                            <li><strong>Event Sourcing:</strong> Complete order history with event replay capability</li>
+                            <li><strong>CQRS Pattern:</strong> Optimized read models for fast product queries</li>
+                            <li><strong>Azure AKS:</strong> Kubernetes orchestration for auto-scaling</li>
+                            <li><strong>CDN Integration:</strong> Global content delivery for images and static assets</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="details-sidebar">
+                    <div class="sidebar-card">
+                        <h3>Project Info</h3>
+                        <ul class="info-list">
+                            <li>
+                                <span class="info-label">Type</span>
+                                <span class="info-value">Marketplace</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Industry</span>
+                                <span class="info-value">E-Commerce</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Duration</span>
+                                <span class="info-value">8 Months</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Platform</span>
+                                <span class="info-value">Web & Mobile</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="sidebar-card">
+                        <h3>Technologies Used</h3>
+                        <div class="tech-tags">
+                            <span>.NET Core</span>
+                            <span>Angular</span>
+                            <span>Azure</span>
+                            <span>Kubernetes</span>
+                            <span>Service Bus</span>
+                            <span>Elasticsearch</span>
+                            <span>Redis</span>
+                            <span>SQL Server</span>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-card cta-card">
+                        <h3>Building an E-Commerce Platform?</h3>
+                        <p>Let's discuss how I can help create your marketplace solution.</p>
+                        <a href="../index.html#contact" class="btn btn-primary">
+                            <span>Get in Touch</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- More Projects -->
+    <section class="more-projects">
+        <div class="container">
+            <h2>More Projects</h2>
+            <div class="projects-row">
+                <a href="pos-system.html" class="project-preview">
+                    <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/14.webp" alt="POS System">
+                    <div class="preview-content">
+                        <h4>Point of Sale System</h4>
+                        <span>View Project <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
+                <a href="ai-chatbot.html" class="project-preview">
+                    <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop" alt="AI Chatbot">
+                    <div class="preview-content">
+                        <h4>AI Customer Support Bot</h4>
+                        <span>View Project <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
+                <a href="document-management.html" class="project-preview">
+                    <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/Login.webp" alt="Document Management">
+                    <div class="preview-content">
+                        <h4>Document Management System</h4>
+                        <span>View Project <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Zain Abbas Tahir. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1542,6 +1542,23 @@ section {
     color: var(--accent-primary);
 }
 
+.project-btn {
+    margin-top: 16px;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-sm {
+    padding: 10px 20px;
+    font-size: 13px;
+}
+
+.project-card:hover .project-btn {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+}
+
 .projects-cta {
     text-align: center;
     margin-top: 48px;

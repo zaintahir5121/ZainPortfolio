@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="URL Shortener with Analytics - High-performance link management with detailed click tracking and analytics">
+    <title>URL Shortener & Analytics | Zain Abbas Tahir</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar scrolled" id="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-text">ZAT</span>
+                <span class="logo-dot"></span>
+            </a>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../index.html#about" class="nav-link">About</a></li>
+                <li><a href="../index.html#skills" class="nav-link">Skills</a></li>
+                <li><a href="../index.html#projects" class="nav-link active">Projects</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <a href="../index.html#contact" class="nav-cta">Hire Me</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Project Hero -->
+    <section class="project-hero">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Projects</span>
+            </a>
+            
+            <div class="project-hero-content">
+                <div class="project-meta">
+                    <span class="project-category">SaaS Platform</span>
+                    <span class="project-year">2022</span>
+                </div>
+                
+                <h1 class="project-title">URL Shortener & Analytics</h1>
+                
+                <p class="project-subtitle">
+                    High-performance URL shortening service with comprehensive analytics, 
+                    click tracking, geographic data, and custom branded domains.
+                </p>
+                
+                <div class="project-tags">
+                    <span class="tag">.NET Core</span>
+                    <span class="tag">React</span>
+                    <span class="tag">Redis</span>
+                    <span class="tag">Azure</span>
+                    <span class="tag">Analytics</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Image -->
+    <section class="project-showcase">
+        <div class="container">
+            <div class="showcase-image">
+                <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/2020-11-06_2-50-22-1-1.webp" alt="URL Shortener Dashboard">
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Details -->
+    <section class="project-details">
+        <div class="container">
+            <div class="details-grid">
+                <div class="details-main">
+                    <div class="detail-section">
+                        <h2>Project Overview</h2>
+                        <p>
+                            A scalable URL shortening platform designed to handle millions of redirects per day 
+                            while providing detailed analytics on link performance. The system offers both 
+                            self-hosted and cloud-based deployment options.
+                        </p>
+                        <p>
+                            Built for marketers, businesses, and developers who need reliable link tracking 
+                            with insights into audience behavior, geographic distribution, and referral sources.
+                        </p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h2>Key Features</h2>
+                        <ul class="feature-list">
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>High-Performance Redirects</strong>
+                                    <p>Sub-millisecond redirect latency with Redis caching and CDN integration</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Comprehensive Analytics</strong>
+                                    <p>Track clicks, unique visitors, referrers, devices, and geographic data</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Custom Branded Domains</strong>
+                                    <p>Use your own domain for shortened URLs with automatic SSL certificates</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>QR Code Generation</strong>
+                                    <p>Auto-generate QR codes for any shortened URL with custom styling</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>API Access</strong>
+                                    <p>RESTful API for programmatic URL creation and analytics retrieval</p>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>Link Expiration & Password Protection</strong>
+                                    <p>Set expiration dates and optional password protection for sensitive links</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h2>Technical Implementation</h2>
+                        <p>
+                            The architecture prioritizes speed and reliability. Redis serves as the primary 
+                            cache for hot URLs, with SQL Server handling persistent storage and analytics. 
+                            The system processes click events asynchronously to ensure redirects are never blocked.
+                        </p>
+                        <div class="tech-stack">
+                            <div class="tech-item">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg" alt=".NET Core">
+                                <span>.NET Core</span>
+                            </div>
+                            <div class="tech-item">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React">
+                                <span>React</span>
+                            </div>
+                            <div class="tech-item">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" alt="Redis">
+                                <span>Redis</span>
+                            </div>
+                            <div class="tech-item">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg" alt="Azure">
+                                <span>Azure</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h2>Architecture Highlights</h2>
+                        <ul class="architecture-list">
+                            <li><strong>Base62 Encoding:</strong> Compact URL slugs using alphanumeric characters</li>
+                            <li><strong>Multi-tier Caching:</strong> CDN, Redis, and in-memory caching for optimal performance</li>
+                            <li><strong>Event Sourcing:</strong> All click events stored for detailed historical analysis</li>
+                            <li><strong>Geo-IP Resolution:</strong> Real-time geographic location tracking</li>
+                            <li><strong>Rate Limiting:</strong> Protection against abuse with configurable limits</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="details-sidebar">
+                    <div class="sidebar-card">
+                        <h3>Project Info</h3>
+                        <ul class="info-list">
+                            <li>
+                                <span class="info-label">Type</span>
+                                <span class="info-value">SaaS Product</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Industry</span>
+                                <span class="info-value">Marketing Tech</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Duration</span>
+                                <span class="info-value">4 Months</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Platform</span>
+                                <span class="info-value">Web Application</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="sidebar-card">
+                        <h3>Technologies Used</h3>
+                        <div class="tech-tags">
+                            <span>.NET Core</span>
+                            <span>React</span>
+                            <span>Redis</span>
+                            <span>SQL Server</span>
+                            <span>Azure CDN</span>
+                            <span>REST API</span>
+                            <span>Chart.js</span>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-card cta-card">
+                        <h3>Need a Similar Solution?</h3>
+                        <p>Let's discuss how I can help build your analytics platform.</p>
+                        <a href="../index.html#contact" class="btn btn-primary">
+                            <span>Get in Touch</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- More Projects -->
+    <section class="more-projects">
+        <div class="container">
+            <h2>More Projects</h2>
+            <div class="projects-row">
+                <a href="face-recognition.html" class="project-preview">
+                    <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/th.jpg" alt="Face Recognition">
+                    <div class="preview-content">
+                        <h4>Face Recognition Login</h4>
+                        <span>View Project <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
+                <a href="pos-system.html" class="project-preview">
+                    <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/14.webp" alt="POS System">
+                    <div class="preview-content">
+                        <h4>Point of Sale System</h4>
+                        <span>View Project <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
+                <a href="ai-chatbot.html" class="project-preview">
+                    <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop" alt="AI Chatbot">
+                    <div class="preview-content">
+                        <h4>AI Customer Support Bot</h4>
+                        <span>View Project <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Zain Abbas Tahir. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

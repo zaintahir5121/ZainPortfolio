@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio of projects by Zain Abbas Tahir - AI Developer, Cloud Architect & Full Stack Engineer. Explore AI chatbots, enterprise apps, and cloud solutions.">
+    <title>All Projects | Zain Abbas Tahir Portfolio</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="project-detail.css">
+    
+    <style>
+        /* All Projects Page Specific Styles */
+        .projects-hero {
+            padding: 120px 0 60px;
+            background: var(--bg-secondary);
+            text-align: center;
+        }
+        
+        .projects-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .projects-hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+        
+        .projects-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: var(--accent-gradient);
+            color: white;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .all-projects-section {
+            padding: 80px 0;
+            background: var(--bg-primary);
+        }
+        
+        .projects-filter-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-chip {
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-chip:hover,
+        .filter-chip.active {
+            color: white;
+            background: var(--accent-gradient);
+            border-color: transparent;
+        }
+        
+        .all-projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+        
+        .project-card-full {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .project-card-full:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-primary);
+        }
+        
+        .project-card-image {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+        
+        .project-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .project-card-full:hover .project-card-image img {
+            transform: scale(1.1);
+        }
+        
+        .project-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+        
+        .project-card-full:hover .project-card-overlay {
+            opacity: 1;
+        }
+        
+        .view-project-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: white;
+            color: var(--accent-primary);
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .project-card-content {
+            padding: 24px;
+        }
+        
+        .project-card-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-primary);
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .project-card-content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .project-card-content p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .project-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .project-card-tags span {
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .back-home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+        
+        .back-home-link:hover {
+            color: var(--accent-primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .all-projects-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .projects-hero {
+                padding: 100px 0 40px;
+            }
+            
+            .projects-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .projects-hero p {
+                font-size: 1rem;
+                padding: 0 20px;
+            }
+            
+            .all-projects-section {
+                padding: 50px 0;
+            }
+            
+            .all-projects-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .project-card-image {
+                height: 180px;
+            }
+            
+            .project-card-content {
+                padding: 20px;
+            }
+            
+            .projects-filter-bar {
+                gap: 8px;
+            }
+            
+            .filter-chip {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .projects-hero h1 {
+                font-size: 1.75rem;
+            }
+            
+            .project-card-content h3 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar scrolled" id="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-text">ZAT</span>
+                <span class="logo-dot"></span>
+            </a>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../index.html#about" class="nav-link">About</a></li>
+                <li><a href="../index.html#skills" class="nav-link">Skills</a></li>
+                <li><a href="../index.html#projects" class="nav-link active">Projects</a></li>
+                <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <a href="../index.html#contact" class="nav-cta">Hire Me</a>
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Projects Hero -->
+    <section class="projects-hero">
+        <div class="container">
+            <a href="../index.html" class="back-home-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Home</span>
+            </a>
+            
+            <h1>My <span class="gradient-text">Projects</span></h1>
+            <p>Explore my portfolio of AI solutions, enterprise applications, and cloud-native systems built with modern technologies.</p>
+            
+            <span class="projects-count">
+                <i class="fas fa-folder-open"></i>
+                7 Projects
+            </span>
+        </div>
+    </section>
+
+    <!-- All Projects -->
+    <section class="all-projects-section">
+        <div class="container">
+            <!-- Filter Bar -->
+            <div class="projects-filter-bar">
+                <button class="filter-chip active" data-filter="all">All Projects</button>
+                <button class="filter-chip" data-filter="ai">AI / ML</button>
+                <button class="filter-chip" data-filter="web">Web Apps</button>
+                <button class="filter-chip" data-filter="cloud">Cloud</button>
+                <button class="filter-chip" data-filter="enterprise">Enterprise</button>
+            </div>
+            
+            <!-- Projects Grid -->
+            <div class="all-projects-grid">
+                <!-- AI Customer Support Bot -->
+                <a href="ai-chatbot.html" class="project-card-full" data-category="ai cloud">
+                    <div class="project-card-image">
+                        <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop" alt="AI Chatbot">
+                        <div class="project-card-overlay">
+                            <span class="view-project-btn">
+                                View Project <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="project-card-content">
+                        <span class="project-card-category">AI / LLM</span>
+                        <h3>AI Customer Support Bot</h3>
+                        <p>Intelligent chatbot powered by RAG and Azure OpenAI for automated customer service with sentiment analysis.</p>
+                        <div class="project-card-tags">
+                            <span>RAG</span>
+                            <span>Azure OpenAI</span>
+                            <span>LLMs</span>
+                            <span>.NET Core</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Document Management System -->
+                <a href="document-management.html" class="project-card-full" data-category="enterprise web">
+                    <div class="project-card-image">
+                        <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&h=500&fit=crop" alt="Document Management">
+                        <div class="project-card-overlay">
+                            <span class="view-project-btn">
+                                View Project <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="project-card-content">
+                        <span class="project-card-category">Enterprise</span>
+                        <h3>Document Management System</h3>
+                        <p>Enterprise-grade document management with role-based access, version control, and advanced search.</p>
+                        <div class="project-card-tags">
+                            <span>.NET Core</span>
+                            <span>Angular</span>
+                            <span>Azure</span>
+                            <span>SQL Server</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Predictive Analytics Engine -->
+                <a href="predictive-analytics.html" class="project-card-full" data-category="ai cloud">
+                    <div class="project-card-image">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop" alt="Predictive Analytics">
+                        <div class="project-card-overlay">
+                            <span class="view-project-btn">
+                                View Project <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="project-card-content">
+                        <span class="project-card-category">AI / Analytics</span>
+                        <h3>Predictive Analytics Engine</h3>
+                        <p>ML-powered business forecasting system with real-time dashboards and predictive modeling.</p>
+                        <div class="project-card-tags">
+                            <span>Azure ML</span>
+                            <span>Python</span>
+                            <span>Power BI</span>
+                            <span>Data Factory</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- E-Commerce Platform -->
+                <a href="ecommerce-platform.html" class="project-card-full" data-category="web enterprise">
+                    <div class="project-card-image">
+                        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=500&fit=crop" alt="E-Commerce Platform">
+                        <div class="project-card-overlay">
+                            <span class="view-project-btn">
+                                View Project <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="project-card-content">
+                        <span class="project-card-category">Web App</span>
+                        <h3>E-Commerce Platform</h3>
+                        <p>Scalable multi-vendor marketplace with microservices architecture and real-time inventory.</p>
+                        <div class="project-card-tags">
+                            <span>Microservices</span>
+                            <span>Angular</span>
+                            <span>Azure</span>
+                            <span>Redis</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- POS System -->
+                <a href="pos-system.html" class="project-card-full" data-category="enterprise web">
+                    <div class="project-card-image">
+                        <img src="https://images.unsplash.com/photo-1556742393-d75f468bfcb0?w=800&h=500&fit=crop" alt="POS System">
+                        <div class="project-card-overlay">
+                            <span class="view-project-btn">
+                                View Project <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="project-card-content">
+                        <span class="project-card-category">Enterprise</span>
+                        <h3>Point of Sale System</h3>
+                        <p>Modern POS with inventory management, reporting, and multi-location support.</p>
+                        <div class="project-card-tags">
+                            <span>.NET Core</span>
+                            <span>Angular</span>
+                            <span>SQL Server</span>
+                            <span>SignalR</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Face Recognition Login -->
+                <a href="face-recognition.html" class="project-card-full" data-category="ai cloud">
+                    <div class="project-card-image">
+                        <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&h=500&fit=crop" alt="Face Recognition">
+                        <div class="project-card-overlay">
+                            <span class="view-project-btn">
+                                View Project <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="project-card-content">
+                        <span class="project-card-category">AI / Security</span>
+                        <h3>Face Recognition Login</h3>
+                        <p>Biometric authentication system using Azure Computer Vision for secure passwordless login.</p>
+                        <div class="project-card-tags">
+                            <span>Azure AI</span>
+                            <span>Computer Vision</span>
+                            <span>.NET Core</span>
+                            <span>Angular</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- URL Shortener -->
+                <a href="url-shortener.html" class="project-card-full" data-category="web cloud">
+                    <div class="project-card-image">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop" alt="URL Shortener">
+                        <div class="project-card-overlay">
+                            <span class="view-project-btn">
+                                View Project <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="project-card-content">
+                        <span class="project-card-category">Web App</span>
+                        <h3>URL Shortener Service</h3>
+                        <p>Analytics-enabled link shortening with click tracking, custom aliases, and QR code generation.</p>
+                        <div class="project-card-tags">
+                            <span>.NET Core</span>
+                            <span>Redis</span>
+                            <span>Angular</span>
+                            <span>Analytics</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section style="padding: 80px 0; background: var(--bg-secondary);">
+        <div class="container">
+            <div class="hire-cta">
+                <div class="cta-content">
+                    <h3>Have a Project in Mind?</h3>
+                    <p>Let's discuss how I can help bring your ideas to life</p>
+                </div>
+                <div class="cta-actions">
+                    <a href="../index.html#contact" class="btn btn-primary btn-lg">
+                        <span>Get In Touch</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="https://calendly.com/zainabbastahir/30min" target="_blank" class="btn btn-outline btn-lg">
+                        <span>Schedule Call</span>
+                        <i class="fas fa-calendar"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2024 Zain Abbas Tahir. All rights reserved. Made with <i class="fas fa-heart"></i> in Malaysia</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <a href="#" class="back-to-top" id="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const savedTheme = localStorage.getItem('theme');
+        
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+        
+        // Mobile Menu
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const navMenu = document.getElementById('nav-menu');
+        
+        mobileMenuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
+        });
+        
+        // Close menu on link click
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            });
+        });
+        
+        // Back to Top
+        const backToTop = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+        
+        backToTop.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // Projects Filter
+        const filterChips = document.querySelectorAll('.filter-chip');
+        const projectCards = document.querySelectorAll('.project-card-full');
+        
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                // Update active state
+                filterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                
+                const filter = chip.getAttribute('data-filter');
+                
+                // Filter projects
+                projectCards.forEach(card => {
+                    const categories = card.getAttribute('data-category');
+                    
+                    if (filter === 'all' || (categories && categories.includes(filter))) {
+                        card.style.display = 'block';
+                        card.style.animation = 'fadeIn 0.5s ease forwards';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

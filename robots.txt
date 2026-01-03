@@ -1,0 +1,24 @@
+# Robots.txt for Zain Abbas Tahir Portfolio
+# https://zainabbastahir.com
+
+# Allow all search engines
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://zainabbastahir.com/sitemap.xml
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+
+# Block access to admin or private areas (if any)
+# Disallow: /admin/
+# Disallow: /private/
+
+# Crawl-delay for polite crawling (optional)
+# Crawl-delay: 10

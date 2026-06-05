@@ -4,153 +4,153 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zain Abbas Tahir — AI Technical Lead</title>
-  <meta name="description" content="AI Technical Lead & Cloud Architect. Building intelligent enterprise systems with RAG, LLMs, Azure, .NET & Angular. 13+ years. Available worldwide.">
+  <meta name="description" content="AI Technical Lead & Cloud Architect. RAG, LLMs, Azure, .NET & Angular. 13+ years. Available worldwide.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+  <!-- 3D CANVAS BACKGROUND -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- CURSOR -->
+  <div id="cursor"></div>
+  <div id="cursor-trail"></div>
+
   <!-- NAV -->
-  <header id="hdr">
-    <div class="hdr-inner">
-      <a href="#" class="wordmark">Zain<span>.</span></a>
-      <nav class="desktop-nav">
-        <a href="#about">About</a>
-        <a href="#services">Services</a>
-        <a href="#work">Work</a>
-        <a href="#experience">Experience</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <div class="hdr-right">
-        <span class="avail-tag"><span class="dot-g"></span> Available</span>
-        <a href="https://calendly.com/zainabbastahir/30min" target="_blank" class="hdr-cta">Book a Call →</a>
-        <button class="mob-btn" id="mob-btn" aria-label="Menu">
-          <span></span><span></span>
-        </button>
+  <nav id="nav">
+    <div class="nav-inner">
+      <a href="#hero" class="brand">ZAT<span class="brand-dot">.</span></a>
+      <div class="nav-links" id="nav-links">
+        <a href="#about" class="nl">About</a>
+        <a href="#services" class="nl">Services</a>
+        <a href="#work" class="nl">Work</a>
+        <a href="#stack" class="nl">Stack</a>
+        <a href="#contact" class="nl">Contact</a>
+      </div>
+      <div class="nav-end">
+        <div class="status-pill"><span class="pulse"></span>Available</div>
+        <a href="https://calendly.com/zainabbastahir/30min" target="_blank" class="nav-book">Book a Call</a>
+        <button class="burger" id="burger"><span></span><span></span></button>
       </div>
     </div>
-    <div class="mob-menu" id="mob-menu">
-      <a href="#about">About</a>
-      <a href="#services">Services</a>
-      <a href="#work">Work</a>
-      <a href="#experience">Experience</a>
-      <a href="#contact">Contact</a>
-      <a href="https://calendly.com/zainabbastahir/30min" target="_blank" class="mob-cta">Book a Call →</a>
-    </div>
-  </header>
+  </nav>
 
   <!-- HERO -->
   <section id="hero" class="hero">
-    <div class="hero-layout">
-      <div class="hero-left">
-        <div class="hero-eyebrow">
-          <span class="num-tag">AI Technical Lead</span>
-          <span class="sep-dot">·</span>
-          <span class="num-tag">Cloud Architect</span>
-          <span class="sep-dot">·</span>
-          <span class="num-tag">Islamabad, PK</span>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-tag glass-pill">
+          <span class="pulse s"></span>
+          AI Technical Lead &amp; Cloud Architect
         </div>
         <h1 class="hero-h1">
-          <span class="line-wrap"><em class="line">I turn your</em></span>
-          <span class="line-wrap"><em class="line accent-word">toughest tech</em></span>
-          <span class="line-wrap"><em class="line">problems into</em></span>
-          <span class="line-wrap"><em class="line accent-word">shipped products.</em></span>
+          <span class="word">Building</span>
+          <span class="word accent">AI Systems</span>
+          <span class="word">That Scale</span>
         </h1>
-        <p class="hero-body">13+ years building enterprise AI, cloud, and software solutions that scale. From RAG pipelines to Azure infrastructure — I architect, lead, and deliver.</p>
-        <div class="hero-actions">
-          <a href="#services" class="pill-btn dark">See What I Build</a>
-          <a href="#contact" class="pill-btn light">Start a Project</a>
+        <p class="hero-desc">
+          13+ years architecting enterprise AI, cloud infrastructure, and software at scale.
+          RAG · LLMs · Azure · .NET · Angular — from first commit to production.
+        </p>
+        <div class="hero-btns">
+          <a href="#services" class="btn-3d">
+            <span class="btn-face">Explore My Work</span>
+            <span class="btn-shadow"></span>
+          </a>
+          <a href="#contact" class="btn-ghost">Start a Project <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div class="hero-nums">
-          <div class="hn"><strong class="count" data-n="13">0</strong><sup>+</sup><small>Years</small></div>
-          <div class="hn-sep"></div>
-          <div class="hn"><strong class="count" data-n="50">0</strong><sup>+</sup><small>Projects</small></div>
-          <div class="hn-sep"></div>
-          <div class="hn"><strong class="count" data-n="20">0</strong><sup>+</sup><small>Enterprises</small></div>
-        </div>
-      </div>
-      <div class="hero-right">
-        <div class="photo-frame">
-          <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain Abbas Tahir" class="hero-photo">
-          <div class="photo-label">
-            <span class="pl-name">Zain Abbas Tahir</span>
-            <span class="pl-role">Technical Lead @ Aventra</span>
+        <div class="hero-stats">
+          <div class="stat-3d tilt-card">
+            <span class="s-num" data-n="13">0</span><sup>+</sup>
+            <span class="s-lbl">Years Exp.</span>
+          </div>
+          <div class="stat-3d tilt-card">
+            <span class="s-num" data-n="50">0</span><sup>+</sup>
+            <span class="s-lbl">Projects</span>
+          </div>
+          <div class="stat-3d tilt-card">
+            <span class="s-num" data-n="20">0</span><sup>+</sup>
+            <span class="s-lbl">Enterprises</span>
           </div>
         </div>
-        <div class="hero-card hc1">
-          <i class="fas fa-robot"></i>
-          <span>RAG & LLM Systems</span>
+      </div>
+
+      <div class="hero-card-wrap">
+        <div class="profile-3d tilt-card" id="profile-card">
+          <div class="card-inner">
+            <div class="card-glow"></div>
+            <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain Abbas Tahir" class="profile-img">
+            <div class="card-info">
+              <strong>Zain Abbas Tahir</strong>
+              <span>Technical Lead · Aventra Group</span>
+              <span class="card-loc"><i class="fas fa-map-marker-alt"></i> Kuala Lumpur, MY</span>
+            </div>
+            <div class="card-badges">
+              <span class="cb"><i class="fas fa-robot"></i> RAG Systems</span>
+              <span class="cb"><i class="fas fa-cloud"></i> Azure</span>
+              <span class="cb"><i class="fas fa-code"></i> .NET Core</span>
+            </div>
+            <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="li-btn">
+              <i class="fab fa-linkedin-in"></i> View LinkedIn
+            </a>
+          </div>
         </div>
-        <div class="hero-card hc2">
-          <i class="fas fa-cloud"></i>
-          <span>Azure Architecture</span>
+
+        <div class="orbit-badges">
+          <div class="ob ob1 tilt-card"><i class="fas fa-brain"></i><span>LLMs</span></div>
+          <div class="ob ob2 tilt-card"><i class="fab fa-microsoft"></i><span>Azure</span></div>
+          <div class="ob ob3 tilt-card"><i class="fas fa-infinity"></i><span>DevOps</span></div>
+          <div class="ob ob4 tilt-card"><i class="fas fa-layer-group"></i><span>Microservices</span></div>
         </div>
-        <div class="hero-card hc3">
-          <i class="fas fa-check-circle" style="color:#22c55e"></i>
-          <span>Available Now</span>
-        </div>
-        <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="li-float">
-          <i class="fab fa-linkedin-in"></i> Connect on LinkedIn
-        </a>
       </div>
     </div>
-  </section>
 
-  <!-- TICKER -->
-  <div class="ticker-wrap">
-    <div class="ticker">
-      <span>RAG Systems</span><span class="dot">✦</span>
-      <span>Azure Cloud</span><span class="dot">✦</span>
-      <span>LLMs & GPT-4</span><span class="dot">✦</span>
-      <span>.NET Core 8</span><span class="dot">✦</span>
-      <span>Angular 17+</span><span class="dot">✦</span>
-      <span>Microservices</span><span class="dot">✦</span>
-      <span>Predictive AI</span><span class="dot">✦</span>
-      <span>CI/CD Pipelines</span><span class="dot">✦</span>
-      <span>Docker & K8s</span><span class="dot">✦</span>
-      <span>Copilot Studio</span><span class="dot">✦</span>
-      <span>Sentiment Analysis</span><span class="dot">✦</span>
-      <span>AI Foundry</span><span class="dot">✦</span>
-      <span>SQL Server</span><span class="dot">✦</span>
-      <span>Blazor</span><span class="dot">✦</span>
-      <!-- repeat for loop -->
-      <span>RAG Systems</span><span class="dot">✦</span>
-      <span>Azure Cloud</span><span class="dot">✦</span>
-      <span>LLMs & GPT-4</span><span class="dot">✦</span>
-      <span>.NET Core 8</span><span class="dot">✦</span>
-      <span>Angular 17+</span><span class="dot">✦</span>
-      <span>Microservices</span><span class="dot">✦</span>
-      <span>Predictive AI</span><span class="dot">✦</span>
-      <span>CI/CD Pipelines</span><span class="dot">✦</span>
-      <span>Docker & K8s</span><span class="dot">✦</span>
-      <span>Copilot Studio</span><span class="dot">✦</span>
-      <span>Sentiment Analysis</span><span class="dot">✦</span>
-      <span>AI Foundry</span><span class="dot">✦</span>
-      <span>SQL Server</span><span class="dot">✦</span>
-      <span>Blazor</span><span class="dot">✦</span>
+    <div class="scroll-cue">
+      <div class="sc-line"></div>
+      <span>Scroll</span>
     </div>
-  </div>
+  </section>
 
   <!-- ABOUT -->
   <section id="about" class="section">
     <div class="container">
-      <div class="section-num">01</div>
-      <div class="about-split">
-        <div class="about-left">
-          <h2 class="sec-title">The person<br>behind the code.</h2>
+      <div class="section-label"><span>01</span> About</div>
+      <div class="about-grid">
+        <div class="about-txt reveal">
+          <h2 class="sec-h2">The architect<br>behind the <em>intelligence.</em></h2>
+          <p>I'm Zain — an AI Technical Lead who turns complex business problems into intelligent, production-grade systems. Currently leading AI product development at <strong>Aventra Group</strong> in Kuala Lumpur.</p>
+          <p>I've spent 13+ years building everything from facial recognition APIs to global logistics RAG systems — always focused on systems that actually work in the real world.</p>
+          <div class="about-socials">
+            <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="soc-btn tilt-card"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://github.com/zainabbastahir" target="_blank" class="soc-btn tilt-card"><i class="fab fa-github"></i></a>
+            <a href="https://www.youtube.com/@zainabbastahir" target="_blank" class="soc-btn tilt-card"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.upwork.com/freelancers/~013b69c81fcb1ae708" target="_blank" class="soc-btn tilt-card"><i class="fas fa-briefcase"></i></a>
+          </div>
         </div>
-        <div class="about-right">
-          <p class="about-p big">I'm Zain — an AI Technical Lead who's been in the industry for <strong>13+ years</strong>, building everything from healthcare platforms to AI-powered logistics systems for DHL.</p>
-          <p class="about-p">Right now I lead a team at <strong>Aventra Group</strong> in Kuala Lumpur, shipping AI products: RAG search systems, LLM chatbots, predictive analytics dashboards, and cloud-native microservices on Azure.</p>
-          <p class="about-p">I work with companies worldwide — from startups needing their first production AI feature to enterprises modernising legacy systems on Azure.</p>
-          <div class="about-links">
-            <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="about-link"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
-            <a href="https://github.com/zainabbastahir" target="_blank" class="about-link"><i class="fab fa-github"></i> GitHub</a>
-            <a href="https://www.youtube.com/@zainabbastahir" target="_blank" class="about-link"><i class="fab fa-youtube"></i> YouTube</a>
-            <a href="https://www.upwork.com/freelancers/~013b69c81fcb1ae708" target="_blank" class="about-link"><i class="fas fa-briefcase"></i> Upwork</a>
+        <div class="about-cards reveal">
+          <div class="about-feat-card tilt-card">
+            <div class="afc-icon"><i class="fas fa-robot"></i></div>
+            <h4>AI &amp; LLM Expert</h4>
+            <p>RAG, LLMs, Predictive AI, Sentiment Analysis, AI Foundry, Copilot Studio</p>
+          </div>
+          <div class="about-feat-card tilt-card">
+            <div class="afc-icon"><i class="fas fa-cloud"></i></div>
+            <h4>Azure Architect</h4>
+            <p>Data Fabric, Service Bus, Data Factory, Kubernetes, Terraform IaC</p>
+          </div>
+          <div class="about-feat-card tilt-card">
+            <div class="afc-icon"><i class="fas fa-users-cog"></i></div>
+            <h4>Delivery Manager</h4>
+            <p>End-to-end delivery, technical leadership, code standards, team unblocking</p>
+          </div>
+          <div class="about-feat-card tilt-card">
+            <div class="afc-icon"><i class="fas fa-rocket"></i></div>
+            <h4>DevOps &amp; Automation</h4>
+            <p>CI/CD pipelines, ARM/Bicep, GitHub Codespaces, Azure DevOps</p>
           </div>
         </div>
       </div>
@@ -158,61 +158,46 @@
   </section>
 
   <!-- SERVICES -->
-  <section id="services" class="section section-dark">
+  <section id="services" class="section">
     <div class="container">
-      <div class="section-num light">02</div>
-      <div class="sec-hd light">
-        <h2 class="sec-title light">What I build<br>for you.</h2>
-        <a href="#contact" class="pill-btn light sm">Start a project →</a>
-      </div>
-      <div class="services-list">
+      <div class="section-label"><span>02</span> Services</div>
+      <h2 class="sec-h2 center">What I build<br><em>for you.</em></h2>
+      <div class="services-grid">
 
-        <div class="svc-row reveal">
+        <div class="svc-card tilt-card reveal">
           <div class="svc-num">01</div>
-          <div class="svc-body">
-            <h3>AI Product Development</h3>
-            <p>RAG pipelines, LLM-powered chatbots, predictive analytics, sentiment dashboards, computer vision, and Copilot Studio agents — end-to-end, production-ready on Azure.</p>
-          </div>
-          <div class="svc-tags">
-            <span>RAG</span><span>LLMs</span><span>Azure OpenAI</span><span>Copilot Studio</span>
-          </div>
-          <a href="#contact" class="svc-arrow">→</a>
+          <div class="svc-icon-wrap"><i class="fas fa-robot"></i></div>
+          <h3>AI Product Development</h3>
+          <p>RAG pipelines, LLM-powered chatbots, predictive analytics, sentiment dashboards, Copilot Studio agents — end-to-end on Azure.</p>
+          <div class="svc-tags"><span>RAG</span><span>LLMs</span><span>Azure OpenAI</span></div>
+          <a href="#contact" class="svc-link">Start a project <i class="fas fa-arrow-right"></i></a>
         </div>
 
-        <div class="svc-row reveal">
+        <div class="svc-card tilt-card reveal" style="--d:.1s">
           <div class="svc-num">02</div>
-          <div class="svc-body">
-            <h3>Cloud Architecture & DevOps</h3>
-            <p>Azure infrastructure design, microservices architecture, CI/CD pipelines, Kubernetes deployments, Terraform IaC — built to scale and survive production.</p>
-          </div>
-          <div class="svc-tags">
-            <span>Azure</span><span>Docker</span><span>Kubernetes</span><span>Terraform</span>
-          </div>
-          <a href="#contact" class="svc-arrow">→</a>
+          <div class="svc-icon-wrap"><i class="fas fa-cloud"></i></div>
+          <h3>Cloud Architecture &amp; DevOps</h3>
+          <p>Azure infrastructure design, microservices, CI/CD pipelines, Kubernetes, Terraform IaC — scalable and production-ready.</p>
+          <div class="svc-tags"><span>Azure</span><span>Docker</span><span>Kubernetes</span></div>
+          <a href="#contact" class="svc-link">Start a project <i class="fas fa-arrow-right"></i></a>
         </div>
 
-        <div class="svc-row reveal">
+        <div class="svc-card tilt-card reveal" style="--d:.2s">
           <div class="svc-num">03</div>
-          <div class="svc-body">
-            <h3>Enterprise Software Development</h3>
-            <p>Robust .NET Core backends, Angular frontends, SaaS platforms, REST APIs, and database-heavy applications — clean architecture, TDD, and maintainable code.</p>
-          </div>
-          <div class="svc-tags">
-            <span>.NET Core</span><span>Angular 17+</span><span>Blazor</span><span>SQL Server</span>
-          </div>
-          <a href="#contact" class="svc-arrow">→</a>
+          <div class="svc-icon-wrap"><i class="fas fa-code"></i></div>
+          <h3>Enterprise Software</h3>
+          <p>Robust .NET Core backends, Angular frontends, multi-tenant SaaS platforms, REST APIs — clean architecture, TDD.</p>
+          <div class="svc-tags"><span>.NET Core</span><span>Angular 17+</span><span>Blazor</span></div>
+          <a href="#contact" class="svc-link">Start a project <i class="fas fa-arrow-right"></i></a>
         </div>
 
-        <div class="svc-row reveal">
+        <div class="svc-card tilt-card reveal" style="--d:.3s">
           <div class="svc-num">04</div>
-          <div class="svc-body">
-            <h3>Technical Leadership & Consulting</h3>
-            <p>Stepping in as Technical Lead or Delivery Manager — team direction, code reviews, architecture decisions, delivery planning. I unblock teams and ship on time.</p>
-          </div>
-          <div class="svc-tags">
-            <span>Tech Lead</span><span>Code Review</span><span>Architecture</span><span>Delivery</span>
-          </div>
-          <a href="#contact" class="svc-arrow">→</a>
+          <div class="svc-icon-wrap"><i class="fas fa-chess-king"></i></div>
+          <h3>Technical Leadership</h3>
+          <p>Team direction, code reviews, architecture decisions, delivery planning. I step in as Tech Lead or Delivery Manager.</p>
+          <div class="svc-tags"><span>Tech Lead</span><span>Architecture</span><span>Delivery</span></div>
+          <a href="#contact" class="svc-link">Start a project <i class="fas fa-arrow-right"></i></a>
         </div>
 
       </div>
@@ -222,106 +207,76 @@
   <!-- WORK -->
   <section id="work" class="section">
     <div class="container">
-      <div class="section-num">03</div>
-      <div class="sec-hd-row">
-        <h2 class="sec-title">Selected<br>projects.</h2>
+      <div class="section-label"><span>03</span> Work</div>
+      <div class="work-head">
+        <h2 class="sec-h2">Selected<br><em>projects.</em></h2>
         <div class="work-filters">
-          <button class="wf active" data-f="all">All</button>
-          <button class="wf" data-f="ai">AI/ML</button>
-          <button class="wf" data-f="cloud">Cloud</button>
-          <button class="wf" data-f="web">Web</button>
-          <button class="wf" data-f="desktop">Desktop</button>
+          <button class="wfb active" data-f="all">All</button>
+          <button class="wfb" data-f="ai">AI/ML</button>
+          <button class="wfb" data-f="cloud">Cloud</button>
+          <button class="wfb" data-f="web">Web</button>
+          <button class="wfb" data-f="desktop">Desktop</button>
         </div>
       </div>
-      <div class="projects-list" id="proj-list">
+      <div class="work-grid" id="wg">
 
-        <div class="proj-item reveal" data-c="web cloud">
-          <div class="proj-img">
-            <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/Login.webp" alt="Document Management System" loading="lazy">
-          </div>
-          <div class="proj-info">
-            <div class="proj-meta">
-              <span class="proj-cat">Web · Cloud</span>
-              <div class="proj-chips"><span>.NET Core</span><span>Azure</span><span>Angular</span></div>
-            </div>
+        <div class="work-card tilt-card reveal" data-c="web cloud">
+          <div class="wc-img"><img src="https://zainabbastahir.com/wp-content/uploads/2025/02/Login.webp" alt="Document Management System" loading="lazy"></div>
+          <div class="wc-body">
+            <div class="wc-top"><span class="wc-cat">Web · Cloud</span><div class="wc-chips"><span>.NET Core</span><span>Azure</span><span>Angular</span></div></div>
             <h3>Document Management System</h3>
-            <p>Enterprise DMS with role-based access, PDF viewer, email & WhatsApp sharing for a multi-tenant platform used by hundreds of concurrent users.</p>
-            <div class="proj-result"><i class="fas fa-arrow-up-right-dots"></i> Multi-tenant · Secure · Azure-hosted</div>
+            <p>Enterprise DMS with role-based access, PDF viewer, email & WhatsApp sharing for a multi-tenant platform.</p>
+            <div class="wc-outcome"><i class="fas fa-check"></i> Multi-tenant · Secure · Azure-hosted</div>
           </div>
         </div>
 
-        <div class="proj-item reveal" data-c="ai cloud">
-          <div class="proj-img">
-            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=900&h=600&fit=crop" alt="AI Support Bot" loading="lazy">
-          </div>
-          <div class="proj-info">
-            <div class="proj-meta">
-              <span class="proj-cat">AI · Cloud</span>
-              <div class="proj-chips"><span>RAG</span><span>Azure OpenAI</span><span>LLMs</span></div>
-            </div>
+        <div class="work-card tilt-card reveal" data-c="ai cloud" style="--d:.1s">
+          <div class="wc-img"><img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop" alt="AI Support Bot" loading="lazy"></div>
+          <div class="wc-body">
+            <div class="wc-top"><span class="wc-cat">AI · Cloud</span><div class="wc-chips"><span>RAG</span><span>Azure OpenAI</span></div></div>
             <h3>AI Customer Support Bot</h3>
-            <p>Context-aware chatbot using RAG + GPT-4 that handles thousands of support queries automatically, dramatically reducing response time and support costs.</p>
-            <div class="proj-result"><i class="fas fa-arrow-up-right-dots"></i> 24/7 automation · Reduced support costs</div>
+            <p>Context-aware RAG + GPT-4 chatbot handling thousands of support queries automatically.</p>
+            <div class="wc-outcome"><i class="fas fa-check"></i> 24/7 automation · Reduced support costs</div>
           </div>
         </div>
 
-        <div class="proj-item reveal" data-c="ai cloud">
-          <div class="proj-img">
-            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&h=600&fit=crop" alt="Predictive Analytics" loading="lazy">
-          </div>
-          <div class="proj-info">
-            <div class="proj-meta">
-              <span class="proj-cat">AI · Analytics</span>
-              <div class="proj-chips"><span>Azure ML</span><span>Data Factory</span><span>Power BI</span></div>
-            </div>
+        <div class="work-card tilt-card reveal" data-c="ai cloud" style="--d:.2s">
+          <div class="wc-img"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop" alt="Predictive Analytics" loading="lazy"></div>
+          <div class="wc-body">
+            <div class="wc-top"><span class="wc-cat">AI · Analytics</span><div class="wc-chips"><span>Azure ML</span><span>Power BI</span></div></div>
             <h3>Predictive Analytics Engine</h3>
-            <p>ML-powered sales forecasting and demand prediction platform giving enterprises a competitive edge in planning and inventory management.</p>
-            <div class="proj-result"><i class="fas fa-arrow-up-right-dots"></i> Improved forecast accuracy · Azure ML</div>
+            <p>ML-powered sales forecasting and demand prediction platform using Azure ML.</p>
+            <div class="wc-outcome"><i class="fas fa-check"></i> Improved forecast accuracy</div>
           </div>
         </div>
 
-        <div class="proj-item reveal" data-c="ai">
-          <div class="proj-img">
-            <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/th.jpg" alt="Face Recognition" loading="lazy">
-          </div>
-          <div class="proj-info">
-            <div class="proj-meta">
-              <span class="proj-cat">AI · Security</span>
-              <div class="proj-chips"><span>Python</span><span>AI/ML</span><span>.NET</span></div>
-            </div>
+        <div class="work-card tilt-card reveal" data-c="ai" style="--d:.3s">
+          <div class="wc-img"><img src="https://zainabbastahir.com/wp-content/uploads/2025/02/th.jpg" alt="Face Recognition" loading="lazy"></div>
+          <div class="wc-body">
+            <div class="wc-top"><span class="wc-cat">AI · Security</span><div class="wc-chips"><span>Python</span><span>.NET</span></div></div>
             <h3>Face Recognition Login</h3>
-            <p>Passwordless authentication system using real-time facial recognition — replacing passwords with a secure, frictionless login experience.</p>
-            <div class="proj-result"><i class="fas fa-arrow-up-right-dots"></i> Passwordless · Real-time detection</div>
+            <p>AI-powered passwordless authentication using real-time facial recognition.</p>
+            <div class="wc-outcome"><i class="fas fa-check"></i> Passwordless · Real-time</div>
           </div>
         </div>
 
-        <div class="proj-item reveal" data-c="web">
-          <div class="proj-img">
-            <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/2020-11-06_2-50-22-1-1.webp" alt="URL Shortener" loading="lazy">
-          </div>
-          <div class="proj-info">
-            <div class="proj-meta">
-              <span class="proj-cat">Web · Analytics</span>
-              <div class="proj-chips"><span>.NET Core</span><span>MVC</span><span>Analytics</span></div>
-            </div>
-            <h3>URL Shortener & Analytics</h3>
-            <p>Custom short-link platform with geo-based click tracking, analytics dashboard, and built-in monetisation via AdSense integration.</p>
-            <div class="proj-result"><i class="fas fa-arrow-up-right-dots"></i> Click tracking · Revenue-ready</div>
+        <div class="work-card tilt-card reveal" data-c="web" style="--d:.1s">
+          <div class="wc-img"><img src="https://zainabbastahir.com/wp-content/uploads/2025/02/2020-11-06_2-50-22-1-1.webp" alt="URL Shortener" loading="lazy"></div>
+          <div class="wc-body">
+            <div class="wc-top"><span class="wc-cat">Web · Analytics</span><div class="wc-chips"><span>.NET Core</span><span>MVC</span></div></div>
+            <h3>URL Shortener &amp; Analytics</h3>
+            <p>Custom short-link platform with geo click tracking and AdSense integration.</p>
+            <div class="wc-outcome"><i class="fas fa-check"></i> Click tracking · Revenue-ready</div>
           </div>
         </div>
 
-        <div class="proj-item reveal" data-c="desktop">
-          <div class="proj-img">
-            <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/14.webp" alt="POS" loading="lazy">
-          </div>
-          <div class="proj-info">
-            <div class="proj-meta">
-              <span class="proj-cat">Desktop · Business</span>
-              <div class="proj-chips"><span>C#</span><span>WinForms</span><span>SQL Server</span></div>
-            </div>
+        <div class="work-card tilt-card reveal" data-c="desktop" style="--d:.2s">
+          <div class="wc-img"><img src="https://zainabbastahir.com/wp-content/uploads/2025/02/14.webp" alt="POS" loading="lazy"></div>
+          <div class="wc-body">
+            <div class="wc-top"><span class="wc-cat">Desktop</span><div class="wc-chips"><span>C#</span><span>WinForms</span></div></div>
             <h3>Point of Sale Software</h3>
-            <p>Full retail POS with inventory management, barcode scanning, debt tracking, and comprehensive business reporting for retail operations.</p>
-            <div class="proj-result"><i class="fas fa-arrow-up-right-dots"></i> Barcode ready · Full reporting</div>
+            <p>Full retail POS with inventory, barcode scanning, debt tracking and reporting.</p>
+            <div class="wc-outcome"><i class="fas fa-check"></i> Barcode ready · Full reporting</div>
           </div>
         </div>
 
@@ -329,123 +284,87 @@
     </div>
   </section>
 
-  <!-- EXPERIENCE -->
-  <section id="experience" class="section section-accent">
+  <!-- STACK 3D -->
+  <section id="stack" class="section stack-section">
     <div class="container">
-      <div class="section-num light">04</div>
-      <h2 class="sec-title light" style="margin-bottom:3rem">13 years.<br>5 companies.<br>1 standard.</h2>
-      <div class="exp-list">
-
-        <div class="exp-row reveal">
-          <div class="exp-year">2025 →</div>
-          <div class="exp-body">
-            <div class="exp-cur">Current</div>
-            <h3>Technical Lead</h3>
-            <h4>Aventra Group · Kuala Lumpur</h4>
-            <p>Building AI products: RAG systems, AI search, predictive analytics, sentiment dashboards. Leading teams, architecting microservices, deploying on Azure.</p>
-            <div class="exp-chips"><span>RAG</span><span>LLMs</span><span>.NET Core</span><span>Angular</span><span>Azure</span></div>
+      <div class="section-label"><span>04</span> Stack</div>
+      <h2 class="sec-h2 center">The tools I<br><em>master.</em></h2>
+      <div class="stack-orbs">
+        <div class="orb-group reveal">
+          <div class="og-title"><i class="fas fa-brain"></i> AI &amp; ML</div>
+          <div class="orbs">
+            <div class="orb tilt-card" style="--s:92%"><span>RAG</span><div class="orb-fill" data-p="92"></div></div>
+            <div class="orb tilt-card" style="--s:90%"><span>LLMs</span><div class="orb-fill" data-p="90"></div></div>
+            <div class="orb tilt-card" style="--s:88%"><span>Predictive AI</span><div class="orb-fill" data-p="88"></div></div>
+            <div class="orb tilt-card" style="--s:90%"><span>AI Foundry</span><div class="orb-fill" data-p="90"></div></div>
+            <div class="orb tilt-card" style="--s:88%"><span>Copilot Studio</span><div class="orb-fill" data-p="88"></div></div>
+            <div class="orb tilt-card" style="--s:85%"><span>Sentiment AI</span><div class="orb-fill" data-p="85"></div></div>
           </div>
         </div>
-
-        <div class="exp-row reveal">
-          <div class="exp-year">2022 – 2025</div>
-          <div class="exp-body">
-            <h3>Technical Lead</h3>
-            <h4>DHL IT Services · Kuala Lumpur</h4>
-            <p>Led logistics software delivery. Built AI Route Optimisation and RAG-powered Global Search. Managed Azure Service Bus, Data Factory, Cosmos DB, Redis.</p>
-            <div class="exp-chips"><span>.NET Core</span><span>Angular 18</span><span>Azure</span><span>RAG</span><span>Cosmos DB</span></div>
+        <div class="orb-group reveal" style="--d:.1s">
+          <div class="og-title"><i class="fas fa-cloud"></i> Cloud &amp; DevOps</div>
+          <div class="orbs">
+            <div class="orb tilt-card" style="--s:95%"><span>Azure</span><div class="orb-fill" data-p="95"></div></div>
+            <div class="orb tilt-card" style="--s:92%"><span>Azure DevOps</span><div class="orb-fill" data-p="92"></div></div>
+            <div class="orb tilt-card" style="--s:90%"><span>Docker</span><div class="orb-fill" data-p="90"></div></div>
+            <div class="orb tilt-card" style="--s:85%"><span>Kubernetes</span><div class="orb-fill" data-p="85"></div></div>
+            <div class="orb tilt-card" style="--s:88%"><span>Terraform</span><div class="orb-fill" data-p="88"></div></div>
+            <div class="orb tilt-card" style="--s:93%"><span>CI/CD</span><div class="orb-fill" data-p="93"></div></div>
           </div>
         </div>
-
-        <div class="exp-row reveal">
-          <div class="exp-year">2019 – 2022</div>
-          <div class="exp-body">
-            <h3>Senior Software Engineer</h3>
-            <h4>Tapcheck · Remote (US)</h4>
-            <p>Onboarded enterprise payroll integrations for US fintech clients. Built Angular frontends, led code reviews, established coding standards.</p>
-            <div class="exp-chips"><span>.NET Core</span><span>Angular</span><span>REST APIs</span></div>
+        <div class="orb-group reveal" style="--d:.2s">
+          <div class="og-title"><i class="fas fa-code"></i> Development</div>
+          <div class="orbs">
+            <div class="orb tilt-card" style="--s:95%"><span>.NET Core</span><div class="orb-fill" data-p="95"></div></div>
+            <div class="orb tilt-card" style="--s:92%"><span>Angular 17+</span><div class="orb-fill" data-p="92"></div></div>
+            <div class="orb tilt-card" style="--s:88%"><span>Blazor</span><div class="orb-fill" data-p="88"></div></div>
+            <div class="orb tilt-card" style="--s:85%"><span>React</span><div class="orb-fill" data-p="85"></div></div>
+            <div class="orb tilt-card" style="--s:93%"><span>Microservices</span><div class="orb-fill" data-p="93"></div></div>
+            <div class="orb tilt-card" style="--s:95%"><span>SQL Server</span><div class="orb-fill" data-p="95"></div></div>
           </div>
         </div>
-
-        <div class="exp-row reveal">
-          <div class="exp-year">2018 – 2019</div>
-          <div class="exp-body">
-            <h3>Senior Software Engineer</h3>
-            <h4>UMCH · Kuala Lumpur</h4>
-            <p>Built facial & emotion recognition APIs, intelligent chatbots, image classification with transfer learning, and NLP sentiment analysis.</p>
-            <div class="exp-chips"><span>Python</span><span>ML</span><span>NLP</span><span>Chatbots</span></div>
-          </div>
-        </div>
-
-        <div class="exp-row reveal">
-          <div class="exp-year">2013 – 2018</div>
-          <div class="exp-body">
-            <h3>Software Architect & Engineer</h3>
-            <h4>MTBC (CareCloud) + Interactive Group · Islamabad</h4>
-            <p>Designed scalable healthcare architecture at MTBC. Built client web apps and APIs at Interactive Group and Moftak Solutions.</p>
-            <div class="exp-chips"><span>ASP.NET MVC</span><span>C#</span><span>SQL Server</span><span>Healthcare IT</span></div>
-          </div>
-        </div>
-
       </div>
     </div>
   </section>
 
   <!-- CONTACT -->
-  <section id="contact" class="section">
+  <section id="contact" class="section contact-sec">
     <div class="container">
-      <div class="section-num">05</div>
-      <div class="contact-split">
-        <div class="contact-left">
-          <h2 class="sec-title">Have a project<br>in mind?<br><span class="accent-line">Let's talk.</span></h2>
-          <div class="contact-info-list">
-            <div class="cil">
-              <span class="cil-label">Email</span>
-              <a href="mailto:zabbastahir@gmail.com">zabbastahir@gmail.com</a>
-            </div>
-            <div class="cil">
-              <span class="cil-label">Schedule</span>
-              <a href="https://calendly.com/zainabbastahir/30min" target="_blank">Book a free 30-min call</a>
-            </div>
-            <div class="cil">
-              <span class="cil-label">Location</span>
-              <span>Islamabad, PK · Remote Worldwide</span>
-            </div>
+      <div class="section-label"><span>05</span> Contact</div>
+      <div class="contact-grid">
+        <div class="contact-left reveal">
+          <h2 class="sec-h2">Let's build<br><em>something great.</em></h2>
+          <p class="contact-sub">Have a project in mind? I'd love to hear about it. Let's talk.</p>
+          <div class="cinfo">
+            <div class="ci"><div class="ci-ic"><i class="fas fa-envelope"></i></div><div><strong>Email</strong><a href="mailto:zabbastahir@gmail.com">zabbastahir@gmail.com</a></div></div>
+            <div class="ci"><div class="ci-ic"><i class="fas fa-video"></i></div><div><strong>Schedule</strong><a href="https://calendly.com/zainabbastahir/30min" target="_blank">Book a free 30-min call</a></div></div>
+            <div class="ci"><div class="ci-ic"><i class="fas fa-globe"></i></div><div><strong>Location</strong><span>Islamabad, PK · Remote Worldwide</span></div></div>
           </div>
-          <div class="contact-socials">
-            <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-            <a href="https://github.com/zainabbastahir" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="https://www.youtube.com/@zainabbastahir" target="_blank"><i class="fab fa-youtube"></i></a>
-            <a href="https://www.upwork.com/freelancers/~013b69c81fcb1ae708" target="_blank"><i class="fas fa-briefcase"></i></a>
+          <div class="csocials">
+            <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="soc-btn tilt-card"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://github.com/zainabbastahir" target="_blank" class="soc-btn tilt-card"><i class="fab fa-github"></i></a>
+            <a href="https://www.youtube.com/@zainabbastahir" target="_blank" class="soc-btn tilt-card"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.upwork.com/freelancers/~013b69c81fcb1ae708" target="_blank" class="soc-btn tilt-card"><i class="fas fa-briefcase"></i></a>
           </div>
         </div>
-        <form id="cf" class="contact-form">
+        <form id="cf" class="contact-form glass-card tilt-card reveal" style="--d:.15s">
           <div class="cf-row">
-            <div class="cf-f">
-              <label>Name</label>
-              <input type="text" placeholder="Your name" required>
-            </div>
-            <div class="cf-f">
-              <label>Email</label>
-              <input type="email" placeholder="your@email.com" required>
-            </div>
+            <div class="cf-f"><label>Name</label><input type="text" placeholder="Your name" required></div>
+            <div class="cf-f"><label>Email</label><input type="email" placeholder="you@email.com" required></div>
           </div>
           <div class="cf-f">
-            <label>I need help with</label>
+            <label>Service needed</label>
             <select>
-              <option value="">Choose a service…</option>
+              <option value="">Select…</option>
               <option>AI / LLM Product</option>
               <option>Azure Cloud Architecture</option>
               <option>Enterprise .NET / Angular App</option>
               <option>Technical Leadership</option>
-              <option>Something Else</option>
+              <option>Other</option>
             </select>
           </div>
-          <div class="cf-f">
-            <label>Tell me about your project</label>
-            <textarea rows="5" placeholder="What are you trying to build or solve?" required></textarea>
-          </div>
-          <button type="submit" class="pill-btn dark full">Send Message →</button>
+          <div class="cf-f"><label>Message</label><textarea rows="4" placeholder="Tell me about your project…" required></textarea></div>
+          <button type="submit" class="btn-3d full"><span class="btn-face">Send Message</span><span class="btn-shadow"></span></button>
           <p id="cf-ok" class="cf-ok"></p>
         </form>
       </div>
@@ -455,10 +374,10 @@
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
-      <div class="footer-row">
-        <a href="#" class="wordmark">Zain<span>.</span></a>
+      <div class="footer-inner">
+        <a href="#hero" class="brand">ZAT<span class="brand-dot">.</span></a>
         <p>© 2025 Zain Abbas Tahir · AI Technical Lead & Cloud Architect</p>
-        <div class="f-socials">
+        <div class="fsoc">
           <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
           <a href="https://github.com/zainabbastahir" target="_blank"><i class="fab fa-github"></i></a>
           <a href="https://www.youtube.com/@zainabbastahir" target="_blank"><i class="fab fa-youtube"></i></a>
@@ -469,38 +388,35 @@
 
   <!-- CHATBOT -->
   <div id="bot">
-    <button id="bot-fab" aria-label="Open chat">
-      <i class="fas fa-robot" id="bot-ico"></i>
-      <i class="fas fa-times" id="bot-x-ico" style="display:none"></i>
+    <button id="bot-btn" aria-label="Chat with assistant">
+      <i class="fas fa-robot" id="bico"></i>
+      <i class="fas fa-times" id="bx" style="display:none"></i>
+      <span class="bot-pulse"></span>
     </button>
-    <div id="bot-win">
-      <div class="bw-header">
+    <div id="bot-win" style="display:none">
+      <div class="bw-hd">
         <div class="bw-av"><i class="fas fa-robot"></i></div>
-        <div class="bw-info">
-          <strong>Zain's Assistant</strong>
-          <small><span class="dot-g"></span> Ask me anything</small>
-        </div>
+        <div><strong>Zain's AI Assistant</strong><small><span class="pulse s"></span> Online</small></div>
         <button id="bw-close"><i class="fas fa-times"></i></button>
       </div>
       <div id="bw-msgs" class="bw-msgs">
-        <div class="bm bot"><div class="bb">Hi! I can answer any questions about Zain — his skills, experience, projects, or how to hire him. 👋</div></div>
-        <div class="bm bot" id="bqr-wrap">
-          <div class="bqrs">
-            <button class="bqr" data-q="What do you build?">What do you build?</button>
-            <button class="bqr" data-q="Tell me about your experience">Experience</button>
-            <button class="bqr" data-q="What are your skills?">Skills</button>
-            <button class="bqr" data-q="Are you available?">Availability</button>
-            <button class="bqr" data-q="How do I contact you?">Contact</button>
-          </div>
+        <div class="bm bot"><div class="bb">Hi! 👋 I'm Zain's assistant. Ask me anything about his skills, projects, experience, or how to work with him.</div></div>
+        <div class="bqrs" id="bqrs">
+          <button class="bqr" data-q="What do you build?">What do you build?</button>
+          <button class="bqr" data-q="Tell me your experience">Experience</button>
+          <button class="bqr" data-q="What skills do you have?">Skills</button>
+          <button class="bqr" data-q="Are you available for hire?">Available?</button>
+          <button class="bqr" data-q="How can I contact you?">Contact</button>
         </div>
       </div>
-      <div class="bw-input">
-        <input id="bw-in" type="text" placeholder="Ask me anything…" autocomplete="off">
+      <div class="bw-inp">
+        <input id="bw-in" type="text" placeholder="Ask anything…" autocomplete="off">
         <button id="bw-send"><i class="fas fa-paper-plane"></i></button>
       </div>
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="script.js"></script>
   <script src="chatbot.js"></script>
 </body>

@@ -1,147 +1,88 @@
-/* ZAIN'S CHATBOT */
-const KB = {
-  hi: {
-    p: ['hi','hello','hey','good morning','good afternoon','howdy','hiya','sup'],
-    r: `Hi there! 👋 I'm Zain's assistant. Ask me anything about what he builds, his experience, or how to hire him!`
-  },
-  who: {
-    p: ['who are you','who is zain','about zain','tell me about','introduce','zain abbas'],
-    r: `**Zain Abbas Tahir** is an AI Technical Lead & Cloud Architect with **13+ years** of experience. He's currently Technical Lead at **Aventra Group** in Kuala Lumpur. He specialises in building AI products (RAG, LLMs), Azure cloud infrastructure, and enterprise .NET/Angular apps.`
-  },
-  solve: {
-    p: ['what do you solve','what can you build','problems','challenge','help me with','what do you do','services'],
-    r: `Zain solves 4 main categories of problems:\n\n🤖 **AI Products** — RAG systems, LLM chatbots, predictive AI, sentiment dashboards\n☁️ **Cloud Architecture** — Azure design, microservices, DevOps, CI/CD\n💻 **Enterprise Software** — .NET Core backends, Angular frontends, APIs, SaaS platforms\n👥 **Technical Leadership** — Leading dev teams, delivery management, code quality`
-  },
-  skills: {
-    p: ['skill','technology','tech stack','expertise','programming','tools'],
-    r: `**AI/ML:** RAG, LLMs, Azure OpenAI, Predictive AI, Sentiment Analysis, Copilot Studio\n\n**Cloud:** Azure, Service Bus, Data Factory, Kubernetes, Docker, Key Vault\n\n**Dev:** .NET Core 8, Angular 17+, Blazor, React, Microservices, CQRS\n\n**DevOps:** CI/CD, Azure DevOps, Terraform, ARM/Bicep, SQL Server, Redis`
-  },
-  experience: {
-    p: ['experience','career','worked','company','employment','job','history'],
-    r: `13+ years across:\n\n🟢 **Aventra Group** — Technical Lead (Nov 2025–Present, KL)\n🔵 **DHL IT Services** — Technical Lead (2022–2025, KL)\n🔵 **Tapcheck** — Senior SWE (2019–2022, Remote US)\n🔵 **UMCH** — Senior SWE (2018–2019, KL)\n🔵 **MTBC/CareCloud** — Software Architect (2016–2018, Islamabad)\n🔵 **Interactive Group** — Software Engineer (2013–2016, Islamabad)`
-  },
-  projects: {
-    p: ['project','portfolio','built','created','examples','work'],
-    r: `Notable projects:\n\n📁 **Document Management System** — Enterprise DMS (.NET, Azure, Angular)\n🤖 **AI Customer Support Bot** — RAG + LLMs for 24/7 automated support\n📊 **Predictive Analytics Engine** — Azure ML forecasting platform\n👤 **Face Recognition Login** — AI-powered passwordless auth\n🔗 **URL Shortener** — Click analytics platform\n🖥️ **Point of Sale System** — Full retail POS with inventory`
-  },
-  contact: {
-    p: ['contact','email','reach','get in touch','message','connect','phone'],
-    r: `📧 **Email:** zabbastahir@gmail.com\n📅 **Book a Call:** calendly.com/zainabbastahir/30min\n💼 **LinkedIn:** linkedin.com/in/zainabbastahir\n🐙 **GitHub:** github.com/zainabbastahir\n💻 **Upwork:** upwork.com/freelancers/~013b69c81fcb1ae708`
-  },
-  available: {
-    p: ['available','freelance','hire','remote','contract','opportunity','open to work'],
-    r: `Yes! Zain is **open to new opportunities** including:\n\n✅ Freelance & contract projects\n✅ Full remote positions worldwide\n✅ AI/ML consulting\n✅ Cloud architecture consulting\n✅ Technical leadership roles\n\nBest way to start: **book a free 30-min call** at calendly.com/zainabbastahir/30min`
-  },
-  ai: {
-    p: ['rag','llm','artificial intelligence','machine learning','chatbot','neural','nlp','openai','gpt','ai system'],
-    r: `Zain's AI expertise includes:\n\n🧠 **RAG Systems** — Document Q&A, knowledge base search (Azure AI Search + Vector DB)\n💬 **LLM Integration** — Custom chatbots, Azure OpenAI, GPT-4, Semantic Kernel\n📈 **Predictive AI** — ML forecasting with Azure ML\n😊 **Sentiment Analysis** — Real-time NLP text analytics\n🤖 **Copilot Studio** — Custom enterprise AI assistants\n👁️ **Computer Vision** — Face recognition, OCR`
-  },
-  azure: {
-    p: ['azure','cloud','microsoft','kubernetes','docker','devops','infrastructure','deployment'],
-    r: `Zain is an **Azure Expert** with hands-on experience in:\n\n☁️ App Services, Functions & API Management\n🔄 Service Bus, Data Factory & Logic Apps\n📦 Kubernetes, Docker & containerisation\n🏗️ Terraform, ARM templates & Bicep (IaC)\n🔁 CI/CD Pipelines with Azure DevOps\n💾 Cosmos DB, Redis & SQL Azure`
-  },
-  dotnet: {
-    p: ['.net','dotnet','c#','angular','asp.net','blazor','web api','csharp'],
-    r: `Zain has **10+ years** with .NET & Angular:\n\n⚙️ **.NET Core 8** — APIs, Web Apps, Background Services\n🅰️ **Angular 17+** — Modern SPA with RxJS & NgRx\n🔥 **Blazor** — Server & WebAssembly\n🏛️ **Microservices** — CQRS, event-driven architecture\n📡 **REST APIs** — Clean, versioned, documented`
-  },
-  location: {
-    p: ['location','where','based','pakistan','islamabad','malaysia','kuala lumpur','timezone','country'],
-    r: `Zain is from **Islamabad, Pakistan** 🇵🇰 and currently works in **Kuala Lumpur, Malaysia** 🇲🇾. He's fully comfortable working remotely with US, European, and Asian clients across all time zones.`
-  },
-  youtube: {
-    p: ['youtube','video','tutorial','channel','watch'],
-    r: `Zain has a **YouTube channel** with tutorials on:\n🎬 .NET Core, Azure & AI development\n🎬 Demo walkthroughs of projects\n🎬 Architecture deep-dives\n\n▶️ **youtube.com/@zainabbastahir**`
-  },
-  rate: {
-    p: ['salary','rate','cost','price','charge','fee','how much','hourly'],
-    r: `Rates depend on project scope, duration, and type of engagement. The best way to discuss is to **book a free 30-min call** at calendly.com/zainabbastahir/30min or email zabbastahir@gmail.com directly.`
-  },
-  thanks: {
-    p: ['thank','thanks','appreciate','great','awesome','perfect','helpful','cool'],
-    r: `You're welcome! 😊 Feel free to ask anything else. If you'd like to work with Zain, send an email or book a call — he's always happy to chat!`
-  },
-  bye: {
-    p: ['bye','goodbye','see you','later','take care'],
-    r: `Goodbye! 👋 If you ever want to discuss a project, reach Zain at **zabbastahir@gmail.com** or book a call at Calendly. Have a great day!`
-  }
-};
+const KB = [
+  { p: ['hi','hello','hey','morning','afternoon','howdy','hiya'], r: `Hey! 👋 I'm Zain's assistant. Ask me anything — what he builds, his experience, how to hire him, or anything else!` },
+  { p: ['who is zain','about zain','who are you','introduce','zain abbas'], r: `**Zain Abbas Tahir** is an AI Technical Lead & Cloud Architect with **13+ years** of experience. Currently Technical Lead at **Aventra Group** (Kuala Lumpur). He builds intelligent, scalable enterprise systems using RAG, LLMs, Azure, .NET Core & Angular — and is open to projects worldwide.` },
+  { p: ['what do you build','what can you do','services','problems','solve','help me'], r: `Zain specialises in 4 areas:\n\n🤖 **AI Products** — RAG systems, LLM chatbots, predictive analytics, Copilot Studio agents\n☁️ **Cloud Architecture** — Azure design, microservices, CI/CD, Kubernetes\n💻 **Enterprise Software** — .NET Core, Angular, SaaS platforms, APIs\n👥 **Technical Leadership** — Leading teams, delivery management, architecture consulting` },
+  { p: ['skill','tech stack','technology','expertise','programming'], r: `**AI/ML:** RAG, LLMs, Azure OpenAI, Predictive AI, Sentiment Analysis, AI Foundry, Copilot Studio\n\n**Cloud:** Azure, Service Bus, Data Factory, Kubernetes, Docker, Key Vault, Cosmos DB\n\n**Dev:** .NET Core 8, Angular 17+, Blazor, React, Microservices, CQRS, REST APIs\n\n**DevOps:** CI/CD, Azure DevOps, Terraform, ARM/Bicep, SQL Server, Redis, Power BI` },
+  { p: ['experience','career','worked','company','job','history'], r: `13+ years across 5 companies:\n\n🟢 **Aventra Group** — Technical Lead (Nov 2025–Present, KL)\n🔵 **DHL IT Services** — Technical Lead (2022–2025, KL)\n🔵 **Tapcheck** — Senior SWE (2019–2022, Remote US)\n🔵 **UMCH** — Senior SWE (2018–2019, KL)\n🔵 **MTBC/CareCloud + Interactive Group** — Architect/Engineer (2013–2018, Islamabad)` },
+  { p: ['project','portfolio','built','created','work','example'], r: `Key projects:\n\n📁 **Document Management System** — Enterprise DMS (.NET Core, Azure, Angular)\n🤖 **AI Support Bot** — RAG + GPT-4 for 24/7 automated support\n📊 **Predictive Analytics Engine** — Azure ML forecasting platform\n👤 **Face Recognition Login** — AI-powered passwordless auth\n🔗 **URL Shortener & Analytics** — Click tracking with monetisation\n🖥️ **Point of Sale System** — Full retail POS & inventory` },
+  { p: ['contact','email','reach','message','connect'], r: `📧 **Email:** zabbastahir@gmail.com\n📅 **Book a 30-min call:** calendly.com/zainabbastahir/30min\n💼 **LinkedIn:** linkedin.com/in/zainabbastahir\n🐙 **GitHub:** github.com/zainabbastahir\n💻 **Upwork:** upwork.com/freelancers/~013b69c81fcb1ae708` },
+  { p: ['available','freelance','hire','remote','contract','open to work','opportunity'], r: `Yes! Zain is **open to new projects** including:\n\n✅ Freelance & contract work\n✅ Full remote positions worldwide\n✅ AI/ML development & consulting\n✅ Cloud architecture consulting\n✅ Technical leadership roles\n\nBest next step: **book a free 30-min call** → calendly.com/zainabbastahir/30min` },
+  { p: ['rag','llm','ai','machine learning','chatbot','openai','gpt','neural'], r: `Zain's AI expertise:\n\n🧠 **RAG Systems** — Document Q&A, knowledge base search with Azure AI Search & vector DBs\n💬 **LLM Integration** — Azure OpenAI, GPT-4, Semantic Kernel, custom chatbots\n📈 **Predictive AI** — ML forecasting models with Azure ML\n😊 **Sentiment Analysis** — Real-time NLP text analytics\n🤖 **Copilot Studio** — Custom enterprise AI assistants\n👁️ **Computer Vision** — Face recognition, OCR` },
+  { p: ['azure','cloud','kubernetes','docker','devops','infrastructure'], r: `Azure expertise:\n\n☁️ App Services, Functions & API Management\n🔄 Service Bus, Data Factory & Logic Apps\n📦 Kubernetes, Docker & containerisation\n🏗️ Terraform, ARM & Bicep (IaC)\n🔁 CI/CD with Azure DevOps\n💾 Cosmos DB, Redis & SQL Azure` },
+  { p: ['.net','dotnet','c#','angular','blazor','asp.net','csharp'], r: `10+ years with .NET & Angular:\n\n⚙️ **.NET Core 8** — APIs, Web Apps, Background Services\n🅰️ **Angular 17+** — Modern SPA development\n🔥 **Blazor** — Server & WebAssembly\n🏛️ **Microservices** — CQRS, event-driven design\n📡 **REST APIs** — Clean, versioned, documented` },
+  { p: ['location','where','islamabad','malaysia','kuala lumpur','pakistan','timezone'], r: `Zain is originally from **Islamabad, Pakistan** 🇵🇰 and currently working in **Kuala Lumpur, Malaysia** 🇲🇾. He works remotely with clients in the US, Europe, Middle East, and Asia across all time zones.` },
+  { p: ['youtube','video','tutorial','channel'], r: `Zain runs a **YouTube channel** with tutorials on .NET, Azure, and AI development:\n\n▶️ **youtube.com/@zainabbastahir**` },
+  { p: ['rate','salary','cost','price','fee','how much','charge'], r: `Rates vary depending on project scope, duration, and type. Best way: **email zabbastahir@gmail.com** or book a free call at **calendly.com/zainabbastahir/30min** to discuss.` },
+  { p: ['thank','thanks','appreciate','great','awesome','helpful','perfect'], r: `Happy to help! 😊 Feel free to ask anything else. If you're ready to work with Zain, reach out at zabbastahir@gmail.com!` },
+  { p: ['bye','goodbye','see you','later'], r: `Goodbye! 👋 Come back anytime. To start a project with Zain, email **zabbastahir@gmail.com** or book a call. Have a great day!` }
+];
 
-function getReply(input) {
-  const q = input.toLowerCase().trim();
-  for (const k in KB) {
-    if (KB[k].p.some(p => q.includes(p))) return KB[k].r;
+function getReply(q) {
+  const low = q.toLowerCase();
+  for (const item of KB) {
+    if (item.p.some(p => low.includes(p))) return item.r;
   }
-  return `I'm not sure about that, but here's what I can help with:\n\n• **What Zain builds / solves**\n• **Skills & tech stack**\n• **Work experience**\n• **Projects & portfolio**\n• **Availability & hiring**\n• **Contact info**\n\nOr just email him: **zabbastahir@gmail.com** 📧`;
+  return `I'm not sure about that, but I can help with:\n\n• **What Zain builds**\n• **Skills & stack**\n• **Work experience**\n• **Projects & portfolio**\n• **Availability & hiring**\n• **Contact details**\n\nOr email directly: **zabbastahir@gmail.com**`;
 }
 
 function fmt(t) {
-  return t
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>');
+  return t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
 }
 
 /* UI */
 const fab = document.getElementById('bot-fab');
 const win = document.getElementById('bot-win');
-const bx = document.getElementById('bot-x');
-const msgs = document.getElementById('bot-msgs');
-const inp = document.getElementById('bot-in');
-const send = document.getElementById('bot-send');
+const bwClose = document.getElementById('bw-close');
+const msgs = document.getElementById('bw-msgs');
+const inp = document.getElementById('bw-in');
+const send = document.getElementById('bw-send');
+const ico = document.getElementById('bot-ico');
+const xIco = document.getElementById('bot-x-ico');
 
-fab.addEventListener('click', () => {
-  const open = win.style.display === 'flex';
-  win.style.display = open ? 'none' : 'flex';
-  win.style.flexDirection = 'column';
-  const icon = fab.querySelector('.bot-open');
-  const xi = fab.querySelector('.bot-close');
-  icon.style.display = open ? 'block' : 'none';
-  xi.style.display = open ? 'none' : 'block';
-  if (!open) setTimeout(() => inp.focus(), 300);
-});
-bx.addEventListener('click', () => {
-  win.style.display = 'none';
-  fab.querySelector('.bot-open').style.display = 'block';
-  fab.querySelector('.bot-close').style.display = 'none';
-});
+let open = false;
+win.style.display = 'none';
+
+function toggle() {
+  open = !open;
+  win.style.display = open ? 'flex' : 'none';
+  if (open) win.style.flexDirection = 'column';
+  ico.style.display = open ? 'none' : 'block';
+  xIco.style.display = open ? 'block' : 'none';
+  if (open) setTimeout(() => inp.focus(), 300);
+}
+fab.addEventListener('click', toggle);
+bwClose.addEventListener('click', () => { open = true; toggle(); });
 
 function addMsg(text, role) {
-  const div = document.createElement('div');
-  div.className = `bmsg ${role}`;
-  const bbl = document.createElement('div');
-  bbl.className = 'bbl';
-  bbl.innerHTML = fmt(text);
-  div.appendChild(bbl);
-  msgs.appendChild(div);
+  const d = document.createElement('div');
+  d.className = `bm ${role}`;
+  const b = document.createElement('div');
+  b.className = 'bb';
+  b.innerHTML = fmt(text);
+  d.appendChild(b);
+  msgs.appendChild(d);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
 function showTyping() {
-  const div = document.createElement('div');
-  div.className = 'bmsg bot bot-typing';
-  div.id = 'typing';
-  div.innerHTML = `<div class="bbl"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
-  msgs.appendChild(div);
+  const d = document.createElement('div');
+  d.className = 'bm bot'; d.id = 'btyp';
+  d.innerHTML = `<div class="bb"><div class="typing-d"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(d);
   msgs.scrollTop = msgs.scrollHeight;
 }
-function hideTyping() { document.getElementById('typing')?.remove(); }
+function hideTyping() { document.getElementById('btyp')?.remove(); }
 
 function fire() {
   const txt = inp.value.trim();
   if (!txt) return;
-  document.getElementById('bot-qr')?.remove();
+  document.getElementById('bqr-wrap')?.remove();
   addMsg(txt, 'user');
   inp.value = '';
   showTyping();
-  setTimeout(() => {
-    hideTyping();
-    addMsg(getReply(txt), 'bot');
-  }, 600 + Math.random() * 600);
+  setTimeout(() => { hideTyping(); addMsg(getReply(txt), 'bot'); }, 600 + Math.random() * 500);
 }
 
 send.addEventListener('click', fire);
 inp.addEventListener('keypress', e => { if (e.key === 'Enter') fire(); });
-document.querySelectorAll('.bqr').forEach(b => b.addEventListener('click', function() {
-  inp.value = this.dataset.q;
-  fire();
-}));
+document.querySelectorAll('.bqr').forEach(b => b.addEventListener('click', function () { inp.value = this.dataset.q; fire(); }));

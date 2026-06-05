@@ -1,155 +1,147 @@
-/* ===== ZAIN'S AI CHATBOT ===== */
-
-const KNOWLEDGE_BASE = {
-  greetings: {
-    patterns: ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'hiya'],
-    response: () => `Hi there! 👋 I'm Zain's AI assistant. I can tell you all about Zain's skills, experience, projects, and more. What would you like to know?`
+/* ZAIN'S CHATBOT */
+const KB = {
+  hi: {
+    p: ['hi','hello','hey','good morning','good afternoon','howdy','hiya','sup'],
+    r: `Hi there! 👋 I'm Zain's assistant. Ask me anything about what he builds, his experience, or how to hire him!`
   },
-  name: {
-    patterns: ['who are you', 'who is zain', 'about zain', 'tell me about yourself', 'introduce', 'zain abbas'],
-    response: () => `Zain Abbas Tahir is an **AI Technical Lead & Cloud Architect** based in Islamabad, Pakistan. With **13+ years** of experience, he specializes in building enterprise-grade AI systems using RAG, LLMs, Azure Cloud, .NET Core, and Angular. Currently working as Technical Lead at **Aventra Group** in Kuala Lumpur, Malaysia.`
+  who: {
+    p: ['who are you','who is zain','about zain','tell me about','introduce','zain abbas'],
+    r: `**Zain Abbas Tahir** is an AI Technical Lead & Cloud Architect with **13+ years** of experience. He's currently Technical Lead at **Aventra Group** in Kuala Lumpur. He specialises in building AI products (RAG, LLMs), Azure cloud infrastructure, and enterprise .NET/Angular apps.`
+  },
+  solve: {
+    p: ['what do you solve','what can you build','problems','challenge','help me with','what do you do','services'],
+    r: `Zain solves 4 main categories of problems:\n\n🤖 **AI Products** — RAG systems, LLM chatbots, predictive AI, sentiment dashboards\n☁️ **Cloud Architecture** — Azure design, microservices, DevOps, CI/CD\n💻 **Enterprise Software** — .NET Core backends, Angular frontends, APIs, SaaS platforms\n👥 **Technical Leadership** — Leading dev teams, delivery management, code quality`
   },
   skills: {
-    patterns: ['skill', 'technology', 'tech stack', 'what can you do', 'expertise', 'what do you know', 'programming', 'languages', 'tools', 'capabilities'],
-    response: () => `Zain's key skills span multiple domains:\n\n**AI & ML:** RAG Systems, LLMs, Predictive AI, Sentiment Analysis, AI Foundry, Copilot Studio\n\n**Cloud:** Microsoft Azure, Service Bus, Data Factory, Kubernetes, Azure Functions\n\n**Development:** .NET Core, Angular 17+, Blazor, React, Microservices, CQRS\n\n**DevOps:** CI/CD Pipelines, Azure DevOps, Docker, Terraform, ARM/Bicep\n\n**Data:** SQL Server, EF Core, Cosmos DB, Redis Cache`
+    p: ['skill','technology','tech stack','expertise','programming','tools'],
+    r: `**AI/ML:** RAG, LLMs, Azure OpenAI, Predictive AI, Sentiment Analysis, Copilot Studio\n\n**Cloud:** Azure, Service Bus, Data Factory, Kubernetes, Docker, Key Vault\n\n**Dev:** .NET Core 8, Angular 17+, Blazor, React, Microservices, CQRS\n\n**DevOps:** CI/CD, Azure DevOps, Terraform, ARM/Bicep, SQL Server, Redis`
   },
   experience: {
-    patterns: ['experience', 'work history', 'career', 'where have you worked', 'previous job', 'company', 'employment', 'worked at', 'job'],
-    response: () => `Zain has **13+ years** of professional experience:\n\n🟢 **Aventra Group** (Nov 2025–Present) – Technical Lead, Kuala Lumpur\n🔵 **DHL IT Services** (2022–2025) – Technical Lead, Kuala Lumpur\n🔵 **Tapcheck** (2019–2022) – Senior Software Engineer, Remote (US)\n🔵 **UMCH** (2018–2019) – Senior Software Engineer, Kuala Lumpur\n🔵 **MTBC/CareCloud** (2016–2018) – Software Architect, Islamabad\n🔵 **Interactive Group & Moftak** (2013–2016) – Software Engineer, Islamabad`
+    p: ['experience','career','worked','company','employment','job','history'],
+    r: `13+ years across:\n\n🟢 **Aventra Group** — Technical Lead (Nov 2025–Present, KL)\n🔵 **DHL IT Services** — Technical Lead (2022–2025, KL)\n🔵 **Tapcheck** — Senior SWE (2019–2022, Remote US)\n🔵 **UMCH** — Senior SWE (2018–2019, KL)\n🔵 **MTBC/CareCloud** — Software Architect (2016–2018, Islamabad)\n🔵 **Interactive Group** — Software Engineer (2013–2016, Islamabad)`
   },
   projects: {
-    patterns: ['project', 'portfolio', 'built', 'created', 'developed', 'work samples', 'examples', 'show me'],
-    response: () => `Here are some of Zain's key projects:\n\n📁 **Document Management System** – Enterprise DMS with role-based access, PDF viewing, email & WhatsApp sharing (.NET Core, Angular, Azure)\n\n🤖 **AI Customer Support Bot** – Intelligent chatbot using RAG & LLMs for context-aware responses (Azure OpenAI)\n\n📊 **Predictive Analytics Engine** – ML platform for sales forecasting using Azure ML & Power BI\n\n👤 **Face Recognition Login** – AI-powered passwordless authentication (Python, AI/ML)\n\n🔗 **URL Shortener & Analytics** – Click tracking & analytics dashboard (.NET Core MVC)`
+    p: ['project','portfolio','built','created','examples','work'],
+    r: `Notable projects:\n\n📁 **Document Management System** — Enterprise DMS (.NET, Azure, Angular)\n🤖 **AI Customer Support Bot** — RAG + LLMs for 24/7 automated support\n📊 **Predictive Analytics Engine** — Azure ML forecasting platform\n👤 **Face Recognition Login** — AI-powered passwordless auth\n🔗 **URL Shortener** — Click analytics platform\n🖥️ **Point of Sale System** — Full retail POS with inventory`
   },
   contact: {
-    patterns: ['contact', 'email', 'reach', 'how to get in touch', 'hire', 'get in touch', 'phone', 'message', 'connect'],
-    response: () => `You can reach Zain through:\n\n📧 **Email:** zabbastahir@gmail.com\n💼 **LinkedIn:** linkedin.com/in/zainabbastahir\n🐙 **GitHub:** github.com/zainabbastahir\n💻 **Upwork:** upwork.com/freelancers/~013b69c81fcb1ae708\n📅 **Schedule a meeting:** calendly.com/zainabbastahir/30min`
+    p: ['contact','email','reach','get in touch','message','connect','phone'],
+    r: `📧 **Email:** zabbastahir@gmail.com\n📅 **Book a Call:** calendly.com/zainabbastahir/30min\n💼 **LinkedIn:** linkedin.com/in/zainabbastahir\n🐙 **GitHub:** github.com/zainabbastahir\n💻 **Upwork:** upwork.com/freelancers/~013b69c81fcb1ae708`
   },
-  availability: {
-    patterns: ['available', 'freelance', 'hire', 'open to work', 'remote', 'contract', 'full time', 'part time', 'opportunity'],
-    response: () => `Yes! Zain is **open to new opportunities** including:\n\n✅ Freelance & contract projects\n✅ Remote positions worldwide\n✅ AI/ML consulting\n✅ Cloud architecture consulting\n✅ Technical leadership roles\n\nHe's particularly interested in challenging AI and cloud projects. Feel free to reach out at **zabbastahir@gmail.com** or schedule a call via Calendly!`
+  available: {
+    p: ['available','freelance','hire','remote','contract','opportunity','open to work'],
+    r: `Yes! Zain is **open to new opportunities** including:\n\n✅ Freelance & contract projects\n✅ Full remote positions worldwide\n✅ AI/ML consulting\n✅ Cloud architecture consulting\n✅ Technical leadership roles\n\nBest way to start: **book a free 30-min call** at calendly.com/zainabbastahir/30min`
   },
   ai: {
-    patterns: ['rag', 'llm', 'artificial intelligence', 'machine learning', 'ai system', 'chatbot', 'neural', 'deep learning', 'nlp', 'language model', 'openai', 'gpt'],
-    response: () => `Zain is an **AI specialist** with deep expertise in:\n\n🧠 **RAG Systems** – Retrieval-Augmented Generation with Azure AI Search & vector databases\n💬 **LLM Integration** – Custom chatbots using Azure OpenAI, GPT-4, Semantic Kernel\n📈 **Predictive AI** – ML forecasting models with Azure ML\n😊 **Sentiment Analysis** – NLP-based customer feedback & social media monitoring\n🤖 **Copilot Studio** – Custom AI assistants for enterprise workflows\n👁️ **Computer Vision** – Face recognition, OCR, document processing`
+    p: ['rag','llm','artificial intelligence','machine learning','chatbot','neural','nlp','openai','gpt','ai system'],
+    r: `Zain's AI expertise includes:\n\n🧠 **RAG Systems** — Document Q&A, knowledge base search (Azure AI Search + Vector DB)\n💬 **LLM Integration** — Custom chatbots, Azure OpenAI, GPT-4, Semantic Kernel\n📈 **Predictive AI** — ML forecasting with Azure ML\n😊 **Sentiment Analysis** — Real-time NLP text analytics\n🤖 **Copilot Studio** — Custom enterprise AI assistants\n👁️ **Computer Vision** — Face recognition, OCR`
   },
   azure: {
-    patterns: ['azure', 'cloud', 'microsoft', 'aws', 'infrastructure', 'devops', 'kubernetes', 'docker', 'deployment'],
-    response: () => `Zain is an **Azure Expert** with hands-on experience in:\n\n☁️ Azure App Services & Azure Functions\n🔄 Service Bus, Data Factory & Logic Apps\n🔐 Key Vault, AD & RBAC\n📦 Kubernetes, Docker & containerization\n🏗️ Infrastructure as Code (Terraform, ARM, Bicep)\n🔁 CI/CD Pipelines with Azure DevOps\n💾 Cosmos DB, Redis Cache & SQL Azure`
+    p: ['azure','cloud','microsoft','kubernetes','docker','devops','infrastructure','deployment'],
+    r: `Zain is an **Azure Expert** with hands-on experience in:\n\n☁️ App Services, Functions & API Management\n🔄 Service Bus, Data Factory & Logic Apps\n📦 Kubernetes, Docker & containerisation\n🏗️ Terraform, ARM templates & Bicep (IaC)\n🔁 CI/CD Pipelines with Azure DevOps\n💾 Cosmos DB, Redis & SQL Azure`
   },
   dotnet: {
-    patterns: ['.net', 'dotnet', 'c#', 'asp.net', 'mvc', 'blazor', 'web api', 'entity framework', 'csharp'],
-    response: () => `Zain has **10+ years** with the .NET ecosystem:\n\n⚙️ **.NET Core / .NET 8** – Full-stack web apps & APIs\n🅰️ **Angular 17+** – Modern SPA development\n🔥 **Blazor** – Server & WebAssembly apps\n🏛️ **Microservices** – CQRS, event-driven architecture\n📡 **REST & GraphQL APIs** – Clean API design\n🗄️ **EF Core** – Database-first & code-first approaches`
+    p: ['.net','dotnet','c#','angular','asp.net','blazor','web api','csharp'],
+    r: `Zain has **10+ years** with .NET & Angular:\n\n⚙️ **.NET Core 8** — APIs, Web Apps, Background Services\n🅰️ **Angular 17+** — Modern SPA with RxJS & NgRx\n🔥 **Blazor** — Server & WebAssembly\n🏛️ **Microservices** — CQRS, event-driven architecture\n📡 **REST APIs** — Clean, versioned, documented`
   },
   location: {
-    patterns: ['location', 'where are you', 'based', 'country', 'city', 'pakistan', 'islamabad', 'malaysia', 'kuala lumpur', 'timezone'],
-    response: () => `Zain is originally from **Islamabad, Pakistan** 🇵🇰 and is currently working in **Kuala Lumpur, Malaysia** 🇲🇾 at Aventra Group. He's fully comfortable working remotely across different time zones and has experience with US, European, and Asian clients.`
-  },
-  education: {
-    patterns: ['education', 'degree', 'university', 'college', 'study', 'qualification', 'academic'],
-    response: () => `Zain holds a strong academic background in Computer Science and has been continuously expanding his knowledge through professional certifications in Azure and AI. He's also a **content creator** on YouTube sharing tutorials on .NET, Azure, and AI development.`
+    p: ['location','where','based','pakistan','islamabad','malaysia','kuala lumpur','timezone','country'],
+    r: `Zain is from **Islamabad, Pakistan** 🇵🇰 and currently works in **Kuala Lumpur, Malaysia** 🇲🇾. He's fully comfortable working remotely with US, European, and Asian clients across all time zones.`
   },
   youtube: {
-    patterns: ['youtube', 'video', 'tutorial', 'channel', 'content', 'watch'],
-    response: () => `Zain runs a **YouTube channel** where he shares:\n\n🎬 Technical tutorials on .NET, Azure & AI\n🎬 Demo videos of projects he's built\n🎬 Tips for enterprise software development\n\n🔗 Subscribe at: **youtube.com/@zainabbastahir**`
+    p: ['youtube','video','tutorial','channel','watch'],
+    r: `Zain has a **YouTube channel** with tutorials on:\n🎬 .NET Core, Azure & AI development\n🎬 Demo walkthroughs of projects\n🎬 Architecture deep-dives\n\n▶️ **youtube.com/@zainabbastahir**`
   },
-  salary: {
-    patterns: ['salary', 'rate', 'cost', 'price', 'charge', 'fee', 'how much', 'hourly'],
-    response: () => `For freelance rates or salary expectations, it's best to discuss directly with Zain as it depends on the project scope, duration, and requirements. You can reach him at **zabbastahir@gmail.com** or schedule a consultation via **Calendly**.`
+  rate: {
+    p: ['salary','rate','cost','price','charge','fee','how much','hourly'],
+    r: `Rates depend on project scope, duration, and type of engagement. The best way to discuss is to **book a free 30-min call** at calendly.com/zainabbastahir/30min or email zabbastahir@gmail.com directly.`
   },
   thanks: {
-    patterns: ['thank', 'thanks', 'appreciate', 'great', 'awesome', 'perfect', 'helpful'],
-    response: () => `You're very welcome! 😊 Feel free to ask anything else about Zain. If you'd like to discuss a project, don't hesitate to reach out at zabbastahir@gmail.com!`
+    p: ['thank','thanks','appreciate','great','awesome','perfect','helpful','cool'],
+    r: `You're welcome! 😊 Feel free to ask anything else. If you'd like to work with Zain, send an email or book a call — he's always happy to chat!`
   },
   bye: {
-    patterns: ['bye', 'goodbye', 'see you', 'cya', 'later', 'take care'],
-    response: () => `Goodbye! 👋 Feel free to come back anytime. If you're interested in working with Zain, send an email to **zabbastahir@gmail.com** or visit his LinkedIn profile!`
+    p: ['bye','goodbye','see you','later','take care'],
+    r: `Goodbye! 👋 If you ever want to discuss a project, reach Zain at **zabbastahir@gmail.com** or book a call at Calendly. Have a great day!`
   }
 };
 
-function getResponse(input) {
-  const lower = input.toLowerCase().trim();
-  for (const key in KNOWLEDGE_BASE) {
-    const entry = KNOWLEDGE_BASE[key];
-    if (entry.patterns.some(p => lower.includes(p))) {
-      return entry.response();
-    }
+function getReply(input) {
+  const q = input.toLowerCase().trim();
+  for (const k in KB) {
+    if (KB[k].p.some(p => q.includes(p))) return KB[k].r;
   }
-  return `I'm not sure about that, but I'd love to help! You can ask me about Zain's:\n\n• **Skills & technologies**\n• **Work experience**\n• **Projects & portfolio**\n• **Availability & contact**\n• **AI & cloud expertise**\n\nOr email him directly at **zabbastahir@gmail.com** 📧`;
+  return `I'm not sure about that, but here's what I can help with:\n\n• **What Zain builds / solves**\n• **Skills & tech stack**\n• **Work experience**\n• **Projects & portfolio**\n• **Availability & hiring**\n• **Contact info**\n\nOr just email him: **zabbastahir@gmail.com** 📧`;
 }
 
-/* ===== CHAT UI ===== */
-const chatWidget = document.getElementById('chat-widget');
-const chatFab = document.getElementById('chat-fab');
-const chatWindow = document.getElementById('chat-window');
-const cwClose = document.getElementById('cw-close');
-const cwMessages = document.getElementById('cw-messages');
-const cwInput = document.getElementById('cw-input');
-const cwSend = document.getElementById('cw-send');
-
-chatFab.addEventListener('click', () => {
-  chatWidget.classList.toggle('open');
-  if (chatWidget.classList.contains('open')) {
-    setTimeout(() => cwInput.focus(), 350);
-  }
-});
-
-cwClose.addEventListener('click', () => chatWidget.classList.remove('open'));
-
-function appendMsg(text, role) {
-  const msgEl = document.createElement('div');
-  msgEl.className = `cw-msg ${role}`;
-  const bubble = document.createElement('div');
-  bubble.className = 'cw-bubble';
-  bubble.innerHTML = formatResponse(text);
-  msgEl.appendChild(bubble);
-  cwMessages.appendChild(msgEl);
-  cwMessages.scrollTop = cwMessages.scrollHeight;
-}
-
-function formatResponse(text) {
-  return text
+function fmt(t) {
+  return t
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>')
-    .replace(/🟢|🔵|📁|🤖|📊|👤|🔗|📧|💼|🐙|💻|📅|✅|🧠|💬|📈|😊|🔄|☁️|🔐|📦|🏗️|🔁|💾|⚙️|🅰️|🔥|🏛️|📡|🗄️|🇵🇰|🇲🇾|🎬|👋|😊|📢/g, m => `<span>${m}</span>`);
+    .replace(/\n/g, '<br>');
+}
+
+/* UI */
+const fab = document.getElementById('bot-fab');
+const win = document.getElementById('bot-win');
+const bx = document.getElementById('bot-x');
+const msgs = document.getElementById('bot-msgs');
+const inp = document.getElementById('bot-in');
+const send = document.getElementById('bot-send');
+
+fab.addEventListener('click', () => {
+  const open = win.style.display === 'flex';
+  win.style.display = open ? 'none' : 'flex';
+  win.style.flexDirection = 'column';
+  const icon = fab.querySelector('.bot-open');
+  const xi = fab.querySelector('.bot-close');
+  icon.style.display = open ? 'block' : 'none';
+  xi.style.display = open ? 'none' : 'block';
+  if (!open) setTimeout(() => inp.focus(), 300);
+});
+bx.addEventListener('click', () => {
+  win.style.display = 'none';
+  fab.querySelector('.bot-open').style.display = 'block';
+  fab.querySelector('.bot-close').style.display = 'none';
+});
+
+function addMsg(text, role) {
+  const div = document.createElement('div');
+  div.className = `bmsg ${role}`;
+  const bbl = document.createElement('div');
+  bbl.className = 'bbl';
+  bbl.innerHTML = fmt(text);
+  div.appendChild(bbl);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
 function showTyping() {
-  const typingEl = document.createElement('div');
-  typingEl.className = 'cw-msg bot';
-  typingEl.id = 'cw-typing-indicator';
-  typingEl.innerHTML = `<div class="cw-bubble cw-typing"><span></span><span></span><span></span></div>`;
-  cwMessages.appendChild(typingEl);
-  cwMessages.scrollTop = cwMessages.scrollHeight;
+  const div = document.createElement('div');
+  div.className = 'bmsg bot bot-typing';
+  div.id = 'typing';
+  div.innerHTML = `<div class="bbl"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
 }
+function hideTyping() { document.getElementById('typing')?.remove(); }
 
-function hideTyping() {
-  const el = document.getElementById('cw-typing-indicator');
-  if (el) el.remove();
-}
-
-function sendMessage() {
-  const text = cwInput.value.trim();
-  if (!text) return;
-  const qr = document.getElementById('cw-quick');
-  if (qr) qr.remove();
-  appendMsg(text, 'user');
-  cwInput.value = '';
+function fire() {
+  const txt = inp.value.trim();
+  if (!txt) return;
+  document.getElementById('bot-qr')?.remove();
+  addMsg(txt, 'user');
+  inp.value = '';
   showTyping();
   setTimeout(() => {
     hideTyping();
-    const reply = getResponse(text);
-    appendMsg(reply, 'bot');
-  }, 700 + Math.random() * 600);
+    addMsg(getReply(txt), 'bot');
+  }, 600 + Math.random() * 600);
 }
 
-cwSend.addEventListener('click', sendMessage);
-cwInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-document.querySelectorAll('.cw-qr').forEach(btn => {
-  btn.addEventListener('click', function() {
-    cwInput.value = this.dataset.q;
-    sendMessage();
-  });
-});
+send.addEventListener('click', fire);
+inp.addEventListener('keypress', e => { if (e.key === 'Enter') fire(); });
+document.querySelectorAll('.bqr').forEach(b => b.addEventListener('click', function() {
+  inp.value = this.dataset.q;
+  fire();
+}));

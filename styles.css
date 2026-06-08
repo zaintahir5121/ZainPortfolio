@@ -544,6 +544,28 @@ body:has(button:hover) #cursor-ring {
 }
 .proj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 
+/* Gradient project image block */
+.proj-img-bg {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.proj-img-bg::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    45deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px,
+    transparent 0, transparent 50%
+  );
+  background-size: 12px 12px;
+}
+.proj-img-icon {
+  font-size: 3.5rem; color: rgba(255,255,255,0.9);
+  filter: drop-shadow(0 4px 24px rgba(0,0,0,0.3));
+  position: relative; z-index: 1;
+  transition: transform 0.4s ease;
+}
+.tilt-card:hover .proj-img-icon { transform: scale(1.15) rotate(-5deg); }
+
 /* 3D Tilt card */
 .tilt-card {
   background: var(--glass); border-radius: 16px; overflow: hidden;

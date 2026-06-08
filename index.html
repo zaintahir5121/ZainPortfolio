@@ -13,6 +13,13 @@
 </head>
 <body>
 
+  <!-- SCROLL PROGRESS -->
+  <div id="scroll-progress"></div>
+
+  <!-- CUSTOM CURSOR -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
   <!-- NAVBAR -->
   <nav class="navbar" id="navbar">
     <div class="nav-inner">
@@ -39,6 +46,7 @@
 
   <!-- HERO -->
   <section class="hero" id="home">
+    <canvas id="particles-canvas"></canvas>
     <div class="hero-bg-grid"></div>
     <div class="hero-orb hero-orb-1"></div>
     <div class="hero-orb hero-orb-2"></div>
@@ -49,11 +57,7 @@
           Available for new opportunities
         </div>
         <div class="hero-roles">
-          <span>AI Technical Lead</span>
-          <span class="sep">·</span>
-          <span>Cloud Architect</span>
-          <span class="sep">·</span>
-          <span>Delivery Manager</span>
+          <span id="typewriter" class="typewriter-text"></span><span class="typewriter-cursor">|</span>
         </div>
         <h1 class="hero-h1">
           Building <span class="grad-text">AI-Powered</span><br>Systems That Scale
@@ -69,8 +73,8 @@
           <div class="stat"><span class="stat-n" data-count="20">0</span><sup>+</sup><small>Enterprise</small></div>
         </div>
         <div class="hero-actions">
-          <a href="#projects" class="btn-primary">View Work <i class="fas fa-arrow-right"></i></a>
-          <a href="#contact" class="btn-ghost">Let's Talk <i class="fas fa-paper-plane"></i></a>
+          <a href="#projects" class="btn-primary magnetic">View Work <i class="fas fa-arrow-right"></i></a>
+          <a href="#contact" class="btn-ghost magnetic">Let's Talk <i class="fas fa-paper-plane"></i></a>
         </div>
         <div class="hero-socials">
           <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -436,7 +440,7 @@
       </div>
       <div class="proj-grid" id="proj-grid">
 
-        <div class="proj-card reveal" data-cat="web cloud">
+        <div class="proj-card reveal tilt-card" data-cat="web cloud">
           <div class="proj-img">
             <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/Login.webp" alt="Document Management System" loading="lazy">
             <div class="proj-overlay">
@@ -454,7 +458,7 @@
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="ai cloud">
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
           <div class="proj-img">
             <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop" alt="AI Customer Support Bot" loading="lazy">
             <div class="proj-overlay">
@@ -472,7 +476,7 @@
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="ai cloud">
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
           <div class="proj-img">
             <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop" alt="Predictive Analytics Engine" loading="lazy">
             <div class="proj-overlay">
@@ -490,7 +494,7 @@
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="ai">
+        <div class="proj-card reveal tilt-card" data-cat="ai">
           <div class="proj-img">
             <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/th.jpg" alt="Face Recognition System" loading="lazy">
             <div class="proj-overlay">
@@ -508,7 +512,7 @@
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="web">
+        <div class="proj-card reveal tilt-card" data-cat="web">
           <div class="proj-img">
             <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/2020-11-06_2-50-22-1-1.webp" alt="URL Shortener" loading="lazy">
             <div class="proj-overlay">
@@ -526,7 +530,7 @@
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="desktop">
+        <div class="proj-card reveal tilt-card" data-cat="desktop">
           <div class="proj-img">
             <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/14.webp" alt="Point of Sale System" loading="lazy">
             <div class="proj-overlay">

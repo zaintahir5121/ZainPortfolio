@@ -23,11 +23,12 @@ const KNOWLEDGE_BASE = {
   },
   contact: {
     patterns: ['contact', 'email', 'reach', 'how to get in touch', 'hire', 'get in touch', 'phone', 'message', 'connect'],
-    response: () => `You can reach Zain through:\n\n📧 **Email:** zabbastahir@gmail.com\n💼 **LinkedIn:** linkedin.com/in/zainabbastahir\n🐙 **GitHub:** github.com/zainabbastahir\n💻 **Upwork:** upwork.com/freelancers/~013b69c81fcb1ae708\n📅 **Schedule a meeting:** calendly.com/zainabbastahir/30min`
+    response: () => `You can reach Zain through:\n\n📧 **Email:** zain.tahir512@gmail.com
+💬 **WhatsApp:** +60-10-3635-921\n💼 **LinkedIn:** linkedin.com/in/zainabbastahir\n🐙 **GitHub:** github.com/zainabbastahir\n💻 **Upwork:** upwork.com/freelancers/~013b69c81fcb1ae708\n📅 **Schedule a meeting:** calendly.com/zainabbastahir/30min`
   },
   availability: {
     patterns: ['available', 'freelance', 'hire', 'open to work', 'remote', 'contract', 'full time', 'part time', 'opportunity'],
-    response: () => `Yes! Zain is **open to new opportunities** including:\n\n✅ Freelance & contract projects\n✅ Remote positions worldwide\n✅ AI/ML consulting\n✅ Cloud architecture consulting\n✅ Technical leadership roles\n\nHe's particularly interested in challenging AI and cloud projects. Feel free to reach out at **zabbastahir@gmail.com** or schedule a call via Calendly!`
+    response: () => `Yes! Zain is **open to new opportunities** including:\n\n✅ Freelance & contract projects\n✅ Remote positions worldwide\n✅ AI/ML consulting\n✅ Cloud architecture consulting\n✅ Technical leadership roles\n\nHe's particularly interested in challenging AI and cloud projects. Feel free to reach out at **zain.tahir512@gmail.com** or schedule a call via Calendly!`
   },
   ai: {
     patterns: ['rag', 'llm', 'artificial intelligence', 'machine learning', 'ai system', 'chatbot', 'neural', 'deep learning', 'nlp', 'language model', 'openai', 'gpt'],
@@ -55,15 +56,15 @@ const KNOWLEDGE_BASE = {
   },
   salary: {
     patterns: ['salary', 'rate', 'cost', 'price', 'charge', 'fee', 'how much', 'hourly'],
-    response: () => `For freelance rates or salary expectations, it's best to discuss directly with Zain as it depends on the project scope, duration, and requirements. You can reach him at **zabbastahir@gmail.com** or schedule a consultation via **Calendly**.`
+    response: () => `For freelance rates or salary expectations, it's best to discuss directly with Zain as it depends on the project scope, duration, and requirements. You can reach him at **zain.tahir512@gmail.com** or schedule a consultation via **Calendly**.`
   },
   thanks: {
     patterns: ['thank', 'thanks', 'appreciate', 'great', 'awesome', 'perfect', 'helpful'],
-    response: () => `You're very welcome! 😊 Feel free to ask anything else about Zain. If you'd like to discuss a project, don't hesitate to reach out at zabbastahir@gmail.com!`
+    response: () => `You're very welcome! 😊 Feel free to ask anything else about Zain. If you'd like to discuss a project, don't hesitate to reach out at zain.tahir512@gmail.com!`
   },
   bye: {
     patterns: ['bye', 'goodbye', 'see you', 'cya', 'later', 'take care'],
-    response: () => `Goodbye! 👋 Feel free to come back anytime. If you're interested in working with Zain, send an email to **zabbastahir@gmail.com** or visit his LinkedIn profile!`
+    response: () => `Goodbye! 👋 Feel free to come back anytime. If you're interested in working with Zain, send an email to **zain.tahir512@gmail.com** or visit his LinkedIn profile!`
   }
 };
 
@@ -75,7 +76,7 @@ function getResponse(input) {
       return entry.response();
     }
   }
-  return `I'm not sure about that, but I'd love to help! You can ask me about Zain's:\n\n• **Skills & technologies**\n• **Work experience**\n• **Projects & portfolio**\n• **Availability & contact**\n• **AI & cloud expertise**\n\nOr email him directly at **zabbastahir@gmail.com** 📧`;
+  return `I'm not sure about that, but I'd love to help! You can ask me about Zain's:\n\n• **Skills & technologies**\n• **Work experience**\n• **Projects & portfolio**\n• **Availability & contact**\n• **AI & cloud expertise**\n\nOr email him directly at **zain.tahir512@gmail.com** 📧`;
 }
 
 /* ===== CHAT UI ===== */

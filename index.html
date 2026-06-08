@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zain Abbas Tahir | AI Technical Lead & Cloud Architect</title>
-  <meta name="description" content="AI Technical Lead & Cloud Architect with 13+ years building RAG, LLMs, Azure Cloud, .NET & Angular enterprise solutions. Based in Islamabad, Pakistan.">
+  <meta name="description" content="AI Technical Lead & Cloud Architect with 14+ years building RAG, LLMs, Azure Cloud, .NET & Angular enterprise solutions. Based in Islamabad, Pakistan.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -12,6 +12,13 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+  <!-- SCROLL PROGRESS -->
+  <div id="scroll-progress"></div>
+
+  <!-- CUSTOM CURSOR -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
 
   <!-- NAVBAR -->
   <nav class="navbar" id="navbar">
@@ -29,7 +36,7 @@
         <button class="theme-btn" id="theme-btn" aria-label="Toggle theme">
           <i class="fas fa-moon" id="theme-icon"></i>
         </button>
-        <a href="mailto:zabbastahir@gmail.com" class="nav-hire">Hire Me</a>
+        <a href="mailto:zain.tahir512@gmail.com" class="nav-hire">Hire Me</a>
         <button class="hamburger" id="hamburger" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
@@ -39,6 +46,7 @@
 
   <!-- HERO -->
   <section class="hero" id="home">
+    <canvas id="particles-canvas"></canvas>
     <div class="hero-bg-grid"></div>
     <div class="hero-orb hero-orb-1"></div>
     <div class="hero-orb hero-orb-2"></div>
@@ -49,35 +57,32 @@
           Available for new opportunities
         </div>
         <div class="hero-roles">
-          <span>AI Technical Lead</span>
-          <span class="sep">·</span>
-          <span>Cloud Architect</span>
-          <span class="sep">·</span>
-          <span>Delivery Manager</span>
+          <span id="typewriter" class="typewriter-text"></span><span class="typewriter-cursor">|</span>
         </div>
         <h1 class="hero-h1">
           Building <span class="grad-text">AI-Powered</span><br>Systems That Scale
         </h1>
         <p class="hero-p">
-          13+ years designing enterprise-grade solutions with <strong>RAG</strong>, <strong>LLMs</strong>,
+          14+ years designing enterprise-grade solutions with <strong>RAG</strong>, <strong>LLMs</strong>,
           <strong>Azure Cloud</strong>, <strong>.NET Core</strong> &amp; <strong>Angular</strong> —
           turning complex data into actionable intelligence.
         </p>
         <div class="hero-stats">
-          <div class="stat"><span class="stat-n" data-count="13">0</span><sup>+</sup><small>Years Exp.</small></div>
-          <div class="stat"><span class="stat-n" data-count="50">0</span><sup>+</sup><small>Projects</small></div>
+          <div class="stat"><span class="stat-n" data-count="14">0</span><sup>+</sup><small>Years Exp.</small></div>
+          <div class="stat"><span class="stat-n" data-count="60">0</span><sup>+</sup><small>Projects</small></div>
           <div class="stat"><span class="stat-n" data-count="20">0</span><sup>+</sup><small>Enterprise</small></div>
         </div>
         <div class="hero-actions">
-          <a href="#projects" class="btn-primary">View Work <i class="fas fa-arrow-right"></i></a>
-          <a href="#contact" class="btn-ghost">Let's Talk <i class="fas fa-paper-plane"></i></a>
+          <a href="#projects" class="btn-primary magnetic">View Work <i class="fas fa-arrow-right"></i></a>
+          <a href="#contact" class="btn-ghost magnetic">Let's Talk <i class="fas fa-paper-plane"></i></a>
         </div>
         <div class="hero-socials">
           <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
           <a href="https://github.com/zainabbastahir" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
           <a href="https://www.youtube.com/@zainabbastahir" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
           <a href="https://www.upwork.com/freelancers/~013b69c81fcb1ae708" target="_blank" aria-label="Upwork"><i class="fas fa-briefcase"></i></a>
-          <a href="mailto:zabbastahir@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+          <a href="mailto:zain.tahir512@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+          <a href="https://wa.me/60103635921" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
       <div class="hero-visual">
@@ -89,7 +94,7 @@
           <pre class="code-body"><code><span class="c-kw">public class</span> <span class="c-cls">ZainAbbasTahir</span>
 {
   <span class="c-kw">public string</span> Role =&gt; <span class="c-str">"AI Technical Lead"</span>;
-  <span class="c-kw">public int</span> YearsExp =&gt; <span class="c-num">13</span>;
+  <span class="c-kw">public int</span> YearsExp =&gt; <span class="c-num">14</span>;
 
   <span class="c-kw">public</span> List&lt;string&gt; Stack =&gt; <span class="c-kw">new</span>()
   {
@@ -130,10 +135,10 @@
       <div class="about-grid">
         <div class="about-img-wrap">
           <div class="about-img-frame">
-            <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=1769040000&v=beta&t=TUiiTGu06kKI5KsCZJXLshEV6BZA0NozBiEf9nMywkk" alt="Zain Abbas Tahir">
+            <img src="https://media.licdn.com/dms/image/v2/D5603AQHMF2-TqJj2Tg/profile-displayphoto-scale_200_200/B56ZlsZj34I8AY-/0/1758460270237?e=2147483647&v=beta&t=whJmcOwqyQNNnPe5KgbTwqYdX1TkMaOYKMEAGybq59c" alt="Zain Abbas Tahir">
           </div>
           <div class="exp-badge">
-            <span class="exp-n">13+</span>
+            <span class="exp-n">14+</span>
             <span class="exp-l">Years of<br>Excellence</span>
           </div>
           <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="li-badge">
@@ -201,7 +206,7 @@
       <div class="sec-header">
         <span class="sec-tag">Technical Expertise</span>
         <h2>Technologies I <span class="grad-text">Master</span></h2>
-        <p class="sec-desc">A comprehensive toolkit built over 13+ years of professional development</p>
+        <p class="sec-desc">A comprehensive toolkit built over 14+ years of professional development</p>
       </div>
       <div class="skills-wrap">
 
@@ -271,7 +276,7 @@
           <div class="tl-card">
             <div class="tl-top">
               <div>
-                <h3 class="tl-role">Technical Lead</h3>
+                <h3 class="tl-role">Technical Manager / Cloud Architect</h3>
                 <h4 class="tl-co">Aventra Group</h4>
               </div>
               <div class="tl-meta">
@@ -425,46 +430,136 @@
       <div class="sec-header">
         <span class="sec-tag">Featured Work</span>
         <h2>Projects That <span class="grad-text">Deliver Results</span></h2>
-        <p class="sec-desc">Real solutions built for real business challenges</p>
+        <p class="sec-desc">Real solutions built for real business challenges across AI, Cloud &amp; Enterprise domains</p>
       </div>
       <div class="proj-filters">
         <button class="pf-btn active" data-f="all">All</button>
-        <button class="pf-btn" data-f="web">Web Apps</button>
-        <button class="pf-btn" data-f="cloud">Cloud</button>
         <button class="pf-btn" data-f="ai">AI / ML</button>
+        <button class="pf-btn" data-f="cloud">Cloud</button>
+        <button class="pf-btn" data-f="web">Web Apps</button>
         <button class="pf-btn" data-f="desktop">Desktop</button>
       </div>
       <div class="proj-grid" id="proj-grid">
 
-        <div class="proj-card reveal" data-cat="web cloud">
+        <!-- AI Compliance Review Platform -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
           <div class="proj-img">
-            <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/Login.webp" alt="Document Management System" loading="lazy">
-            <div class="proj-overlay">
-              <a href="https://zainabbastahir.com" target="_blank" title="Live"><i class="fas fa-external-link-alt"></i></a>
-            </div>
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#0891b2,#6366f1)"><i class="fas fa-shield-halved proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
           </div>
           <div class="proj-body">
-            <div class="proj-tags"><span>.NET Core</span><span>Azure</span><span>Angular</span></div>
-            <h3>Document Management System</h3>
-            <p>Enterprise-grade document management with role-based access, PDF viewing, email &amp; WhatsApp sharing capabilities.</p>
+            <div class="proj-tags"><span>Azure OpenAI</span><span>RAG</span><span>LLMs</span><span>.NET Core</span></div>
+            <h3>AI Compliance Review Platform</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Manual compliance reviews were slow, error-prone and impossible to scale across hundreds of policy documents.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an LLM-powered platform that auto-reads documents, flags regulatory gaps and generates structured audit reports — cutting review time by 70%.</p>
             <div class="proj-stats">
-              <span><i class="fas fa-users"></i> Multi-tenant</span>
-              <span><i class="fas fa-shield-alt"></i> Secure</span>
+              <span><i class="fas fa-file-contract"></i> Audit Ready</span>
+              <span><i class="fas fa-robot"></i> LLM Powered</span>
             </div>
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="ai cloud">
+        <!-- AI Spot Report Generator -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
           <div class="proj-img">
-            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop" alt="AI Customer Support Bot" loading="lazy">
-            <div class="proj-overlay">
-              <a href="https://zainabbastahir.com" target="_blank" title="Live"><i class="fas fa-external-link-alt"></i></a>
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"><i class="fas fa-file-lines proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Azure OpenAI</span><span>LLMs</span><span>Cosmos DB</span></div>
+            <h3>AI Spot Report Generator</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Operations teams spent hours manually compiling data into reports, delaying decisions and wasting analyst time.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Delivered an LLM engine that ingests live operational data and auto-generates structured spot reports — reducing effort by 80%.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-bolt"></i> 80% Faster</span>
+              <span><i class="fas fa-chart-bar"></i> Auto Reports</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Document Chat Using AI -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#10b981,#0ea5e9)"><i class="fas fa-comments proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>RAG</span><span>AI Search</span><span>Azure OpenAI</span><span>Angular</span></div>
+            <h3>Document Chat Using AI</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Employees wasted hours searching through thousands of documents to find answers buried in PDFs, Word files and reports.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built a RAG-powered chat UI so users simply ask a question and get exact answers from the document library in seconds.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-magnifying-glass"></i> Semantic Search</span>
+              <span><i class="fas fa-file-arrow-up"></i> Multi-format</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Agentic AI Chatbot -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#7c3aed,#6366f1)"><i class="fas fa-network-wired proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Agentic AI</span><span>Copilot Studio</span><span>Azure OpenAI</span></div>
+            <h3>Agentic AI – Internal Ecosystem Bot</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Repetitive internal workflows (approvals, lookups, handoffs) required constant human coordination across multiple systems.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Designed a multi-agent AI system that autonomously plans tasks, calls tools and completes cross-system workflows — freeing teams for high-value work.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-gears"></i> Multi-Agent</span>
+              <span><i class="fas fa-sitemap"></i> Orchestrated</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Performance Optimization -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#f97316,#eab308)"><i class="fas fa-gauge proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Azure ML</span><span>App Insights</span><span>Power BI</span></div>
+            <h3>AI Based Performance Optimization</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Teams only discovered performance bottlenecks after users complained — reactive firefighting was costly and damaging to SLAs.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an ML monitoring platform that proactively detects degradation patterns and auto-recommends or applies fixes before users are impacted.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-chart-line"></i> Auto-Optimize</span>
+              <span><i class="fas fa-eye"></i> Real-time</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Sales & Lead Generator -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#22c55e,#0ea5e9)"><i class="fas fa-handshake proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Azure OpenAI</span><span>LLMs</span><span>CRM APIs</span><span>Angular</span></div>
+            <h3>AI Sales &amp; Lead Generator</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Sales teams spent 60% of their time on unqualified leads and generic outreach, resulting in low conversion and wasted effort.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Engineered an AI pipeline that scores prospects, crafts personalised outreach via LLMs and feeds qualified leads directly into the CRM.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-user-plus"></i> Lead Scoring</span>
+              <span><i class="fas fa-envelope-open"></i> Auto Outreach</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Customer Support Bot -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#6366f1,#a78bfa)"><i class="fas fa-robot proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>RAG</span><span>Azure OpenAI</span><span>LLMs</span></div>
             <h3>AI Customer Support Bot</h3>
-            <p>Intelligent chatbot powered by RAG and LLMs for automated, context-aware customer service responses.</p>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Support teams were overwhelmed with repetitive queries, causing long wait times and high operational cost.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Deployed a RAG + LLM chatbot that handles 70% of queries autonomously, with full context awareness and 24/7 availability.</p>
             <div class="proj-stats">
               <span><i class="fas fa-robot"></i> AI Powered</span>
               <span><i class="fas fa-comments"></i> 24/7 Support</span>
@@ -472,17 +567,17 @@
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="ai cloud">
+        <!-- Predictive Analytics Engine -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
           <div class="proj-img">
-            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop" alt="Predictive Analytics Engine" loading="lazy">
-            <div class="proj-overlay">
-              <a href="https://zainabbastahir.com" target="_blank" title="Live"><i class="fas fa-external-link-alt"></i></a>
-            </div>
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)"><i class="fas fa-chart-line proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Azure ML</span><span>Data Factory</span><span>Power BI</span></div>
             <h3>Predictive Analytics Engine</h3>
-            <p>ML platform for sales forecasting, demand prediction, and customer behavior analysis using Azure ML.</p>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Business decisions were made on gut feeling — lack of forecasting led to inventory mismatches and missed revenue opportunities.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an Azure ML platform that forecasts demand, predicts churn and surfaces customer behaviour patterns in real-time Power BI dashboards.</p>
             <div class="proj-stats">
               <span><i class="fas fa-chart-line"></i> Forecasting</span>
               <span><i class="fas fa-brain"></i> ML Models</span>
@@ -490,17 +585,17 @@
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="ai">
+        <!-- Face Recognition Login -->
+        <div class="proj-card reveal tilt-card" data-cat="ai">
           <div class="proj-img">
-            <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/th.jpg" alt="Face Recognition System" loading="lazy">
-            <div class="proj-overlay">
-              <a href="https://zainabbastahir.com" target="_blank" title="Live"><i class="fas fa-external-link-alt"></i></a>
-            </div>
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)"><i class="fas fa-smile proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>AI/ML</span><span>Python</span><span>.NET</span></div>
             <h3>Face Recognition Login</h3>
-            <p>AI-powered authentication system using facial recognition for secure, passwordless login experiences.</p>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Password-based logins were a security liability — brute-force attacks, credential sharing and resets created constant risk and friction.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Delivered a facial recognition + liveness detection system for passwordless, phish-proof enterprise authentication.</p>
             <div class="proj-stats">
               <span><i class="fas fa-eye"></i> Face Detection</span>
               <span><i class="fas fa-lock"></i> Secure Auth</span>
@@ -508,17 +603,69 @@
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="web">
+        <!-- Route Optimization System -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
           <div class="proj-img">
-            <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/2020-11-06_2-50-22-1-1.webp" alt="URL Shortener" loading="lazy">
-            <div class="proj-overlay">
-              <a href="https://zainabbastahir.com" target="_blank" title="Live"><i class="fas fa-external-link-alt"></i></a>
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#00d4ff,#6366f1)"><i class="fas fa-route proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Azure AI</span><span>Microservices</span><span>.NET Core</span></div>
+            <h3>AI Route Optimization System</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> DHL's manual route planning failed to account for real-time traffic and capacity — drivers followed suboptimal routes, increasing cost and delays.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Architected an AI system that ingests live data and dynamically re-optimises delivery routes — cutting fuel costs and improving on-time delivery.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-location-dot"></i> Smart Routing</span>
+              <span><i class="fas fa-truck"></i> Logistics</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Sentiment Analysis Dashboard -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#ec4899,#f43f5e)"><i class="fas fa-heartbeat proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>NLP</span><span>Python</span><span>Power BI</span><span>Azure</span></div>
+            <h3>Sentiment Analysis Dashboard</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Customer feedback was scattered across emails, reviews and social media — no way to spot trends or act on dissatisfaction quickly.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an NLP pipeline that ingests multi-channel feedback and surfaces real-time sentiment trends in Power BI for immediate action.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-smile-beam"></i> NLP Powered</span>
+              <span><i class="fas fa-chart-pie"></i> Real-time</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Document Management System -->
+        <div class="proj-card reveal tilt-card" data-cat="web cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#334155,#6366f1)"><i class="fas fa-folder-open proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>.NET Core</span><span>Azure</span><span>Angular</span></div>
+            <h3>Document Management System</h3>
+            <p>Enterprise-grade multi-tenant DMS with role-based access, PDF viewing, email &amp; WhatsApp sharing and audit trails.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-users"></i> Multi-tenant</span>
+              <span><i class="fas fa-shield-alt"></i> Secure</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- URL Shortener -->
+        <div class="proj-card reveal tilt-card" data-cat="web">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#0369a1,#0ea5e9)"><i class="fas fa-link proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>.NET Core</span><span>MVC</span><span>Analytics</span></div>
             <h3>URL Shortener &amp; Analytics</h3>
-            <p>Custom URL shortening service with click tracking, analytics dashboard, and AdSense integration.</p>
+            <p>Custom URL shortening service with click tracking, analytics dashboard, geographic insights and AdSense integration.</p>
             <div class="proj-stats">
               <span><i class="fas fa-link"></i> Short URLs</span>
               <span><i class="fas fa-chart-bar"></i> Click Stats</span>
@@ -526,17 +673,160 @@
           </div>
         </div>
 
-        <div class="proj-card reveal" data-cat="desktop">
+        <!-- Automated Language Translator -->
+        <div class="proj-card reveal tilt-card" data-cat="ai">
           <div class="proj-img">
-            <img src="https://zainabbastahir.com/wp-content/uploads/2025/02/14.webp" alt="Point of Sale System" loading="lazy">
-            <div class="proj-overlay">
-              <a href="https://zainabbastahir.com" target="_blank" title="Live"><i class="fas fa-external-link-alt"></i></a>
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#0891b2,#10b981)"><i class="fas fa-language proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>NLP</span><span>Python</span><span>Deep Learning</span></div>
+            <h3>Automated Language Translator</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Language barriers blocked effective communication between global teams and users across regions.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Designed an NLP-based automated translation engine supporting multi-language pairs with context-aware accuracy.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-globe"></i> Multi-language</span>
+              <span><i class="fas fa-bolt"></i> Real-time</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Image-to-Video & Text Classifier -->
+        <div class="proj-card reveal tilt-card" data-cat="ai">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#7c3aed,#ec4899)"><i class="fas fa-film proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Computer Vision</span><span>Python</span><span>TensorFlow</span></div>
+            <h3>Image-to-Video &amp; Text Classifier</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Unstructured visual and textual content was impossible to categorise at scale without massive manual effort.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built a deep learning pipeline that classifies images, converts image sequences to video summaries and categorises text content automatically.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-image"></i> Vision AI</span>
+              <span><i class="fas fa-tags"></i> Auto-classify</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transfer Learning Food Detector -->
+        <div class="proj-card reveal tilt-card" data-cat="ai">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#f97316,#22c55e)"><i class="fas fa-utensils proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Transfer Learning</span><span>CNN</span><span>Python</span></div>
+            <h3>AI Food Detector &amp; Classifier</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Training food recognition models from scratch required huge labelled datasets and significant compute resources.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Applied transfer learning on pre-trained CNN models to build a high-accuracy food detection and classification system with minimal training data.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-brain"></i> Transfer Learning</span>
+              <span><i class="fas fa-camera"></i> Image Recognition</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Human Disease Predictor -->
+        <div class="proj-card reveal tilt-card" data-cat="ai">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#ef4444,#f97316)"><i class="fas fa-heartbeat proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>ML</span><span>Python</span><span>Healthcare AI</span></div>
+            <h3>Human Disease Predictor</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Clinicians lacked tools to identify high-risk patients early — diseases were often caught too late from fragmented medical histories.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Developed an ML model that analyses patient medical history to predict disease likelihood, enabling early intervention and preventive care.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-stethoscope"></i> Healthcare AI</span>
+              <span><i class="fas fa-chart-line"></i> Predictive</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blockchain & AI Research -->
+        <div class="proj-card reveal tilt-card" data-cat="ai">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#f59e0b,#6366f1)"><i class="fas fa-cube proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Blockchain</span><span>AI</span><span>Python</span></div>
+            <h3>Blockchain &amp; AI Integration</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> AI models lacked transparency and tamper-proof audit trails — enterprises couldn't trust or verify AI-driven decisions.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Investigated and implemented a framework combining blockchain's immutable ledger with AI decision logging to create verifiable, trustworthy AI pipelines.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-link"></i> Immutable Audit</span>
+              <span><i class="fas fa-shield-halved"></i> Trustworthy AI</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Association Platform Framework -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#0ea5e9,#10b981)"><i class="fas fa-project-diagram proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Graph Analytics</span><span>Python</span><span>ML</span></div>
+            <h3>Association Platform Framework</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Hidden relationships between items, users and behaviours were invisible — businesses missed cross-sell and pattern opportunities.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an association analysis framework using graph-based algorithms to surface item relationships, behavioural patterns and recommendation signals.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-project-diagram"></i> Graph Analysis</span>
+              <span><i class="fas fa-lightbulb"></i> Insights</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Processing & Cleansing Pipeline -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#475569,#0ea5e9)"><i class="fas fa-database proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Azure Data Factory</span><span>Python</span><span>SQL</span></div>
+            <h3>Data Processing &amp; Cleansing Pipeline</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Dirty, inconsistent data across systems caused downstream analytics failures and unreliable business reports.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built automated ETL pipelines with validation, deduplication and cleansing rules — ensuring analytics and ML models always run on trusted, verified data.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-filter"></i> Auto Cleanse</span>
+              <span><i class="fas fa-check-double"></i> Verified Data</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Automated Anomaly Detection -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#dc2626,#7c3aed)"><i class="fas fa-satellite-dish proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>ML</span><span>Azure Monitor</span><span>Python</span><span>.NET</span></div>
+            <h3>Automated Anomaly Detection</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Fraudulent transactions, system failures and security breaches went unnoticed until significant damage had already occurred.</p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> Developed an ML-driven anomaly detection system with continuous monitoring, auto-alerting and self-improving accuracy over time.</p>
+            <div class="proj-stats">
+              <span><i class="fas fa-bell"></i> Real-time Alerts</span>
+              <span><i class="fas fa-shield-halved"></i> Auto-detect</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Point of Sale -->
+        <div class="proj-card reveal tilt-card" data-cat="desktop">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#57534e,#a78bfa)"><i class="fas fa-cash-register proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>C#</span><span>WinForms</span><span>SQL Server</span></div>
             <h3>Point of Sale Software</h3>
-            <p>Complete POS system with inventory management, barcode support, debt tracking, and sales reporting.</p>
+            <p>Complete POS system with inventory management, barcode support, debt tracking, and detailed sales reporting.</p>
             <div class="proj-stats">
               <span><i class="fas fa-barcode"></i> Barcode Ready</span>
               <span><i class="fas fa-chart-line"></i> Analytics</span>
@@ -563,7 +853,7 @@
             <div class="ci-icon"><i class="fas fa-envelope"></i></div>
             <div>
               <strong>Email</strong>
-              <a href="mailto:zabbastahir@gmail.com">zabbastahir@gmail.com</a>
+              <a href="mailto:zain.tahir512@gmail.com">zain.tahir512@gmail.com</a>
             </div>
           </div>
           <div class="ci-item">
@@ -571,6 +861,13 @@
             <div>
               <strong>Location</strong>
               <span>Islamabad, Pakistan</span>
+            </div>
+          </div>
+          <div class="ci-item">
+            <div class="ci-icon" style="color:#25d366;box-shadow:0 0 15px rgba(37,211,102,0.2)"><i class="fab fa-whatsapp"></i></div>
+            <div>
+              <strong>WhatsApp</strong>
+              <a href="https://wa.me/60103635921" target="_blank">+60-10-3635-921</a>
             </div>
           </div>
           <div class="ci-item">
@@ -585,6 +882,7 @@
             <a href="https://github.com/zainabbastahir" target="_blank" class="ci-soc"><i class="fab fa-github"></i></a>
             <a href="https://www.youtube.com/@zainabbastahir" target="_blank" class="ci-soc"><i class="fab fa-youtube"></i></a>
             <a href="https://www.upwork.com/freelancers/~013b69c81fcb1ae708" target="_blank" class="ci-soc"><i class="fas fa-briefcase"></i></a>
+          <a href="https://wa.me/60103635921" target="_blank" class="ci-soc" style="background:rgba(37,211,102,0.1);border-color:rgba(37,211,102,0.3);color:#25d366"><i class="fab fa-whatsapp"></i></a>
           </div>
           <a href="https://calendly.com/zainabbastahir/30min" target="_blank" class="btn-primary" style="display:inline-flex;margin-top:1.5rem;">
             <i class="fas fa-video"></i> Schedule a Meeting
@@ -669,6 +967,9 @@
       </div>
     </div>
   </div>
+
+  <!-- WHATSAPP FLOAT BUTTON -->
+  <a href="https://wa.me/60103635921?text=Hi%20Zain%2C%20I%20saw%20your%20portfolio%20and%20would%20love%20to%20connect!" target="_blank" class="wa-float" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i><span class="wa-tooltip">Chat on WhatsApp</span></a>
 
   <script src="script.js"></script>
   <script src="chatbot.js"></script>

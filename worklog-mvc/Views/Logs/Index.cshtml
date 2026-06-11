@@ -1,130 +1,89 @@
 @model WorkLogApp.Models.ViewModels.DashboardViewModel
 @{
-    ViewData["Title"] = "Logs";
-    var today = DateOnly.FromDateTime(DateTime.Today);
-    string[] cardColors = ["c0","c1","c2","c3","c4","c5","c6"];
+    ViewData["Title"] = "My Logs";
 }
 
-<!-- ── Page header ── -->
-<div class="pg-head">
-  <div>
-    <h1>@Model.Greeting, @Model.UserName.Split(' ')[0].</h1>
-    <p class="pg-date">@DateTime.Today.ToString("dddd, MMMM d")</p>
-  </div>
-  <button class="ai-sum-btn" id="ai-sum-btn" onclick="genSummary()">
-    ✦ AI Summary
-  </button>
-</div>
-
-<!-- ── AI Summary box ── -->
-<div class="ai-box hidden" id="ai-box">
-  <div class="ai-box-hdr">
-    <span>✦ Today's AI Summary</span>
-    <button onclick="document.getElementById('ai-box').classList.add('hidden')" class="ai-box-close">✕</button>
-  </div>
-  <div class="ai-box-body" id="ai-box-body"></div>
-</div>
-
-<!-- ── Quick-add bar ── -->
-<div class="qadd" id="qadd">
-
-  <div class="qadd-idle" id="qadd-idle" onclick="openForm()">
-    <span class="qadd-ico">+</span>
-    <span class="qadd-ph">Write a note… what did you work on today?</span>
-  </div>
-
-  <form asp-controller="Logs" asp-action="Add" method="post"
-        class="qadd-form hidden" id="qadd-form">
-    @Html.AntiForgeryToken()
-
-    <div class="qrow">
-      <div class="qfield">
-        <label>Date</label>
-        <input type="date" name="Date" value="@today.ToString("yyyy-MM-dd")" required>
-      </div>
-      <div class="qfield qfield-sm">
-        <label>Hours</label>
-        <input type="number" name="Hours" min="0.5" max="24" step="0.5"
-               placeholder="e.g. 3.5" required>
-      </div>
-      <div class="qfield">
-        <label>Project</label>
-        <input type="text" name="Project" placeholder="e.g. Portal v2" required>
-      </div>
-    </div>
-
-    <div class="qfield">
-      <label>What did you work on?</label>
-      <div class="ta-wrap">
-        <textarea name="Description" id="qdesc" rows="3"
-                  placeholder="Describe what you built, fixed, or reviewed…" required></textarea>
-        <button type="button" class="ai-pill" id="ai-pill" onclick="improveDesc()">
-          ✦ AI
-        </button>
-      </div>
-    </div>
-
-    <div class="qfield">
-      <label>Tags <small>(comma-separated, optional)</small></label>
-      <input type="text" name="Tags" placeholder="bugfix, frontend, meeting">
-    </div>
-
-    <div class="qactions">
-      <button type="button" class="qcancel" onclick="closeForm()">Cancel</button>
-      <button type="submit" class="qsave">Add log</button>
-    </div>
-  </form>
-
-</div>
-
-<!-- ── Filter tabs + search ── -->
-<div class="filters">
-  <div class="tabs">
-    @foreach (var (label, val) in new[]{ ("All","all"),("Today","today"),("This week","week"),("This month","month") })
+<!-- Greeting -->
+<div class="greeting">
+  <div class="greeting-text">@Model.Greeting, <span class="gs-hi">@(Model.UserName.Split(' ').FirstOrDefault() ?? Model.UserName)</span> 👋</div>
+  <div class="greeting-sub">
+    <span><span class="gs-dot"></span>@DateTime.Today.ToString("dddd, MMMM d")</span>
+    @if (Model.TodayHours > 0)
     {
-      <a asp-action="Index" asp-route-period="@val" asp-route-q="@Model.SearchQuery"
-         class="tab @(Model.Period == val ? "tab-on" : "")">@label</a>
+      <span><span class="gs-dot"></span>@Model.TodayHours h logged today</span>
     }
+    <span><span class="gs-dot"></span>@Model.WeekLogsCount logs this week</span>
+    <span><span class="gs-dot"></span>@Model.ProjectsCount projects</span>
   </div>
-  <form asp-action="Index" method="get" class="search-form">
-    <input type="hidden" name="period" value="@Model.Period">
-    <input type="text" name="q" value="@Model.SearchQuery"
-           class="search-in" placeholder="Search logs…">
+</div>
+
+<!-- Smart capture bar -->
+<div class="capture-zone">
+  <form asp-action="Add" method="post" id="capture-form">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Date"        id="f-date"    value="@DateTime.Today.ToString("yyyy-MM-dd")">
+    <input type="hidden" name="Project"     id="f-project" value="">
+    <input type="hidden" name="Hours"       id="f-hours"   value="">
+    <input type="hidden" name="Description" id="f-desc"    value="">
+    <input type="hidden" name="Tags"        id="f-tags"    value="">
+
+    <div class="capture-bar">
+      <button type="button" class="voice-btn" id="voice-btn" title="Speak to log">🎤</button>
+      <input type="text" class="capture-input" id="capture-input"
+             placeholder='Try: "API integration 3h, fixed OAuth bug  #backend" or press 🎤'
+             autocomplete="off">
+      <button type="button" class="capture-ai" id="capture-ai-btn" title="Auto-improve with AI">✦ AI</button>
+      <button type="button" class="capture-submit" id="capture-submit-btn">Log it →</button>
+    </div>
+    <div class="parsed-preview hidden" id="parsed-preview"></div>
   </form>
 </div>
 
-<!-- ── Cards grid ── -->
+<!-- Filter + view toggle -->
+<div class="fv-bar">
+  <div class="tabs">
+    <a href="?period=all"   class="tab @(Model.Period == "all"   ? "tab-on" : "")">All</a>
+    <a href="?period=today" class="tab @(Model.Period == "today" ? "tab-on" : "")">Today</a>
+    <a href="?period=week"  class="tab @(Model.Period == "week"  ? "tab-on" : "")">This week</a>
+    <a href="?period=month" class="tab @(Model.Period == "month" ? "tab-on" : "")">This month</a>
+  </div>
+  <div class="fv-right">
+    <form method="get" id="search-form">
+      <input type="hidden" name="period" value="@Model.Period">
+      <input class="search-in" type="search" name="q" value="@Model.SearchQuery" placeholder="Search…"
+             onchange="this.form.submit()">
+    </form>
+    <div class="view-btns">
+      <button class="view-btn" id="vb-grid" onclick="setView('grid')" title="Grid view">⊞</button>
+      <button class="view-btn" id="vb-list" onclick="setView('list')" title="List view">≡</button>
+    </div>
+  </div>
+</div>
+
 @if (!Model.Logs.Any())
 {
   <div class="empty">
-    <div class="empty-ico">📭</div>
+    <div class="empty-ico">✏️</div>
     <h3>Nothing here yet</h3>
-    <p>Click the note bar above to log your first work entry.</p>
+    <p>Type what you worked on above and press <strong>Log it →</strong><br>
+       or tap 🎤 to speak it. Hours required — e.g. "wrote tests 2h".</p>
   </div>
 }
 else
 {
-  <div class="cards">
+  <!-- Grid view -->
+  <div class="cards" id="view-grid">
     @foreach (var log in Model.Logs)
     {
-      var col = cardColors[log.ColorIndex];
-      <div class="card @col">
+      <div class="card c@(log.ColorIndex)">
         <div class="card-actions">
-          <form asp-action="Delete" asp-route-id="@log.Id" method="post" style="margin:0"
-                onsubmit="return confirm('Delete this entry?')">
+          <form asp-action="Delete" asp-route-id="@log.Id" method="post" style="display:inline">
             @Html.AntiForgeryToken()
-            <button type="submit" class="card-del" title="Delete">✕</button>
+            <button type="submit" class="card-del" onclick="return confirm('Delete this entry?')">✕</button>
           </form>
         </div>
-
-        @if (Model.IsAdmin)
-        {
-          <div class="card-who">@log.User?.Name</div>
-        }
-
         <div class="card-proj">@log.Project</div>
         <div class="card-desc">@log.Description</div>
-
         <div class="card-foot">
           <div class="card-left">
             <span class="hrs">@log.Hours h</span>
@@ -133,12 +92,37 @@ else
           @if (log.TagList.Any())
           {
             <div class="card-tags">
-              @foreach (var tag in log.TagList)
-              {
-                <span class="ctag">@tag</span>
-              }
+              @foreach (var t in log.TagList) { <span class="ctag">@t</span> }
             </div>
           }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- List view -->
+  <div class="log-list hidden" id="view-list">
+    @foreach (var log in Model.Logs)
+    {
+      <div class="ll-item c@(log.ColorIndex)">
+        <div class="ll-date">
+          <div class="ll-date-num">@log.Date.Day</div>
+          <div class="ll-date-mo">@log.Date.ToString("MMM")</div>
+        </div>
+        <div class="ll-proj-cell"><div class="ll-proj">@log.Project</div></div>
+        <div class="ll-desc-cell">
+          <div class="ll-desc">@log.Description</div>
+          @if (log.TagList.Any())
+          {
+            <div class="ll-tags">@foreach (var t in log.TagList) { <span class="ctag">@t</span> }</div>
+          }
+        </div>
+        <div class="ll-meta">
+          <span class="ll-hrs">@log.Hours h</span>
+          <form asp-action="Delete" asp-route-id="@log.Id" method="post" style="margin:0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="ll-del" onclick="return confirm('Delete?')">✕</button>
+          </form>
         </div>
       </div>
     }
@@ -147,71 +131,189 @@ else
 
 @section Scripts {
 <script>
-/* ── Form toggle ── */
-function openForm() {
-  document.getElementById('qadd-idle').classList.add('hidden');
-  document.getElementById('qadd-form').classList.remove('hidden');
-  document.querySelector('#qadd-form input[name="Project"]').focus();
+// ── View toggle ────────────────────────────────────────────────────────
+let view = localStorage.getItem('wl-view') || 'grid';
+function setView(v) {
+  view = v;
+  localStorage.setItem('wl-view', v);
+  const g = document.getElementById('view-grid');
+  const l = document.getElementById('view-list');
+  if (g) g.classList.toggle('hidden', v !== 'grid');
+  if (l) l.classList.toggle('hidden', v !== 'list');
+  document.getElementById('vb-grid').classList.toggle('vb-on', v === 'grid');
+  document.getElementById('vb-list').classList.toggle('vb-on', v === 'list');
 }
-function closeForm() {
-  document.getElementById('qadd-idle').classList.remove('hidden');
-  document.getElementById('qadd-form').classList.add('hidden');
-  document.getElementById('qadd-form').reset();
+setView(view);
+
+// ── Smart client-side parser ───────────────────────────────────────────
+function quickParse(raw) {
+  const text = raw.trim();
+  // Hours: 3h / 3.5h / 3 hours / 3hrs
+  const hm = text.match(/(\d+(?:[.,]\d+)?)\s*h(?:rs?|ours?)?(?:\s|$|,)/i);
+  const hours = hm ? parseFloat(hm[1].replace(',', '.')) : null;
+
+  // Hashtags → tags
+  const tags = [...text.matchAll(/#(\w+)/g)].map(m => m[1]).join(', ');
+
+  // Project: phrase before first comma or before "Nh"
+  let project = '';
+  const pComma = text.match(/^([^,#]+?)(?:,|#|\d+\s*h(?:rs?|ours?)?|$)/i);
+  if (pComma) project = pComma[1].replace(/\s+for\s*$/i, '').trim();
+
+  // Clean description: strip hours + hashtags
+  const desc = text
+    .replace(/(\d+(?:[.,]\d+)?)\s*h(?:rs?|ours?)?(?:\s|$|,)/gi, ' ')
+    .replace(/#\w+/g, '')
+    .replace(/\s+/g, ' ').trim();
+
+  return { project, hours, description: desc || text, tags };
 }
 
-/* ── AI improve description ── */
-async function improveDesc() {
-  const ta  = document.getElementById('qdesc');
-  const btn = document.getElementById('ai-pill');
-  if (!ta.value.trim()) return;
+function renderChips(p) {
+  let out = '';
+  if (p.project) out += `<span class="pp-chip"><span class="pp-lbl">project</span>${esc(p.project)}</span>`;
+  if (p.hours)   out += `<span class="pp-chip"><span class="pp-lbl">hours</span>${p.hours}h</span>`;
+  if (p.tags)    out += `<span class="pp-chip"><span class="pp-lbl">tags</span>${esc(p.tags)}</span>`;
+  if (!p.hours)  out += `<span class="pp-chip pp-warn">⚠ add hours — e.g. "3h"</span>`;
+  return out;
+}
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-  btn.textContent = '…';
-  btn.disabled = true;
+const captureInput  = document.getElementById('capture-input');
+const parsedPreview = document.getElementById('parsed-preview');
+const aiBtnEl       = document.getElementById('capture-ai-btn');
 
+captureInput.addEventListener('input', () => {
+  clearTimeout(aiTimer);
+  const text = captureInput.value.trim();
+  if (!text) { parsedPreview.classList.add('hidden'); return; }
+  const p = quickParse(text);
+  parsedPreview.innerHTML = renderChips(p);
+  parsedPreview.classList.remove('hidden');
+  if (text.length >= 12) aiTimer = setTimeout(() => runAiParse(text), 2200);
+});
+
+// ── AI auto-parse ──────────────────────────────────────────────────────
+let aiTimer = null;
+let aiRunning = false;
+
+async function runAiParse(text) {
+  if (aiRunning) return;
+  aiRunning = true;
+  const orig = aiBtnEl.textContent;
+  aiBtnEl.textContent = '⟳';
+  aiBtnEl.style.opacity = '1';
   try {
-    const r = await fetch('/Logs/AiImprove', {
-      method:  'POST',
+    const r = await fetch('/Logs/AiParse', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ text: ta.value })
+      body: JSON.stringify({ text })
     });
-    const d = await r.json();
-    if (d.result) ta.value = d.result;
-    else showToast(d.error ?? 'AI error', true);
-  } catch { showToast('Could not reach AI service', true); }
-  finally { btn.textContent = '✦ AI'; btn.disabled = false; }
-}
-
-/* ── AI daily summary ── */
-async function genSummary() {
-  const btn = document.getElementById('ai-sum-btn');
-  btn.textContent = '… generating';
-  btn.disabled = true;
-
-  try {
-    const r = await fetch('/Logs/AiSummary', { method: 'POST' });
-    const d = await r.json();
-    if (d.result) {
-      document.getElementById('ai-box-body').textContent = d.result;
-      document.getElementById('ai-box').classList.remove('hidden');
-    } else {
-      showToast(d.error ?? 'AI error', true);
+    if (r.ok) {
+      const d = await r.json();
+      if (d.description) captureInput.value = d.description;
+      parsedPreview.innerHTML = renderChips({
+        project: d.project || quickParse(captureInput.value).project,
+        hours:   d.hours   || quickParse(captureInput.value).hours,
+        tags:    d.tags    || quickParse(captureInput.value).tags,
+        description: d.description
+      });
     }
-  } catch { showToast('Could not reach AI service', true); }
-  finally { btn.textContent = '✦ AI Summary'; btn.disabled = false; }
+  } catch {}
+  aiBtnEl.textContent = orig;
+  aiBtnEl.style.opacity = '';
+  aiRunning = false;
 }
 
-/* ── Toast ── */
-function showToast(msg, err = false) {
+aiBtnEl.addEventListener('click', () => {
+  const text = captureInput.value.trim();
+  if (text) runAiParse(text);
+});
+
+// ── Submit ─────────────────────────────────────────────────────────────
+document.getElementById('capture-submit-btn').addEventListener('click', doSubmit);
+captureInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSubmit(); }
+});
+
+function doSubmit() {
+  const raw = captureInput.value.trim();
+  if (!raw) { captureInput.focus(); return; }
+  const p = quickParse(raw);
+  if (!p.hours) {
+    parsedPreview.innerHTML = renderChips(p);
+    parsedPreview.classList.remove('hidden');
+    captureInput.focus();
+    toast('Add hours to your log — e.g. "3h"');
+    return;
+  }
+  document.getElementById('f-project').value = p.project || raw.split(/[\s,]/)[0];
+  document.getElementById('f-hours').value   = p.hours;
+  document.getElementById('f-tags').value    = p.tags;
+  document.getElementById('f-desc').value    = p.description.length > 4 ? p.description : raw;
+  document.getElementById('capture-form').submit();
+}
+
+// ── Voice ──────────────────────────────────────────────────────────────
+const voiceBtn = document.getElementById('voice-btn');
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let recActive = false;
+
+voiceBtn.addEventListener('click', () => {
+  if (!SR) { toast('Voice not supported in this browser. Try Chrome.'); return; }
+  if (recActive) { recognition?.stop(); return; }
+  startRecording();
+});
+
+function startRecording() {
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  recActive = true;
+  voiceBtn.classList.add('rec');
+  voiceBtn.textContent = '⏹';
+
+  recognition.onresult = e => {
+    const transcript = [...e.results].map(r => r[0].transcript).join('');
+    captureInput.value = transcript;
+    const p = quickParse(transcript);
+    parsedPreview.innerHTML = renderChips(p);
+    parsedPreview.classList.remove('hidden');
+  };
+
+  recognition.onend = () => {
+    recActive = false;
+    voiceBtn.classList.remove('rec');
+    voiceBtn.textContent = '🎤';
+    const text = captureInput.value.trim();
+    if (text) {
+      const p = quickParse(text);
+      if (p.hours) {
+        setTimeout(doSubmit, 500);
+      } else {
+        runAiParse(text);
+      }
+    }
+  };
+
+  recognition.onerror = e => {
+    recActive = false;
+    voiceBtn.classList.remove('rec');
+    voiceBtn.textContent = '🎤';
+    if (e.error !== 'no-speech' && e.error !== 'aborted') toast('Voice error: ' + e.error);
+  };
+
+  recognition.start();
+}
+
+function toast(msg) {
   const el = document.createElement('div');
-  el.className = 'toast-wrap' + (err ? ' toast-err' : '');
+  el.className = 'toast-wrap';
   el.innerHTML = `<div class="toast">${msg}</div>`;
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3500);
+  setTimeout(() => el.remove(), 3000);
 }
-
-/* search on Enter */
-document.querySelector('.search-in')?.addEventListener('keydown', e => {
-  if (e.key === 'Enter') e.target.closest('form').submit();
-});
 </script>
 }

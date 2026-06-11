@@ -39,6 +39,36 @@ public class OllamaService(HttpClient http, IConfiguration cfg) : IOllamaService
         return await CallOllamaAsync(prompt, timeout: 90);
     }
 
+    public async Task<ParsedEntry> ParseLogEntryAsync(string text)
+    {
+        var prompt =
+            $"Parse this work log into JSON. Return ONLY a valid JSON object — no explanation, no markdown.\n" +
+            $"Keys: \"project\" (string), \"hours\" (decimal or null), \"description\" (clear professional description, string), \"tags\" (comma-separated keywords, string).\n\n" +
+            $"Input: {text}\n\nJSON:";
+
+        string raw;
+        try { raw = await CallOllamaAsync(prompt, timeout: 20); }
+        catch { return new ParsedEntry(null, null, text, ""); }
+
+        var start = raw.IndexOf('{');
+        var end   = raw.LastIndexOf('}');
+        if (start < 0 || end <= start) return new ParsedEntry(null, null, text, "");
+
+        try
+        {
+            using var doc  = JsonDocument.Parse(raw[start..(end + 1)]);
+            var root       = doc.RootElement;
+            var project    = root.TryGetProperty("project",     out var p) ? p.GetString() : null;
+            var desc       = root.TryGetProperty("description", out var d) ? d.GetString() ?? text : text;
+            var tags       = root.TryGetProperty("tags",        out var t) ? t.GetString() ?? "" : "";
+            decimal? hours = null;
+            if (root.TryGetProperty("hours", out var h) && h.ValueKind is JsonValueKind.Number)
+                hours = h.GetDecimal();
+            return new ParsedEntry(project, hours, desc, tags);
+        }
+        catch { return new ParsedEntry(null, null, text, ""); }
+    }
+
     private async Task<string> CallOllamaAsync(string prompt, int timeout = 40)
     {
         using var cts  = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));

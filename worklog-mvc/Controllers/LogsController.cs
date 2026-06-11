@@ -126,6 +126,30 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         }
     }
 
+    /* ── AI: parse natural language into structured log entry ── */
+    [HttpPost]
+    public async Task<IActionResult> AiParse([FromBody] AiParseRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Text))
+            return BadRequest(new { error = "text required" });
+
+        try
+        {
+            var result = await ollama.ParseLogEntryAsync(req.Text);
+            return Ok(new
+            {
+                project     = result.Project,
+                hours       = result.Hours,
+                description = result.Description,
+                tags        = result.Tags,
+            });
+        }
+        catch
+        {
+            return StatusCode(503, new { error = "AI unavailable" });
+        }
+    }
+
     /* ── AI: daily summary ── */
     [HttpPost]
     public async Task<IActionResult> AiSummary()
@@ -150,4 +174,5 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
     }
 
     public record AiTextRequest(string Text);
+    public record AiParseRequest(string Text);
 }

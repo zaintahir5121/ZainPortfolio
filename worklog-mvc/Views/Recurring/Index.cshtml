@@ -1,0 +1,146 @@
+@model List<WorkLogApp.Models.RecurringEntry>
+@{
+    ViewData["Title"] = "Recurring";
+}
+
+<div class="pg-head">
+  <div>
+    <h1>Recurring Entries</h1>
+    <p class="pg-date">Auto-logs fire on your first visit of each day</p>
+  </div>
+</div>
+
+@if (!Model.Any())
+{
+  <div class="empty" style="padding:40px 20px">
+    <div class="empty-ico">&#x21BA;</div>
+    <h3>No recurring entries yet</h3>
+    <p>Set one up below &#x2014; daily standup, code reviews, weekly meetings.<br>
+       Each entry fires automatically when you open the app that day.</p>
+  </div>
+}
+else
+{
+  <div class="rec-list">
+    @foreach (var r in Model)
+    {
+      <div class="rec-item @(!r.IsActive ? "inactive" : "")">
+        <div class="rec-ico">&#x1F4C5;</div>
+        <div class="rec-body">
+          <div class="rec-proj">@r.Project</div>
+          @if (!string.IsNullOrEmpty(r.Description))
+          {
+            <div class="rec-desc">@r.Description</div>
+          }
+          <div class="rec-meta">
+            <span class="rec-badge">@r.ScheduleLabel</span>
+            <span class="rec-hrs">@r.Hours h</span>
+            @if (r.LastFiredDate.HasValue)
+            {
+              <span class="rec-last">last fired @r.LastFiredDate.Value.ToString("MMM d")</span>
+            }
+            @if (!string.IsNullOrEmpty(r.Tags))
+            {
+              foreach (var t in r.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+              {
+                <span class="ctag">@t</span>
+              }
+            }
+          </div>
+        </div>
+        <div class="rec-actions">
+          <form asp-action="Toggle" asp-route-id="@r.Id" method="post" style="margin:0">
+            @Html.AntiForgeryToken()
+            <label class="toggle-switch" title="@(r.IsActive ? "Pause" : "Enable")">
+              <input type="checkbox" @(r.IsActive ? "checked" : "") onchange="this.form.submit()">
+              <span class="toggle-track"></span>
+            </label>
+          </form>
+          <form asp-action="Delete" asp-route-id="@r.Id" method="post" style="margin:0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="card-del" onclick="return confirm('Delete this recurring entry?')">&#x2715;</button>
+          </form>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<!-- Create form -->
+<div class="rec-form-card">
+  <div class="rec-form-title">&#x2795; New recurring entry</div>
+  <form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="rec-form-grid">
+      <div class="rfield">
+        <label>Project</label>
+        <input type="text" name="Project" placeholder="Daily Standup" required autocomplete="off">
+      </div>
+      <div class="rfield">
+        <label>Hours</label>
+        <input type="number" name="Hours" placeholder="0.5" step="0.25" min="0.25" max="24" required>
+      </div>
+    </div>
+
+    <div class="rfield" style="margin-bottom:14px">
+      <label>Description</label>
+      <textarea name="Description" placeholder="What happens in this recurring block&#x2026;"></textarea>
+    </div>
+
+    <div class="rfield" style="margin-bottom:14px">
+      <label>Tags <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">&#x2014; optional</span></label>
+      <input type="text" name="Tags" placeholder="meetings, standup">
+    </div>
+
+    <div class="rfield" style="margin-bottom:20px">
+      <label>Schedule</label>
+      <div class="schedule-opts">
+        <label class="sched-opt sched-on" id="so-weekdays">
+          <input type="radio" name="_sched" value="weekdays" checked onchange="pickSched('weekdays')">
+          Mon&#x2013;Fri
+        </label>
+        <label class="sched-opt" id="so-daily">
+          <input type="radio" name="_sched" value="daily" onchange="pickSched('daily')">
+          Every day
+        </label>
+        <label class="sched-opt" id="so-custom">
+          <input type="radio" name="_sched" value="custom" onchange="pickSched('custom')">
+          Custom days
+        </label>
+      </div>
+      <div class="day-picker hidden" id="day-picker">
+        @foreach (var (day, label, title) in new[]{
+            ("mon","M","Monday"),("tue","T","Tuesday"),("wed","W","Wednesday"),
+            ("thu","T","Thursday"),("fri","F","Friday"),("sat","S","Saturday"),("sun","S","Sunday")})
+        {
+          <button type="button" class="day-btn" data-day="@day" title="@title"
+                  onclick="toggleDay('@day',this)">@label</button>
+        }
+      </div>
+      <input type="hidden" name="Schedule" id="schedule-val" value="weekdays">
+    </div>
+
+    <button type="submit" class="rec-save">Save &#x21BA;</button>
+  </form>
+</div>
+
+@section Scripts {
+<script>
+function pickSched(val) {
+  document.querySelectorAll('.sched-opt').forEach(el => el.classList.remove('sched-on'));
+  document.getElementById('so-' + val).classList.add('sched-on');
+  document.getElementById('day-picker').classList.toggle('hidden', val !== 'custom');
+  if (val !== 'custom') document.getElementById('schedule-val').value = val;
+  else updateCustom();
+}
+function toggleDay(day, btn) {
+  btn.classList.toggle('day-on');
+  updateCustom();
+}
+function updateCustom() {
+  const days = [...document.querySelectorAll('.day-btn.day-on')].map(b => b.dataset.day);
+  document.getElementById('schedule-val').value = days.length ? days.join(',') : 'weekdays';
+}
+</script>
+}

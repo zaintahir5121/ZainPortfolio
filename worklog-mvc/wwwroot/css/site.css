@@ -148,6 +148,61 @@ button { font-family:var(--font); cursor:pointer; }
 .i-up { color:#059669; font-weight:700; margin-left:4px; }
 .i-dn { color:#dc2626; font-weight:700; margin-left:4px; }
 
+/* ═══ RECURRING ENTRIES ═══ */
+.rec-list { display:flex; flex-direction:column; gap:10px; margin-bottom:32px; }
+.rec-item {
+  display:flex; align-items:center; gap:14px;
+  background:var(--white); border:1px solid var(--line);
+  border-radius:12px; padding:16px 18px;
+  box-shadow:var(--sh-sm); transition:all .15s;
+}
+.rec-item:hover { box-shadow:var(--sh); }
+.rec-item.inactive { opacity:.5; }
+.rec-ico { font-size:22px; flex-shrink:0; }
+.rec-body { flex:1; min-width:0; }
+.rec-proj { font-size:14px; font-weight:700; margin-bottom:3px; }
+.rec-desc { font-size:13px; color:var(--text-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:6px; }
+.rec-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; color:var(--muted); }
+.rec-badge { background:var(--accent-bg); color:var(--accent); border:1px solid rgba(99,102,241,.15); border-radius:99px; padding:2px 10px; font-size:11px; font-weight:600; }
+.rec-hrs { font-weight:700; color:var(--text); font-size:12px; }
+.rec-last { font-size:11px; color:var(--muted); }
+.rec-actions { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+
+/* Toggle switch */
+.toggle-switch { position:relative; width:40px; height:22px; cursor:pointer; display:flex; }
+.toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+.toggle-track { position:absolute; inset:0; background:var(--line); border-radius:99px; transition:background .2s; }
+.toggle-track::after { content:''; position:absolute; left:3px; top:3px; width:16px; height:16px; border-radius:50%; background:white; transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.toggle-switch input:checked + .toggle-track { background:var(--accent); }
+.toggle-switch input:checked + .toggle-track::after { transform:translateX(18px); }
+
+/* Recurring create form */
+.rec-form-card { background:var(--white); border:1.5px dashed var(--line); border-radius:12px; padding:22px; transition:all .2s; }
+.rec-form-card:focus-within { border-color:rgba(99,102,241,.3); border-style:solid; box-shadow:var(--sh-sm); }
+.rec-form-title { font-size:14px; font-weight:700; margin-bottom:18px; color:var(--text); }
+.rec-form-grid { display:grid; grid-template-columns:1fr 100px; gap:14px; margin-bottom:14px; }
+.rfield { display:flex; flex-direction:column; gap:5px; }
+.rfield label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); }
+.rfield input,.rfield textarea,.rfield select { border:none; border-bottom:1.5px solid var(--line); background:transparent; padding:7px 0; font-size:14px; font-family:var(--font); color:var(--text); outline:none; transition:border-color .15s; width:100%; }
+.rfield input:focus,.rfield textarea:focus,.rfield select:focus { border-bottom-color:var(--accent); }
+.rfield textarea { resize:none; height:56px; }
+
+/* Schedule options */
+.schedule-opts { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.sched-opt { display:inline-flex; align-items:center; gap:6px; padding:7px 16px; border:1.5px solid var(--line); border-radius:99px; font-size:13px; font-weight:500; color:var(--muted); cursor:pointer; transition:all .12s; }
+.sched-opt:hover { border-color:var(--accent); color:var(--accent); }
+.sched-opt.sched-on { border-color:var(--accent); background:var(--accent-bg); color:var(--accent); }
+.sched-opt input[type=radio] { display:none; }
+
+/* Day picker */
+.day-picker { display:flex; gap:6px; margin-top:12px; flex-wrap:wrap; }
+.day-btn { width:40px; height:40px; border-radius:50%; border:1.5px solid var(--line); background:var(--white); font-size:13px; font-weight:700; color:var(--muted); cursor:pointer; transition:all .12s; }
+.day-btn:hover { border-color:var(--accent); color:var(--accent); }
+.day-btn.day-on { background:var(--accent); color:white; border-color:var(--accent); }
+
+.rec-save { margin-top:4px; background:var(--accent); color:white; border:none; border-radius:var(--r); padding:10px 28px; font-size:14px; font-weight:600; font-family:var(--font); transition:all .15s; box-shadow:0 4px 14px rgba(99,102,241,.25); }
+.rec-save:hover { opacity:.88; transform:translateY(-1px); }
+
 /* ═══ FILTER / VIEW BAR ═══ */
 .fv-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
 .tabs { display:flex; gap:4px; }

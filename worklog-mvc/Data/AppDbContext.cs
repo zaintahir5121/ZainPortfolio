@@ -5,13 +5,18 @@ namespace WorkLogApp.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<User>     Users      { get; set; }
-    public DbSet<LogEntry> LogEntries { get; set; }
+    public DbSet<User>           Users            { get; set; }
+    public DbSet<LogEntry>       LogEntries       { get; set; }
+    public DbSet<RecurringEntry> RecurringEntries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder b)
     {
         b.Entity<LogEntry>()
          .Property(l => l.Hours)
+         .HasColumnType("decimal(5,2)");
+
+        b.Entity<RecurringEntry>()
+         .Property(r => r.Hours)
          .HasColumnType("decimal(5,2)");
     }
 

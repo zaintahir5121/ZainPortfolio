@@ -19,6 +19,11 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
     [HttpGet]
     public async Task<IActionResult> Index(string? period, string? q)
     {
+        // Fire any recurring entries due today (no-op if already fired)
+        var fired = await RecurringController.FireTodayAsync(db, CurrentUserId);
+        if (fired > 0)
+            TempData["Toast"] = $"↺ {fired} recurring {(fired == 1 ? "entry" : "entries")} auto-logged for today";
+
         var today = DateOnly.FromDateTime(DateTime.Today);
         var weekStart = today.AddDays(-(int)today.DayOfWeek);
         var monthStart = new DateOnly(today.Year, today.Month, 1);

@@ -33,6 +33,24 @@ using (var scope = app.Services.CreateScope())
     var ctx = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     ctx.Database.EnsureCreated();
     AppDbContext.Seed(ctx);
+
+    // Add RecurringEntries table to existing databases (EnsureCreated won't add new tables)
+    ctx.Database.ExecuteSqlRaw("""
+        IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'RecurringEntries')
+        CREATE TABLE RecurringEntries (
+            Id            INT            NOT NULL IDENTITY(1,1) CONSTRAINT PK_RecurringEntries PRIMARY KEY,
+            UserId        INT            NOT NULL,
+            Project       NVARCHAR(200)  NOT NULL DEFAULT N'',
+            Description   NVARCHAR(1000) NOT NULL DEFAULT N'',
+            Hours         DECIMAL(5,2)   NOT NULL DEFAULT 0,
+            Tags          NVARCHAR(200)  NOT NULL DEFAULT N'',
+            Schedule      NVARCHAR(100)  NOT NULL DEFAULT N'weekdays',
+            IsActive      BIT            NOT NULL DEFAULT 1,
+            LastFiredDate DATE           NULL,
+            CreatedAt     DATETIME2      NOT NULL DEFAULT GETUTCDATE(),
+            CONSTRAINT FK_RecurringEntries_Users FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+        )
+    """);
 }
 
 if (!app.Environment.IsDevelopment())

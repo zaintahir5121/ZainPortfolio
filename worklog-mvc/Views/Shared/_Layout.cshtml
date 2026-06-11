@@ -18,6 +18,8 @@
        class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Logs" ? "t-link-on" : "")">Logs</a>
     <a asp-controller="Timesheet" asp-action="Index"
        class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Timesheet" ? "t-link-on" : "")">Timesheet</a>
+    <a asp-controller="Recurring" asp-action="Index"
+       class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Recurring" ? "t-link-on" : "")">↺ Recurring</a>
   </div>
   <div class="t-right">
     @if (ViewBag.TodayHours is decimal th && th > 0)

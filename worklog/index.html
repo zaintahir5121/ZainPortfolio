@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkLog — Smart Work Tracking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="worklog.css">
+</head>
+<body>
+
+<!-- Toast notification -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- ═══════════════════ LANDING ═══════════════════ -->
+<section id="section-landing" class="section">
+
+  <nav class="wl-nav">
+    <div class="wl-nav-inner">
+      <div class="brand">Work<span>Log</span></div>
+      <button class="btn-outline" onclick="showSection('login')">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-badge"><i class="fas fa-robot"></i> Powered by Ollama AI</div>
+    <h1>Track Your Work,<br><span class="clr-accent">Smarter.</span></h1>
+    <p class="hero-desc">
+      Simple, focused work logging for cooperative teams —<br>
+      with AI-powered descriptions and daily summaries built right in.
+    </p>
+    <button class="btn-primary hero-cta" onclick="showSection('login')">
+      Get Started <i class="fas fa-arrow-right"></i>
+    </button>
+    <div class="hero-scroll"><i class="fas fa-chevron-down"></i></div>
+  </div>
+
+  <div class="features">
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon clr-green-icon"><i class="fas fa-pen-to-square"></i></div>
+        <h3>Log Instantly</h3>
+        <p>Log project work, tasks, and hours with a clean, fast form. No clutter.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon clr-purple-icon"><i class="fas fa-brain"></i></div>
+        <h3>AI Assist</h3>
+        <p>Let Ollama improve your descriptions and generate professional daily summaries.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon clr-blue-icon"><i class="fas fa-users"></i></div>
+        <h3>Team View</h3>
+        <p>Admins see all team logs across every project in one clean overview.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="wl-footer">
+    <p>&copy; 2025 WorkLog &mdash; Built for cooperative teams</p>
+  </footer>
+
+</section><!-- /landing -->
+
+<!-- ═══════════════════ LOGIN ═══════════════════ -->
+<section id="section-login" class="section">
+  <div class="login-wrap">
+    <div class="login-card">
+
+      <button class="back-link" onclick="showSection('landing')">
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
+
+      <div class="brand login-brand">Work<span>Log</span></div>
+      <h2>Welcome back</h2>
+      <p class="login-sub">Sign in to log your work</p>
+
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="field">
+          <label>Username</label>
+          <div class="field-ico-wrap">
+            <i class="fas fa-user field-ico"></i>
+            <input type="text" id="l-user" placeholder="your username"
+                   autocomplete="username" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="field-ico-wrap">
+            <i class="fas fa-lock field-ico"></i>
+            <input type="password" id="l-pass" placeholder="your password"
+                   autocomplete="current-password" required>
+          </div>
+        </div>
+
+        <div id="login-err" class="err-msg hidden"></div>
+
+        <button type="submit" class="btn-primary full mt4" id="login-submit">
+          Sign In <i class="fas fa-sign-in-alt"></i>
+        </button>
+      </form>
+
+      <div class="demo-creds">
+        <span>Demo accounts:</span><br>
+        <code onclick="fillDemo('admin','admin123')">admin / admin123</code>
+        &nbsp;&middot;&nbsp;
+        <code onclick="fillDemo('john','pass123')">john / pass123</code>
+      </div>
+
+    </div>
+  </div>
+</section><!-- /login -->
+
+<!-- ═══════════════════ DASHBOARD ═══════════════════ -->
+<section id="section-dashboard" class="section">
+
+  <!-- top header -->
+  <header class="dash-hdr">
+    <div class="brand">Work<span>Log</span></div>
+    <div class="dash-hdr-right">
+      <span id="d-user-name" class="dash-uname"></span>
+      <span id="d-user-role" class="user-badge"></span>
+      <button class="icon-btn" onclick="handleLogout()" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- stats bar -->
+  <div class="stats-bar">
+    <div class="stat-box">
+      <div class="stat-num" id="s-today">0h</div>
+      <div class="stat-lbl">Today</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="s-week">0</div>
+      <div class="stat-lbl">This Week</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="s-projects">0</div>
+      <div class="stat-lbl">Projects</div>
+    </div>
+    <button class="btn-outline ai-sum-btn" id="ai-sum-btn" onclick="genAiSummary()">
+      <i class="fas fa-magic"></i> AI Summary
+    </button>
+  </div>
+
+  <!-- AI summary output box -->
+  <div id="ai-box" class="ai-box hidden">
+    <div class="ai-box-hdr">
+      <span><i class="fas fa-robot"></i> AI Daily Summary</span>
+      <button class="icon-btn sm" onclick="document.getElementById('ai-box').classList.add('hidden')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="ai-box-body" class="ai-box-body"></div>
+  </div>
+
+  <!-- 2-column main content -->
+  <div class="dash-main">
+
+    <!-- ── Add Log form ── -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-plus-circle clr-accent"></i> Log Work
+      </div>
+      <form id="log-form" onsubmit="handleAddLog(event)">
+        <div class="row2">
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="f-date" required>
+          </div>
+          <div class="field">
+            <label>Hours</label>
+            <input type="number" id="f-hours" min="0.5" max="24" step="0.5"
+                   placeholder="e.g. 3.5" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>Project</label>
+          <input type="text" id="f-project" placeholder="e.g. Client Portal v2" required>
+        </div>
+        <div class="field">
+          <label>What did you work on?</label>
+          <div class="ta-wrap">
+            <textarea id="f-desc" rows="4"
+                      placeholder="Describe your work…" required></textarea>
+            <button type="button" class="ai-pill" id="ai-improve-btn"
+                    onclick="improveDesc()" title="Let AI improve your description">
+              <i class="fas fa-magic"></i> AI
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Tags <small>(comma-separated, optional)</small></label>
+          <input type="text" id="f-tags" placeholder="bugfix, frontend, meeting">
+        </div>
+        <div id="log-err" class="err-msg hidden"></div>
+        <button type="submit" class="btn-primary full mt4">
+          <i class="fas fa-plus"></i> Add Log Entry
+        </button>
+      </form>
+    </div>
+
+    <!-- ── Logs list ── -->
+    <div class="card logs-card">
+      <div class="logs-hdr">
+        <div class="card-title"><i class="fas fa-list clr-accent"></i> Work Logs</div>
+        <div class="logs-ctrl">
+          <input type="text" id="log-filter" class="filter-in"
+                 placeholder="Filter…" oninput="filterLogs(this.value)">
+          <select id="log-period" class="filter-sel"
+                  onchange="filterLogs(document.getElementById('log-filter').value)">
+            <option value="all">All time</option>
+            <option value="today">Today</option>
+            <option value="week">This week</option>
+            <option value="month">This month</option>
+          </select>
+        </div>
+      </div>
+      <div id="logs-list"></div>
+    </div>
+
+  </div><!-- /dash-main -->
+</section><!-- /dashboard -->
+
+<script src="worklog.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "WorkLog";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkLog — Simple work tracking for teams</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+</head>
+<body>
+
+<div class="landing">
+
+  <nav class="l-nav">
+    <div class="l-logo">worklog<span>.</span></div>
+    <a asp-controller="Account" asp-action="Login" class="l-signin">Sign in →</a>
+  </nav>
+
+  <div class="l-hero">
+    <div class="l-eyebrow">For cooperative teams</div>
+
+    <h1>Your team's<br>daily work log.</h1>
+
+    <p class="l-sub">
+      Simple, distraction-free logging — write what you did,<br>
+      how long it took, and let AI do the rest.
+    </p>
+
+    <a asp-controller="Account" asp-action="Login" class="l-cta">Start logging</a>
+
+    <div class="l-pills">
+      <span class="pill">✦ Ollama AI assist</span>
+      <span class="pill">📋 Daily work logs</span>
+      <span class="pill">👥 Team overview</span>
+      <span class="pill">🏷️ Projects &amp; tags</span>
+    </div>
+  </div>
+
+  <!-- mini preview of card colours -->
+  <div class="l-preview" aria-hidden="true">
+    <div class="p-card p-c0">
+      <div class="p-proj">Client Portal v2</div>
+      <div class="p-desc">Implemented JWT auth refresh flow and token rotation</div>
+      <div class="p-foot"><span class="p-hrs">3h</span><span class="p-tag">backend</span></div>
+    </div>
+    <div class="p-card p-c1">
+      <div class="p-proj">Internal Dashboard</div>
+      <div class="p-desc">Fixed responsive layout on reports page, dark mode toggle</div>
+      <div class="p-foot"><span class="p-hrs">2h</span><span class="p-tag">frontend</span></div>
+    </div>
+    <div class="p-card p-c2">
+      <div class="p-proj">API Gateway</div>
+      <div class="p-desc">Added rate limiting middleware and logging pipeline</div>
+      <div class="p-foot"><span class="p-hrs">4h</span><span class="p-tag">devops</span></div>
+    </div>
+  </div>
+
+  <footer class="l-footer">&copy; 2025 WorkLog &mdash; simple by design</footer>
+</div>
+
+</body>
+</html>

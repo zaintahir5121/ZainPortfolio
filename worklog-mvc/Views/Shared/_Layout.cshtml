@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@(ViewData["Title"] ?? "WorkLog")</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <a href="/" class="sidebar-logo">worklog<span>.</span></a>
+
+    <div class="sidebar-section">
+      <nav>
+        <a asp-controller="Logs" asp-action="Index"
+           class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Logs" ? "active" : "")">
+          <span class="nav-ico">📋</span> My Logs
+        </a>
+        @if (User.IsInRole("admin"))
+        {
+          <a asp-controller="Logs" asp-action="Index" asp-route-all="1"
+             class="nav-item">
+            <span class="nav-ico">👥</span> Team Logs
+          </a>
+        }
+      </nav>
+    </div>
+
+    <div class="sidebar-sep"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Overview</div>
+      <div class="stat-row">
+        <span class="sk">Hours today</span>
+        <span class="sv">@(ViewBag.TodayHours != null ? ViewBag.TodayHours + "h" : "—")</span>
+      </div>
+      <div class="stat-row">
+        <span class="sk">This week</span>
+        <span class="sv">@(ViewBag.WeekLogsCount ?? "—") logs</span>
+      </div>
+      <div class="stat-row">
+        <span class="sk">Projects</span>
+        <span class="sv">@(ViewBag.ProjectsCount ?? "—")</span>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="avatar">@(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "?")</div>
+      <div class="uinfo">
+        <div class="uname">@User.Identity?.Name</div>
+        <div class="urole">@User.FindFirstValue(ClaimTypes.Role)</div>
+      </div>
+      <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="signout-btn" title="Sign out">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+    @RenderBody()
+  </main>
+
+</div>
+
+@if (TempData["Toast"] is string toast)
+{
+  <div class="toast-wrap" id="tw"><div class="toast">@toast</div></div>
+  <script>setTimeout(()=>document.getElementById('tw')?.remove(), 3000)</script>
+}
+
+@if (TempData["Error"] is string err)
+{
+  <div class="toast-wrap toast-err" id="twe"><div class="toast">@err</div></div>
+  <script>setTimeout(()=>document.getElementById('twe')?.remove(), 4000)</script>
+}
+
+@RenderSection("Scripts", required: false)
+</body>
+</html>

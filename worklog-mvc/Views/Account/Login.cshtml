@@ -1,0 +1,77 @@
+@model WorkLogApp.Models.ViewModels.LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Sign in";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in — WorkLog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <a asp-controller="Home" asp-action="Index" class="back-link">
+      ← back
+    </a>
+
+    <div class="login-logo">worklog<span>.</span></div>
+    <p class="login-tag">Sign in to your workspace</p>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+      <div class="login-err">
+        @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+          <span>@e.ErrorMessage</span>
+        }
+      </div>
+    }
+
+    <form asp-controller="Account" asp-action="Login"
+          asp-route-returnUrl="@ViewBag.ReturnUrl" method="post"
+          class="login-form">
+      @Html.AntiForgeryToken()
+
+      <div class="lfield">
+        <label asp-for="Username">Username</label>
+        <input asp-for="Username" placeholder="your username"
+               autocomplete="username" autofocus>
+      </div>
+
+      <div class="lfield">
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" type="password"
+               placeholder="your password" autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="login-btn">Continue</button>
+    </form>
+
+    <div class="demo-hint">
+      <span>Try a demo account:</span><br>
+      <code onclick="fill('admin','admin123')">admin / admin123</code>
+      &nbsp;·&nbsp;
+      <code onclick="fill('john','pass123')">john / pass123</code>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function fill(u, p) {
+    document.getElementById('Username').value = u;
+    document.getElementById('Password').value = p;
+  }
+</script>
+
+</body>
+</html>

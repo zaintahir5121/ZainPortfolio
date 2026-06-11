@@ -2,16 +2,27 @@ namespace WorkLogApp.Models.ViewModels;
 
 public class DashboardViewModel
 {
-    public List<LogEntry> Logs          { get; set; } = [];
-    public string         Period        { get; set; } = "all";
-    public string         SearchQuery   { get; set; } = "";
+    public List<LogEntry> Logs        { get; set; } = [];
+    public string         Period      { get; set; } = "all";
+    public string         SearchQuery { get; set; } = "";
+    public string         UserName    { get; set; } = "";
+    public bool           IsAdmin     { get; set; }
 
-    public string  UserName      { get; set; } = "";
-    public bool    IsAdmin       { get; set; }
-
+    /* sidebar / nav stats */
     public decimal TodayHours    { get; set; }
     public int     WeekLogsCount { get; set; }
     public int     ProjectsCount { get; set; }
+
+    /* insights */
+    public int     Streak            { get; set; }
+    public decimal WeekHours         { get; set; }
+    public decimal LastWeekHours     { get; set; }
+    public string  TopProject        { get; set; } = "";
+    public decimal TopProjectHours   { get; set; }
+    public bool    WarnNotLogged     { get; set; }
+
+    /* autocomplete */
+    public List<string> RecentProjects { get; set; } = [];
 
     public string Greeting =>
         DateTime.Now.Hour switch

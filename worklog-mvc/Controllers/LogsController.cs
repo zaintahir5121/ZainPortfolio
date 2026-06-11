@@ -48,16 +48,56 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         var logs  = await query.OrderByDescending(l => l.Date).ThenByDescending(l => l.CreatedAt).ToListAsync();
         var stats = await allMine.ToListAsync();
 
+        // ── Insights ──────────────────────────────────────────────
+        var lastWeekStart = weekStart.AddDays(-7);
+        var lastWeekEnd   = weekStart.AddDays(-1);
+        var monthStart    = new DateOnly(today.Year, today.Month, 1);
+
+        var weekHours     = stats.Where(l => l.Date >= weekStart && l.Date <= today).Sum(l => l.Hours);
+        var lastWeekHours = stats.Where(l => l.Date >= lastWeekStart && l.Date <= lastWeekEnd).Sum(l => l.Hours);
+
+        var topProj = stats
+            .Where(l => l.Date >= monthStart)
+            .GroupBy(l => l.Project)
+            .Select(g => new { Name = g.Key, Hours = g.Sum(e => e.Hours) })
+            .OrderByDescending(x => x.Hours)
+            .FirstOrDefault();
+
+        // Streak: consecutive logged days ending today or yesterday
+        var logDates  = new HashSet<DateOnly>(stats.Select(l => l.Date));
+        var checkDay  = logDates.Contains(today) ? today : today.AddDays(-1);
+        var streak    = 0;
+        while (logDates.Contains(checkDay)) { streak++; checkDay = checkDay.AddDays(-1); }
+
+        // Warn if it's after 4 pm and nothing logged today
+        var warnNotLogged = DateTime.Now.Hour >= 16 && stats.All(l => l.Date != today);
+
+        // Recent distinct projects ordered by last use date
+        var recentProjects = stats
+            .GroupBy(l => l.Project)
+            .Select(g => new { Name = g.Key, LastDate = g.Max(e => e.Date), TotalHours = g.Sum(e => e.Hours) })
+            .OrderByDescending(x => x.LastDate)
+            .Select(x => x.Name)
+            .Take(15)
+            .ToList();
+
         var vm = new DashboardViewModel
         {
-            Logs          = logs,
-            Period        = period ?? "all",
-            SearchQuery   = q ?? "",
-            UserName      = User.FindFirstValue(ClaimTypes.Name) ?? "",
-            IsAdmin       = IsAdmin,
-            TodayHours    = stats.Where(l => l.Date == today).Sum(l => l.Hours),
-            WeekLogsCount = stats.Count(l => l.Date >= weekStart),
-            ProjectsCount = stats.Select(l => l.Project).Distinct().Count(),
+            Logs             = logs,
+            Period           = period ?? "all",
+            SearchQuery      = q ?? "",
+            UserName         = User.FindFirstValue(ClaimTypes.Name) ?? "",
+            IsAdmin          = IsAdmin,
+            TodayHours       = stats.Where(l => l.Date == today).Sum(l => l.Hours),
+            WeekLogsCount    = stats.Count(l => l.Date >= weekStart),
+            ProjectsCount    = stats.Select(l => l.Project).Distinct().Count(),
+            Streak           = streak,
+            WeekHours        = weekHours,
+            LastWeekHours    = lastWeekHours,
+            TopProject       = topProj?.Name ?? "",
+            TopProjectHours  = topProj?.Hours ?? 0,
+            WarnNotLogged    = warnNotLogged,
+            RecentProjects   = recentProjects,
         };
 
         ViewBag.TodayHours    = vm.TodayHours;

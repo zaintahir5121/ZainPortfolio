@@ -17,6 +17,50 @@
   </div>
 </div>
 
+<!-- Insights bar -->
+@{
+  var hasInsights = Model.Streak > 1 || Model.WeekHours > 0 || !string.IsNullOrEmpty(Model.TopProject) || Model.WarnNotLogged;
+}
+@if (hasInsights)
+{
+  <div class="insights-bar">
+    @if (Model.WarnNotLogged)
+    {
+      <div class="insight-chip i-warn">
+        <span class="i-ico">⏰</span>
+        <span>Nothing logged yet today — it's getting late</span>
+      </div>
+    }
+    @if (Model.Streak > 1)
+    {
+      <div class="insight-chip i-streak">
+        <span class="i-ico">🔥</span>
+        <span><strong>@Model.Streak-day</strong> streak</span>
+      </div>
+    }
+    @if (Model.WeekHours > 0)
+    {
+      var pct  = Model.LastWeekHours > 0 ? (Model.WeekHours - Model.LastWeekHours) / Model.LastWeekHours * 100m : 0m;
+      var up   = pct >= 0;
+      var sign = up ? "↑" : "↓";
+      var cls  = up ? "i-up" : "i-dn";
+      <div class="insight-chip">
+        <span class="i-ico">📈</span>
+        <span><strong>@Model.WeekHours h</strong> this week
+        @if (Model.LastWeekHours > 0) { <span class="@cls">@sign@(Math.Abs(pct).ToString("F0"))%</span> }
+        </span>
+      </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.TopProject))
+    {
+      <div class="insight-chip">
+        <span class="i-ico">🏆</span>
+        <span>Top: <strong>@Model.TopProject</strong> · @Model.TopProjectHours h this month</span>
+      </div>
+    }
+  </div>
+}
+
 <!-- Smart capture bar -->
 <div class="capture-zone">
   <form asp-action="Add" method="post" id="capture-form">
@@ -27,15 +71,32 @@
     <input type="hidden" name="Description" id="f-desc"    value="">
     <input type="hidden" name="Tags"        id="f-tags"    value="">
 
-    <div class="capture-bar">
-      <button type="button" class="voice-btn" id="voice-btn" title="Speak to log">🎤</button>
-      <input type="text" class="capture-input" id="capture-input"
-             placeholder='Try: "API integration 3h, fixed OAuth bug  #backend" or press 🎤'
-             autocomplete="off">
-      <button type="button" class="capture-ai" id="capture-ai-btn" title="Auto-improve with AI">✦ AI</button>
-      <button type="button" class="capture-submit" id="capture-submit-btn">Log it →</button>
+    <div class="ac-wrap">
+      <div class="capture-bar">
+        <button type="button" class="voice-btn" id="voice-btn" title="Speak to log">🎤</button>
+        <input type="text" class="capture-input" id="capture-input"
+               placeholder='Try: "API integration 3h, fixed OAuth bug  #backend" or press 🎤'
+               autocomplete="off">
+        <button type="button" class="capture-ai" id="capture-ai-btn" title="Auto-improve with AI">✦ AI</button>
+        <button type="button" class="capture-submit" id="capture-submit-btn">Log it →</button>
+      </div>
+      <div class="parsed-preview hidden" id="parsed-preview"></div>
+      <div class="ac-dropdown hidden" id="ac-dropdown">
+        @if (Model.RecentProjects.Any())
+        {
+          <div class="ac-quick" id="ac-quick">
+            <div class="ac-section">Recent projects</div>
+            <div class="ac-chips">
+              @foreach (var p in Model.RecentProjects.Take(6))
+              {
+                <button type="button" class="ac-q-chip" data-project="@p">@p</button>
+              }
+            </div>
+          </div>
+        }
+        <div id="ac-results"></div>
+      </div>
     </div>
-    <div class="parsed-preview hidden" id="parsed-preview"></div>
   </form>
 </div>
 
@@ -131,6 +192,9 @@ else
 
 @section Scripts {
 <script>
+// ── Project data (for autocomplete) ────────────────────────────────────
+const ALL_PROJECTS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RecentProjects));
+
 // ── View toggle ────────────────────────────────────────────────────────
 let view = localStorage.getItem('wl-view') || 'grid';
 function setView(v) {
@@ -237,6 +301,7 @@ captureInput.addEventListener('keydown', e => {
 });
 
 function doSubmit() {
+  acDropdown.classList.add('hidden');
   const raw = captureInput.value.trim();
   if (!raw) { captureInput.focus(); return; }
   const p = quickParse(raw);
@@ -247,7 +312,9 @@ function doSubmit() {
     toast('Add hours to your log — e.g. "3h"');
     return;
   }
-  document.getElementById('f-project').value = p.project || raw.split(/[\s,]/)[0];
+  const proj = p.project || raw.split(/[\s,]/)[0];
+  if (proj) localStorage.setItem('wl-last-project', proj);
+  document.getElementById('f-project').value = proj;
   document.getElementById('f-hours').value   = p.hours;
   document.getElementById('f-tags').value    = p.tags;
   document.getElementById('f-desc').value    = p.description.length > 4 ? p.description : raw;
@@ -315,5 +382,86 @@ function toast(msg) {
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 3000);
 }
+
+// ── Autocomplete ────────────────────────────────────────────────────────
+const acDropdown = document.getElementById('ac-dropdown');
+const acResults  = document.getElementById('ac-results');
+let acIndex = -1;
+
+function showDropdown() {
+  acIndex = -1;
+  const q = captureInput.value.trim().toLowerCase();
+  if (!q) {
+    // show quick chips + last project suggestion
+    acResults.innerHTML = buildLastProjectHint();
+    acDropdown.classList.remove('hidden');
+    return;
+  }
+  const matches = ALL_PROJECTS.filter(p => p.toLowerCase().includes(q));
+  if (!matches.length) { acDropdown.classList.add('hidden'); return; }
+  acResults.innerHTML = matches.slice(0, 6).map((p, i) =>
+    `<div class="ac-item" data-project="${esc2(p)}" data-i="${i}">${highlight(p, q)}</div>`
+  ).join('');
+  acResults.querySelectorAll('.ac-item').forEach(el =>
+    el.addEventListener('mousedown', e => { e.preventDefault(); pickProject(el.dataset.project); })
+  );
+  acDropdown.classList.remove('hidden');
+}
+
+function hideDropdown() { setTimeout(() => acDropdown.classList.add('hidden'), 120); }
+
+function buildLastProjectHint() {
+  const last = localStorage.getItem('wl-last-project');
+  if (!last) return '';
+  return `<div class="ac-last" data-project="${esc2(last)}" onmousedown="event.preventDefault();pickProject('${esc2(last)}')">↺ Continue <strong>${esc2(last)}</strong></div>`;
+}
+
+function pickProject(name) {
+  const cur = captureInput.value;
+  // Replace existing project part or prepend
+  const hasHours = /\d+(?:[.,]\d+)?\s*h(?:rs?|ours?)?/i.test(cur);
+  if (!hasHours) {
+    captureInput.value = name + ' ';
+  } else {
+    // inject project name before hours
+    captureInput.value = name + ' ' + cur.replace(/^[^,#\d]*/, '').trim();
+  }
+  captureInput.focus();
+  acDropdown.classList.add('hidden');
+  captureInput.dispatchEvent(new Event('input'));
+}
+
+function highlight(text, q) {
+  return text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),
+    '<strong>$1</strong>');
+}
+function esc2(s) { return s.replace(/"/g,'&quot;'); }
+
+captureInput.addEventListener('focus',  showDropdown);
+captureInput.addEventListener('blur',   hideDropdown);
+captureInput.addEventListener('input',  showDropdown);
+captureInput.addEventListener('keydown', e => {
+  const items = acResults.querySelectorAll('.ac-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    acIndex = Math.min(acIndex + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('ac-sel', i === acIndex));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    acIndex = Math.max(acIndex - 1, -1);
+    items.forEach((el, i) => el.classList.toggle('ac-sel', i === acIndex));
+  } else if (e.key === 'Tab' && acIndex >= 0) {
+    e.preventDefault();
+    pickProject(items[acIndex].dataset.project);
+  }
+});
+
+// Wire quick chips
+document.querySelectorAll('.ac-q-chip').forEach(btn =>
+  btn.addEventListener('click', () => pickProject(btn.dataset.project))
+);
+
+
 </script>
 }

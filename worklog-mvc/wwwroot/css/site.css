@@ -115,6 +115,39 @@ button { font-family:var(--font); cursor:pointer; }
 .pp-chip.pp-warn { background:#fef3c7; color:#92400e; border-color:#fde68a; }
 .pp-lbl { font-size:10px; font-weight:400; opacity:.6; text-transform:uppercase; letter-spacing:.3px; }
 
+/* Autocomplete */
+.ac-wrap { position:relative; }
+.ac-dropdown {
+  position:absolute; top:calc(100% + 4px); left:0; right:0;
+  background:var(--white); border:1px solid var(--line);
+  border-radius:12px; box-shadow:var(--sh); z-index:50; overflow:hidden;
+}
+.ac-section { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); padding:10px 14px 5px; }
+.ac-chips { display:flex; gap:6px; flex-wrap:wrap; padding:0 14px 10px; border-bottom:1px solid var(--line); }
+.ac-q-chip { padding:4px 12px; border-radius:99px; background:var(--faint); border:1px solid var(--line); font-size:12px; font-weight:500; color:var(--text-2); cursor:pointer; transition:all .12s; }
+.ac-q-chip:hover { background:var(--accent-bg); color:var(--accent); border-color:rgba(99,102,241,.2); }
+.ac-item { padding:9px 14px; font-size:13px; cursor:pointer; color:var(--text-2); transition:background .1s; }
+.ac-item:hover,.ac-item.ac-sel { background:var(--accent-bg); color:var(--accent); }
+.ac-item strong { color:var(--accent); }
+.ac-last { padding:9px 14px; font-size:13px; color:var(--muted); cursor:pointer; transition:background .1s; }
+.ac-last:hover { background:var(--faint); }
+.ac-last strong { color:var(--text); }
+
+/* ═══ INSIGHTS BAR ═══ */
+.insights-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.insight-chip {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:7px 14px; border-radius:99px;
+  background:var(--white); border:1px solid var(--line);
+  font-size:12px; color:var(--text-2); box-shadow:var(--sh-sm); white-space:nowrap;
+}
+.insight-chip .i-ico { font-size:14px; }
+.insight-chip strong { color:var(--text); }
+.insight-chip.i-warn { background:#fff7ed; border-color:#fed7aa; color:#c2410c; }
+.insight-chip.i-streak { background:linear-gradient(135deg,#fffbeb,#fef9c3); border-color:#fde68a; }
+.i-up { color:#059669; font-weight:700; margin-left:4px; }
+.i-dn { color:#dc2626; font-weight:700; margin-left:4px; }
+
 /* ═══ FILTER / VIEW BAR ═══ */
 .fv-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
 .tabs { display:flex; gap:4px; }

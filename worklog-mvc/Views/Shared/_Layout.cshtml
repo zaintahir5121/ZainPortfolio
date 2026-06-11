@@ -30,6 +30,11 @@
             <span class="nav-ico">👥</span> Team Logs
           </a>
         }
+        <a asp-controller="Timesheet" asp-action="Index"
+           class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Timesheet" ? "active" : "")"
+           style="margin-top:3px">
+          <span class="nav-ico">🗓️</span> Timesheet
+        </a>
       </nav>
     </div>
 

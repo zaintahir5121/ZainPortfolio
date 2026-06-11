@@ -1,0 +1,305 @@
+@model WorkLogApp.Models.ViewModels.TimesheetViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timesheet — @Model.EmployeeName — @Model.PeriodLabel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --text: #1a1a1a;
+      --muted: #666;
+      --line: #e0e0e0;
+      --accent: #37352f;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: white;
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 48px 56px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .ts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--text);
+      margin-bottom: 24px;
+    }
+    .ts-company { font-size: 22px; font-weight: 800; letter-spacing: -.5px; }
+    .ts-company span { opacity: .35; }
+    .ts-doc-title { font-size: 12px; color: var(--muted); margin-top: 3px; letter-spacing: .3px; text-transform: uppercase; }
+
+    /* Meta grid */
+    .ts-meta {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .ts-meta-cell {
+      padding: 12px 16px;
+      border-right: 1px solid var(--line);
+    }
+    .ts-meta-cell:last-child { border-right: none; }
+    .ts-meta-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); font-weight: 600; margin-bottom: 3px; }
+    .ts-meta-val { font-size: 14px; font-weight: 600; }
+
+    /* AI Summary box */
+    .summary-box {
+      background: #f9f9f9;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: #333;
+    }
+    .summary-box-title {
+      font-size: 10px; text-transform: uppercase; letter-spacing: .4px;
+      color: var(--muted); font-weight: 600; margin-bottom: 8px;
+    }
+
+    /* Main table */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
+    thead th {
+      font-size: 10px; text-transform: uppercase; letter-spacing: .4px;
+      color: var(--muted); font-weight: 700;
+      padding: 8px 12px; border-bottom: 1.5px solid var(--text);
+      text-align: left;
+    }
+    thead th.r { text-align: right; }
+    td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+
+    .td-date-num { font-size: 16px; font-weight: 700; line-height: 1; }
+    .td-date-mo  { font-size: 10px; color: var(--muted); }
+    .td-day { font-size: 11px; color: var(--muted); padding-top: 11px; }
+    .td-proj { font-weight: 600; font-size: 13px; }
+    .td-desc { color: #444; max-width: 320px; }
+    .td-hrs  { text-align: right; font-weight: 700; white-space: nowrap; }
+
+    .tr-day-total td {
+      background: #f5f5f5;
+      font-size: 11px; color: var(--muted);
+      border-bottom: 1.5px solid var(--line);
+    }
+    .tr-day-total .r { text-align: right; font-weight: 600; color: var(--text); }
+
+    tfoot td {
+      font-weight: 800; font-size: 14px;
+      border-top: 2px solid var(--text);
+      padding-top: 12px;
+    }
+    tfoot .r { text-align: right; }
+
+    /* Tags */
+    .print-tags { margin-top: 4px; display: flex; gap: 4px; flex-wrap: wrap; }
+    .print-tag {
+      font-size: 10px; padding: 1px 6px; border-radius: 99px;
+      background: #eee; color: #555;
+    }
+
+    /* Project summary */
+    .section-title {
+      font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+      color: var(--muted); font-weight: 700;
+      margin-bottom: 10px; padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    .proj-summary {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 36px;
+    }
+    .proj-cell {
+      border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
+    }
+    .proj-cell-name { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
+    .proj-cell-hrs  { font-size: 20px; font-weight: 800; }
+    .proj-cell-pct  { font-size: 11px; color: var(--muted); }
+
+    /* Signature */
+    .sig-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px;
+      margin-top: 48px;
+    }
+    .sig-line { border-bottom: 1px solid var(--text); padding-bottom: 4px; margin-bottom: 5px; height: 40px; }
+    .sig-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); font-weight: 600; }
+
+    /* Print chrome */
+    .print-actions {
+      position: fixed; top: 16px; right: 16px; z-index: 99;
+      display: flex; gap: 8px;
+    }
+    .print-btn {
+      background: var(--text); color: white;
+      border: none; border-radius: 6px;
+      padding: 9px 18px; font-size: 13px; font-weight: 600;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+    }
+    .close-btn {
+      background: #f0f0f0; color: var(--text);
+      border: none; border-radius: 6px;
+      padding: 9px 18px; font-size: 13px; font-weight: 600;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+    }
+
+    @media print {
+      body { padding: 24px 32px; }
+      .print-actions { display: none; }
+      @@page { margin: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="print-actions">
+  <button class="close-btn" onclick="window.close()">✕ Close</button>
+  <button class="print-btn" onclick="window.print()">🖨 Print / Save PDF</button>
+</div>
+
+<!-- Header -->
+<div class="ts-header">
+  <div>
+    <div class="ts-company">worklog<span>.</span></div>
+    <div class="ts-doc-title">Employee Timesheet</div>
+  </div>
+  <div style="text-align:right">
+    <div style="font-size:11px;color:#999;margin-bottom:4px">Generated @DateTime.Now.ToString("MMMM d, yyyy")</div>
+  </div>
+</div>
+
+<!-- Meta -->
+<div class="ts-meta">
+  <div class="ts-meta-cell">
+    <div class="ts-meta-lbl">Employee</div>
+    <div class="ts-meta-val">@Model.EmployeeName</div>
+  </div>
+  <div class="ts-meta-cell">
+    <div class="ts-meta-lbl">Period</div>
+    <div class="ts-meta-val">@Model.PeriodLabel</div>
+  </div>
+  <div class="ts-meta-cell">
+    <div class="ts-meta-lbl">Total Hours</div>
+    <div class="ts-meta-val">@Model.TotalHours h</div>
+  </div>
+  <div class="ts-meta-cell">
+    <div class="ts-meta-lbl">Days Worked</div>
+    <div class="ts-meta-val">@Model.DaysWorked</div>
+  </div>
+</div>
+
+@if (!Model.Entries.Any())
+{
+  <p style="color:#999;text-align:center;padding:40px">No work logs recorded for this period.</p>
+}
+else
+{
+  <!-- Main table -->
+  <table>
+    <thead>
+      <tr>
+        <th style="width:52px">Date</th>
+        <th style="width:36px">Day</th>
+        <th style="width:150px">Project</th>
+        <th>Description</th>
+        <th class="r" style="width:60px">Hours</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var day in Model.ByDay)
+      {
+        var dayList  = day.ToList();
+        var dayTotal = dayList.Sum(e => e.Hours);
+
+        @for (int i = 0; i < dayList.Count; i++)
+        {
+          var e = dayList[i];
+          <tr>
+            @if (i == 0)
+            {
+              <td rowspan="@dayList.Count" style="vertical-align:top;padding-top:11px">
+                <div class="td-date-num">@day.Key.Day</div>
+                <div class="td-date-mo">@day.Key.ToString("MMM")</div>
+              </td>
+              <td class="td-day" rowspan="@dayList.Count">@day.Key.DayOfWeek.ToString()[..3]</td>
+            }
+            <td class="td-proj">@e.Project</td>
+            <td class="td-desc">
+              @e.Description
+              @if (e.TagList.Any())
+              {
+                <div class="print-tags">
+                  @foreach (var t in e.TagList) { <span class="print-tag">@t</span> }
+                </div>
+              }
+            </td>
+            <td class="td-hrs">@e.Hours</td>
+          </tr>
+        }
+
+        @if (dayList.Count > 1)
+        {
+          <tr class="tr-day-total">
+            <td colspan="2"></td>
+            <td colspan="2" style="font-size:11px;color:#888">Day total</td>
+            <td class="r" style="text-align:right;font-weight:600">@dayTotal</td>
+          </tr>
+        }
+      }
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4">Total hours for @Model.PeriodLabel</td>
+        <td class="r">@Model.TotalHours h</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Project summary -->
+  <div class="section-title">Project breakdown</div>
+  <div class="proj-summary">
+    @foreach (var g in Model.ByProject)
+    {
+      var pct = Model.TotalHours == 0 ? 0m : g.Sum(e => e.Hours) / Model.TotalHours * 100m;
+      <div class="proj-cell">
+        <div class="proj-cell-name">@g.Key</div>
+        <div class="proj-cell-hrs">@g.Sum(e => e.Hours) h</div>
+        <div class="proj-cell-pct">@pct.ToString("F0")% of total</div>
+      </div>
+    }
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-grid">
+    <div>
+      <div class="sig-line"></div>
+      <div class="sig-lbl">Employee Signature</div>
+    </div>
+    <div>
+      <div class="sig-line"></div>
+      <div class="sig-lbl">Manager Approval</div>
+    </div>
+    <div>
+      <div class="sig-line"></div>
+      <div class="sig-lbl">Date</div>
+    </div>
+  </div>
+}
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+@model WorkLogApp.Models.ViewModels.TimesheetViewModel
+@{
+    ViewData["Title"] = "Timesheet";
+    var months = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.MonthNames
+                    .Take(12).Select((n, i) => (Name: n, Value: i + 1));
+}
+
+<!-- ── Page header ── -->
+<div class="pg-head">
+  <div>
+    <h1>Timesheet</h1>
+    <p class="pg-date">Generate and export your time records</p>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <a asp-action="Print"
+       asp-route-period="@Model.PeriodType"
+       asp-route-month="@Model.Month"
+       asp-route-year="@Model.Year"
+       target="_blank" class="ts-btn-outline">
+      🖨 Print / PDF
+    </a>
+  </div>
+</div>
+
+<!-- ── Period selector ── -->
+<div class="ts-period-bar">
+  <form asp-action="Index" method="get" class="ts-period-form" id="period-form">
+
+    <div class="ts-period-group">
+      <span class="ts-period-label">Period</span>
+      <div class="ts-seg" id="seg">
+        @foreach (var (val, label) in new[]{ ("mid","Mid-month  1–15"), ("end","End-month  16–31"), ("full","Full month") })
+        {
+          <button type="button" class="seg-btn @(Model.PeriodType == val ? "seg-on" : "")"
+                  data-val="@val" onclick="setPeriod('@val')">@label</button>
+        }
+      </div>
+      <input type="hidden" name="period" id="period-input" value="@Model.PeriodType">
+    </div>
+
+    <div class="ts-period-group">
+      <span class="ts-period-label">Month</span>
+      <select name="month" class="ts-sel" onchange="this.form.submit()">
+        @foreach (var m in months)
+        {
+          <option value="@m.Value" @(m.Value == Model.Month ? "selected" : "")>@m.Name</option>
+        }
+      </select>
+    </div>
+
+    <div class="ts-period-group">
+      <span class="ts-period-label">Year</span>
+      <select name="year" class="ts-sel" onchange="this.form.submit()">
+        @for (int y = DateTime.Today.Year; y >= DateTime.Today.Year - 3; y--)
+        {
+          <option value="@y" @(y == Model.Year ? "selected" : "")>@y</option>
+        }
+      </select>
+    </div>
+
+  </form>
+
+  <div class="ts-export-group">
+    <span class="ts-period-label">Export</span>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <a asp-action="ExportCsv"
+         asp-route-period="@Model.PeriodType"
+         asp-route-month="@Model.Month"
+         asp-route-year="@Model.Year"
+         asp-route-fmt="standard"
+         class="ts-btn-outline">⬇ CSV</a>
+
+      <a asp-action="ExportCsv"
+         asp-route-period="@Model.PeriodType"
+         asp-route-month="@Model.Month"
+         asp-route-year="@Model.Year"
+         asp-route-fmt="bamboohr"
+         class="ts-btn-outline" title="BambooHR-compatible import format">🌿 BambooHR CSV</a>
+    </div>
+  </div>
+</div>
+
+@if (!Model.Entries.Any())
+{
+  <!-- Empty state -->
+  <div class="empty" style="padding:60px 20px">
+    <div class="empty-ico">🗓️</div>
+    <h3>No logs for @Model.PeriodLabel</h3>
+    <p>
+      Add work logs for this period and they'll appear here automatically.<br>
+      <a asp-controller="Logs" asp-action="Index" style="color:var(--text);text-decoration:underline">Go to My Logs →</a>
+    </p>
+  </div>
+}
+else
+{
+  <!-- ── Stats row ── -->
+  <div class="ts-stats">
+    <div class="ts-stat">
+      <div class="ts-stat-num">@Model.TotalHours<span class="ts-stat-unit">h</span></div>
+      <div class="ts-stat-lbl">Total hours</div>
+    </div>
+    <div class="ts-stat">
+      <div class="ts-stat-num">@Model.DaysWorked</div>
+      <div class="ts-stat-lbl">Days worked</div>
+    </div>
+    <div class="ts-stat">
+      <div class="ts-stat-num">@Model.ProjectCount</div>
+      <div class="ts-stat-lbl">Projects</div>
+    </div>
+    <div class="ts-stat">
+      <div class="ts-stat-num">@((Model.TotalHours / (Model.DaysWorked == 0 ? 1 : Model.DaysWorked)).ToString("F1"))<span class="ts-stat-unit">h</span></div>
+      <div class="ts-stat-lbl">Avg / day</div>
+    </div>
+
+    <!-- AI summary trigger -->
+    <button class="ts-ai-btn" id="ai-sum-btn" onclick="genAiSummary()">
+      ✦ AI Write Summary
+    </button>
+  </div>
+
+  <!-- AI summary box -->
+  <div class="ts-ai-box hidden" id="ai-box">
+    <div class="ts-ai-hdr">
+      <span>✦ AI Period Summary</span>
+      <button onclick="document.getElementById('ai-box').classList.add('hidden')" class="ai-box-close">✕</button>
+    </div>
+    <div class="ts-ai-body" id="ai-body"></div>
+    <div class="ts-ai-foot">
+      <span class="ts-ai-hint">Suitable for manager / HR review</span>
+      <button onclick="copyAiText()" class="ts-btn-outline" style="font-size:12px;padding:5px 12px">📋 Copy</button>
+    </div>
+  </div>
+
+  <!-- ── Two column layout: table + project summary ── -->
+  <div class="ts-grid">
+
+    <!-- Daily breakdown table -->
+    <div class="ts-table-wrap">
+      <div class="ts-section-title">Daily breakdown · @Model.PeriodLabel</div>
+      <table class="ts-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Project</th>
+            <th>Description</th>
+            <th class="ts-num">Hours</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var day in Model.ByDay)
+          {
+            var dayEntries = day.ToList();
+            var dayTotal   = dayEntries.Sum(e => e.Hours);
+
+            @for (int i = 0; i < dayEntries.Count; i++)
+            {
+              var e = dayEntries[i];
+              <tr class="@(i == 0 ? "tr-day-first" : "tr-day-cont")">
+                @if (i == 0)
+                {
+                  <td class="td-date" rowspan="@dayEntries.Count">
+                    <div class="td-date-num">@day.Key.Day</div>
+                    <div class="td-date-mo">@day.Key.ToString("MMM")</div>
+                  </td>
+                  <td class="td-day" rowspan="@dayEntries.Count">@day.Key.DayOfWeek.ToString()[..3]</td>
+                }
+                <td class="td-proj">@e.Project</td>
+                <td class="td-desc">
+                  @e.Description
+                  @if (e.TagList.Any())
+                  {
+                    <div class="td-tags">
+                      @foreach (var t in e.TagList) { <span class="ctag">@t</span> }
+                    </div>
+                  }
+                </td>
+                <td class="ts-num td-hrs">@e.Hours</td>
+              </tr>
+            }
+
+            @if (dayEntries.Count > 1)
+            {
+              <tr class="tr-day-total">
+                <td colspan="3" class="td-day-total-lbl">Day total</td>
+                <td class="ts-num td-day-total-val">@dayTotal h</td>
+              </tr>
+            }
+          }
+        </tbody>
+        <tfoot>
+          <tr class="tr-grand-total">
+            <td colspan="4">Total</td>
+            <td class="ts-num">@Model.TotalHours h</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Project breakdown -->
+    <div>
+      <div class="ts-section-title">By project</div>
+      <div class="ts-proj-list">
+        @{
+          var totalHours = Model.TotalHours == 0 ? 1m : Model.TotalHours;
+        }
+        @foreach (var g in Model.ByProject)
+        {
+          var pct = (g.Sum(e => e.Hours) / totalHours) * 100m;
+          <div class="ts-proj-row">
+            <div class="ts-proj-top">
+              <span class="ts-proj-name">@g.Key</span>
+              <span class="ts-proj-hrs">@g.Sum(e => e.Hours) h</span>
+            </div>
+            <div class="ts-proj-bar-wrap">
+              <div class="ts-proj-bar" style="width:@pct.ToString("F0")%"></div>
+            </div>
+            <div class="ts-proj-pct">@pct.ToString("F0")% of total</div>
+          </div>
+        }
+      </div>
+
+      <!-- Integration note -->
+      <div class="ts-integrations">
+        <div class="ts-int-title">HR Tool Exports</div>
+        <div class="ts-int-row">
+          <div class="ts-int-icon">🌿</div>
+          <div>
+            <div class="ts-int-name">BambooHR</div>
+            <div class="ts-int-desc">Download BambooHR CSV → Time Tracking → Import</div>
+            <a asp-action="ExportCsv"
+               asp-route-period="@Model.PeriodType"
+               asp-route-month="@Model.Month"
+               asp-route-year="@Model.Year"
+               asp-route-fmt="bamboohr"
+               class="ts-int-link">Download BambooHR CSV →</a>
+          </div>
+        </div>
+        <div class="ts-int-row">
+          <div class="ts-int-icon">📄</div>
+          <div>
+            <div class="ts-int-name">Any HR / Payroll Tool</div>
+            <div class="ts-int-desc">Standard CSV works with Workday, SAP, ADP, Rippling, Gusto</div>
+            <a asp-action="ExportCsv"
+               asp-route-period="@Model.PeriodType"
+               asp-route-month="@Model.Month"
+               asp-route-year="@Model.Year"
+               asp-route-fmt="standard"
+               class="ts-int-link">Download Standard CSV →</a>
+          </div>
+        </div>
+        <div class="ts-int-row">
+          <div class="ts-int-icon">🖨</div>
+          <div>
+            <div class="ts-int-name">Print / Manual Submit</div>
+            <div class="ts-int-desc">Opens print view — save as PDF in browser print dialog</div>
+            <a asp-action="Print"
+               asp-route-period="@Model.PeriodType"
+               asp-route-month="@Model.Month"
+               asp-route-year="@Model.Year"
+               target="_blank"
+               class="ts-int-link">Open print view →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ts-grid -->
+}
+
+@section Scripts {
+<script>
+function setPeriod(val) {
+  document.getElementById('period-input').value = val;
+  document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('seg-on', b.dataset.val === val));
+  document.getElementById('period-form').submit();
+}
+
+async function genAiSummary() {
+  const btn = document.getElementById('ai-sum-btn');
+  btn.textContent = '… writing';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch('/Timesheet/AiSummary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        period: '@Model.PeriodType',
+        month:  @Model.Month,
+        year:   @Model.Year
+      })
+    });
+    const d = await r.json();
+    if (d.result) {
+      document.getElementById('ai-body').textContent = d.result;
+      document.getElementById('ai-box').classList.remove('hidden');
+    } else {
+      alert(d.error ?? 'AI error');
+    }
+  } catch { alert('Could not reach AI service'); }
+  finally { btn.textContent = '✦ AI Write Summary'; btn.disabled = false; }
+}
+
+function copyAiText() {
+  const text = document.getElementById('ai-body').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Copied to clipboard!');
+  });
+}
+
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast-wrap';
+  el.innerHTML = `<div class="toast">${msg}</div>`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+</script>
+}

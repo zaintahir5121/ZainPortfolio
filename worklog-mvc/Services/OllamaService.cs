@@ -22,6 +22,23 @@ public class OllamaService(HttpClient http, IConfiguration cfg) : IOllamaService
         return await CallOllamaAsync(prompt, timeout: 60);
     }
 
+    public async Task<string> GenerateTimesheetSummaryAsync(
+        string employeeName, DateOnly start, DateOnly end, IEnumerable<LogEntry> entries)
+    {
+        var list    = entries.ToList();
+        var grouped = list.GroupBy(e => e.Project)
+                          .Select(g => $"• {g.Key}: {g.Sum(e => e.Hours)}h — {string.Join("; ", g.Select(e => e.Description))}");
+
+        var prompt =
+            $"Write a professional 3-4 sentence timesheet summary for {employeeName} " +
+            $"covering {start:MMMM d} to {end:MMMM d, yyyy}. " +
+            $"Total hours logged: {list.Sum(e => e.Hours)}h across {list.Select(e => e.Project).Distinct().Count()} projects. " +
+            $"Work completed:\n{string.Join('\n', grouped)}\n\n" +
+            $"The summary should be suitable for a manager or HR review — clear, factual, professional.";
+
+        return await CallOllamaAsync(prompt, timeout: 90);
+    }
+
     private async Task<string> CallOllamaAsync(string prompt, int timeout = 40)
     {
         using var cts  = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));

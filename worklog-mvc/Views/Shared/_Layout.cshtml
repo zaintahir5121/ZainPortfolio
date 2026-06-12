@@ -23,18 +23,11 @@
     <a asp-controller="Recurring" asp-action="Index"
        class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Recurring" ? "t-link-on" : "")">↺ Recurring</a>
     @{
-      var growthControllers = new[]{"Growth","Achievements","Experience","Learning"};
-      var growthActive = growthControllers.Contains(ViewContext.RouteData.Values["controller"]?.ToString() ?? "");
+      var growthActive = new[]{"Growth","Achievements","Experience","Learning"}
+        .Contains(ViewContext.RouteData.Values["controller"]?.ToString() ?? "");
     }
-    <div class="t-dropdown" id="growthDrop">
-      <button class="t-link t-drop-btn @(growthActive ? "t-link-on" : "")" id="growthBtn">🌱 Growth</button>
-      <div class="t-drop-panel hidden" id="growthPanel">
-        <a asp-controller="Growth" asp-action="Index" class="t-drop-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Growth" ? "t-drop-on" : "")">Overview</a>
-        <a asp-controller="Achievements" asp-action="Index" class="t-drop-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Achievements" ? "t-drop-on" : "")">🏆 Achievements</a>
-        <a asp-controller="Experience" asp-action="Index" class="t-drop-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Experience" ? "t-drop-on" : "")">💼 Experience</a>
-        <a asp-controller="Learning" asp-action="Index" class="t-drop-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Learning" ? "t-drop-on" : "")">📚 Learning</a>
-      </div>
-    </div>
+    <a asp-controller="Growth" asp-action="Index"
+       class="t-link @(growthActive ? "t-link-on" : "")">🌱 Growth</a>
   </div>
   <div class="t-right">
     @if (ViewBag.TodayHours is decimal th && th > 0)
@@ -58,10 +51,8 @@
   <a asp-controller="Recurring" asp-action="Index"
      class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Recurring" ? "t-link-on" : "")">↺ Recurring</a>
   <div class="t-drawer-divider"></div>
-  <a asp-controller="Growth" asp-action="Index" class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Growth" ? "t-link-on" : "")">🌱 Growth Hub</a>
-  <a asp-controller="Achievements" asp-action="Index" class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Achievements" ? "t-link-on" : "")">🏆 Achievements</a>
-  <a asp-controller="Experience" asp-action="Index" class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Experience" ? "t-link-on" : "")">💼 Experience</a>
-  <a asp-controller="Learning" asp-action="Index" class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Learning" ? "t-link-on" : "")">📚 Learning</a>
+  <a asp-controller="Growth" asp-action="Index"
+     class="t-drawer-link @(growthActive ? "t-link-on" : "")">🌱 Growth</a>
   <div class="t-drawer-divider"></div>
   <button class="t-drawer-signout" onclick="document.getElementById('logoutForm').submit()">Sign out</button>
 </div>
@@ -94,16 +85,6 @@
 }
 
 <script>
-  // Growth dropdown
-  const growthBtn   = document.getElementById('growthBtn');
-  const growthPanel = document.getElementById('growthPanel');
-  if (growthBtn && growthPanel) {
-    growthBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      growthPanel.classList.toggle('hidden');
-    });
-    document.addEventListener('click', () => growthPanel.classList.add('hidden'));
-  }
   // Hamburger
   const btn = document.getElementById('tMenuBtn');
   const drawer = document.getElementById('tMobileDrawer');

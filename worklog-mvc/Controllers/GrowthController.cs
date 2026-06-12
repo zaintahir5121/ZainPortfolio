@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkLogApp.Data;
+using WorkLogApp.Models;
 
 namespace WorkLogApp.Controllers;
 
@@ -18,39 +19,160 @@ public class GrowthController(AppDbContext db) : Controller
         var achievements = await db.Achievements
             .Where(a => a.UserId == uid)
             .OrderByDescending(a => a.Date)
-            .Take(4)
             .ToListAsync();
 
         var experiences = await db.Experiences
             .Where(e => e.UserId == uid)
             .OrderByDescending(e => e.IsCurrent)
             .ThenByDescending(e => e.StartDate)
-            .Take(3)
             .ToListAsync();
 
         var learning = await db.LearningItems
             .Where(l => l.UserId == uid)
-            .OrderByDescending(l => l.CreatedAt)
-            .Take(4)
+            .OrderBy(l => l.Status == "completed" ? 2 : l.Status == "in-progress" ? 0 : 1)
+            .ThenByDescending(l => l.CreatedAt)
             .ToListAsync();
 
-        var achieveCount = await db.Achievements.CountAsync(a => a.UserId == uid);
-        var xpCount      = await db.Experiences.CountAsync(e => e.UserId == uid);
-        var learnCount   = await db.LearningItems.CountAsync(l => l.UserId == uid);
-        var learnDone    = await db.LearningItems.CountAsync(l => l.UserId == uid && l.Status == "completed");
+        ViewBag.AchieveCount = achievements.Count;
+        ViewBag.XpCount      = experiences.Count;
+        ViewBag.LearnCount   = learning.Count;
+        ViewBag.LearnDone    = learning.Count(l => l.Status == "completed");
+        ViewBag.Achievements = achievements;
+        ViewBag.Experiences  = experiences;
+        ViewBag.Learning     = learning;
 
         await SetNavStats();
-
-        ViewBag.AchieveCount  = achieveCount;
-        ViewBag.XpCount       = xpCount;
-        ViewBag.LearnCount    = learnCount;
-        ViewBag.LearnDone     = learnDone;
-        ViewBag.Achievements  = achievements;
-        ViewBag.Experiences   = experiences;
-        ViewBag.Learning      = learning;
-
         return View();
     }
+
+    // ── Achievements ──────────────────────────────────────────────────────────
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddAchievement(string title, string description,
+        DateOnly date, string category)
+    {
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            db.Achievements.Add(new Achievement {
+                UserId      = UserId,
+                Title       = title.Trim(),
+                Description = description?.Trim() ?? "",
+                Date        = date == default ? DateOnly.FromDateTime(DateTime.Today) : date,
+                Category    = category ?? "work",
+                CreatedAt   = DateTime.UtcNow,
+            });
+            await db.SaveChangesAsync();
+            TempData["Toast"] = "Achievement added! 🏆";
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteAchievement(int id)
+    {
+        var item = await db.Achievements.FindAsync(id);
+        if (item != null && item.UserId == UserId)
+        {
+            db.Achievements.Remove(item);
+            await db.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    // ── Experience ────────────────────────────────────────────────────────────
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddExperience(string company, string role,
+        string location, string description, string tags,
+        DateOnly startDate, DateOnly? endDate, bool isCurrent)
+    {
+        if (!string.IsNullOrWhiteSpace(company) && !string.IsNullOrWhiteSpace(role))
+        {
+            db.Experiences.Add(new Experience {
+                UserId      = UserId,
+                Company     = company.Trim(),
+                Role        = role.Trim(),
+                Location    = location?.Trim() ?? "",
+                Description = description?.Trim() ?? "",
+                Tags        = tags?.Trim() ?? "",
+                StartDate   = startDate == default ? DateOnly.FromDateTime(DateTime.Today) : startDate,
+                EndDate     = isCurrent ? null : endDate,
+                IsCurrent   = isCurrent,
+                CreatedAt   = DateTime.UtcNow,
+            });
+            await db.SaveChangesAsync();
+            TempData["Toast"] = "Role added! 💼";
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteExperience(int id)
+    {
+        var item = await db.Experiences.FindAsync(id);
+        if (item != null && item.UserId == UserId)
+        {
+            db.Experiences.Remove(item);
+            await db.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    // ── Learning ──────────────────────────────────────────────────────────────
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddLearning(string title, string type,
+        string source, string status, string notes,
+        DateOnly? startedDate, DateOnly? completedDate, int rating)
+    {
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            db.LearningItems.Add(new LearningItem {
+                UserId        = UserId,
+                Title         = title.Trim(),
+                Type          = type ?? "course",
+                Source        = source?.Trim() ?? "",
+                Status        = status ?? "in-progress",
+                Notes         = notes?.Trim() ?? "",
+                StartedDate   = startedDate,
+                CompletedDate = completedDate,
+                Rating        = Math.Clamp(rating, 0, 5),
+                CreatedAt     = DateTime.UtcNow,
+            });
+            await db.SaveChangesAsync();
+            TempData["Toast"] = "Added to learning list!";
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateLearningStatus(int id, string status)
+    {
+        var item = await db.LearningItems.FindAsync(id);
+        if (item != null && item.UserId == UserId)
+        {
+            item.Status = status;
+            if (status == "completed" && item.CompletedDate is null)
+                item.CompletedDate = DateOnly.FromDateTime(DateTime.Today);
+            await db.SaveChangesAsync();
+            TempData["Toast"] = status == "completed" ? "Marked complete! 🎉" : "Status updated.";
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteLearning(int id)
+    {
+        var item = await db.LearningItems.FindAsync(id);
+        if (item != null && item.UserId == UserId)
+        {
+            db.LearningItems.Remove(item);
+            await db.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
 
     private async Task SetNavStats()
     {

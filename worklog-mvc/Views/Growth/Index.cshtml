@@ -1,7 +1,7 @@
 @{
-    ViewData["Title"] = "Growth Hub";
-    var achievements = ViewBag.Achievements as List<WorkLogApp.Models.Achievement> ?? new();
-    var experiences  = ViewBag.Experiences  as List<WorkLogApp.Models.Experience>  ?? new();
+    ViewData["Title"] = "Growth";
+    var achievements = ViewBag.Achievements as List<WorkLogApp.Models.Achievement>  ?? new();
+    var experiences  = ViewBag.Experiences  as List<WorkLogApp.Models.Experience>   ?? new();
     var learning     = ViewBag.Learning     as List<WorkLogApp.Models.LearningItem> ?? new();
     int achieveCount = ViewBag.AchieveCount ?? 0;
     int xpCount      = ViewBag.XpCount      ?? 0;
@@ -9,110 +9,257 @@
     int learnDone    = ViewBag.LearnDone    ?? 0;
 }
 
-<div class="hub-head">
-  <div>
-    <div class="hub-label">Personal Growth</div>
-    <h1 class="hub-title">Growth Hub</h1>
-    <p class="hub-sub">Your achievements, career history, and learning journey in one place.</p>
+<!-- ── Header ──────────────────────────────────────────────────────────────── -->
+<div class="gp-head">
+  <div class="gp-head-left">
+    <div class="gp-eyebrow">🌱 Personal Growth</div>
+    <h1 class="gp-h1">Your Growth Story</h1>
+    <p class="gp-sub">Career, achievements, and learning — all in one place.</p>
   </div>
-  <div class="hub-stats">
-    <div class="hub-stat"><span class="hs-num">@achieveCount</span><span class="hs-lbl">Achievements</span></div>
-    <div class="hub-stat"><span class="hs-num">@xpCount</span><span class="hs-lbl">Roles</span></div>
-    <div class="hub-stat"><span class="hs-num">@learnDone<span class="hs-of">/@learnCount</span></span><span class="hs-lbl">Learned</span></div>
+  <div class="gp-stats-row">
+    <div class="gp-stat">
+      <span class="gs-num">@xpCount</span>
+      <span class="gs-lbl">Roles</span>
+    </div>
+    <div class="gp-stat-div"></div>
+    <div class="gp-stat">
+      <span class="gs-num">@achieveCount</span>
+      <span class="gs-lbl">Wins</span>
+    </div>
+    <div class="gp-stat-div"></div>
+    <div class="gp-stat">
+      <span class="gs-num">@learnDone<span class="gs-of">/@learnCount</span></span>
+      <span class="gs-lbl">Learned</span>
+    </div>
   </div>
 </div>
 
-<div class="hub-grid">
+<!-- ── Bento grid ─────────────────────────────────────────────────────────── -->
+<div class="gp-bento">
 
-  <!-- ACHIEVEMENTS PANEL -->
-  <div class="hub-panel">
-    <div class="hp-head">
-      <div class="hp-title"><span class="hp-ico">🏆</span> Achievements</div>
-      <a asp-controller="Achievements" asp-action="Index" class="hp-all">See all →</a>
+  <!-- ── EXPERIENCE ───────────────────────────────────────────────────────── -->
+  <div class="gp-col gp-col-xp">
+    <div class="gp-sec-head">
+      <span class="gp-sec-ico">💼</span>
+      <span class="gp-sec-title">Experience</span>
+      <span class="gp-count-pill">@xpCount</span>
     </div>
-    @if (achievements.Count == 0)
-    {
-      <div class="hp-empty">No achievements yet.<br><a asp-controller="Achievements" asp-action="Index">Add your first win →</a></div>
-    }
-    else
-    {
-      <div class="hp-list">
-        @foreach (var a in achievements)
-        {
-          <div class="hp-item achieve-@a.Category">
-            <span class="hpi-ico">@a.CategoryEmoji</span>
-            <div class="hpi-body">
-              <div class="hpi-title">@a.Title</div>
-              <div class="hpi-meta">@a.CategoryLabel &bull; @a.Date.ToString("MMM yyyy")</div>
+
+    <div class="gp-xp-list">
+      @if (experiences.Count == 0)
+      {
+        <div class="gp-empty">No roles yet — add your first position.</div>
+      }
+      @foreach (var e in experiences)
+      {
+        <div class="gp-xp-item @(e.IsCurrent ? "xp-current" : "")">
+          <div class="gp-xp-dot"></div>
+          <div class="gp-xp-content">
+            <div class="gp-xp-role">@e.Role</div>
+            <div class="gp-xp-co">
+              @e.Company
+              @if (!string.IsNullOrWhiteSpace(e.Location))
+              {
+                <span class="gp-xp-loc"> · @e.Location</span>
+              }
+              @if (e.IsCurrent) { <span class="gp-cur-badge">Now</span> }
             </div>
+            <div class="gp-xp-dur">@e.Duration</div>
           </div>
-        }
-      </div>
-    }
-    <a asp-controller="Achievements" asp-action="Index" class="hp-cta">+ Add achievement</a>
+          <form asp-action="DeleteExperience" method="post" class="gp-del-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@e.Id">
+            <button type="submit" class="gp-del-btn" title="Remove">×</button>
+          </form>
+        </div>
+      }
+    </div>
+
+    <button class="gp-add-btn" onclick="toggleGpForm('xp-form', this)">+ Add role</button>
+    <div class="gp-add-form" id="xp-form" style="display:none">
+      <form asp-action="AddExperience" method="post">
+        @Html.AntiForgeryToken()
+        <input name="role" placeholder="Job title *" class="gp-inp" required>
+        <input name="company" placeholder="Company *" class="gp-inp" required>
+        <input name="location" placeholder="Location (optional)" class="gp-inp">
+        <div class="gp-row2">
+          <div>
+            <label class="gp-lbl">Start date</label>
+            <input name="startDate" type="date" class="gp-inp" required>
+          </div>
+          <div>
+            <label class="gp-lbl">End date</label>
+            <input name="endDate" type="date" class="gp-inp" id="xp-end-date">
+          </div>
+        </div>
+        <label class="gp-check">
+          <input type="checkbox" name="isCurrent" value="true"
+                 onchange="document.getElementById('xp-end-date').disabled=this.checked">
+          I currently work here
+        </label>
+        <textarea name="description" placeholder="Brief description (optional)"
+                  class="gp-inp gp-ta" rows="2"></textarea>
+        <div class="gp-form-foot">
+          <button type="submit" class="gp-save-btn">Save role</button>
+          <button type="button" class="gp-cancel-btn"
+                  onclick="toggleGpForm('xp-form', null)">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <!-- EXPERIENCE PANEL -->
-  <div class="hub-panel">
-    <div class="hp-head">
-      <div class="hp-title"><span class="hp-ico">💼</span> Experience</div>
-      <a asp-controller="Experience" asp-action="Index" class="hp-all">See all →</a>
+  <!-- ── ACHIEVEMENTS ──────────────────────────────────────────────────────── -->
+  <div class="gp-col gp-col-ach">
+    <div class="gp-sec-head">
+      <span class="gp-sec-ico">🏆</span>
+      <span class="gp-sec-title">Achievements</span>
+      <span class="gp-count-pill">@achieveCount</span>
     </div>
-    @if (experiences.Count == 0)
-    {
-      <div class="hp-empty">No experience added yet.<br><a asp-controller="Experience" asp-action="Index">Add your first role →</a></div>
-    }
-    else
-    {
-      <div class="hp-list">
-        @foreach (var e in experiences)
-        {
-          <div class="hp-item">
-            <div class="hpi-xp-dot @(e.IsCurrent ? "dot-current" : "dot-past")"></div>
-            <div class="hpi-body">
-              <div class="hpi-title">@e.Role <span class="hpi-at">@ @e.Company</span></div>
-              <div class="hpi-meta">
-                @e.Duration
-                @if (e.IsCurrent) { <span class="xp-current-badge">Current</span> }
-              </div>
-            </div>
+
+    <div class="gp-ach-list">
+      @if (achievements.Count == 0)
+      {
+        <div class="gp-empty">No wins logged yet — add your first achievement.</div>
+      }
+      @foreach (var a in achievements)
+      {
+        <div class="gp-ach-item ach-@a.Category">
+          <span class="gp-ach-ico">@a.CategoryEmoji</span>
+          <div class="gp-ach-info">
+            <div class="gp-ach-title">@a.Title</div>
+            <div class="gp-ach-meta">@a.CategoryLabel · @a.Date.ToString("MMM yyyy")</div>
           </div>
-        }
-      </div>
-    }
-    <a asp-controller="Experience" asp-action="Index" class="hp-cta">+ Add role</a>
+          <form asp-action="DeleteAchievement" method="post" class="gp-del-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@a.Id">
+            <button type="submit" class="gp-del-btn" title="Remove">×</button>
+          </form>
+        </div>
+      }
+    </div>
+
+    <button class="gp-add-btn" onclick="toggleGpForm('ach-form', this)">+ Add win</button>
+    <div class="gp-add-form" id="ach-form" style="display:none">
+      <form asp-action="AddAchievement" method="post">
+        @Html.AntiForgeryToken()
+        <input name="title" placeholder="What did you achieve? *" class="gp-inp" required>
+        <input name="description" placeholder="Short description (optional)" class="gp-inp">
+        <div class="gp-row2">
+          <div>
+            <label class="gp-lbl">Category</label>
+            <select name="category" class="gp-inp">
+              <option value="work">💼 Work win</option>
+              <option value="cert">🎓 Certification</option>
+              <option value="award">🏅 Award</option>
+              <option value="personal">⭐ Personal</option>
+            </select>
+          </div>
+          <div>
+            <label class="gp-lbl">Date</label>
+            <input name="date" type="date" class="gp-inp">
+          </div>
+        </div>
+        <div class="gp-form-foot">
+          <button type="submit" class="gp-save-btn">Save win</button>
+          <button type="button" class="gp-cancel-btn"
+                  onclick="toggleGpForm('ach-form', null)">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <!-- LEARNING PANEL -->
-  <div class="hub-panel">
-    <div class="hp-head">
-      <div class="hp-title"><span class="hp-ico">📚</span> Learning</div>
-      <a asp-controller="Learning" asp-action="Index" class="hp-all">See all →</a>
+  <!-- ── LEARNING ──────────────────────────────────────────────────────────── -->
+  <div class="gp-col gp-col-learn">
+    <div class="gp-sec-head">
+      <span class="gp-sec-ico">📚</span>
+      <span class="gp-sec-title">Learning</span>
+      <span class="gp-count-pill">@learnDone<span style="opacity:.6;font-weight:400">/@learnCount</span></span>
     </div>
-    @if (learning.Count == 0)
-    {
-      <div class="hp-empty">Nothing tracked yet.<br><a asp-controller="Learning" asp-action="Index">Start tracking →</a></div>
-    }
-    else
-    {
-      <div class="hp-list">
-        @foreach (var l in learning)
-        {
-          <div class="hp-item">
-            <span class="hpi-ico">@l.TypeEmoji</span>
-            <div class="hpi-body">
-              <div class="hpi-title">@l.Title</div>
-              <div class="hpi-meta">
-                <span class="learn-status-dot status-@l.Status"></span>
-                @l.StatusLabel
-                @if (!string.IsNullOrWhiteSpace(l.Source)) { <span>&bull; @l.Source</span> }
-              </div>
+
+    <div class="gp-learn-list">
+      @if (learning.Count == 0)
+      {
+        <div class="gp-empty">Nothing tracked yet — add what you're learning.</div>
+      }
+      @foreach (var l in learning)
+      {
+        <div class="gp-learn-item ls-@l.Status">
+          <span class="gp-learn-ico">@l.TypeEmoji</span>
+          <div class="gp-learn-info">
+            <div class="gp-learn-title">@l.Title</div>
+            <div class="gp-learn-meta">
+              <span class="ls-dot ls-@l.Status"></span>
+              @l.StatusLabel
+              @if (!string.IsNullOrWhiteSpace(l.Source)) { <span class="gp-learn-src">· @l.Source</span> }
             </div>
           </div>
-        }
-      </div>
-    }
-    <a asp-controller="Learning" asp-action="Index" class="hp-cta">+ Add item</a>
+          @if (l.Status != "completed")
+          {
+            <form asp-action="UpdateLearningStatus" method="post" class="gp-del-form">
+              @Html.AntiForgeryToken()
+              <input type="hidden" name="id" value="@l.Id">
+              <input type="hidden" name="status" value="completed">
+              <button type="submit" class="gp-done-btn" title="Mark complete">✓</button>
+            </form>
+          }
+          <form asp-action="DeleteLearning" method="post" class="gp-del-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@l.Id">
+            <button type="submit" class="gp-del-btn" title="Remove">×</button>
+          </form>
+        </div>
+      }
+    </div>
+
+    <button class="gp-add-btn" onclick="toggleGpForm('learn-form', this)">+ Add item</button>
+    <div class="gp-add-form" id="learn-form" style="display:none">
+      <form asp-action="AddLearning" method="post">
+        @Html.AntiForgeryToken()
+        <input name="title" placeholder="What are you learning? *" class="gp-inp" required>
+        <div class="gp-row2">
+          <div>
+            <label class="gp-lbl">Type</label>
+            <select name="type" class="gp-inp">
+              <option value="course">🎓 Course</option>
+              <option value="book">📖 Book</option>
+              <option value="video">🎬 Video</option>
+              <option value="article">📄 Article</option>
+              <option value="tutorial">💻 Tutorial</option>
+              <option value="podcast">🎙️ Podcast</option>
+              <option value="other">💡 Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="gp-lbl">Status</label>
+            <select name="status" class="gp-inp">
+              <option value="in-progress">In progress</option>
+              <option value="want">Want to learn</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <input name="source" placeholder="Source or URL (optional)" class="gp-inp">
+        <div class="gp-form-foot">
+          <button type="submit" class="gp-save-btn">Save item</button>
+          <button type="button" class="gp-cancel-btn"
+                  onclick="toggleGpForm('learn-form', null)">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
 
 </div>
+
+@section Scripts {
+<script>
+function toggleGpForm(id, btn) {
+  const el = document.getElementById(id);
+  const open = el.style.display !== 'none';
+  // close all forms first
+  ['xp-form','ach-form','learn-form'].forEach(fid => {
+    document.getElementById(fid).style.display = 'none';
+  });
+  if (!open) el.style.display = 'block';
+}
+</script>
+}

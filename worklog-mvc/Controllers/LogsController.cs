@@ -56,13 +56,13 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         // ── Insights ──────────────────────────────────────────────
         var lastWeekStart = weekStart.AddDays(-7);
         var lastWeekEnd   = weekStart.AddDays(-1);
-        var monthStart    = new DateOnly(today.Year, today.Month, 1);
+        var insightMonth  = new DateOnly(today.Year, today.Month, 1);
 
         var weekHours     = stats.Where(l => l.Date >= weekStart && l.Date <= today).Sum(l => l.Hours);
         var lastWeekHours = stats.Where(l => l.Date >= lastWeekStart && l.Date <= lastWeekEnd).Sum(l => l.Hours);
 
         var topProj = stats
-            .Where(l => l.Date >= monthStart)
+            .Where(l => l.Date >= insightMonth)
             .GroupBy(l => l.Project)
             .Select(g => new { Name = g.Key, Hours = g.Sum(e => e.Hours) })
             .OrderByDescending(x => x.Hours)
@@ -86,6 +86,15 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
             .Take(15)
             .ToList();
 
+        // ── Weekly day breakdown (Mon–Sun) for sidebar ───────────────────────
+        var dow         = (int)today.DayOfWeek;
+        var monStart    = today.AddDays(dow == 0 ? -6 : -(dow - 1));
+        var weekDays    = Enumerable.Range(0, 7).Select(i =>
+        {
+            var d = monStart.AddDays(i);
+            return new WeekDayStat(d.ToString("ddd"), stats.Where(l => l.Date == d).Sum(l => l.Hours), d == today, d > today);
+        }).ToList();
+
         var vm = new DashboardViewModel
         {
             Logs             = logs,
@@ -97,12 +106,14 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
             WeekLogsCount    = stats.Count(l => l.Date >= weekStart),
             ProjectsCount    = stats.Select(l => l.Project).Distinct().Count(),
             Streak           = streak,
-            WeekHours        = weekHours,
+            WeekHours        = weekDays.Sum(d => d.Hours),
             LastWeekHours    = lastWeekHours,
             TopProject       = topProj?.Name ?? "",
             TopProjectHours  = topProj?.Hours ?? 0,
             WarnNotLogged    = warnNotLogged,
             RecentProjects   = recentProjects,
+            WeekDays         = weekDays,
+            WeekGoal         = 40m,
         };
 
         ViewBag.TodayHours    = vm.TodayHours;
@@ -218,6 +229,52 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         }
     }
 
+    /* ── AI: parse full day description into multiple entries ── */
+    [HttpPost]
+    public async Task<IActionResult> ParseDay([FromBody] AiTextRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Text))
+            return BadRequest(new { error = "text required" });
+
+        try
+        {
+            var entries = await ollama.ParseDayLogAsync(req.Text);
+            return Ok(entries);
+        }
+        catch
+        {
+            return StatusCode(503, new { error = "AI unavailable — make sure Ollama is running locally." });
+        }
+    }
+
+    /* ── Bulk-save a day's parsed entries ── */
+    [HttpPost]
+    public async Task<IActionResult> BulkAdd([FromBody] BulkAddRequest req)
+    {
+        if (req.Entries is null || req.Entries.Count == 0)
+            return BadRequest(new { error = "no entries" });
+
+        var today = req.Date ?? DateOnly.FromDateTime(DateTime.Today);
+        foreach (var e in req.Entries.Where(e => !string.IsNullOrWhiteSpace(e.Description)))
+        {
+            db.LogEntries.Add(new LogEntry
+            {
+                UserId      = CurrentUserId,
+                Date        = today,
+                Project     = (e.Project?.Trim().Length > 0 ? e.Project : e.Category) ?? "General",
+                Description = e.Description.Trim(),
+                Hours       = e.Hours,
+                Tags        = e.Category?.Trim() ?? "",
+                CreatedAt   = DateTime.UtcNow,
+            });
+        }
+
+        await db.SaveChangesAsync();
+        return Ok(new { saved = req.Entries.Count });
+    }
+
     public record AiTextRequest(string Text);
     public record AiParseRequest(string Text);
+    public record BulkAddEntry(string Description, decimal Hours, string Category, string Project);
+    public record BulkAddRequest(List<BulkAddEntry> Entries, DateOnly? Date = null);
 }

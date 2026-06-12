@@ -1,467 +1,382 @@
 @model WorkLogApp.Models.ViewModels.DashboardViewModel
 @{
-    ViewData["Title"] = "My Logs";
+    ViewData["Title"] = "WorkLog Today";
+    var todayLogs = Model.Logs.Where(l => l.Date == DateOnly.FromDateTime(DateTime.Today)).ToList();
+    var maxDayH   = Model.WeekDays.Count > 0 ? Model.WeekDays.Max(d => d.Hours) : 1m;
+    if (maxDayH == 0) maxDayH = 1m;
 }
 
-<!-- Greeting -->
-<div class="greeting">
-  <div class="greeting-text">@Model.Greeting, <span class="gs-hi">@(Model.UserName.Split(' ').FirstOrDefault() ?? Model.UserName)</span> 👋</div>
-  <div class="greeting-sub">
-    <span><span class="gs-dot"></span>@DateTime.Today.ToString("dddd, MMMM d")</span>
-    @if (Model.TodayHours > 0)
-    {
-      <span><span class="gs-dot"></span>@Model.TodayHours h logged today</span>
-    }
-    <span><span class="gs-dot"></span>@Model.WeekLogsCount logs this week</span>
-    <span><span class="gs-dot"></span>@Model.ProjectsCount projects</span>
-  </div>
-</div>
+<!-- ── Two-column today layout ──────────────────────────────────────────── -->
+<div class="tl-layout">
 
-<!-- Insights bar -->
-@{
-  var hasInsights = Model.Streak > 1 || Model.WeekHours > 0 || !string.IsNullOrEmpty(Model.TopProject) || Model.WarnNotLogged;
-}
-@if (hasInsights)
-{
-  <div class="insights-bar">
-    @if (Model.WarnNotLogged)
-    {
-      <div class="insight-chip i-warn">
-        <span class="i-ico">⏰</span>
-        <span>Nothing logged yet today — it's getting late</span>
-      </div>
-    }
-    @if (Model.Streak > 1)
-    {
-      <div class="insight-chip i-streak">
-        <span class="i-ico">🔥</span>
-        <span><strong>@Model.Streak-day</strong> streak</span>
-      </div>
-    }
-    @if (Model.WeekHours > 0)
-    {
-      var pct  = Model.LastWeekHours > 0 ? (Model.WeekHours - Model.LastWeekHours) / Model.LastWeekHours * 100m : 0m;
-      var up   = pct >= 0;
-      var sign = up ? "↑" : "↓";
-      var cls  = up ? "i-up" : "i-dn";
-      <div class="insight-chip">
-        <span class="i-ico">📈</span>
-        <span><strong>@Model.WeekHours h</strong> this week
-        @if (Model.LastWeekHours > 0) { <span class="@cls">@sign@(Math.Abs(pct).ToString("F0"))%</span> }
-        </span>
-      </div>
-    }
-    @if (!string.IsNullOrEmpty(Model.TopProject))
-    {
-      <div class="insight-chip">
-        <span class="i-ico">🏆</span>
-        <span>Top: <strong>@Model.TopProject</strong> · @Model.TopProjectHours h this month</span>
-      </div>
-    }
-  </div>
-}
+  <!-- ════ LEFT: Daily input ════════════════════════════════════════════ -->
+  <div class="tl-main">
 
-<!-- Smart capture bar -->
-<div class="capture-zone">
-  <form asp-action="Add" method="post" id="capture-form">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="Date"        id="f-date"    value="@DateTime.Today.ToString("yyyy-MM-dd")">
-    <input type="hidden" name="Project"     id="f-project" value="">
-    <input type="hidden" name="Hours"       id="f-hours"   value="">
-    <input type="hidden" name="Description" id="f-desc"    value="">
-    <input type="hidden" name="Tags"        id="f-tags"    value="">
+    <!-- Greeting -->
+    <div class="tl-greet">
+      <h1 class="tl-hi">Hi @Model.FirstName! What did you work on today?</h1>
+      <p class="tl-sub">Type or speak — Ollama will structure it automatically.</p>
+    </div>
 
-    <div class="ac-wrap">
-      <div class="capture-bar">
-        <button type="button" class="voice-btn" id="voice-btn" title="Speak to log">🎤</button>
-        <input type="text" class="capture-input" id="capture-input"
-               placeholder='Try: "API integration 3h, fixed OAuth bug  #backend" or press 🎤'
-               autocomplete="off">
-        <button type="button" class="capture-ai" id="capture-ai-btn" title="Auto-improve with AI">✦ AI</button>
-        <button type="button" class="capture-submit" id="capture-submit-btn">Log it →</button>
+    <!-- Input card -->
+    <div class="tl-input-card">
+      <textarea id="dayInput" class="tl-textarea"
+                placeholder="e.g. Fixed payment API bugs for 2h, attended sprint planning for 1h, reviewed pull requests for 30m…"
+                rows="4" autocomplete="off" spellcheck="true"></textarea>
+
+      <div class="tl-input-foot">
+        <button id="voiceBtn" class="tl-voice-btn" title="Start voice input">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-6 10a6 6 0 0 0 12 0h2a8 8 0 0 1-7 7.93V21h-2v-2.07A8 8 0 0 1 4 11z"/>
+          </svg>
+          Voice
+        </button>
+        <div class="tl-input-right">
+          <span id="charCount" class="tl-char-count">0 words</span>
+          <button id="parseBtn" class="tl-parse-btn" disabled>
+            <span id="parseBtnIcon">✦</span> <span id="parseBtnText">Parse with AI</span>
+          </button>
+        </div>
       </div>
-      <div class="parsed-preview hidden" id="parsed-preview"></div>
-      <div class="ac-dropdown hidden" id="ac-dropdown">
-        @if (Model.RecentProjects.Any())
-        {
-          <div class="ac-quick" id="ac-quick">
-            <div class="ac-section">Recent projects</div>
-            <div class="ac-chips">
-              @foreach (var p in Model.RecentProjects.Take(6))
+
+      <!-- Voice waveform -->
+      <div id="voiceWave" class="tl-wave hidden">
+        <div class="wave-bars">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <small>Listening…</small>
+      </div>
+
+      <!-- Processing indicator -->
+      <div id="processing" class="tl-processing hidden">
+        <div class="proc-dots"><span></span><span></span><span></span></div>
+        <span>AI is processing your work…</span>
+      </div>
+    </div>
+
+    <!-- AI Summary (shown after parse) -->
+    <div id="aiSummary" class="tl-summary hidden">
+      <div class="ts-head">
+        <div class="ts-head-left">
+          <span class="ts-star">✦</span>
+          <span class="ts-title">AI Summary</span>
+          <span class="ts-subtitle">Review and edit before saving</span>
+        </div>
+        <button class="ts-clear-btn" onclick="clearSummary()">✕ Clear</button>
+      </div>
+
+      <div id="parsedList" class="ts-list"></div>
+
+      <div class="ts-footer">
+        <div class="ts-total">Total Time: <strong id="totalTime">0h</strong></div>
+        <button id="sendBtn" class="tl-send-btn">Send Work Log →</button>
+      </div>
+      <p class="ts-privacy">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right:4px">
+          <path d="M12 1L3 5v6c0 5.25 3.75 10.15 9 11.35C17.25 21.15 21 16.25 21 11V5z"/>
+        </svg>
+        Your data is private and secure. Powered by Ollama (Local AI)
+      </p>
+    </div>
+
+    <!-- Today's saved entries -->
+    @if (todayLogs.Any())
+    {
+      <div class="tl-today-saved">
+        <div class="tts-head">
+          <span class="tts-title">Today's saved log</span>
+          <span class="tts-badge">@todayLogs.Sum(l => l.Hours)h logged</span>
+        </div>
+        <div class="tts-list">
+          @foreach (var log in todayLogs)
+          {
+            <div class="tts-item">
+              <span class="tts-dot" style="background:@CategoryColor(log.Tags)"></span>
+              <span class="tts-desc">@log.Description</span>
+              @if (!string.IsNullOrWhiteSpace(log.Project))
               {
-                <button type="button" class="ac-q-chip" data-project="@p">@p</button>
+                <span class="tts-proj">@log.Project</span>
+              }
+              <span class="tts-hrs">@log.Hours h</span>
+              <form asp-action="Delete" method="post" class="tts-del-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@log.Id">
+                <button type="submit" class="tts-del-btn" title="Delete">×</button>
+              </form>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- ════ RIGHT: Sidebar ═══════════════════════════════════════════════ -->
+  <div class="tl-sidebar">
+
+    <!-- This Week -->
+    <div class="tl-card">
+      <div class="tlc-head">
+        <span class="tlc-title">This Week</span>
+        <a asp-controller="Timesheet" asp-action="Index" class="tlc-action" title="View full timesheet">📅</a>
+      </div>
+      <div class="week-days">
+        @foreach (var day in Model.WeekDays)
+        {
+          <div class="wd-row @(day.IsToday ? "wd-today" : "") @(day.IsFuture ? "wd-future" : "")">
+            <span class="wd-name">@day.Name</span>
+            <div class="wd-bar-track">
+              @if (!day.IsFuture && day.Hours > 0)
+              {
+                <div class="wd-bar" style="width:@((day.Hours / maxDayH * 100).ToString("F0"))%"></div>
               }
             </div>
+            <span class="wd-hours">@day.Formatted</span>
           </div>
         }
-        <div id="ac-results"></div>
+      </div>
+      <div class="week-total-row">
+        <span class="wtr-lbl">Total</span>
+        <span class="wtr-hrs">@Model.WeekTotalFormatted</span>
       </div>
     </div>
-  </form>
-</div>
 
-<!-- Filter + view toggle -->
-<div class="fv-bar">
-  <div class="tabs">
-    <a href="?period=all"   class="tab @(Model.Period == "all"   ? "tab-on" : "")">All</a>
-    <a href="?period=today" class="tab @(Model.Period == "today" ? "tab-on" : "")">Today</a>
-    <a href="?period=week"  class="tab @(Model.Period == "week"  ? "tab-on" : "")">This week</a>
-    <a href="?period=month" class="tab @(Model.Period == "month" ? "tab-on" : "")">This month</a>
-  </div>
-  <div class="fv-right">
-    <form method="get" id="search-form">
-      <input type="hidden" name="period" value="@Model.Period">
-      <input class="search-in" type="search" name="q" value="@Model.SearchQuery" placeholder="Search…"
-             onchange="this.form.submit()">
-    </form>
-    <div class="view-btns">
-      <button class="view-btn" id="vb-grid" onclick="setView('grid')" title="Grid view">⊞</button>
-      <button class="view-btn" id="vb-list" onclick="setView('list')" title="List view">≡</button>
+    <!-- Weekly Progress -->
+    <div class="tl-card">
+      <div class="tlc-head">
+        <span class="tlc-title">Weekly Progress</span>
+        <span class="tlc-goal">@((int)Model.WeekGoal)h goal</span>
+      </div>
+      <div class="prog-ring-wrap">
+        <svg width="140" height="140" viewBox="0 0 120 120" class="prog-svg">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--line)" stroke-width="9"/>
+          <circle cx="60" cy="60" r="50" fill="none"
+                  stroke="@(Model.WeekPctInt >= 100 ? "#10b981" : Model.WeekPctInt >= 50 ? "#6366f1" : "#f59e0b")"
+                  stroke-width="9" stroke-linecap="round"
+                  stroke-dasharray="314.159"
+                  stroke-dashoffset="@Model.SvgOffset.ToString("F1")"
+                  transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="prog-inner">
+          <div class="prog-pct">@Model.WeekPctInt<span class="prog-sym">%</span></div>
+          <div class="prog-hrs">@Model.WeekTotalFormatted</div>
+          <div class="prog-goal-lbl">/ @((int)Model.WeekGoal)h</div>
+        </div>
+      </div>
+      <p class="prog-msg">@Model.ProgressMessage</p>
     </div>
+
+    <!-- Export Timesheet -->
+    <div class="tl-card">
+      <div class="tlc-head">
+        <span class="tlc-title">Export Timesheet</span>
+      </div>
+      <div class="exp-row">
+        <a asp-controller="Timesheet" asp-action="ExportCsv" class="exp-btn exp-csv">
+          📊 CSV
+        </a>
+        <a asp-controller="Timesheet" asp-action="Index" class="exp-btn exp-view">
+          📄 View
+        </a>
+        <a asp-controller="Timesheet" asp-action="ExportCsv" class="exp-btn exp-xl">
+          ⬇️ Excel
+        </a>
+      </div>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="tl-card">
+      <div class="qs-row">
+        <div class="qs-stat">
+          <span class="qs-num">@Model.Streak</span>
+          <span class="qs-lbl">day streak 🔥</span>
+        </div>
+        <div class="qs-div"></div>
+        <div class="qs-stat">
+          <span class="qs-num">@Model.TodayHours h</span>
+          <span class="qs-lbl">today</span>
+        </div>
+        <div class="qs-div"></div>
+        <div class="qs-stat">
+          <span class="qs-num">@Model.ProjectsCount</span>
+          <span class="qs-lbl">projects</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
-@if (!Model.Logs.Any())
-{
-  <div class="empty">
-    <div class="empty-ico">✏️</div>
-    <h3>Nothing here yet</h3>
-    <p>Type what you worked on above and press <strong>Log it →</strong><br>
-       or tap 🎤 to speak it. Hours required — e.g. "wrote tests 2h".</p>
-  </div>
-}
-else
-{
-  <!-- Grid view -->
-  <div class="cards" id="view-grid">
-    @foreach (var log in Model.Logs)
-    {
-      <div class="card c@(log.ColorIndex)">
-        <div class="card-actions">
-          <form asp-action="Delete" asp-route-id="@log.Id" method="post" style="display:inline">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="card-del" onclick="return confirm('Delete this entry?')">✕</button>
-          </form>
-        </div>
-        <div class="card-proj">@log.Project</div>
-        <div class="card-desc">@log.Description</div>
-        <div class="card-foot">
-          <div class="card-left">
-            <span class="hrs">@log.Hours h</span>
-            <span class="cdate">@log.Date.ToString("MMM d")</span>
-          </div>
-          @if (log.TagList.Any())
-          {
-            <div class="card-tags">
-              @foreach (var t in log.TagList) { <span class="ctag">@t</span> }
-            </div>
-          }
-        </div>
-      </div>
-    }
-  </div>
-
-  <!-- List view -->
-  <div class="log-list hidden" id="view-list">
-    @foreach (var log in Model.Logs)
-    {
-      <div class="ll-item c@(log.ColorIndex)">
-        <div class="ll-date">
-          <div class="ll-date-num">@log.Date.Day</div>
-          <div class="ll-date-mo">@log.Date.ToString("MMM")</div>
-        </div>
-        <div class="ll-proj-cell"><div class="ll-proj">@log.Project</div></div>
-        <div class="ll-desc-cell">
-          <div class="ll-desc">@log.Description</div>
-          @if (log.TagList.Any())
-          {
-            <div class="ll-tags">@foreach (var t in log.TagList) { <span class="ctag">@t</span> }</div>
-          }
-        </div>
-        <div class="ll-meta">
-          <span class="ll-hrs">@log.Hours h</span>
-          <form asp-action="Delete" asp-route-id="@log.Id" method="post" style="margin:0">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="ll-del" onclick="return confirm('Delete?')">✕</button>
-          </form>
-        </div>
-      </div>
-    }
-  </div>
+@functions {
+    static string CategoryColor(string cat) => cat switch {
+        "Development"   => "#3b82f6",
+        "Meeting"       => "#f59e0b",
+        "Code Review"   => "#10b981",
+        "Testing"       => "#8b5cf6",
+        "Documentation" => "#06b6d4",
+        "DevOps"        => "#ef4444",
+        "Research"      => "#6366f1",
+        "Design"        => "#ec4899",
+        _               => "#94a3b8",
+    };
 }
 
 @section Scripts {
 <script>
-// ── Project data (for autocomplete) ────────────────────────────────────
-const ALL_PROJECTS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RecentProjects));
+const CAT_COLORS = {
+  'Development':'#3b82f6','Meeting':'#f59e0b','Code Review':'#10b981',
+  'Testing':'#8b5cf6','Documentation':'#06b6d4','DevOps':'#ef4444',
+  'Research':'#6366f1','Design':'#ec4899','Other':'#94a3b8',
+};
+const CAT_BG = {
+  'Development':'#dbeafe','Meeting':'#fef3c7','Code Review':'#d1fae5',
+  'Testing':'#ede9fe','Documentation':'#cffafe','DevOps':'#fee2e2',
+  'Research':'#e0e7ff','Design':'#fce7f3','Other':'#f1f5f9',
+};
 
-// ── View toggle ────────────────────────────────────────────────────────
-let view = localStorage.getItem('wl-view') || 'grid';
-function setView(v) {
-  view = v;
-  localStorage.setItem('wl-view', v);
-  const g = document.getElementById('view-grid');
-  const l = document.getElementById('view-list');
-  if (g) g.classList.toggle('hidden', v !== 'grid');
-  if (l) l.classList.toggle('hidden', v !== 'list');
-  document.getElementById('vb-grid').classList.toggle('vb-on', v === 'grid');
-  document.getElementById('vb-list').classList.toggle('vb-on', v === 'list');
-}
-setView(view);
+let parsedEntries = [];
 
-// ── Smart client-side parser ───────────────────────────────────────────
-function quickParse(raw) {
-  const text = raw.trim();
-  // Hours: 3h / 3.5h / 3 hours / 3hrs
-  const hm = text.match(/(\d+(?:[.,]\d+)?)\s*h(?:rs?|ours?)?(?:\s|$|,)/i);
-  const hours = hm ? parseFloat(hm[1].replace(',', '.')) : null;
+const dayInput   = document.getElementById('dayInput');
+const parseBtn   = document.getElementById('parseBtn');
+const processing = document.getElementById('processing');
+const aiSummary  = document.getElementById('aiSummary');
+const parsedList = document.getElementById('parsedList');
+const totalTime  = document.getElementById('totalTime');
+const sendBtn    = document.getElementById('sendBtn');
+const voiceBtn   = document.getElementById('voiceBtn');
+const voiceWave  = document.getElementById('voiceWave');
+const charCount  = document.getElementById('charCount');
 
-  // Hashtags → tags
-  const tags = [...text.matchAll(/#(\w+)/g)].map(m => m[1]).join(', ');
-
-  // Project: phrase before first comma or before "Nh"
-  let project = '';
-  const pComma = text.match(/^([^,#]+?)(?:,|#|\d+\s*h(?:rs?|ours?)?|$)/i);
-  if (pComma) project = pComma[1].replace(/\s+for\s*$/i, '').trim();
-
-  // Clean description: strip hours + hashtags
-  const desc = text
-    .replace(/(\d+(?:[.,]\d+)?)\s*h(?:rs?|ours?)?(?:\s|$|,)/gi, ' ')
-    .replace(/#\w+/g, '')
-    .replace(/\s+/g, ' ').trim();
-
-  return { project, hours, description: desc || text, tags };
-}
-
-function renderChips(p) {
-  let out = '';
-  if (p.project) out += `<span class="pp-chip"><span class="pp-lbl">project</span>${esc(p.project)}</span>`;
-  if (p.hours)   out += `<span class="pp-chip"><span class="pp-lbl">hours</span>${p.hours}h</span>`;
-  if (p.tags)    out += `<span class="pp-chip"><span class="pp-lbl">tags</span>${esc(p.tags)}</span>`;
-  if (!p.hours)  out += `<span class="pp-chip pp-warn">⚠ add hours — e.g. "3h"</span>`;
-  return out;
-}
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
-
-const captureInput  = document.getElementById('capture-input');
-const parsedPreview = document.getElementById('parsed-preview');
-const aiBtnEl       = document.getElementById('capture-ai-btn');
-
-captureInput.addEventListener('input', () => {
-  clearTimeout(aiTimer);
-  const text = captureInput.value.trim();
-  if (!text) { parsedPreview.classList.add('hidden'); return; }
-  const p = quickParse(text);
-  parsedPreview.innerHTML = renderChips(p);
-  parsedPreview.classList.remove('hidden');
-  if (text.length >= 12) aiTimer = setTimeout(() => runAiParse(text), 2200);
+// word count
+dayInput.addEventListener('input', () => {
+  const words = dayInput.value.trim().split(/\s+/).filter(Boolean).length;
+  charCount.textContent = words === 0 ? '0 words' : `${words} word${words===1?'':'s'}`;
+  parseBtn.disabled = dayInput.value.trim().length < 8;
 });
 
-// ── AI auto-parse ──────────────────────────────────────────────────────
-let aiTimer = null;
-let aiRunning = false;
+parseBtn.addEventListener('click', parseDay);
 
-async function runAiParse(text) {
-  if (aiRunning) return;
-  aiRunning = true;
-  const orig = aiBtnEl.textContent;
-  aiBtnEl.textContent = '⟳';
-  aiBtnEl.style.opacity = '1';
+async function parseDay() {
+  const text = dayInput.value.trim();
+  if (text.length < 5) return;
+
+  parseBtn.disabled = true;
+  document.getElementById('parseBtnText').textContent = 'Parsing…';
+  document.getElementById('parseBtnIcon').textContent = '⏳';
+  processing.classList.remove('hidden');
+  aiSummary.classList.add('hidden');
+
   try {
-    const r = await fetch('/Logs/AiParse', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
+    const res = await fetch('/Logs/ParseDay', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text }),
     });
-    if (r.ok) {
-      const d = await r.json();
-      if (d.description) captureInput.value = d.description;
-      parsedPreview.innerHTML = renderChips({
-        project: d.project || quickParse(captureInput.value).project,
-        hours:   d.hours   || quickParse(captureInput.value).hours,
-        tags:    d.tags    || quickParse(captureInput.value).tags,
-        description: d.description
-      });
-    }
-  } catch {}
-  aiBtnEl.textContent = orig;
-  aiBtnEl.style.opacity = '';
-  aiRunning = false;
-}
-
-aiBtnEl.addEventListener('click', () => {
-  const text = captureInput.value.trim();
-  if (text) runAiParse(text);
-});
-
-// ── Submit ─────────────────────────────────────────────────────────────
-document.getElementById('capture-submit-btn').addEventListener('click', doSubmit);
-captureInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSubmit(); }
-});
-
-function doSubmit() {
-  acDropdown.classList.add('hidden');
-  const raw = captureInput.value.trim();
-  if (!raw) { captureInput.focus(); return; }
-  const p = quickParse(raw);
-  if (!p.hours) {
-    parsedPreview.innerHTML = renderChips(p);
-    parsedPreview.classList.remove('hidden');
-    captureInput.focus();
-    toast('Add hours to your log — e.g. "3h"');
-    return;
+    if (!res.ok) { const e = await res.json().catch(()=>({})); showErr(e.error ?? 'Parse failed — is Ollama running?'); return; }
+    parsedEntries = await res.json();
+    renderSummary();
+  } catch { showErr('Network error — check Ollama is running on port 11434.'); }
+  finally {
+    parseBtn.disabled = false;
+    document.getElementById('parseBtnText').textContent = 'Parse with AI';
+    document.getElementById('parseBtnIcon').textContent = '✦';
+    processing.classList.add('hidden');
   }
-  const proj = p.project || raw.split(/[\s,]/)[0];
-  if (proj) localStorage.setItem('wl-last-project', proj);
-  document.getElementById('f-project').value = proj;
-  document.getElementById('f-hours').value   = p.hours;
-  document.getElementById('f-tags').value    = p.tags;
-  document.getElementById('f-desc').value    = p.description.length > 4 ? p.description : raw;
-  document.getElementById('capture-form').submit();
 }
 
-// ── Voice ──────────────────────────────────────────────────────────────
-const voiceBtn = document.getElementById('voice-btn');
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
-let recActive = false;
+function renderSummary() {
+  parsedList.innerHTML = '';
+  parsedEntries.forEach((e, i) => {
+    const bg  = CAT_BG[e.category]    ?? CAT_BG.Other;
+    const col = CAT_COLORS[e.category] ?? CAT_COLORS.Other;
+    const h = Math.floor(e.hours), m = Math.round((e.hours-h)*60);
+    const timeStr = h>0&&m>0?`${h}h ${m}m`:h>0?`${h}h`:`${m}m`;
 
+    const row = document.createElement('div');
+    row.className = 'ts-entry';
+    row.innerHTML = `
+      <span class="ts-dot" style="background:${col}"></span>
+      <div class="ts-body">
+        <span class="ts-desc" contenteditable="true" data-i="${i}" data-f="desc">${escHtml(e.description)}</span>
+        <span class="ts-badge" style="background:${bg};color:${col}">${e.category}</span>
+      </div>
+      <span class="ts-time" contenteditable="true" data-i="${i}" data-f="hours">${timeStr}</span>
+      <button class="ts-del" data-i="${i}">×</button>
+    `;
+    parsedList.appendChild(row);
+  });
+
+  parsedList.querySelectorAll('[contenteditable]').forEach(el => el.addEventListener('blur', onEdit));
+  parsedList.querySelectorAll('.ts-del').forEach(btn => btn.addEventListener('click', () => {
+    parsedEntries.splice(+btn.dataset.i, 1); renderSummary();
+  }));
+  updateTotal();
+  aiSummary.classList.remove('hidden');
+}
+
+function onEdit(ev) {
+  const i = +ev.target.dataset.i, f = ev.target.dataset.f, v = ev.target.textContent.trim();
+  if (f === 'desc') { parsedEntries[i].description = v; }
+  else {
+    const h = v.match(/(\d+(?:\.\d+)?)\s*h/i)?.[1];
+    const m = v.match(/(\d+)\s*m/i)?.[1];
+    if (h||m) parsedEntries[i].hours = parseFloat(h??0) + parseInt(m??0)/60;
+    else { const n=parseFloat(v); if(!isNaN(n)) parsedEntries[i].hours=n; }
+    updateTotal();
+  }
+}
+
+function updateTotal() {
+  const tot = parsedEntries.reduce((s,e)=>s+(e.hours||0),0);
+  const h=Math.floor(tot), m=Math.round((tot-h)*60);
+  totalTime.textContent = h>0&&m>0?`${h}h ${m}m`:h>0?`${h}h`:`${m}m`;
+}
+
+window.clearSummary = () => {
+  parsedEntries=[]; aiSummary.classList.add('hidden');
+  dayInput.value=''; charCount.textContent='0 words'; parseBtn.disabled=true;
+};
+
+sendBtn.addEventListener('click', async () => {
+  if (!parsedEntries.length) return;
+  sendBtn.disabled=true; sendBtn.textContent='Saving…';
+  try {
+    const res = await fetch('/Logs/BulkAdd', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ entries: parsedEntries }),
+    });
+    if (res.ok) { window.location.reload(); }
+    else { const e=await res.json().catch(()=>({})); showErr(e.error??'Save failed'); sendBtn.disabled=false; sendBtn.textContent='Send Work Log →'; }
+  } catch { showErr('Network error'); sendBtn.disabled=false; sendBtn.textContent='Send Work Log →'; }
+});
+
+// Voice
+let rec;
 voiceBtn.addEventListener('click', () => {
-  if (!SR) { toast('Voice not supported in this browser. Try Chrome.'); return; }
-  if (recActive) { recognition?.stop(); return; }
-  startRecording();
-});
-
-function startRecording() {
-  recognition = new SR();
-  recognition.continuous = false;
-  recognition.interimResults = true;
-  recognition.lang = 'en-US';
-  recActive = true;
-  voiceBtn.classList.add('rec');
-  voiceBtn.textContent = '⏹';
-
-  recognition.onresult = e => {
-    const transcript = [...e.results].map(r => r[0].transcript).join('');
-    captureInput.value = transcript;
-    const p = quickParse(transcript);
-    parsedPreview.innerHTML = renderChips(p);
-    parsedPreview.classList.remove('hidden');
-  };
-
-  recognition.onend = () => {
-    recActive = false;
-    voiceBtn.classList.remove('rec');
-    voiceBtn.textContent = '🎤';
-    const text = captureInput.value.trim();
-    if (text) {
-      const p = quickParse(text);
-      if (p.hours) {
-        setTimeout(doSubmit, 500);
-      } else {
-        runAiParse(text);
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showErr('Voice not supported in this browser.'); return; }
+  if (!rec) {
+    rec = new SR(); rec.continuous=true; rec.interimResults=true; rec.lang='en-US';
+    let base='';
+    rec.onresult = ev => {
+      let interim='';
+      for (let i=ev.resultIndex;i<ev.results.length;i++) {
+        if (ev.results[i].isFinal) base+=ev.results[i][0].transcript+' ';
+        else interim+=ev.results[i][0].transcript;
       }
-    }
-  };
-
-  recognition.onerror = e => {
-    recActive = false;
-    voiceBtn.classList.remove('rec');
-    voiceBtn.textContent = '🎤';
-    if (e.error !== 'no-speech' && e.error !== 'aborted') toast('Voice error: ' + e.error);
-  };
-
-  recognition.start();
-}
-
-function toast(msg) {
-  const el = document.createElement('div');
-  el.className = 'toast-wrap';
-  el.innerHTML = `<div class="toast">${msg}</div>`;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
-}
-
-// ── Autocomplete ────────────────────────────────────────────────────────
-const acDropdown = document.getElementById('ac-dropdown');
-const acResults  = document.getElementById('ac-results');
-let acIndex = -1;
-
-function showDropdown() {
-  acIndex = -1;
-  const q = captureInput.value.trim().toLowerCase();
-  if (!q) {
-    // show quick chips + last project suggestion
-    acResults.innerHTML = buildLastProjectHint();
-    acDropdown.classList.remove('hidden');
-    return;
+      dayInput.value=base+interim; dayInput.dispatchEvent(new Event('input'));
+    };
+    rec.onend=()=>{ voiceBtn.classList.remove('voice-on'); voiceWave.classList.add('hidden'); };
   }
-  const matches = ALL_PROJECTS.filter(p => p.toLowerCase().includes(q));
-  if (!matches.length) { acDropdown.classList.add('hidden'); return; }
-  acResults.innerHTML = matches.slice(0, 6).map((p, i) =>
-    `<div class="ac-item" data-project="${esc2(p)}" data-i="${i}">${highlight(p, q)}</div>`
-  ).join('');
-  acResults.querySelectorAll('.ac-item').forEach(el =>
-    el.addEventListener('mousedown', e => { e.preventDefault(); pickProject(el.dataset.project); })
-  );
-  acDropdown.classList.remove('hidden');
-}
-
-function hideDropdown() { setTimeout(() => acDropdown.classList.add('hidden'), 120); }
-
-function buildLastProjectHint() {
-  const last = localStorage.getItem('wl-last-project');
-  if (!last) return '';
-  return `<div class="ac-last" data-project="${esc2(last)}" onmousedown="event.preventDefault();pickProject('${esc2(last)}')">↺ Continue <strong>${esc2(last)}</strong></div>`;
-}
-
-function pickProject(name) {
-  const cur = captureInput.value;
-  // Replace existing project part or prepend
-  const hasHours = /\d+(?:[.,]\d+)?\s*h(?:rs?|ours?)?/i.test(cur);
-  if (!hasHours) {
-    captureInput.value = name + ' ';
-  } else {
-    // inject project name before hours
-    captureInput.value = name + ' ' + cur.replace(/^[^,#\d]*/, '').trim();
-  }
-  captureInput.focus();
-  acDropdown.classList.add('hidden');
-  captureInput.dispatchEvent(new Event('input'));
-}
-
-function highlight(text, q) {
-  return text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),
-    '<strong>$1</strong>');
-}
-function esc2(s) { return s.replace(/"/g,'&quot;'); }
-
-captureInput.addEventListener('focus',  showDropdown);
-captureInput.addEventListener('blur',   hideDropdown);
-captureInput.addEventListener('input',  showDropdown);
-captureInput.addEventListener('keydown', e => {
-  const items = acResults.querySelectorAll('.ac-item');
-  if (!items.length) return;
-  if (e.key === 'ArrowDown') {
-    e.preventDefault();
-    acIndex = Math.min(acIndex + 1, items.length - 1);
-    items.forEach((el, i) => el.classList.toggle('ac-sel', i === acIndex));
-  } else if (e.key === 'ArrowUp') {
-    e.preventDefault();
-    acIndex = Math.max(acIndex - 1, -1);
-    items.forEach((el, i) => el.classList.toggle('ac-sel', i === acIndex));
-  } else if (e.key === 'Tab' && acIndex >= 0) {
-    e.preventDefault();
-    pickProject(items[acIndex].dataset.project);
-  }
+  if (voiceBtn.classList.contains('voice-on')) { rec.stop(); }
+  else { rec.start(); voiceBtn.classList.add('voice-on'); voiceWave.classList.remove('hidden'); }
 });
 
-// Wire quick chips
-document.querySelectorAll('.ac-q-chip').forEach(btn =>
-  btn.addEventListener('click', () => pickProject(btn.dataset.project))
-);
-
-
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showErr(msg) {
+  const d=document.createElement('div');
+  d.className='toast-wrap toast-err'; d.innerHTML=`<div class="toast">${msg}</div>`;
+  document.body.appendChild(d); setTimeout(()=>d.remove(),4500);
+}
 </script>
 }

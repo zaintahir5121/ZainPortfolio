@@ -69,6 +69,36 @@ public class OllamaService(HttpClient http, IConfiguration cfg) : IOllamaService
         catch { return new ParsedEntry(null, null, text, ""); }
     }
 
+    public async Task<List<ParsedDayEntry>> ParseDayLogAsync(string text)
+    {
+        var prompt =
+            "Parse the following work-day description into a JSON array of individual tasks.\n" +
+            "For each task extract exactly these keys:\n" +
+            "  description : clear, professional one-line description\n" +
+            "  hours       : decimal number (e.g. 2.0, 1.5, 0.5) — estimate if not stated\n" +
+            "  category    : one of Development | Meeting | Code Review | Testing | Documentation | DevOps | Research | Design | Other\n" +
+            "  project     : project or client name if mentioned, otherwise \"General\"\n\n" +
+            "IMPORTANT: Return ONLY a raw JSON array. No markdown fences, no explanation.\n\n" +
+            $"Input: {text}\n\nJSON:";
+
+        string raw;
+        try { raw = await CallOllamaAsync(prompt, timeout: 35); }
+        catch { return [new ParsedDayEntry(text.Trim(), 0, "Other", "General")]; }
+
+        var s = raw.IndexOf('[');
+        var e = raw.LastIndexOf(']');
+        if (s < 0 || e <= s) return [new ParsedDayEntry(text.Trim(), 0, "Other", "General")];
+
+        try
+        {
+            var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var list = JsonSerializer.Deserialize<List<ParsedDayEntry>>(raw[s..(e + 1)], opts);
+            return list?.Where(x => !string.IsNullOrWhiteSpace(x.Description)).ToList()
+                ?? [new ParsedDayEntry(text.Trim(), 0, "Other", "General")];
+        }
+        catch { return [new ParsedDayEntry(text.Trim(), 0, "Other", "General")]; }
+    }
+
     private async Task<string> CallOllamaAsync(string prompt, int timeout = 40)
     {
         using var cts  = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));

@@ -1,5 +1,19 @@
 namespace WorkLogApp.Models.ViewModels;
 
+public record WeekDayStat(string Name, decimal Hours, bool IsToday, bool IsFuture)
+{
+    public string Formatted
+    {
+        get
+        {
+            if (Hours == 0) return "—";
+            var h = (int)Hours;
+            var m = (int)Math.Round((Hours - h) * 60);
+            return m == 0 ? $"{h}h" : $"{h}h {m}m";
+        }
+    }
+}
+
 public class DashboardViewModel
 {
     public List<LogEntry> Logs        { get; set; } = [];
@@ -24,11 +38,31 @@ public class DashboardViewModel
     /* autocomplete */
     public List<string> RecentProjects { get; set; } = [];
 
-    public string Greeting =>
-        DateTime.Now.Hour switch
+    /* weekly sidebar */
+    public List<WeekDayStat> WeekDays   { get; set; } = [];
+    public decimal           WeekGoal   { get; set; } = 40m;
+    public string WeekTotalFormatted
+    {
+        get
         {
-            < 12 => "Good morning",
-            < 17 => "Good afternoon",
-            _    => "Good evening",
-        };
+            var h = (int)WeekHours;
+            var m = (int)Math.Round((WeekHours - h) * 60);
+            return m == 0 ? $"{h}h" : $"{h}h {m}m";
+        }
+    }
+    public int    WeekPctInt => (int)Math.Min(100, Math.Round(WeekGoal > 0 ? WeekHours / WeekGoal * 100 : 0));
+    public double SvgOffset  => 314.159 * (1.0 - Math.Min(1.0, (double)(WeekGoal > 0 ? WeekHours / WeekGoal : 0)));
+    public string ProgressMessage =>
+        WeekPctInt >= 100 ? "🎉 Goal reached — excellent week!"   :
+        WeekPctInt >=  75 ? "Great job! You're on track 🙌"        :
+        WeekPctInt >=  50 ? "Halfway there — keep pushing!"         :
+        WeekPctInt >=  25 ? "Good start — build that momentum!"     :
+                            "Let's get this week going!";
+
+    public string Greeting =>
+        DateTime.Now.Hour switch { < 12 => "Good morning", < 17 => "Good afternoon", _ => "Good evening" };
+
+    public string FirstName =>
+        string.IsNullOrWhiteSpace(UserName) ? "there"
+            : UserName.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
 }

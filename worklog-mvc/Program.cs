@@ -34,7 +34,6 @@ using (var scope = app.Services.CreateScope())
     ctx.Database.EnsureCreated();
     AppDbContext.Seed(ctx);
 
-    // Add RecurringEntries table to existing databases (EnsureCreated won't add new tables)
     ctx.Database.ExecuteSqlRaw("""
         IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'RecurringEntries')
         CREATE TABLE RecurringEntries (
@@ -49,6 +48,53 @@ using (var scope = app.Services.CreateScope())
             LastFiredDate DATE           NULL,
             CreatedAt     DATETIME2      NOT NULL DEFAULT GETUTCDATE(),
             CONSTRAINT FK_RecurringEntries_Users FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+        )
+    """);
+    ctx.Database.ExecuteSqlRaw("""
+        IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'Achievements')
+        CREATE TABLE Achievements (
+            Id          INT            NOT NULL IDENTITY(1,1) CONSTRAINT PK_Achievements PRIMARY KEY,
+            UserId      INT            NOT NULL,
+            Title       NVARCHAR(300)  NOT NULL DEFAULT N'',
+            Description NVARCHAR(2000) NOT NULL DEFAULT N'',
+            Date        DATE           NOT NULL DEFAULT GETDATE(),
+            Category    NVARCHAR(50)   NOT NULL DEFAULT N'milestone',
+            CreatedAt   DATETIME2      NOT NULL DEFAULT GETUTCDATE(),
+            CONSTRAINT FK_Achievements_Users FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+        )
+    """);
+    ctx.Database.ExecuteSqlRaw("""
+        IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'Experiences')
+        CREATE TABLE Experiences (
+            Id          INT            NOT NULL IDENTITY(1,1) CONSTRAINT PK_Experiences PRIMARY KEY,
+            UserId      INT            NOT NULL,
+            Company     NVARCHAR(200)  NOT NULL DEFAULT N'',
+            Role        NVARCHAR(200)  NOT NULL DEFAULT N'',
+            Location    NVARCHAR(200)  NOT NULL DEFAULT N'',
+            StartDate   DATE           NOT NULL DEFAULT GETDATE(),
+            EndDate     DATE           NULL,
+            IsCurrent   BIT            NOT NULL DEFAULT 0,
+            Description NVARCHAR(2000) NOT NULL DEFAULT N'',
+            Tags        NVARCHAR(500)  NOT NULL DEFAULT N'',
+            CreatedAt   DATETIME2      NOT NULL DEFAULT GETUTCDATE(),
+            CONSTRAINT FK_Experiences_Users FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+        )
+    """);
+    ctx.Database.ExecuteSqlRaw("""
+        IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'LearningItems')
+        CREATE TABLE LearningItems (
+            Id            INT            NOT NULL IDENTITY(1,1) CONSTRAINT PK_LearningItems PRIMARY KEY,
+            UserId        INT            NOT NULL,
+            Title         NVARCHAR(300)  NOT NULL DEFAULT N'',
+            Type          NVARCHAR(50)   NOT NULL DEFAULT N'course',
+            Source        NVARCHAR(200)  NOT NULL DEFAULT N'',
+            Status        NVARCHAR(50)   NOT NULL DEFAULT N'in-progress',
+            Notes         NVARCHAR(2000) NOT NULL DEFAULT N'',
+            StartedDate   DATE           NULL,
+            CompletedDate DATE           NULL,
+            Rating        INT            NOT NULL DEFAULT 0,
+            CreatedAt     DATETIME2      NOT NULL DEFAULT GETUTCDATE(),
+            CONSTRAINT FK_LearningItems_Users FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
         )
     """);
 }

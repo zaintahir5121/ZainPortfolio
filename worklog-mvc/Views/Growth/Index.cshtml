@@ -1,0 +1,118 @@
+@{
+    ViewData["Title"] = "Growth Hub";
+    var achievements = ViewBag.Achievements as List<WorkLogApp.Models.Achievement> ?? new();
+    var experiences  = ViewBag.Experiences  as List<WorkLogApp.Models.Experience>  ?? new();
+    var learning     = ViewBag.Learning     as List<WorkLogApp.Models.LearningItem> ?? new();
+    int achieveCount = ViewBag.AchieveCount ?? 0;
+    int xpCount      = ViewBag.XpCount      ?? 0;
+    int learnCount   = ViewBag.LearnCount   ?? 0;
+    int learnDone    = ViewBag.LearnDone    ?? 0;
+}
+
+<div class="hub-head">
+  <div>
+    <div class="hub-label">Personal Growth</div>
+    <h1 class="hub-title">Growth Hub</h1>
+    <p class="hub-sub">Your achievements, career history, and learning journey in one place.</p>
+  </div>
+  <div class="hub-stats">
+    <div class="hub-stat"><span class="hs-num">@achieveCount</span><span class="hs-lbl">Achievements</span></div>
+    <div class="hub-stat"><span class="hs-num">@xpCount</span><span class="hs-lbl">Roles</span></div>
+    <div class="hub-stat"><span class="hs-num">@learnDone<span class="hs-of">/@learnCount</span></span><span class="hs-lbl">Learned</span></div>
+  </div>
+</div>
+
+<div class="hub-grid">
+
+  <!-- ACHIEVEMENTS PANEL -->
+  <div class="hub-panel">
+    <div class="hp-head">
+      <div class="hp-title"><span class="hp-ico">🏆</span> Achievements</div>
+      <a asp-controller="Achievements" asp-action="Index" class="hp-all">See all →</a>
+    </div>
+    @if (achievements.Count == 0)
+    {
+      <div class="hp-empty">No achievements yet.<br><a asp-controller="Achievements" asp-action="Index">Add your first win →</a></div>
+    }
+    else
+    {
+      <div class="hp-list">
+        @foreach (var a in achievements)
+        {
+          <div class="hp-item achieve-@a.Category">
+            <span class="hpi-ico">@a.CategoryEmoji</span>
+            <div class="hpi-body">
+              <div class="hpi-title">@a.Title</div>
+              <div class="hpi-meta">@a.CategoryLabel &bull; @a.Date.ToString("MMM yyyy")</div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+    <a asp-controller="Achievements" asp-action="Index" class="hp-cta">+ Add achievement</a>
+  </div>
+
+  <!-- EXPERIENCE PANEL -->
+  <div class="hub-panel">
+    <div class="hp-head">
+      <div class="hp-title"><span class="hp-ico">💼</span> Experience</div>
+      <a asp-controller="Experience" asp-action="Index" class="hp-all">See all →</a>
+    </div>
+    @if (experiences.Count == 0)
+    {
+      <div class="hp-empty">No experience added yet.<br><a asp-controller="Experience" asp-action="Index">Add your first role →</a></div>
+    }
+    else
+    {
+      <div class="hp-list">
+        @foreach (var e in experiences)
+        {
+          <div class="hp-item">
+            <div class="hpi-xp-dot @(e.IsCurrent ? "dot-current" : "dot-past")"></div>
+            <div class="hpi-body">
+              <div class="hpi-title">@e.Role <span class="hpi-at">@ @e.Company</span></div>
+              <div class="hpi-meta">
+                @e.Duration
+                @if (e.IsCurrent) { <span class="xp-current-badge">Current</span> }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+    <a asp-controller="Experience" asp-action="Index" class="hp-cta">+ Add role</a>
+  </div>
+
+  <!-- LEARNING PANEL -->
+  <div class="hub-panel">
+    <div class="hp-head">
+      <div class="hp-title"><span class="hp-ico">📚</span> Learning</div>
+      <a asp-controller="Learning" asp-action="Index" class="hp-all">See all →</a>
+    </div>
+    @if (learning.Count == 0)
+    {
+      <div class="hp-empty">Nothing tracked yet.<br><a asp-controller="Learning" asp-action="Index">Start tracking →</a></div>
+    }
+    else
+    {
+      <div class="hp-list">
+        @foreach (var l in learning)
+        {
+          <div class="hp-item">
+            <span class="hpi-ico">@l.TypeEmoji</span>
+            <div class="hpi-body">
+              <div class="hpi-title">@l.Title</div>
+              <div class="hpi-meta">
+                <span class="learn-status-dot status-@l.Status"></span>
+                @l.StatusLabel
+                @if (!string.IsNullOrWhiteSpace(l.Source)) { <span>&bull; @l.Source</span> }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+    <a asp-controller="Learning" asp-action="Index" class="hp-cta">+ Add item</a>
+  </div>
+
+</div>

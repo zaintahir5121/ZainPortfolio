@@ -8,6 +8,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User>           Users            { get; set; }
     public DbSet<LogEntry>       LogEntries       { get; set; }
     public DbSet<RecurringEntry> RecurringEntries { get; set; }
+    public DbSet<Achievement>    Achievements     { get; set; }
+    public DbSet<Experience>     Experiences      { get; set; }
+    public DbSet<LearningItem>   LearningItems    { get; set; }
 
     protected override void OnModelCreating(ModelBuilder b)
     {

@@ -1,0 +1,114 @@
+@model List<WorkLogApp.Models.Achievement>
+@{
+    ViewData["Title"] = "Achievements";
+    string curCat = ViewBag.Cat ?? "all";
+    int total = ViewBag.Total ?? 0;
+    var cats = new[] {
+        ("all","all","All"),
+        ("milestone","milestone","🏆 Milestone"),
+        ("work","work","💼 Work win"),
+        ("cert","cert","🎓 Certification"),
+        ("award","award","🏅 Award"),
+        ("personal","personal","⭐ Personal"),
+    };
+}
+
+<div class="pg-head">
+  <div>
+    <h1>Achievements <span class="pg-count">@total</span></h1>
+    <p class="pg-date">Your wins, milestones, and moments that matter.</p>
+  </div>
+  <a asp-controller="Growth" asp-action="Index" class="pg-back">← Growth Hub</a>
+</div>
+
+<!-- Add form -->
+<div class="add-card" id="addCard">
+  <button class="add-toggle" id="addToggle" onclick="toggleAddForm()">+ Add achievement</button>
+  <form class="add-form hidden" id="addForm" method="post" asp-controller="Achievements" asp-action="Add">
+    @Html.AntiForgeryToken()
+    <div class="af-grid">
+      <div class="rfield af-full">
+        <label>Title *</label>
+        <input name="title" placeholder="Got promoted, launched feature X, completed AWS cert..." required>
+      </div>
+      <div class="rfield">
+        <label>Date</label>
+        <input type="date" name="date" value="@DateTime.Today.ToString("yyyy-MM-dd")">
+      </div>
+      <div class="rfield">
+        <label>Category</label>
+        <select name="category">
+          <option value="milestone">🏆 Milestone</option>
+          <option value="work">💼 Work win</option>
+          <option value="cert">🎓 Certification</option>
+          <option value="award">🏅 Award</option>
+          <option value="personal">⭐ Personal</option>
+        </select>
+      </div>
+      <div class="rfield af-full">
+        <label>Description (optional)</label>
+        <textarea name="description" placeholder="What made this special?"></textarea>
+      </div>
+    </div>
+    <div class="af-actions">
+      <button type="submit" class="btn-primary">Save achievement</button>
+      <button type="button" class="btn-ghost" onclick="toggleAddForm()">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- Category filter -->
+<div class="cat-filter">
+  @foreach (var (val, cls, lbl) in cats)
+  {
+    <a asp-controller="Achievements" asp-action="Index"
+       asp-route-cat="@(val == "all" ? null : val)"
+       class="cat-tab @(curCat == val ? "cat-on" : "")">@lbl</a>
+  }
+</div>
+
+@if (Model.Count == 0)
+{
+  <div class="empty">
+    <div class="empty-ico">🏆</div>
+    <h3>No achievements yet</h3>
+    <p>Add your first win — promotions, certifications, projects shipped, goals crushed.</p>
+  </div>
+}
+else
+{
+  <div class="achieve-grid">
+    @foreach (var a in Model)
+    {
+      <div class="achieve-card ac-@a.Category">
+        <div class="ac-top">
+          <span class="ac-cat-ico">@a.CategoryEmoji</span>
+          <span class="ac-cat-lbl">@a.CategoryLabel</span>
+          <form method="post" asp-controller="Achievements" asp-action="Delete" style="margin-left:auto">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@a.Id">
+            <button class="ac-del" onclick="return confirm('Delete this achievement?')">✕</button>
+          </form>
+        </div>
+        <div class="ac-title">@a.Title</div>
+        @if (!string.IsNullOrWhiteSpace(a.Description))
+        {
+          <div class="ac-desc">@a.Description</div>
+        }
+        <div class="ac-date">@a.Date.ToString("MMMM d, yyyy")</div>
+      </div>
+    }
+  </div>
+}
+
+@section Scripts {
+<script>
+function toggleAddForm() {
+  const form = document.getElementById("addForm");
+  const btn  = document.getElementById("addToggle");
+  const isHidden = form.classList.contains("hidden");
+  form.classList.toggle("hidden", !isHidden);
+  btn.textContent = isHidden ? "✕ Cancel" : "+ Add achievement";
+}
+</script>
+}

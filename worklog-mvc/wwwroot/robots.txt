@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /Logs/
+Disallow: /Timesheet/
+Disallow: /Recurring/
+Disallow: /Account/
+
+Sitemap: https://worklog.app/sitemap.xml

@@ -8,6 +8,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WorkLog — Simple work tracking for teams</title>
+  <meta name="description" content="WorkLog — simple, AI-powered work logging for developers, freelancers, and teams. Voice input, daily summaries, timesheets, and recurring entries.">
+  <meta name="robots" content="index, follow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -61,7 +63,17 @@
     </div>
   </div>
 
-  <footer class="l-footer">&copy; 2025 WorkLog &mdash; simple by design</footer>
+  <footer class="l-footer">
+    <div class="lf-inner">
+      <span>&copy; 2025 WorkLog &mdash; simple by design</span>
+      <nav class="lf-links">
+        <a asp-controller="Home" asp-action="About">About</a>
+        <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <a asp-controller="Home" asp-action="Terms">Terms</a>
+        <a asp-controller="Home" asp-action="Contact">Contact</a>
+      </nav>
+    </div>
+  </footer>
 </div>
 
 </body>

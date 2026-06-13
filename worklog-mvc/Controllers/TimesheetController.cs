@@ -64,7 +64,7 @@ public class TimesheetController(AppDbContext db, IOllamaService ollama) : Contr
         }
         catch
         {
-            return StatusCode(503, new { error = "AI unavailable — make sure Ollama is running." });
+            return StatusCode(503, new { error = "AI unavailable — please try again shortly." });
         }
     }
 
@@ -87,7 +87,7 @@ public class TimesheetController(AppDbContext db, IOllamaService ollama) : Contr
             var result = await ollama.GenerateSummaryAsync(entries);
             return Ok(new { result });
         }
-        catch { return StatusCode(503, new { error = "AI unavailable — make sure Ollama is running." }); }
+        catch { return StatusCode(503, new { error = "AI unavailable — please try again shortly." }); }
     }
 
     /* ─────────────── helpers ─────────────── */

@@ -28,13 +28,13 @@
   <ul>
     <li>Displaying your work logs and timesheet reports</li>
     <li>Computing statistics (streak, weekly hours, project breakdowns)</li>
-    <li>Generating AI-powered summaries using the locally-running Ollama model</li>
+    <li>Generating AI-powered summaries</li>
     <li>Auto-firing recurring entries on your first daily visit</li>
   </ul>
   <p>We never use your data for advertising, profiling, or any purpose other than providing the WorkLog service to you.</p>
 
   <h2>3. AI and Local Processing</h2>
-  <p>WorkLog's AI features (description improvement, natural language parsing, daily summaries) are powered by <strong>Ollama</strong>, which runs entirely on your own machine or server. Your work log content is sent only to the Ollama instance you have configured — it is not sent to Anthropic, OpenAI, or any other cloud AI service.</p>
+  <p>WorkLog's AI features (description improvement, natural language parsing, daily summaries) are processed on the same server where WorkLog is deployed. Your work log content is not sent to third-party cloud AI services.</p>
 
   <h2>4. Data Storage</h2>
   <p>All data is stored in a SQL Server database on the server or machine where WorkLog is deployed. If you are self-hosting WorkLog, you have full control over your database and can delete all data at any time.</p>

@@ -282,7 +282,7 @@
       <button class="wb-mic" id="wbMicBtn" onclick="wbToggleVoice()" title="Voice input">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v6a2 2 0 0 0 4 0V5a2 2 0 0 0-2-2zm7 7a1 1 0 0 1 1 1 8 8 0 0 1-16 0 1 1 0 0 1 2 0 6 6 0 0 0 12 0 1 1 0 0 1 1-1zm-7 11v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 2 0z"/></svg>
       </button>
-      <button class="wb-aifix" id="wbAiFixBtn" onclick="wbToggleAiFix()" title="AI Fix — Ollama will correct your English before logging">✨ AI Fix</button>
+      <button class="wb-aifix" id="wbAiFixBtn" onclick="wbToggleAiFix()" title="AI Fix — AI will correct your English before logging">✨ AI Fix</button>
       <div class="wb-ta-wrap">
         <textarea id="wbInput" class="wb-ta"
                   placeholder="What did you work on? e.g. 'Fixed login bug 2h, reviewed 3 PRs 1h, sprint planning 45min…'"
@@ -447,7 +447,7 @@ function wbToggleAiFix() {
   wbAiFix = !wbAiFix;
   const btn = document.getElementById('wbAiFixBtn');
   btn.classList.toggle('on', wbAiFix);
-  showToast(wbAiFix ? '✨ AI Fix ON — Ollama will correct your text before logging' : 'AI Fix off');
+  showToast(wbAiFix ? '✨ AI Fix ON — AI will correct your text before logging' : 'AI Fix off');
 }
 
 // ── Status bar ────────────────────────────────────────────────────────────
@@ -831,7 +831,7 @@ async function handleStandup() {
     setStatus('✅ Standup ready — copy and paste to Slack/Teams!');
     histSave('bot', body.slice(0, 200));
   } catch {
-    setStatus('⚠ Could not generate standup — log some work first or check Ollama.', true);
+    setStatus('⚠ Could not generate standup — log some work first or check the AI service.', true);
   }
 }
 
@@ -1018,7 +1018,7 @@ function handleHelp() {
     `<div>${kw('this week')} <span style="color:var(--text-2);margin-left:6px">Week summary with day-by-day bar chart</span></div>` +
     `<div>${kw('show June 10')} <span style="color:var(--text-2);margin-left:6px">View logs for any date: "yesterday", "last Friday", "June 10", or use 🗓 chip</span></div>` +
     `<div>${kw('share')} <span style="color:var(--text-2);margin-left:6px">Create a shareable card for LinkedIn, Twitter, Instagram</span></div>` +
-    `<div>${kw('✨ AI Fix')} <span style="color:var(--text-2);margin-left:6px">Toggle AI Fix — Ollama auto-corrects your English before logging</span></div>` +
+    `<div>${kw('✨ AI Fix')} <span style="color:var(--text-2);margin-left:6px">Toggle AI Fix — AI auto-corrects your English before logging</span></div>` +
     `<div>${kw('history')} <span style="color:var(--text-2);margin-left:6px">View conversation history · say "clear history" to reset</span></div>` +
     `</div>` +
     `<p style="margin-top:12px;font-size:12px;color:var(--muted)">💡 Use 🎤 for voice · ✏ to edit any card · drag cards between days · 🗓 to browse any date</p>`

@@ -178,7 +178,7 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         }
         catch
         {
-            return StatusCode(503, new { error = "AI unavailable — make sure Ollama is running." });
+            return StatusCode(503, new { error = "AI unavailable — please try again shortly." });
         }
     }
 
@@ -225,7 +225,7 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         }
         catch
         {
-            return StatusCode(503, new { error = "AI unavailable — make sure Ollama is running." });
+            return StatusCode(503, new { error = "AI unavailable — please try again shortly." });
         }
     }
 
@@ -243,7 +243,7 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         }
         catch
         {
-            return StatusCode(503, new { error = "AI unavailable — make sure Ollama is running locally." });
+            return StatusCode(503, new { error = "AI unavailable — please try again shortly." });
         }
     }
 
@@ -328,7 +328,7 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         });
     }
 
-    /* ── Weekly AI insight (data-driven, no Ollama required) ── */
+    /* ── Weekly AI insight (data-driven) ── */
     [HttpGet]
     public async Task<IActionResult> WeeklyInsight()
     {

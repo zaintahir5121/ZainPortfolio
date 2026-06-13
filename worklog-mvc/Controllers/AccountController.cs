@@ -103,4 +103,33 @@ public class AccountController(AppDbContext db) : Controller
         await HttpContext.SignOutAsync("Cookies");
         return RedirectToAction("Index", "Home");
     }
+
+    /* ── API key for Teams / webhook integration ── */
+    [HttpGet]
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public async Task<IActionResult> ApiKey()
+    {
+        var uid  = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await db.Users.FindAsync(uid);
+        if (user is null) return NotFound();
+
+        if (string.IsNullOrWhiteSpace(user.ApiKey))
+        {
+            user.ApiKey = Guid.NewGuid().ToString("N")[..24];
+            await db.SaveChangesAsync();
+        }
+        return Ok(new { apiKey = user.ApiKey, user = user.Name });
+    }
+
+    [HttpPost]
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public async Task<IActionResult> RegenerateKey()
+    {
+        var uid  = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await db.Users.FindAsync(uid);
+        if (user is null) return NotFound();
+        user.ApiKey = Guid.NewGuid().ToString("N")[..24];
+        await db.SaveChangesAsync();
+        return Ok(new { apiKey = user.ApiKey });
+    }
 }

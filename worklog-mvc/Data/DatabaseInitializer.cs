@@ -165,6 +165,8 @@ public static class DatabaseInitializer
         Col(ctx, "LearningItems",    "Notes",         "NVARCHAR(2000) NOT NULL DEFAULT N''",  logger);
         // Experience.Tags
         Col(ctx, "Experiences",      "Tags",          "NVARCHAR(500)  NOT NULL DEFAULT N''",  logger);
+        // User.ApiKey
+        Col(ctx, "Users",            "ApiKey",        "NVARCHAR(100)  NULL",                   logger);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

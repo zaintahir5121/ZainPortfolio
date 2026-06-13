@@ -8,5 +8,7 @@ public class User
     public string Name         { get; set; } = "";
     public string Role         { get; set; } = "employee";   // "admin" | "employee"
 
+    public string? ApiKey { get; set; }
+
     public ICollection<LogEntry> LogEntries { get; set; } = [];
 }

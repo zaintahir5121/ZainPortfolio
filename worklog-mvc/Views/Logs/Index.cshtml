@@ -27,6 +27,10 @@
           <span class="clog-head-dot">●</span>
           <span class="clog-head-sub">auto-logs everything you say</span>
         </div>
+        <a href="#teams-section" class="teams-badge" onclick="revealTeams(event)" title="Connect Microsoft Teams">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#5b5fc7"><path d="M19.5 5.25h-4a.75.75 0 0 0 0 1.5h4a.75.75 0 0 0 0-1.5zm.75 3.75h-5.5a.75.75 0 0 0-.75.75v7.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-7.5a.75.75 0 0 0-.75-.75zm-10.5 0H4.25a.75.75 0 0 0-.75.75v7.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-7.5a.75.75 0 0 0-.75-.75zm-2.75-3.75h-3a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5z"/></svg>
+          Teams
+        </a>
       </div>
 
       <div class="clog-feed" id="clogFeed">
@@ -46,12 +50,14 @@
       </div>
 
       <div class="clog-bar">
-        <textarea id="clogInput" class="clog-ta"
-                  placeholder="Fixed auth bug 2h, reviewed PRs 1h, sprint planning 45min…"
-                  rows="2" onkeydown="clogEnter(event)"></textarea>
-        <button class="clog-send" id="clogSendBtn" onclick="sendLog()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
-        </button>
+        <div class="clog-ta-wrap">
+          <textarea id="clogInput" class="clog-ta"
+                    placeholder="Fixed auth bug 2h, reviewed PRs 1h, sprint planning 45min…"
+                    rows="2" onkeydown="clogEnter(event)"></textarea>
+          <button class="clog-send" id="clogSendBtn" onclick="sendLog()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -221,6 +227,27 @@
           <span class="qs-num">@Model.ProjectsCount</span>
           <span class="qs-lbl">projects</span>
         </div>
+      </div>
+    </div>
+
+    <!-- Teams / Webhook integration -->
+    <div class="tl-card" id="teams-section" style="display:none">
+      <div class="tlc-head">
+        <span class="tlc-title">🔗 Teams Integration</span>
+        <button onclick="document.getElementById('teams-section').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--muted)">✕</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">Log from Microsoft Teams with one message. Your API key:</p>
+      <div id="apiKeyWrap" style="font-size:11.5px;color:var(--muted)">Loading…</div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">
+        <p style="font-size:11.5px;color:var(--muted);line-height:1.6">
+          <strong>How to connect Teams:</strong><br>
+          1. In Teams, go to a channel → <em>Workflows</em> → <em>+ New</em><br>
+          2. Use "When a message is posted" trigger<br>
+          3. Add HTTP action → POST to:<br>
+          <code style="font-size:10.5px;background:var(--surface);padding:2px 6px;border-radius:4px;display:block;margin:4px 0;word-break:break-all">https://your-domain.com/api/webhook/log</code>
+          4. Body: <code style="font-size:10.5px;background:var(--surface);padding:1px 5px;border-radius:4px">&#123;"apiKey":"YOUR_KEY","text":"@@message"&#125;</code>
+        </p>
+        <button onclick="regenerateKey()" style="margin-top:8px;font-size:11px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer">↻ Regenerate key</button>
       </div>
     </div>
 
@@ -537,6 +564,44 @@ async function saveEdit(id) {
     if (res.ok) { window.location.reload(); }
     else { showErr('Could not save — please try again.'); }
   } catch { showErr('Network error.'); }
+}
+
+// ── Teams integration ─────────────────────────────────────────────────────────
+async function revealTeams(e) {
+  e.preventDefault();
+  const sec = document.getElementById('teams-section');
+  const visible = sec.style.display !== 'none';
+  sec.style.display = visible ? 'none' : '';
+  if (!visible) loadApiKey();
+}
+async function loadApiKey() {
+  const wrap = document.getElementById('apiKeyWrap');
+  try {
+    const res = await fetch('/Account/ApiKey');
+    if (!res.ok) { wrap.textContent = 'Could not load key.'; return; }
+    const { apiKey } = await res.json();
+    wrap.innerHTML = `<code style="font-size:11px;background:var(--surface);padding:4px 10px;border-radius:6px;display:block;letter-spacing:.6px;word-break:break-all;font-family:monospace">${escHtml(apiKey)}</code>`;
+  } catch { wrap.textContent = 'Error loading key.'; }
+}
+async function regenerateKey() {
+  if (!confirm('Regenerate API key? Your Teams integration will stop working until updated.')) return;
+  const tok = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+  try {
+    const res = await fetch('/Account/RegenerateKey', { method:'POST', headers:{'RequestVerificationToken': tok } });
+    if (res.ok) { loadApiKey(); showToast('✓ API key regenerated'); }
+  } catch { showErr('Could not regenerate.'); }
+}
+
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showErr(msg) {
+  const d=document.createElement('div');
+  d.className='toast-wrap toast-err'; d.innerHTML=`<div class="toast">${msg}</div>`;
+  document.body.appendChild(d); setTimeout(()=>d.remove(),4500);
+}
+function showToast(msg) {
+  const d=document.createElement('div');
+  d.className='toast-wrap toast-ok'; d.innerHTML=`<div class="toast">${msg}</div>`;
+  document.body.appendChild(d); setTimeout(()=>d.remove(),3000);
 }
 </script>
 }

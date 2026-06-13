@@ -273,6 +273,79 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         return Ok(new { saved = req.Entries.Count });
     }
 
+    /* ── Weekly AI insight (data-driven, no Ollama required) ── */
+    [HttpGet]
+    public async Task<IActionResult> WeeklyInsight()
+    {
+        var uid   = CurrentUserId;
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var dow   = (int)today.DayOfWeek;
+        var monW  = today.AddDays(dow == 0 ? -6 : -(dow - 1));
+        var monLW = monW.AddDays(-7);
+
+        var all = await db.LogEntries.Where(l => l.UserId == uid).ToListAsync();
+
+        var thisWeek = all.Where(l => l.Date >= monW && l.Date <= today).ToList();
+        var lastWeek = all.Where(l => l.Date >= monLW && l.Date < monW).ToList();
+
+        if (thisWeek.Count == 0 && lastWeek.Count == 0)
+            return Ok(new { insight = "Start logging your work and I'll surface patterns here each week. The more you log, the smarter the insights." });
+
+        var parts = new List<string>();
+
+        // Meeting % this week vs last
+        var thisMtg  = thisWeek.Where(l => l.Tags == "Meeting").Sum(l => l.Hours);
+        var thisTotal = thisWeek.Sum(l => l.Hours);
+        var lastTotal = lastWeek.Sum(l => l.Hours);
+        if (thisTotal > 0)
+        {
+            var mtgPct = (int)Math.Round(thisMtg / thisTotal * 100);
+            if (lastTotal > 0)
+            {
+                var lastMtg    = lastWeek.Where(l => l.Tags == "Meeting").Sum(l => l.Hours);
+                var lastMtgPct = (int)Math.Round(lastMtg / lastTotal * 100);
+                var diff       = mtgPct - lastMtgPct;
+                if (Math.Abs(diff) >= 10)
+                    parts.Add($"You spent {mtgPct}% of your time in meetings this week — {(diff > 0 ? $"up {diff}% from last week" : $"down {Math.Abs(diff)}% from last week")}.");
+                else if (mtgPct >= 40)
+                    parts.Add($"Heads up — {mtgPct}% of your week went to meetings.");
+            }
+        }
+
+        // Best output day
+        var dayBest = thisWeek
+            .GroupBy(l => l.Date)
+            .Select(g => new { Day = g.Key, Hours = g.Sum(l => l.Hours) })
+            .OrderByDescending(x => x.Hours)
+            .FirstOrDefault();
+        if (dayBest != null && thisWeek.Count > 1)
+            parts.Add($"Your most productive day was {dayBest.Day.ToString("dddd")} with {dayBest.Hours}h logged.");
+
+        // Projects gone silent (active last week, nothing this week)
+        var thisProjects = new HashSet<string>(thisWeek.Select(l => l.Project));
+        var silentProjs  = lastWeek.Select(l => l.Project)
+            .Distinct()
+            .Where(p => !string.IsNullOrWhiteSpace(p) && !thisProjects.Contains(p))
+            .Take(2)
+            .ToList();
+        if (silentProjs.Count > 0)
+            parts.Add($"You haven't touched {string.Join(" or ", silentProjs.Select(p => $"\"{p}\""))} this week — did it wrap up or get paused?");
+
+        // Hours comparison
+        if (thisTotal > 0 && lastTotal > 0)
+        {
+            var diff = thisTotal - lastTotal;
+            if (Math.Abs(diff) >= 2)
+                parts.Add($"You're on track for {(diff > 0 ? "more" : "fewer")} hours than last week ({thisTotal:F0}h vs {lastTotal:F0}h).");
+        }
+
+        var insight = parts.Count > 0
+            ? string.Join(" ", parts)
+            : $"You've logged {thisTotal}h across {thisWeek.Select(l => l.Project).Distinct().Count()} projects this week. Keep it up!";
+
+        return Ok(new { insight });
+    }
+
     /* ── Edit a saved entry (AJAX) ── */
     [HttpPost]
     public async Task<IActionResult> EditLog([FromBody] EditLogRequest req)

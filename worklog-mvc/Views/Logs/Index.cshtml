@@ -4,6 +4,12 @@
     var todayLogs = Model.Logs.Where(l => l.Date == DateOnly.FromDateTime(DateTime.Today)).ToList();
     var maxDayH   = Model.WeekDays.Count > 0 ? Model.WeekDays.Max(d => d.Hours) : 1m;
     if (maxDayH == 0) maxDayH = 1m;
+    // Share card week range
+    var dowShare  = (int)DateTime.Today.DayOfWeek;
+    var monShare  = DateTime.Today.AddDays(dowShare == 0 ? -6 : -(dowShare - 1));
+    var sunShare  = monShare.AddDays(6);
+    var weekLabel = $"{monShare:MMM d} – {sunShare:MMM d, yyyy}";
+    var weekShort = $"{monShare:MMM d} – {sunShare:MMM d}";
 }
 
 <!-- ── Two-column today layout ──────────────────────────────────────────── -->
@@ -213,6 +219,14 @@
       <p class="prog-msg">@Model.ProgressMessage</p>
     </div>
 
+    <!-- AI Insight -->
+    <div class="tl-card ai-insight-card" id="insightCard">
+      <div class="tlc-head">
+        <span class="tlc-title">✦ Your week, in plain English</span>
+      </div>
+      <p class="ai-insight-text" id="insightText">Loading…</p>
+    </div>
+
     <!-- Export Timesheet -->
     <div class="tl-card">
       <div class="tlc-head">
@@ -251,6 +265,107 @@
       </div>
     </div>
 
+    <!-- Share your week -->
+    <div class="tl-card share-cta-card">
+      <div class="share-cta-inner">
+        <div class="share-cta-icon">✦</div>
+        <div>
+          <div class="share-cta-title">Share your week</div>
+          <div class="share-cta-sub">Post your progress to LinkedIn, Instagram &amp; more</div>
+        </div>
+      </div>
+      <button class="share-cta-btn" onclick="openShareModal()">Create share card →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ SHARE MODAL ═══════════════════════════════════════════════════════════ -->
+<div id="shareModal" class="sm-overlay hidden" onclick="if(event.target===this)closeShareModal()">
+  <div class="sm-panel">
+    <div class="sm-header">
+      <span class="sm-title">Share your week</span>
+      <button class="sm-close" onclick="closeShareModal()">✕</button>
+    </div>
+
+    <!-- The card that gets captured -->
+    <div class="sm-card-wrap">
+      <div id="shareCard" class="sc-card">
+        <div class="sc-top">
+          <span class="sc-logo">worklog<span>.</span></span>
+          <span class="sc-week">Week of @weekLabel</span>
+        </div>
+
+        <div class="sc-name">@Model.FirstName's work week</div>
+
+        <div class="sc-stats">
+          <div class="sc-stat">
+            <span class="sc-num">@Model.WeekTotalFormatted</span>
+            <span class="sc-lbl">logged</span>
+          </div>
+          <div class="sc-div"></div>
+          <div class="sc-stat">
+            <span class="sc-num">@Model.Streak</span>
+            <span class="sc-lbl">day streak 🔥</span>
+          </div>
+          <div class="sc-div"></div>
+          <div class="sc-stat">
+            <span class="sc-num">@Model.ProjectsCount</span>
+            <span class="sc-lbl">projects</span>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="sc-prog-wrap">
+          <div class="sc-prog-bar">
+            <div class="sc-prog-fill" style="width:@Math.Min(100,Model.WeekPctInt)%"></div>
+          </div>
+          <span class="sc-prog-lbl">@Model.WeekPctInt% of weekly goal</span>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.TopProject))
+        {
+          <div class="sc-top-proj">
+            <span class="sc-proj-dot"></span>
+            Top project: <strong>@Model.TopProject</strong>
+            <span class="sc-proj-hrs">@Model.TopProjectHours h</span>
+          </div>
+        }
+
+        <div class="sc-msg">@Model.ProgressMessage</div>
+
+        <div class="sc-footer">Tracked with worklog · worklog.app</div>
+      </div>
+    </div>
+
+    <!-- Share actions -->
+    <div class="sm-actions">
+      <button class="sm-btn sm-li" onclick="shareLinkedIn()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </button>
+      <button class="sm-btn sm-fb" onclick="shareFacebook()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook
+      </button>
+      <button class="sm-btn sm-tw" onclick="shareTwitter()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </button>
+      <button class="sm-btn sm-ig" onclick="downloadCard()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        Download for Instagram
+      </button>
+    </div>
+
+    <!-- LinkedIn copy box -->
+    <div id="liCopyBox" class="sm-copy-box hidden">
+      <p class="sm-copy-label">Copy this text, then paste into your LinkedIn post:</p>
+      <textarea id="liCopyText" class="sm-copy-ta" readonly></textarea>
+      <button class="sm-copy-btn" onclick="copyLinkedInText()">📋 Copy to clipboard</button>
+      <span id="copiedConfirm" class="sm-copied hidden">✓ Copied!</span>
+    </div>
+
   </div>
 </div>
 
@@ -280,6 +395,7 @@
 }
 
 @section Scripts {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script>
 const CAT_COLORS = {
   'Development':'#3b82f6','Meeting':'#f59e0b','Code Review':'#10b981',
@@ -449,6 +565,85 @@ voiceBtn.addEventListener('click', () => {
   if (voiceBtn.classList.contains('voice-on')) { rec.stop(); }
   else { rec.start(); voiceBtn.classList.add('voice-on'); voiceWave.classList.remove('hidden'); }
 });
+
+// ── AI Insight card ──────────────────────────────────────────────────────────
+(async () => {
+  try {
+    const res = await fetch('/Logs/WeeklyInsight');
+    if (res.ok) {
+      const { insight } = await res.json();
+      document.getElementById('insightText').textContent = insight;
+    }
+  } catch { document.getElementById('insightText').textContent = 'Log more this week to see your patterns here.'; }
+})();
+
+// ── Social share ─────────────────────────────────────────────────────────────
+function openShareModal()  { document.getElementById('shareModal').classList.remove('hidden'); }
+function closeShareModal() { document.getElementById('shareModal').classList.add('hidden'); document.getElementById('liCopyBox').classList.add('hidden'); }
+
+function buildLinkedInText() {
+  const name    = @Json.Serialize(Model.FirstName);
+  const hrs     = @Json.Serialize(Model.WeekTotalFormatted);
+  const streak  = @Model.Streak;
+  const proj    = @Model.ProjectsCount;
+  const pct     = @Model.WeekPctInt;
+  const topProj = @Json.Serialize(Model.TopProject);
+  const weekOf  = @Json.Serialize(weekShort);
+
+  let lines = [
+    `📊 My work wrap for the week of ${weekOf}:`,
+    ``,
+    `⏱ ${hrs} logged across ${proj} project${proj===1?'':'s'}`,
+    streak > 1 ? `🔥 ${streak}-day logging streak` : null,
+    pct >= 100 ? `✅ Hit my weekly goal!` : `📈 ${pct}% of weekly goal reached`,
+    topProj ? `🚀 Top project: ${topProj}` : null,
+    ``,
+    `Tracking my work consistently has changed how I plan, reflect, and grow.`,
+    ``,
+    `#WorkLog #Productivity #CareerGrowth #WorkLife`,
+  ].filter(l => l !== null);
+
+  return lines.join('\n');
+}
+
+function shareLinkedIn() {
+  document.getElementById('liCopyText').value = buildLinkedInText();
+  document.getElementById('liCopyBox').classList.remove('hidden');
+  document.getElementById('liCopyBox').scrollIntoView({ behavior:'smooth' });
+  // also open LinkedIn in background
+  setTimeout(() => window.open('https://www.linkedin.com/feed/', '_blank'), 600);
+}
+
+function shareFacebook() {
+  const text = encodeURIComponent(buildLinkedInText());
+  window.open(`https://www.facebook.com/sharer/sharer.php?quote=${text}&u=https://worklog.app`, '_blank');
+}
+
+function shareTwitter() {
+  const hrs    = @Json.Serialize(Model.WeekTotalFormatted);
+  const streak = @Model.Streak;
+  const pct    = @Model.WeekPctInt;
+  const t = encodeURIComponent(`📊 This week: ${hrs} logged, ${streak}-day streak, ${pct}% of goal reached. Consistency is everything. #WorkLog #Productivity`);
+  window.open(`https://x.com/intent/tweet?text=${t}`, '_blank');
+}
+
+function copyLinkedInText() {
+  const ta = document.getElementById('liCopyText');
+  ta.select();
+  navigator.clipboard?.writeText(ta.value).catch(() => document.execCommand('copy'));
+  const c = document.getElementById('copiedConfirm');
+  c.classList.remove('hidden'); setTimeout(() => c.classList.add('hidden'), 2500);
+}
+
+async function downloadCard() {
+  if (!window.html2canvas) { showErr('Downloading…'); return; }
+  const card = document.getElementById('shareCard');
+  try {
+    const canvas = await html2canvas(card, { scale:3, useCORS:true, backgroundColor:null });
+    const a = document.createElement('a'); a.download='worklog-week.png';
+    a.href = canvas.toDataURL('image/png'); a.click();
+  } catch { showErr('Could not generate image — try a different browser.'); }
+}
 
 function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function showErr(msg) {

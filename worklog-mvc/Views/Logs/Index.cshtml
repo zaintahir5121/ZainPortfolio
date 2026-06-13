@@ -147,7 +147,7 @@
                   <select class="tce-inp tce-cat">
                     @foreach (var cat in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Other"})
                     {
-                      <option value="@cat" @(log.Tags == cat ? "selected" : "")>@cat</option>
+                      <option value="@cat" selected="@(log.Tags == cat ? "selected" : null)">@cat</option>
                     }
                   </select>
                 </div>

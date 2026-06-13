@@ -11,21 +11,20 @@ public static class DatabaseInitializer
 {
     public static void Initialize(AppDbContext ctx, ILogger logger)
     {
+        // SQLite: EnsureCreated handles everything — skip SQL Server DDL
+        bool isSqlite = ctx.Database.ProviderName?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true;
+
         try
         {
-            // ── 1. Ensure the database itself exists ─────────────────────────
-            // EnsureCreated() creates the full schema for brand-new databases.
-            // For existing databases it is a no-op (returns false).
             bool created = ctx.Database.EnsureCreated();
-            if (created)
-                logger.LogInformation("WorkLog: database created for the first time.");
+            if (created) logger.LogInformation("WorkLog: database created for the first time.");
+
+            if (isSqlite) { AppDbContext.Seed(ctx); return; }
 
             // ── 2. Ensure every table exists (idempotent) ────────────────────
-            // Handles databases that existed before some tables were added.
             EnsureAllTables(ctx, logger);
 
             // ── 3. Ensure every column exists (idempotent) ───────────────────
-            // Handles databases where columns were added in later versions.
             EnsureAllColumns(ctx, logger);
 
             // ── 4. Seed default users if empty ───────────────────────────────

@@ -7,8 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // ── Database ──────────────────────────────────────────────────────────────────
+var connStr = builder.Configuration.GetConnectionString("Default") ?? "";
 builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+{
+    if (connStr.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase))
+        opt.UseSqlite(connStr);
+    else
+        opt.UseSqlServer(connStr);
+});
 
 // ── Authentication (cookie-based, no ASP.NET Identity) ────────────────────────
 builder.Services.AddAuthentication("Cookies")

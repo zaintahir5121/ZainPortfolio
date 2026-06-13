@@ -163,6 +163,18 @@
   <!-- ════ MAIN BOARD ══════════════════════════════════════════════════════ -->
   <div class="wb-main">
 
+    <!-- AI thinking overlay -->
+    <div class="wb-thinking" id="wbThinking">
+      <div style="text-align:center">
+        <div class="wb-thinking-logo">✦</div>
+        <div class="wb-thinking-name">WorkLog AI</div>
+        <div class="wb-thinking-msg" id="wbThinkMsg">Thinking and preparing your notes…</div>
+        <div class="wb-thinking-dots">
+          <span>●</span><span style="animation-delay:.2s">●</span><span style="animation-delay:.4s">●</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Mobile top bar -->
     <div class="wb-mobile-bar">
       <button class="wb-sidebar-toggle" onclick="wbToggleSidebar()" aria-label="Menu">
@@ -223,6 +235,12 @@
                      data-id="@log.Id" data-date="@log.Date.ToString("yyyy-MM-dd")"
                      ondragstart="wbDragStart(event,@log.Id)">
                   <div class="wbcard-stripe" style="background:@cc"></div>
+                  <button class="wbcard-toggle" onclick="wbToggleCollapse(@log.Id)" title="Minimize">‒</button>
+                  <div class="wbcard-compact" id="wbcc-@log.Id" onclick="wbToggleCollapse(@log.Id)">
+                    <span class="wbcard-compact-txt">@log.Description</span>
+                    <span class="wbcard-compact-hrs">@log.Hours h</span>
+                    <span class="wbcard-compact-arr">▸</span>
+                  </div>
                   <div class="wbcard-body">
                     <div class="wbcard-desc" id="wbcd-@log.Id">@log.Description</div>
                     <div class="wbcard-meta">
@@ -234,6 +252,7 @@
                   <div class="wbcard-foot">
                     <span class="wbcard-drag" title="Drag to move">⋮⋮</span>
                     <div class="wbcard-actions">
+                      <button class="wbcard-btn expand" onclick="wbExpandCard(@log.Id)" title="Full view">⤢</button>
                       <button class="wbcard-btn" onclick="wbStartCardEdit(@log.Id)" title="Edit">✏</button>
                       <button class="wbcard-btn del" onclick="wbDeleteCard(@log.Id)" title="Delete">×</button>
                     </div>
@@ -285,7 +304,7 @@
       <button class="wb-aifix" id="wbAiFixBtn" onclick="wbToggleAiFix()" title="AI Fix — AI will correct your English before logging">✨ AI Fix</button>
       <div class="wb-ta-wrap">
         <textarea id="wbInput" class="wb-ta"
-                  placeholder="What did you work on? e.g. 'Fixed login bug 2h, reviewed 3 PRs 1h, sprint planning 45min…'"
+                  placeholder="What did you work on? e.g. 'Fixed login bug 2h, PRs 1h, planning 30min' — or paste a full paragraph and AI will split it into multiple cards."
                   rows="1"
                   onkeydown="wbKeydown(event)"
                   oninput="wbAutosize(this)"></textarea>
@@ -477,6 +496,72 @@ function wbShowModal(title, html) {
 }
 function wbCloseModal() { document.getElementById('wbModal').classList.remove('open'); }
 
+// ── AI thinking overlay ───────────────────────────────────────────────────
+const _thinkMsgs = [
+  'Thinking and preparing your notes…',
+  'Understanding your work entries…',
+  'Organising into cards…',
+  'Almost there — creating your cards…',
+];
+let _thinkTimer = null;
+function showThinking() {
+  const el = document.getElementById('wbThinking');
+  if (!el) return;
+  let i = 0;
+  document.getElementById('wbThinkMsg').textContent = _thinkMsgs[0];
+  el.classList.add('active');
+  _thinkTimer = setInterval(() => {
+    i = (i + 1) % _thinkMsgs.length;
+    const msg = document.getElementById('wbThinkMsg');
+    if (msg) msg.textContent = _thinkMsgs[i];
+  }, 1800);
+}
+function hideThinking() {
+  clearInterval(_thinkTimer); _thinkTimer = null;
+  const el = document.getElementById('wbThinking');
+  if (el) el.classList.remove('active');
+}
+
+// ── Card collapse / expand ────────────────────────────────────────────────
+function wbToggleCollapse(id) {
+  const card = document.getElementById(`wbc-${id}`);
+  if (!card) return;
+  const isMin = card.classList.toggle('wbcard-min');
+  const btn   = card.querySelector('.wbcard-toggle');
+  if (btn) btn.title = isMin ? 'Expand' : 'Minimize';
+  if (btn) btn.textContent = isMin ? '+' : '‒';
+}
+
+function wbExpandCard(id) {
+  const card = document.getElementById(`wbc-${id}`);
+  if (!card) return;
+  const desc  = document.getElementById(`wbcd-${id}`)?.textContent ?? '';
+  const hrs   = document.getElementById(`wbch-${id}`)?.textContent ?? '';
+  const badge = document.getElementById(`wbcb-${id}`);
+  const cat   = badge?.textContent ?? '';
+  const color = badge?.style.background ?? '#94a3b8';
+  const proj  = card.querySelector('.wbcard-proj')?.textContent ?? '';
+  const dateIso = card.dataset.date ?? '';
+  const dateLabel = dateIso ? new Date(dateIso + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' }) : '';
+
+  wbShowModal('📋 Entry Detail',
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></span>
+      <span style="font-size:12px;font-weight:700;color:${color}">${escHtml(cat)}</span>
+      <span style="font-size:12px;color:var(--muted);margin-left:auto">${escHtml(dateLabel)}</span>
+    </div>
+    <div style="font-size:15px;font-weight:600;color:var(--text);line-height:1.55;margin-bottom:10px">${escHtml(desc)}</div>
+    <div style="display:flex;gap:16px;font-size:13px;color:var(--muted)">
+      <span>⏱ <strong style="color:var(--text)">${escHtml(hrs)}</strong></span>
+      <span>📁 <strong style="color:var(--text)">${escHtml(proj)}</strong></span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
+      <button onclick="wbCloseModal();wbStartCardEdit(${id})" style="flex:1;padding:7px;font-size:12.5px;font-weight:600;background:var(--accent-bg);color:var(--accent);border:none;border-radius:7px;cursor:pointer">✏ Edit</button>
+      <button onclick="wbCloseModal();wbDeleteCard(${id})" style="padding:7px 12px;font-size:12.5px;font-weight:600;background:#fee2e2;color:#ef4444;border:none;border-radius:7px;cursor:pointer">× Delete</button>
+    </div>`
+  );
+}
+
 // ── Card board functions ──────────────────────────────────────────────────
 function wbBuildCard(e) {
   const color   = CAT_COLORS[e.category] ?? '#94a3b8';
@@ -487,17 +572,24 @@ function wbBuildCard(e) {
                data-id="${e.id}" data-date="${date}"
                ondragstart="wbDragStart(event,${e.id})">
     <div class="wbcard-stripe" style="background:${color}"></div>
+    <button class="wbcard-toggle" onclick="wbToggleCollapse(${e.id})" title="Minimize">‒</button>
+    <div class="wbcard-compact" id="wbcc-${e.id}" onclick="wbToggleCollapse(${e.id})">
+      <span class="wbcard-compact-txt">${escHtml(e.description)}</span>
+      <span class="wbcard-compact-hrs">${e.hours} h</span>
+      <span class="wbcard-compact-arr">▸</span>
+    </div>
     <div class="wbcard-body">
       <div class="wbcard-desc" id="wbcd-${e.id}">${escHtml(e.description)}</div>
       <div class="wbcard-meta">
         <span class="wbcard-proj">${escHtml(e.project)}</span>
-        <span class="wbcard-hrs" id="wbch-${e.id}">${e.hours}h</span>
+        <span class="wbcard-hrs" id="wbch-${e.id}">${e.hours} h</span>
       </div>
       <span class="wbcard-badge" style="background:${color}" id="wbcb-${e.id}">${escHtml(cat)}</span>
     </div>
     <div class="wbcard-foot">
       <span class="wbcard-drag" title="Drag to move day">⋮⋮</span>
       <div class="wbcard-actions">
+        <button class="wbcard-btn expand" onclick="wbExpandCard(${e.id})" title="Full view">⤢</button>
         <button class="wbcard-btn" onclick="wbStartCardEdit(${e.id})" title="Edit">✏</button>
         <button class="wbcard-btn del" onclick="wbDeleteCard(${e.id})" title="Delete">×</button>
       </div>
@@ -593,10 +685,15 @@ async function wbSaveCardEdit(id) {
     if (!res.ok) { showErr('Could not save.'); return; }
     const color = CAT_COLORS[cat] ?? '#94a3b8';
     document.getElementById(`wbcd-${id}`).textContent = desc;
-    document.getElementById(`wbch-${id}`).textContent = hrs + 'h';
+    document.getElementById(`wbch-${id}`).textContent = hrs + ' h';
     card.querySelector('.wbcard-stripe').style.background = color;
     const badge = document.getElementById(`wbcb-${id}`);
     if (badge) { badge.style.background = color; badge.textContent = cat; }
+    const compact = document.getElementById(`wbcc-${id}`);
+    if (compact) {
+      compact.querySelector('.wbcard-compact-txt').textContent = desc;
+      compact.querySelector('.wbcard-compact-hrs').textContent = hrs + ' h';
+    }
     wbCancelCardEdit(id);
     wbUpdateDayTotal(card.dataset.date);
     showToast('✓ Entry updated');
@@ -717,31 +814,30 @@ function detectIntent(text) {
 // ── Log handler — adds cards to board ────────────────────────────────────
 async function handleLog(text) {
   let logText = text;
+  showThinking();
 
-  if (wbAiFix) {
-    setStatus('typing');
-    try {
-      const fr = await fetch('/Logs/FixText', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ text }),
-      });
-      if (fr.ok) {
-        const { result } = await fr.json();
-        if (result && result.trim().toLowerCase() !== text.toLowerCase()) {
-          logText = result.trim();
-          setStatus(`✨ AI understood: "${logText}"`);
-          await delay(700);
-        }
-      }
-    } catch {}
-  }
-
-  setStatus('typing');
   try {
+    if (wbAiFix) {
+      try {
+        const fr = await fetch('/Logs/FixText', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ text }),
+        });
+        if (fr.ok) {
+          const { result } = await fr.json();
+          if (result && result.trim().toLowerCase() !== text.toLowerCase()) {
+            logText = result.trim();
+          }
+        }
+      } catch {}
+    }
+
     const res = await fetch('/Logs/ChatLog', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ text: logText }),
     });
+
+    hideThinking();
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -765,6 +861,7 @@ async function handleLog(text) {
     histSave('bot', `Logged: ${data.entries.map(e=>e.description).join(', ')}`);
 
   } catch {
+    hideThinking();
     setStatus('⚠ Network error. Please try again.', true);
   }
 }

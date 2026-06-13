@@ -2100,3 +2100,97 @@ body.wb-page .bmc-float:hover { opacity: 1; transform: scale(1.1) translateY(0);
   /* BMC hides on mobile board page — too cramped */
   body.wb-page .bmc-float { display: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   AI Thinking Overlay
+   ═══════════════════════════════════════════════════════════ */
+.wb-main { position: relative; }
+
+.wb-thinking {
+  position: absolute; inset: 0; z-index: 60;
+  background: rgba(249,249,252,.88);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .22s ease;
+}
+.wb-thinking.active { opacity: 1; pointer-events: auto; }
+
+.wb-thinking-inner {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 0 24px; text-align: center;
+}
+.wb-thinking-logo {
+  font-size: 40px; color: var(--accent);
+  animation: wbThinkPulse 1.8s ease-in-out infinite;
+  line-height: 1;
+}
+.wb-thinking-name {
+  font-size: 19px; font-weight: 800; color: var(--text);
+  letter-spacing: -.4px;
+}
+.wb-thinking-msg {
+  font-size: 13.5px; color: var(--muted); min-height: 20px;
+  transition: opacity .35s ease; max-width: 260px; line-height: 1.5;
+}
+.wb-thinking-dots { display: flex; gap: 6px; margin-top: 4px; }
+.wb-thinking-dots span {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+  animation: wbThinkDot 1.3s ease-in-out infinite;
+}
+.wb-thinking-dots span:nth-child(2) { animation-delay: .22s; }
+.wb-thinking-dots span:nth-child(3) { animation-delay: .44s; }
+
+@keyframes wbThinkPulse {
+  0%,100% { transform: scale(1); opacity: .75; }
+  50%      { transform: scale(1.18); opacity: 1; }
+}
+@keyframes wbThinkDot {
+  0%,80%,100% { opacity: .18; transform: scale(.8); }
+  40%         { opacity: 1;   transform: scale(1.1); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Card Minimize / Expand
+   ═══════════════════════════════════════════════════════════ */
+
+/* Toggle button — appears on card hover */
+.wbcard-toggle {
+  position: absolute; top: 5px; right: 5px;
+  width: 18px; height: 18px; border-radius: 4px;
+  background: rgba(0,0,0,.07); border: none;
+  cursor: pointer; font-size: 13px; font-weight: 700; color: var(--muted);
+  display: none; align-items: center; justify-content: center;
+  padding: 0; line-height: 1; z-index: 2;
+  transition: background .12s, color .12s;
+}
+.wbcard { position: relative; }
+.wbcard:hover .wbcard-toggle { display: flex; }
+.wbcard-toggle:hover { background: rgba(0,0,0,.15); color: var(--text); }
+
+/* Compact row — hidden by default, shown when collapsed */
+.wbcard-compact {
+  display: none; align-items: center; gap: 8px;
+  padding: 7px 12px 8px; cursor: pointer;
+  border-radius: 0 0 12px 12px;
+  transition: background .12s;
+}
+.wbcard-compact:hover { background: var(--faint); }
+.wbcard-compact-txt {
+  flex: 1; font-size: 12px; color: var(--text-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wbcard-compact-hrs {
+  font-size: 12px; font-weight: 700; color: var(--accent); flex-shrink: 0;
+}
+.wbcard-compact-arr { font-size: 10px; color: var(--muted); flex-shrink: 0; }
+
+/* Collapsed state */
+.wbcard.wbcard-min .wbcard-body  { display: none; }
+.wbcard.wbcard-min .wbcard-foot  { display: none; }
+.wbcard.wbcard-min .wbcard-editf { display: none !important; }
+.wbcard.wbcard-min .wbcard-compact { display: flex; }
+
+/* Expand button styling */
+.wbcard-btn.expand { color: var(--accent); }
+.wbcard-btn.expand:hover { color: var(--accent); background: var(--accent-bg); }

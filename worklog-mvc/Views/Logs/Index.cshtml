@@ -533,33 +533,113 @@ function wbToggleCollapse(id) {
 }
 
 function wbExpandCard(id) {
-  const card = document.getElementById(`wbc-${id}`);
+  const card    = document.getElementById(`wbc-${id}`);
   if (!card) return;
-  const desc  = document.getElementById(`wbcd-${id}`)?.textContent ?? '';
-  const hrs   = document.getElementById(`wbch-${id}`)?.textContent ?? '';
-  const badge = document.getElementById(`wbcb-${id}`);
-  const cat   = badge?.textContent ?? '';
-  const color = badge?.style.background ?? '#94a3b8';
-  const proj  = card.querySelector('.wbcard-proj')?.textContent ?? '';
+  const desc    = document.getElementById(`wbcd-${id}`)?.textContent ?? '';
+  const hrsRaw  = document.getElementById(`wbch-${id}`)?.textContent?.replace(/[^\d.]/g,'') ?? '0';
+  const badge   = document.getElementById(`wbcb-${id}`);
+  const cat     = badge?.textContent?.trim() ?? 'Other';
+  const color   = badge?.style.background ?? '#94a3b8';
+  const proj    = card.querySelector('.wbcard-proj')?.textContent ?? '';
   const dateIso = card.dataset.date ?? '';
-  const dateLabel = dateIso ? new Date(dateIso + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' }) : '';
+  const dateLabel = dateIso
+    ? new Date(dateIso + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' })
+    : '';
+  const hrs     = parseFloat(hrsRaw) || 0;
+  const catOpts = CAT_LIST.map(c => `<option value="${c}" ${c===cat?'selected':''}>${c}</option>`).join('');
+
+  const inputStyle = 'width:100%;box-sizing:border-box;padding:7px 10px;font-size:13px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font-family:var(--font);outline:none';
+  const rowStyle   = 'display:flex;gap:8px;margin-top:8px';
 
   wbShowModal('📋 Entry Detail',
-    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></span>
-      <span style="font-size:12px;font-weight:700;color:${color}">${escHtml(cat)}</span>
-      <span style="font-size:12px;color:var(--muted);margin-left:auto">${escHtml(dateLabel)}</span>
+    // ── View pane ──
+    `<div id="wbex-view-${id}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:${color}">${escHtml(cat)}</span>
+        <span style="font-size:12px;color:var(--muted);margin-left:auto">${escHtml(dateLabel)}</span>
+      </div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);line-height:1.55;margin-bottom:10px">${escHtml(desc)}</div>
+      <div style="display:flex;gap:16px;font-size:13px;color:var(--muted);margin-bottom:14px">
+        <span>⏱ <strong style="color:var(--text)">${hrs} h</strong></span>
+        <span>📁 <strong style="color:var(--text)">${escHtml(proj)}</strong></span>
+      </div>
+      <div style="display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--line)">
+        <button onclick="wbExpandEdit(${id})" style="flex:1;padding:8px;font-size:12.5px;font-weight:600;background:var(--accent-bg);color:var(--accent);border:none;border-radius:7px;cursor:pointer">✏ Edit</button>
+        <button onclick="wbCloseModal();wbDeleteCard(${id})" style="padding:8px 12px;font-size:12.5px;font-weight:600;background:#fee2e2;color:#ef4444;border:none;border-radius:7px;cursor:pointer">× Delete</button>
+      </div>
     </div>
-    <div style="font-size:15px;font-weight:600;color:var(--text);line-height:1.55;margin-bottom:10px">${escHtml(desc)}</div>
-    <div style="display:flex;gap:16px;font-size:13px;color:var(--muted)">
-      <span>⏱ <strong style="color:var(--text)">${escHtml(hrs)}</strong></span>
-      <span>📁 <strong style="color:var(--text)">${escHtml(proj)}</strong></span>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
-      <button onclick="wbCloseModal();wbStartCardEdit(${id})" style="flex:1;padding:7px;font-size:12.5px;font-weight:600;background:var(--accent-bg);color:var(--accent);border:none;border-radius:7px;cursor:pointer">✏ Edit</button>
-      <button onclick="wbCloseModal();wbDeleteCard(${id})" style="padding:7px 12px;font-size:12.5px;font-weight:600;background:#fee2e2;color:#ef4444;border:none;border-radius:7px;cursor:pointer">× Delete</button>
+    // ── Edit pane (hidden until Edit clicked) ──
+    <div id="wbex-edit-${id}" style="display:none">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Edit entry</div>
+      <textarea class="wbex-desc" rows="3" style="${inputStyle};resize:vertical">${escHtml(desc)}</textarea>
+      <div style="${rowStyle}">
+        <input type="number" class="wbex-hrs" value="${hrs}" step="0.25" min="0.25" max="24"
+               style="${inputStyle};width:80px;flex-shrink:0" placeholder="Hours">
+        <select class="wbex-cat" style="${inputStyle};flex:1">${catOpts}</select>
+      </div>
+      <input type="text" class="wbex-proj" value="${escHtml(proj)}" placeholder="Project"
+             style="${inputStyle};margin-top:8px">
+      <div style="${rowStyle};margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
+        <button onclick="wbExpandSaveEdit(${id})" style="flex:1;padding:8px;font-size:12.5px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:7px;cursor:pointer">Save changes</button>
+        <button onclick="wbExpandCancelEdit(${id})" style="padding:8px 12px;font-size:12.5px;font-weight:600;background:var(--bg);color:var(--muted);border:1px solid var(--line);border-radius:7px;cursor:pointer">Cancel</button>
+      </div>
     </div>`
   );
+}
+
+function wbExpandEdit(id) {
+  document.getElementById(`wbex-view-${id}`).style.display = 'none';
+  document.getElementById(`wbex-edit-${id}`).style.display = '';
+  document.getElementById(`wbex-edit-${id}`).querySelector('.wbex-desc')?.focus();
+}
+
+function wbExpandCancelEdit(id) {
+  document.getElementById(`wbex-edit-${id}`).style.display = 'none';
+  document.getElementById(`wbex-view-${id}`).style.display = '';
+}
+
+async function wbExpandSaveEdit(id) {
+  const pane = document.getElementById(`wbex-edit-${id}`);
+  const desc = pane.querySelector('.wbex-desc').value.trim();
+  const hrs  = parseFloat(pane.querySelector('.wbex-hrs').value);
+  const cat  = pane.querySelector('.wbex-cat').value;
+  const proj = pane.querySelector('.wbex-proj').value.trim();
+  if (!desc || isNaN(hrs) || hrs <= 0) { showErr('Fill in description and hours.'); return; }
+
+  const saveBtn = pane.querySelector('button');
+  saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+
+  try {
+    const res = await fetch('/Logs/EditLog', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, description: desc, hours: hrs, category: cat, project: proj }),
+    });
+    if (!res.ok) { showErr('Could not save.'); saveBtn.disabled = false; saveBtn.textContent = 'Save changes'; return; }
+
+    // Update card DOM
+    const color = CAT_COLORS[cat] ?? '#94a3b8';
+    const card  = document.getElementById(`wbc-${id}`);
+    document.getElementById(`wbcd-${id}`).textContent = desc;
+    document.getElementById(`wbch-${id}`).textContent = hrs + ' h';
+    card?.querySelector('.wbcard-stripe')?.setAttribute('style', `background:${color}`);
+    const badge = document.getElementById(`wbcb-${id}`);
+    if (badge) { badge.style.background = color; badge.textContent = cat; }
+    const compact = document.getElementById(`wbcc-${id}`);
+    if (compact) {
+      compact.querySelector('.wbcard-compact-txt').textContent = desc;
+      compact.querySelector('.wbcard-compact-hrs').textContent = hrs + ' h';
+    }
+    const projEl = card?.querySelector('.wbcard-proj');
+    if (projEl) projEl.textContent = proj;
+    if (card?.dataset.date) wbUpdateDayTotal(card.dataset.date);
+
+    wbCloseModal();
+    showToast('✓ Entry updated');
+  } catch {
+    showErr('Network error.');
+    saveBtn.disabled = false; saveBtn.textContent = 'Save changes';
+  }
 }
 
 // ── Card board functions ──────────────────────────────────────────────────

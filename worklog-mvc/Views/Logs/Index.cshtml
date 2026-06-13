@@ -458,14 +458,16 @@ async function wbSend() {
 function detectIntent(text) {
   const t = text.toLowerCase().trim();
   if (/\b(standup|stand[- ]up|daily update|scrum|morning update|generate.*standup|my standup)\b/.test(t)) return 'standup';
+  // Date checks BEFORE 'today' so "what did I work on last Thursday?" routes correctly
+  if (/\byesterday\b/.test(t)) return 'date';
+  if (/\blast\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/.test(t)) return 'date';
+  if (/\b(show|what did i|entries|logs? for|work on|worked on)\b.*\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/.test(t)) return 'date';
+  if (/\bon\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/.test(t)) return 'date';
   if (/^(today\??|what (did|have) i|show.*today|my.*log|log.*today|done today)/.test(t) || t === 'today') return 'today';
   if (/\b(this week|weekly|show.*week|week.*stat|how.*week|week.*hour)\b/.test(t)) return 'week';
   if (/\b(share|post to|linkedin|twitter|social media)\b/.test(t)) return 'share';
   if (/\b(recurring|repeat|daily|scheduled|template)\b/.test(t)) return 'recurring';
   if (/^(\?|help|what can|commands|how to use|\/help)/.test(t)) return 'help';
-  if (/\byesterday\b/.test(t)) return 'date';
-  if (/\blast\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/.test(t)) return 'date';
-  if (/\b(show|what did i|entries|logs? for|work on)\b.*\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/.test(t)) return 'date';
   if (/\b(history|conversation|chat log|clear history|past messages|session summary|summarize.*session)\b/.test(t)) return 'history';
   return 'log';
 }

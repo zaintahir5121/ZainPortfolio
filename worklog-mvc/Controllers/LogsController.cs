@@ -401,6 +401,50 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         return Ok(new { insight });
     }
 
+    /* ── Get logs for any date ── */
+    [HttpGet]
+    public async Task<IActionResult> DateLogs(string date)
+    {
+        if (!DateOnly.TryParse(date, out var d))
+            return BadRequest(new { error = "Invalid date format. Use YYYY-MM-DD." });
+
+        var logs = await db.LogEntries
+            .Where(l => l.UserId == CurrentUserId && l.Date == d)
+            .OrderBy(l => l.CreatedAt)
+            .ToListAsync();
+
+        return Ok(new
+        {
+            date    = d.ToString("dddd, MMMM d"),
+            total   = logs.Sum(l => l.Hours),
+            entries = logs.Select(l => new
+            {
+                l.Id,
+                description = l.Description,
+                project     = l.Project,
+                hours       = l.Hours,
+                category    = l.Tags,
+            }),
+        });
+    }
+
+    /* ── AI: fix English/grammar ── */
+    [HttpPost]
+    public async Task<IActionResult> FixText([FromBody] AiTextRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Text))
+            return BadRequest(new { error = "text required" });
+        try
+        {
+            var result = await ollama.FixEnglishAsync(req.Text);
+            return Ok(new { result });
+        }
+        catch
+        {
+            return Ok(new { result = req.Text }); // fallback: return unchanged
+        }
+    }
+
     /* ── Edit a saved entry (AJAX) ── */
     [HttpPost]
     public async Task<IActionResult> EditLog([FromBody] EditLogRequest req)

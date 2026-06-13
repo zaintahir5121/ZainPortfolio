@@ -14,6 +14,13 @@ public class OllamaService(HttpClient http, IConfiguration cfg) : IOllamaService
         return await CallOllamaAsync(prompt);
     }
 
+    public async Task<string> FixEnglishAsync(string text)
+    {
+        var prompt = $"Fix the spelling, grammar, and clarity of the following text. " +
+                     $"Return ONLY the corrected text, no explanation, no quotes:\n\n{text}";
+        return await CallOllamaAsync(prompt, timeout: 20);
+    }
+
     public async Task<string> GenerateSummaryAsync(IEnumerable<LogEntry> logs)
     {
         var lines = logs.Select(l => $"• [{l.Project}] {l.Description} ({l.Hours}h)");

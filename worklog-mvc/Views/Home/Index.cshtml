@@ -7,16 +7,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Primary SEO — targeting low-competition keywords -->
   <title>WorkLog — Free Daily Work Journal &amp; Employee Time Tracker</title>
-  <meta name="description" content="The simplest free work log app for employees and freelancers. Type what you did, AI structures it. Export timesheets in one click. No credit card, no subscription — your data stays private.">
-  <meta name="keywords" content="free work log app, daily work journal, employee time tracker free, simple timesheet app, work hours tracker, daily standup tracker, work activity log, time tracking software free, work log software, free employee time log">
+  <meta name="description" content="Stop scrambling for Friday's timesheet. Log work in seconds, AI structures it, timesheets export in one click. Free, private, no credit card.">
+  <meta name="keywords" content="free work log app, daily work journal, employee time tracker free, simple timesheet app, work hours tracker, daily standup tracker">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="author" content="WorkLog">
   <link rel="canonical" href="https://worklog.app/">
 
-  <!-- Open Graph (LinkedIn, Facebook preview) -->
   <meta property="og:type"         content="website">
   <meta property="og:url"          content="https://worklog.app/">
   <meta property="og:title"        content="WorkLog — Free Daily Work Journal &amp; Time Tracker">
@@ -25,21 +22,17 @@
   <meta property="og:image:width"  content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:site_name"    content="WorkLog">
-  <meta property="og:locale"       content="en_US">
 
-  <!-- Twitter / X Card -->
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="WorkLog — Free Daily Work Journal">
-  <meta name="twitter:description" content="Log your work in seconds. AI parses it. Timesheets in one click. Free, private, no subscription.">
+  <meta name="twitter:description" content="Log your work in seconds. AI parses it. Timesheets in one click. Free, private.">
   <meta name="twitter:image"       content="https://worklog.app/og-image.png">
 
-  <!-- PWA / Mobile install -->
   <meta name="theme-color" content="#6366f1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="WorkLog">
   <link rel="manifest" href="/manifest.json">
 
-  <!-- Structured data: SoftwareApplication -->
   <script type="application/ld+json">
   {
     "@@context": "https://schema.org",
@@ -51,20 +44,6 @@
     "operatingSystem": "Web",
     "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "featureList": ["AI daily log parsing", "Timesheet export", "Voice input", "Weekly progress", "Recurring entries", "Privacy-first"]
-  }
-  </script>
-
-  <!-- FAQ schema — boosts Google rich results -->
-  <script type="application/ld+json">
-  {
-    "@@context": "https://schema.org",
-    "@@type": "FAQPage",
-    "mainEntity": [
-      { "@@type":"Question","name":"Is WorkLog free?","acceptedAnswer":{"@@type":"Answer","text":"Yes — completely free. No credit card, no subscription, no limits."}},
-      { "@@type":"Question","name":"Is my work data private?","acceptedAnswer":{"@@type":"Answer","text":"Yes. Your journal lives in your own database. Nothing is sent to third-party servers."}},
-      { "@@type":"Question","name":"How do I export a timesheet?","acceptedAnswer":{"@@type":"Answer","text":"One click. WorkLog generates CSV timesheets for payroll, invoicing, or sharing with your manager."}},
-      { "@@type":"Question","name":"Does it work on mobile?","acceptedAnswer":{"@@type":"Answer","text":"Yes. WorkLog works in any browser and can be installed on your home screen like a native app."}}
-    ]
   }
   </script>
 
@@ -81,31 +60,33 @@
   <nav class="l-nav">
     <div class="l-logo">worklog<span>.</span></div>
     <div class="l-nav-links">
+      <a href="#compare" class="l-nav-link">Why WorkLog</a>
+      <a href="#how" class="l-nav-link">How it works</a>
       <a href="#features" class="l-nav-link">Features</a>
-      <a asp-controller="Home" asp-action="About" class="l-nav-link">About</a>
     </div>
     <a asp-controller="Account" asp-action="Login" class="l-signin">Sign in →</a>
   </nav>
 
   <!-- ── Hero ──────────────────────────────────────────────────────────── -->
   <div class="l-hero">
-    <div class="l-badge">✦ Free &amp; private</div>
+    <div class="l-badge">✦ Free · Private · No credit card</div>
 
     <h1 class="l-h1">
-      Know exactly where<br>
-      <em>your day went.</em>
+      Stop scrambling for<br>
+      <em>your Friday timesheet.</em>
     </h1>
 
     <p class="l-sub">
-      WorkLog is the simplest work journal you'll ever use.
-      Tell it what you did — it handles the rest.
+      Log your work as you go. Type what you did in plain English —
+      AI structures it into coloured cards, timesheets export in one click,
+      and your standup writes itself.
     </p>
 
     <div class="l-cta-row">
-      <a asp-controller="Account" asp-action="Login" class="l-cta-btn">
-        Start your journal free →
+      <a asp-controller="Account" asp-action="Register" class="l-cta-btn">
+        Start free — 30 seconds to set up →
       </a>
-      <a href="#features" class="l-cta-ghost">See how it works ↓</a>
+      <a asp-controller="Account" asp-action="Login" class="l-cta-ghost">Already have an account? Sign in</a>
     </div>
 
     <div class="l-social">
@@ -124,11 +105,11 @@
         <span class="lpf-dot lpf-r"></span>
         <span class="lpf-dot lpf-y"></span>
         <span class="lpf-dot lpf-g"></span>
-        <span class="lpf-url">worklog · today</span>
+        <span class="lpf-url">worklog · today's board</span>
       </div>
       <div class="lpf-body">
         <div class="lpf-input">
-          <span class="lpf-text">Fixed payment API bugs for 2h, attended sprint planning for 1h…</span>
+          <span class="lpf-text">Fixed payment API bugs 2h, sprint planning 1h, reviewed 3 PRs…</span>
           <span class="lpf-cursor"></span>
         </div>
         <div class="lpf-entries">
@@ -146,82 +127,163 @@
           </div>
           <div class="lpf-entry">
             <span class="lpf-dot-e" style="background:#10b981"></span>
-            <span class="lpf-edesc">Reviewed pull requests</span>
+            <span class="lpf-edesc">Code review — 3 PRs</span>
             <span class="lpf-ebadge" style="background:#d1fae5;color:#065f46">Code Review</span>
-            <span class="lpf-etime">30m</span>
+            <span class="lpf-etime">45m</span>
           </div>
         </div>
         <div class="lpf-footer">
-          Total: <strong>3h 30m</strong>
-          <button class="lpf-btn">Send Work Log →</button>
+          Total: <strong>3h 45m</strong>
+          <button class="lpf-btn">Export CSV →</button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- ── Before / After comparison ────────────────────────────────────── -->
+  <div class="l-compare" id="compare">
+    <div class="l-section-label">The difference</div>
+    <h2 class="l-section-h2">Your work life with and without WorkLog</h2>
+
+    <div class="l-compare-wrap">
+      <div class="l-compare-card l-before l-anim">
+        <div class="l-cc-hdr">
+          <span class="l-cc-icon">😩</span>
+          <span class="l-cc-title">Without WorkLog</span>
+        </div>
+        <ul class="l-cc-list">
+          <li><span class="l-cc-x">✗</span> Scrambling every Friday to remember the week</li>
+          <li><span class="l-cc-x">✗</span> Timesheets full of guesses and rough estimates</li>
+          <li><span class="l-cc-x">✗</span> "Uh… same as yesterday" in every standup</li>
+          <li><span class="l-cc-x">✗</span> No proof of what you actually shipped</li>
+          <li><span class="l-cc-x">✗</span> Hours of admin work just to track your time</li>
+          <li><span class="l-cc-x">✗</span> Can't see where your time actually went</li>
+        </ul>
+      </div>
+
+      <div class="l-compare-mid">
+        <div class="l-compare-arrow">→</div>
+      </div>
+
+      <div class="l-compare-card l-after l-anim">
+        <div class="l-cc-hdr">
+          <span class="l-cc-icon">✅</span>
+          <span class="l-cc-title">With WorkLog</span>
+        </div>
+        <ul class="l-cc-list">
+          <li><span class="l-cc-v">✓</span> Log work in 10 seconds as it happens</li>
+          <li><span class="l-cc-v">✓</span> AI parses and categorises everything automatically</li>
+          <li><span class="l-cc-v">✓</span> Standup generated from your actual logs</li>
+          <li><span class="l-cc-v">✓</span> Full timeline of every contribution you made</li>
+          <li><span class="l-cc-v">✓</span> One-click CSV timesheet for payroll or invoicing</li>
+          <li><span class="l-cc-v">✓</span> Visual week summary and streak tracker</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:44px">
+      <a asp-controller="Account" asp-action="Register" class="l-cta-btn">
+        Start using WorkLog free →
+      </a>
+    </div>
+  </div>
+
+  <!-- ── How it works ──────────────────────────────────────────────────── -->
+  <div class="l-how" id="how">
+    <div class="l-section-label">How it works</div>
+    <h2 class="l-section-h2">From thought to timesheet<br>in three steps</h2>
+
+    <div class="l-steps">
+      <div class="l-step l-anim">
+        <div class="l-step-num">1</div>
+        <div class="l-step-body">
+          <div class="l-step-title">Tell it what you did</div>
+          <p class="l-step-desc">Type or speak naturally: <em>"Fixed auth bug 2h, reviewed 3 PRs 1h, sprint planning 45min"</em> — no forms, no dropdowns.</p>
+        </div>
+      </div>
+      <div class="l-step-conn"></div>
+      <div class="l-step l-anim">
+        <div class="l-step-num">2</div>
+        <div class="l-step-body">
+          <div class="l-step-title">AI creates the cards</div>
+          <p class="l-step-desc">WorkLog parses your text — projects, categories, hours — and places colour-coded cards on your Kanban board instantly.</p>
+        </div>
+      </div>
+      <div class="l-step-conn"></div>
+      <div class="l-step l-anim">
+        <div class="l-step-num">3</div>
+        <div class="l-step-body">
+          <div class="l-step-title">You're done</div>
+          <p class="l-step-desc">Export a timesheet, generate your daily standup, share your week on LinkedIn — everything ready, automatically.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="l-how-cta">
+      <a asp-controller="Account" asp-action="Register" class="l-cta-btn">Try it now — it's free →</a>
+    </div>
+  </div>
+
   <!-- ── Features ──────────────────────────────────────────────────────── -->
   <div class="l-features" id="features">
-    <div class="l-features-label">Everything you need</div>
-    <h2 class="l-features-h2">Simple to use. Powerful to have.</h2>
+    <div class="l-features-label">Everything included</div>
+    <h2 class="l-features-h2">Simple to log. Powerful to have.</h2>
 
     <div class="l-feat-grid">
       <div class="l-feat-card">
         <div class="l-feat-ico">⚡</div>
         <div class="l-feat-title">Log in seconds</div>
-        <p class="l-feat-desc">
-          Just type what you did in plain language.
-          AI reads it and organises everything — projects, hours, categories — automatically.
-        </p>
+        <p class="l-feat-desc">Type what you did in plain language. AI reads it and organises everything — projects, hours, categories — automatically. No forms.</p>
       </div>
       <div class="l-feat-card">
         <div class="l-feat-ico">🎤</div>
-        <div class="l-feat-title">Speak your day</div>
-        <p class="l-feat-desc">
-          Prefer talking? Hit the mic and narrate your day out loud.
-          WorkLog transcribes and parses your words instantly.
-        </p>
+        <div class="l-feat-title">Voice logging</div>
+        <p class="l-feat-desc">Prefer talking? Hit the mic and narrate your day out loud. WorkLog transcribes and parses your words instantly — hands-free.</p>
+      </div>
+      <div class="l-feat-card">
+        <div class="l-feat-ico">📋</div>
+        <div class="l-feat-title">Kanban card board</div>
+        <p class="l-feat-desc">Colour-coded cards grouped by day. Edit inline, drag between days, delete — a visual overview of everything you've shipped.</p>
       </div>
       <div class="l-feat-card">
         <div class="l-feat-ico">📊</div>
         <div class="l-feat-title">Instant timesheets</div>
-        <p class="l-feat-desc">
-          See this week's hours at a glance. Export timesheets in one click
-          — for invoicing, payroll, or just your own records.
-        </p>
+        <p class="l-feat-desc">See this week's hours at a glance. Export CSV timesheets in one click — for invoicing, payroll, or your own records.</p>
       </div>
       <div class="l-feat-card">
-        <div class="l-feat-ico">🌱</div>
-        <div class="l-feat-title">Track your growth</div>
-        <p class="l-feat-desc">
-          Log achievements, career milestones, and what you're learning.
-          Build a complete record of your professional journey.
-        </p>
+        <div class="l-feat-ico">✦</div>
+        <div class="l-feat-title">AI daily standup</div>
+        <p class="l-feat-desc">WorkLog AI reads your logs and writes your standup for you. Copy it to Slack or Teams in one click — never be unprepared again.</p>
       </div>
       <div class="l-feat-card">
         <div class="l-feat-ico">↺</div>
         <div class="l-feat-title">Recurring entries</div>
-        <p class="l-feat-desc">
-          Set up daily standup, code review, or any routine task once.
-          WorkLog auto-logs it every morning so you never miss it.
-        </p>
+        <p class="l-feat-desc">Set up daily standups, code reviews, or any routine once. WorkLog auto-logs them every morning — zero admin.</p>
+      </div>
+      <div class="l-feat-card">
+        <div class="l-feat-ico">🔥</div>
+        <div class="l-feat-title">Streak &amp; goal tracking</div>
+        <p class="l-feat-desc">Build a daily logging habit. Track your streak, monitor your weekly goal, see your progress — stay consistent and visible.</p>
+      </div>
+      <div class="l-feat-card">
+        <div class="l-feat-ico">✨</div>
+        <div class="l-feat-title">Share your work</div>
+        <p class="l-feat-desc">Generate a shareable work card for LinkedIn, Twitter, or Instagram — show your output, build your reputation, without the hassle.</p>
       </div>
       <div class="l-feat-card">
         <div class="l-feat-ico">🔒</div>
         <div class="l-feat-title">Completely private</div>
-        <p class="l-feat-desc">
-          Your journal lives in your own database. Nothing is sent
-          to third-party servers. Your data is yours — always.
-        </p>
+        <p class="l-feat-desc">Your journal lives in your own database. Nothing is sent to third-party servers. Your data is yours — always. No surveillance.</p>
       </div>
     </div>
   </div>
 
   <!-- ── CTA banner ────────────────────────────────────────────────────── -->
   <div class="l-cta-banner">
-    <h2 class="l-cta-banner-h">Ready to know where your time goes?</h2>
-    <p class="l-cta-banner-sub">Takes 30 seconds to set up. No credit card, no subscription.</p>
-    <a asp-controller="Account" asp-action="Login" class="l-cta-btn l-cta-light">
-      Start your work journal →
+    <h2 class="l-cta-banner-h">Ready to take back control of your time?</h2>
+    <p class="l-cta-banner-sub">30 seconds to set up. Free forever. Your data stays private.</p>
+    <a asp-controller="Account" asp-action="Register" class="l-cta-btn l-cta-light">
+      Create your free account →
     </a>
   </div>
 
@@ -236,8 +298,8 @@
         <a asp-controller="Home" asp-action="Contact">Contact</a>
       </nav>
       <div class="lf-right">
-        <a href="https://buymeacoffee.com/worklog" target="_blank" rel="noopener" class="lf-bmc">☕ Buy me a coffee</a>
-        <span class="lf-copy">&copy; 2025 WorkLog</span>
+        <a href="https://buymeacoffee.com/zaintahir512" target="_blank" rel="noopener" class="lf-bmc">☕ Buy me a coffee</a>
+        <span class="lf-copy">&copy; 2026 WorkLog</span>
       </div>
     </div>
   </footer>
@@ -245,16 +307,32 @@
 </div>
 
 <!-- Floating Buy Me a Coffee -->
-<a href="https://buymeacoffee.com/worklog" target="_blank" rel="noopener" class="bmc-float" title="Support WorkLog">☕</a>
+<a href="https://buymeacoffee.com/zaintahir512" target="_blank" rel="noopener" class="bmc-float" title="Support WorkLog — Buy me a coffee">☕</a>
 
 <script>
-  // Smooth scroll for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const t = document.querySelector(a.getAttribute('href'));
-      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
-    });
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
   });
+});
+
+// Scroll-reveal animations
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('l-visible');
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.l-anim').forEach((el, i) => {
+  // Stagger steps
+  if (el.classList.contains('l-step')) el.style.transitionDelay = (i * 0.12) + 's';
+  obs.observe(el);
+});
 </script>
 </body>
 </html>

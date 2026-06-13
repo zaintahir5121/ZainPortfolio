@@ -146,8 +146,8 @@
         <a href="/Timesheet" class="wb-qa-btn">
           <span>📅</span> View timesheet
         </a>
-        <button class="wb-qa-btn" onclick="wbToggleTeams()">
-          <span>⚡</span> Teams integration
+        <button class="wb-qa-btn" onclick="openFeedback()">
+          <span>💬</span> Give feedback
         </button>
       </div>
     </div>
@@ -156,25 +156,6 @@
     <div class="wb-sc">
       <div class="wb-sc-title">✦ Weekly Insight</div>
       <p class="wb-insight-text" id="wbInsightText">Loading…</p>
-    </div>
-
-    <!-- Teams card (toggle) -->
-    <div class="wb-sc" id="wbTeamsCard" style="display:none">
-      <div class="wb-sc-title">
-        <span>🔗 Teams Integration</span>
-        <button onclick="wbToggleTeams()" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);line-height:1">✕</button>
-      </div>
-      <p style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:8px">Log from Microsoft Teams via Power Automate. Your API key:</p>
-      <div id="wbApiKeyWrap" style="font-size:11px;color:var(--muted)">Loading…</div>
-      <button onclick="wbRegenerateKey()" style="margin-top:8px;font-size:11px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:var(--font)">↻ Regenerate key</button>
-      <details style="margin-top:10px">
-        <summary style="font-size:11.5px;color:var(--accent);cursor:pointer;font-weight:500">How to connect Teams →</summary>
-        <p style="font-size:10.5px;color:var(--muted);margin-top:6px;line-height:1.65">
-          Teams → Workflows → New → "When a message is posted" → HTTP POST to:<br>
-          <code style="background:var(--bg);padding:2px 5px;border-radius:4px;display:block;margin:4px 0;word-break:break-all;font-size:10px">/api/webhook/log</code>
-          Body: <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:10px">&#123;"apiKey":"KEY","text":"@@{triggerBody()}"&#125;</code>
-        </p>
-      </details>
     </div>
 
   </aside>
@@ -1049,23 +1030,48 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null, recogActive = false;
 
 function wbToggleVoice() {
-  if (!SR) { showToast('Voice input requires Chrome or Safari.'); return; }
+  if (!SR) {
+    showToast('Voice input needs Chrome, Edge, or Safari.');
+    return;
+  }
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    showToast('Voice input requires a secure (HTTPS) connection.');
+    return;
+  }
   recogActive ? stopVoice() : startVoice();
 }
 function startVoice() {
-  recognition = new SR();
-  recognition.continuous = false; recognition.interimResults = true; recognition.lang = 'en-US';
-  recognition.onstart  = () => { recogActive = true; micBtn.classList.add('wbmic-on'); };
-  recognition.onend    = () => stopVoice();
-  recognition.onerror  = () => stopVoice();
-  recognition.onresult = (e) => {
-    const t = Array.from(e.results).map(r => r[0].transcript).join('');
-    inp.value = t; wbAutosize(inp);
-    if (e.results[e.results.length-1].isFinal) stopVoice();
-  };
-  recognition.start();
+  try {
+    recognition = new SR();
+    recognition.continuous      = false;
+    recognition.interimResults  = true;
+    recognition.lang            = 'en-US';
+    recognition.maxAlternatives = 1;
+    recognition.onstart  = () => { recogActive = true; micBtn.classList.add('wbmic-on'); setStatus('🎤 Listening… speak now'); };
+    recognition.onend    = () => stopVoice();
+    recognition.onerror  = (e) => {
+      stopVoice();
+      if (e.error === 'not-allowed' || e.error === 'permission-denied') {
+        showToast('🎤 Microphone permission denied — allow it in your browser settings.');
+      } else if (e.error === 'no-speech') {
+        showToast('No speech detected — try again.');
+      } else if (e.error !== 'aborted') {
+        showToast('Voice input error: ' + e.error);
+      }
+    };
+    recognition.onresult = (e) => {
+      const t = Array.from(e.results).map(r => r[0].transcript).join('');
+      inp.value = t; wbAutosize(inp);
+      if (e.results[e.results.length - 1].isFinal) { stopVoice(); inp.focus(); }
+    };
+    recognition.start();
+  } catch(err) {
+    stopVoice();
+    showToast('Could not start voice input: ' + err.message);
+  }
 }
 function stopVoice() {
+  if (recogActive) setStatus('');
   recogActive = false; micBtn.classList.remove('wbmic-on');
   try { recognition?.stop(); } catch {}
 }
@@ -1104,31 +1110,6 @@ async function wbSaveEdit(id) {
     });
     if (res.ok) location.reload();
     else showErr('Could not save — try again.');
-  } catch { showErr('Network error.'); }
-}
-
-// ── Teams sidebar ─────────────────────────────────────────────────────────
-async function wbToggleTeams() {
-  const card = document.getElementById('wbTeamsCard');
-  const visible = card.style.display !== 'none';
-  card.style.display = visible ? 'none' : '';
-  if (!visible) {
-    const wrap = document.getElementById('wbApiKeyWrap');
-    try {
-      const res = await fetch('/Account/ApiKey');
-      if (!res.ok) { wrap.textContent = 'Could not load key.'; return; }
-      const { apiKey } = await res.json();
-      wrap.innerHTML = `<code style="font-size:10.5px;background:var(--bg);padding:4px 8px;border-radius:6px;display:block;word-break:break-all;font-family:monospace">${escHtml(apiKey)}</code>`;
-    } catch { wrap.textContent = 'Error loading key.'; }
-  }
-}
-async function wbRegenerateKey() {
-  if (!confirm('Regenerate API key? Your Teams integration will stop working until updated.')) return;
-  const tok = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
-  try {
-    const res = await fetch('/Account/RegenerateKey', { method:'POST', headers:{ 'RequestVerificationToken': tok } });
-    if (res.ok) { wbToggleTeams(); wbToggleTeams(); showToast('✓ Key regenerated'); }
-    else showErr('Could not regenerate.');
   } catch { showErr('Network error.'); }
 }
 

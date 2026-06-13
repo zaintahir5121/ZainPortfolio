@@ -71,12 +71,13 @@
 
 <footer class="app-footer">
   <div class="af-inner">
-    <span class="af-copy">&copy; 2025 WorkLog</span>
+    <span class="af-copy">&copy; 2026 WorkLog</span>
     <nav class="af-links">
       <a asp-controller="Home" asp-action="About">About</a>
       <a asp-controller="Home" asp-action="Privacy">Privacy</a>
       <a asp-controller="Home" asp-action="Terms">Terms</a>
       <a asp-controller="Home" asp-action="Contact">Contact</a>
+      <button class="af-feedback" onclick="openFeedback()">💬 Feedback</button>
     </nav>
   </div>
 </footer>
@@ -110,7 +111,81 @@
   }
 </script>
 
+<!-- ── Feedback modal ─────────────────────────────────────────────────────── -->
+<div class="fb-overlay" id="fbOverlay" onclick="if(event.target===this)closeFeedback()" style="display:none">
+  <div class="fb-panel">
+    <div class="fb-hdr">
+      <div>
+        <div class="fb-title">💬 Share your feedback</div>
+        <div class="fb-sub">Help us make WorkLog better for you</div>
+      </div>
+      <button class="fb-close" onclick="closeFeedback()">✕</button>
+    </div>
+    <div class="fb-body">
+      <div class="fb-q">How would you rate WorkLog?</div>
+      <div class="fb-stars" id="fbStars">
+        <button type="button" class="fb-star" onclick="fbRate(1)">★</button>
+        <button type="button" class="fb-star" onclick="fbRate(2)">★</button>
+        <button type="button" class="fb-star" onclick="fbRate(3)">★</button>
+        <button type="button" class="fb-star" onclick="fbRate(4)">★</button>
+        <button type="button" class="fb-star" onclick="fbRate(5)">★</button>
+      </div>
+      <div class="fb-field">
+        <label class="fb-lbl">Category</label>
+        <select class="fb-sel" id="fbCat">
+          <option value="General Feedback">General Feedback</option>
+          <option value="Feature Request">Feature Request</option>
+          <option value="Bug Report">Bug Report</option>
+          <option value="UI Improvement">UI Improvement</option>
+          <option value="Performance">Performance</option>
+        </select>
+      </div>
+      <div class="fb-field">
+        <label class="fb-lbl">Tell us more <span style="font-weight:400;opacity:.45">(optional)</span></label>
+        <textarea class="fb-ta" id="fbMsg" placeholder="What's on your mind?" rows="3" maxlength="1000"></textarea>
+      </div>
+      <button class="fb-submit" id="fbSubmitBtn" onclick="submitFeedback()">Send Feedback →</button>
+      <div class="fb-success hidden" id="fbSuccess">✓ Thank you! Your feedback helps us improve WorkLog.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let _fbRating = 0;
+function openFeedback() {
+  _fbRating = 0;
+  document.querySelectorAll('.fb-star').forEach(s => s.classList.remove('on'));
+  document.getElementById('fbMsg').value = '';
+  document.getElementById('fbSuccess').classList.add('hidden');
+  const btn = document.getElementById('fbSubmitBtn');
+  btn.style.display = ''; btn.disabled = false; btn.textContent = 'Send Feedback →';
+  document.getElementById('fbOverlay').style.display = 'flex';
+}
+function closeFeedback() { document.getElementById('fbOverlay').style.display = 'none'; }
+function fbRate(n) {
+  _fbRating = n;
+  document.querySelectorAll('.fb-star').forEach((s, i) => s.classList.toggle('on', i < n));
+}
+async function submitFeedback() {
+  if (!_fbRating) { alert('Please select a rating first.'); return; }
+  const btn = document.getElementById('fbSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const res = await fetch('/Feedback/Submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating: _fbRating, category: document.getElementById('fbCat').value, message: document.getElementById('fbMsg').value.trim() }),
+    });
+    if (res.ok) {
+      btn.style.display = 'none';
+      document.getElementById('fbSuccess').classList.remove('hidden');
+      setTimeout(closeFeedback, 2800);
+    } else { btn.disabled = false; btn.textContent = 'Send Feedback →'; }
+  } catch { btn.disabled = false; btn.textContent = 'Send Feedback →'; }
+}
+</script>
+
 @RenderSection("Scripts", required: false)
-<a href="https://buymeacoffee.com/worklog" target="_blank" rel="noopener" class="bmc-float" title="Support WorkLog — Buy me a coffee">☕</a>
+<a href="https://buymeacoffee.com/zaintahir512" target="_blank" rel="noopener" class="bmc-float" title="Support WorkLog — Buy me a coffee">☕</a>
 </body>
 </html>

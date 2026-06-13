@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Achievement>    Achievements     { get; set; }
     public DbSet<Experience>     Experiences      { get; set; }
     public DbSet<LearningItem>   LearningItems    { get; set; }
+    public DbSet<FeedbackEntry>  Feedbacks        { get; set; }
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -25,13 +26,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     public static void Seed(AppDbContext db)
     {
-        if (db.Users.Any()) return;
-
-        db.Users.AddRange(
-            new User { Username = "admin", PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"), Name = "Admin",     Role = "admin" },
-            new User { Username = "john",  PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),  Name = "John Doe",  Role = "employee" },
-            new User { Username = "sara",  PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),  Name = "Sara Khan", Role = "employee" }
-        );
-        db.SaveChanges();
+        // No default users — users register their own accounts.
     }
 }

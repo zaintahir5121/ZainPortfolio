@@ -229,12 +229,6 @@
     </form>
 
     <div class="cw-foot">
-      <div class="cw-demo">
-        Demo accounts:
-        <code onclick="fill('admin','admin123')">admin / admin123</code>
-        &nbsp;·&nbsp;
-        <code onclick="fill('john','pass123')">john / pass123</code>
-      </div>
       <div class="cw-register">
         New here? <a asp-controller="Account" asp-action="Register">Create a free account →</a>
       </div>
@@ -261,11 +255,7 @@
   function pwdKey(e) {
     if (e.key === 'Enter') { e.preventDefault(); document.getElementById('loginForm').submit(); }
   }
-  function fill(u, p) {
-    document.getElementById('Username').value = u;
-    revealPwd();
-    document.getElementById('Password').value = p;
-  }
+
 </script>
 </body>
 </html>

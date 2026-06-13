@@ -146,6 +146,20 @@ public static class DatabaseInitializer
                 CONSTRAINT FK_LearningItems_Users FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
             )
             """, "LearningItems", logger);
+
+        // Feedbacks
+        Exec(ctx, """
+            IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'Feedbacks')
+            CREATE TABLE Feedbacks (
+                Id        INT            NOT NULL IDENTITY(1,1) CONSTRAINT PK_Feedbacks PRIMARY KEY,
+                UserId    INT            NULL,
+                UserName  NVARCHAR(200)  NOT NULL DEFAULT N'',
+                Rating    INT            NOT NULL DEFAULT 5,
+                Category  NVARCHAR(100)  NOT NULL DEFAULT N'General Feedback',
+                Message   NVARCHAR(2000) NOT NULL DEFAULT N'',
+                CreatedAt DATETIME2      NOT NULL DEFAULT GETUTCDATE()
+            )
+            """, "Feedbacks", logger);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

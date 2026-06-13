@@ -1,81 +1,196 @@
 @{
     Layout = null;
-    ViewData["Title"] = "WorkLog";
+    ViewData["Title"] = "WorkLog — Know exactly where your day went";
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WorkLog — Your personal work journal</title>
-  <meta name="description" content="WorkLog — simple, AI-powered work journal for developers and freelancers. Voice logging, daily summaries, timesheets, and personal growth tracking.">
+  <title>WorkLog — Know exactly where your day went</title>
+  <meta name="description" content="WorkLog is the simplest work journal you'll ever use. Log what you did each day, see where your time goes, export timesheets, and track your career growth.">
   <meta name="robots" content="index, follow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
 </head>
-<body>
+<body class="landing-body">
 
 <div class="landing">
 
+  <!-- ── Nav ──────────────────────────────────────────────────────────── -->
   <nav class="l-nav">
     <div class="l-logo">worklog<span>.</span></div>
+    <div class="l-nav-links">
+      <a href="#features" class="l-nav-link">Features</a>
+      <a asp-controller="Home" asp-action="About" class="l-nav-link">About</a>
+    </div>
     <a asp-controller="Account" asp-action="Login" class="l-signin">Sign in →</a>
   </nav>
 
+  <!-- ── Hero ──────────────────────────────────────────────────────────── -->
   <div class="l-hero">
-    <div class="l-eyebrow">For developers &amp; freelancers</div>
+    <div class="l-badge">✦ Free &amp; private</div>
 
-    <h1>Your personal<br><em>work journal.</em></h1>
+    <h1 class="l-h1">
+      Know exactly where<br>
+      <em>your day went.</em>
+    </h1>
 
     <p class="l-sub">
-      The simplest way to track what you work on every day —
-      voice input, AI summaries, timesheets, and a full growth tracker.
+      WorkLog is the simplest work journal you'll ever use.
+      Tell it what you did — it handles the rest.
     </p>
 
-    <a asp-controller="Account" asp-action="Login" class="l-cta">Start logging free</a>
+    <div class="l-cta-row">
+      <a asp-controller="Account" asp-action="Login" class="l-cta-btn">
+        Start your journal free →
+      </a>
+      <a href="#features" class="l-cta-ghost">See how it works ↓</a>
+    </div>
 
-    <div class="l-pills">
-      <span class="pill">✦ AI-powered logging</span>
-      <span class="pill">🎤 Voice input</span>
-      <span class="pill">📊 Timesheets</span>
-      <span class="pill">🏆 Growth tracking</span>
-      <span class="pill">↺ Recurring entries</span>
+    <div class="l-social">
+      <span class="l-social-item">✓ No credit card</span>
+      <span class="l-social-sep">·</span>
+      <span class="l-social-item">✓ No subscriptions</span>
+      <span class="l-social-sep">·</span>
+      <span class="l-social-item">✓ Your data stays yours</span>
     </div>
   </div>
 
-  <!-- mini preview of card colours -->
-  <div class="l-preview" aria-hidden="true">
-    <div class="p-card p-c0">
-      <div class="p-proj">Client Portal v2</div>
-      <div class="p-desc">Implemented JWT auth refresh flow and token rotation</div>
-      <div class="p-foot"><span class="p-hrs">3h</span><span class="p-tag">backend</span></div>
-    </div>
-    <div class="p-card p-c1">
-      <div class="p-proj">Internal Dashboard</div>
-      <div class="p-desc">Fixed responsive layout on reports page, dark mode toggle</div>
-      <div class="p-foot"><span class="p-hrs">2h</span><span class="p-tag">frontend</span></div>
-    </div>
-    <div class="p-card p-c2">
-      <div class="p-proj">API Gateway</div>
-      <div class="p-desc">Added rate limiting middleware and logging pipeline</div>
-      <div class="p-foot"><span class="p-hrs">4h</span><span class="p-tag">devops</span></div>
+  <!-- ── App preview ───────────────────────────────────────────────────── -->
+  <div class="l-preview-wrap" aria-hidden="true">
+    <div class="l-preview-frame">
+      <div class="lpf-bar">
+        <span class="lpf-dot lpf-r"></span>
+        <span class="lpf-dot lpf-y"></span>
+        <span class="lpf-dot lpf-g"></span>
+        <span class="lpf-url">worklog · today</span>
+      </div>
+      <div class="lpf-body">
+        <div class="lpf-input">
+          <span class="lpf-text">Fixed payment API bugs for 2h, attended sprint planning for 1h…</span>
+          <span class="lpf-cursor"></span>
+        </div>
+        <div class="lpf-entries">
+          <div class="lpf-entry">
+            <span class="lpf-dot-e" style="background:#3b82f6"></span>
+            <span class="lpf-edesc">Fixed payment API bugs</span>
+            <span class="lpf-ebadge" style="background:#dbeafe;color:#1d4ed8">Development</span>
+            <span class="lpf-etime">2h</span>
+          </div>
+          <div class="lpf-entry">
+            <span class="lpf-dot-e" style="background:#f59e0b"></span>
+            <span class="lpf-edesc">Sprint planning meeting</span>
+            <span class="lpf-ebadge" style="background:#fef3c7;color:#b45309">Meeting</span>
+            <span class="lpf-etime">1h</span>
+          </div>
+          <div class="lpf-entry">
+            <span class="lpf-dot-e" style="background:#10b981"></span>
+            <span class="lpf-edesc">Reviewed pull requests</span>
+            <span class="lpf-ebadge" style="background:#d1fae5;color:#065f46">Code Review</span>
+            <span class="lpf-etime">30m</span>
+          </div>
+        </div>
+        <div class="lpf-footer">
+          Total: <strong>3h 30m</strong>
+          <button class="lpf-btn">Send Work Log →</button>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- ── Features ──────────────────────────────────────────────────────── -->
+  <div class="l-features" id="features">
+    <div class="l-features-label">Everything you need</div>
+    <h2 class="l-features-h2">Simple to use. Powerful to have.</h2>
+
+    <div class="l-feat-grid">
+      <div class="l-feat-card">
+        <div class="l-feat-ico">⚡</div>
+        <div class="l-feat-title">Log in seconds</div>
+        <p class="l-feat-desc">
+          Just type what you did in plain language.
+          AI reads it and organises everything — projects, hours, categories — automatically.
+        </p>
+      </div>
+      <div class="l-feat-card">
+        <div class="l-feat-ico">🎤</div>
+        <div class="l-feat-title">Speak your day</div>
+        <p class="l-feat-desc">
+          Prefer talking? Hit the mic and narrate your day out loud.
+          WorkLog transcribes and parses your words instantly.
+        </p>
+      </div>
+      <div class="l-feat-card">
+        <div class="l-feat-ico">📊</div>
+        <div class="l-feat-title">Instant timesheets</div>
+        <p class="l-feat-desc">
+          See this week's hours at a glance. Export timesheets in one click
+          — for invoicing, payroll, or just your own records.
+        </p>
+      </div>
+      <div class="l-feat-card">
+        <div class="l-feat-ico">🌱</div>
+        <div class="l-feat-title">Track your growth</div>
+        <p class="l-feat-desc">
+          Log achievements, career milestones, and what you're learning.
+          Build a complete record of your professional journey.
+        </p>
+      </div>
+      <div class="l-feat-card">
+        <div class="l-feat-ico">↺</div>
+        <div class="l-feat-title">Recurring entries</div>
+        <p class="l-feat-desc">
+          Set up daily standup, code review, or any routine task once.
+          WorkLog auto-logs it every morning so you never miss it.
+        </p>
+      </div>
+      <div class="l-feat-card">
+        <div class="l-feat-ico">🔒</div>
+        <div class="l-feat-title">Completely private</div>
+        <p class="l-feat-desc">
+          Your journal lives in your own database. Nothing is sent
+          to third-party servers. Your data is yours — always.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CTA banner ────────────────────────────────────────────────────── -->
+  <div class="l-cta-banner">
+    <h2 class="l-cta-banner-h">Ready to know where your time goes?</h2>
+    <p class="l-cta-banner-sub">Takes 30 seconds to set up. No credit card, no subscription.</p>
+    <a asp-controller="Account" asp-action="Login" class="l-cta-btn l-cta-light">
+      Start your work journal →
+    </a>
+  </div>
+
+  <!-- ── Footer ────────────────────────────────────────────────────────── -->
   <footer class="l-footer">
     <div class="lf-inner">
-      <span>&copy; 2025 WorkLog &mdash; simple by design</span>
+      <div class="lf-brand">worklog<span>.</span> <span class="lf-tagline">simple by design</span></div>
       <nav class="lf-links">
         <a asp-controller="Home" asp-action="About">About</a>
         <a asp-controller="Home" asp-action="Privacy">Privacy</a>
         <a asp-controller="Home" asp-action="Terms">Terms</a>
         <a asp-controller="Home" asp-action="Contact">Contact</a>
       </nav>
+      <span class="lf-copy">&copy; 2025 WorkLog</span>
     </div>
   </footer>
+
 </div>
 
+<script>
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
 </body>
 </html>

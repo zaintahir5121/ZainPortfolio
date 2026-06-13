@@ -1,124 +1,124 @@
 @model WorkLogApp.Models.ViewModels.DashboardViewModel
+@section Styles {
+<style>
+  body{overflow:hidden!important}
+  .main-wrap{max-width:none!important;margin:0!important;padding:0!important;height:calc(100dvh - 54px);height:calc(100vh - 54px);overflow:hidden!important}
+  .app-footer{display:none!important}
+</style>
+}
 @{
-    ViewData["Title"] = "WorkLog Today";
     var todayLogs = Model.Logs.Where(l => l.Date == DateOnly.FromDateTime(DateTime.Today)).ToList();
     var maxDayH   = Model.WeekDays.Count > 0 ? Model.WeekDays.Max(d => d.Hours) : 1m;
     if (maxDayH == 0) maxDayH = 1m;
-    // Share card week range
     var dowShare  = (int)DateTime.Today.DayOfWeek;
     var monShare  = DateTime.Today.AddDays(dowShare == 0 ? -6 : -(dowShare - 1));
     var sunShare  = monShare.AddDays(6);
     var weekLabel = $"{monShare:MMM d} – {sunShare:MMM d, yyyy}";
     var weekShort = $"{monShare:MMM d} – {sunShare:MMM d}";
+    // SVG ring offset for sidebar (r=27 → circumference=169.65)
+    var ringOffset = (169.65m * (1 - Math.Min(1m, Model.WeekPctInt / 100m))).ToString("F1");
 }
 
-<!-- ── Two-column today layout ──────────────────────────────────────────── -->
-<div class="tl-layout">
+<div class="wb-app">
 
-  <!-- ════ LEFT: Daily input ════════════════════════════════════════════ -->
-  <div class="tl-main">
+  <!-- ════ SIDEBAR ════════════════════════════════════════════════════════ -->
+  <aside class="wb-sidebar" id="wbSidebar">
 
-    <!-- Chat log input -->
-    <div class="clog-box">
-      <div class="clog-head">
-        <div class="clog-head-av">✦</div>
-        <div class="clog-head-info">
-          <span class="clog-head-name">WorkLog AI</span>
-          <span class="clog-head-dot">●</span>
-          <span class="clog-head-sub">auto-logs everything you say</span>
+    <!-- Bot identity -->
+    <div class="wb-sb-bot">
+      <div class="wb-sb-av">✦</div>
+      <div>
+        <div class="wb-sb-name">WorkLog Bot</div>
+        <div class="wb-sb-status"><span class="wb-online"></span>online · auto-logs everything</div>
+      </div>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="wb-sc">
+      <div class="wb-sc-title">Today</div>
+      <div class="wb-qs-grid">
+        <div class="wb-qs-item">
+          <span class="wb-qs-num">@Model.TodayHours h</span>
+          <span class="wb-qs-lbl">logged</span>
         </div>
-        <a href="#teams-section" class="teams-badge" onclick="revealTeams(event)" title="Connect Microsoft Teams">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#5b5fc7"><path d="M19.5 5.25h-4a.75.75 0 0 0 0 1.5h4a.75.75 0 0 0 0-1.5zm.75 3.75h-5.5a.75.75 0 0 0-.75.75v7.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-7.5a.75.75 0 0 0-.75-.75zm-10.5 0H4.25a.75.75 0 0 0-.75.75v7.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-7.5a.75.75 0 0 0-.75-.75zm-2.75-3.75h-3a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5z"/></svg>
-          Teams
-        </a>
-      </div>
-
-      <div class="clog-feed" id="clogFeed">
-        <div class="cmsg cbot">
-          <div class="cmsg-av">✦</div>
-          <div class="cmsg-bub">Hey @Model.FirstName! 👋 What did you work on today?<br><small>Just describe it naturally — I'll parse, categorize, and save everything.</small></div>
+        <div class="wb-qs-item">
+          <span class="wb-qs-num">@Model.Streak @(Model.Streak >= 3 ? "🔥" : "📅")</span>
+          <span class="wb-qs-lbl">day streak</span>
         </div>
-      </div>
-
-      <div class="clog-chips">
-        <button class="clog-chip" onclick="sendChip('Morning standup 15 min')">☕ Standup</button>
-        <button class="clog-chip" onclick="sendChip('Team meeting 1 hour')">💬 Meeting 1h</button>
-        <button class="clog-chip" onclick="sendChip('Code review 1 hour')">🔍 Review 1h</button>
-        <button class="clog-chip" onclick="sendChip('Bug fixing 2 hours')">🐛 Bug fix 2h</button>
-        <button class="clog-chip" onclick="sendChip('Writing documentation 1 hour')">📝 Docs 1h</button>
-        <button class="clog-chip" onclick="sendChip('Deployment 30 minutes')">🚀 Deploy</button>
-      </div>
-
-      <div class="clog-bar">
-        <div class="clog-ta-wrap">
-          <textarea id="clogInput" class="clog-ta"
-                    placeholder="Fixed auth bug 2h, reviewed PRs 1h, sprint planning 45min…"
-                    rows="2" onkeydown="clogEnter(event)"></textarea>
-          <button class="clog-send" id="clogSendBtn" onclick="sendLog()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
-          </button>
+        <div class="wb-qs-item">
+          <span class="wb-qs-num">@Model.ProjectsCount</span>
+          <span class="wb-qs-lbl">projects</span>
+        </div>
+        <div class="wb-qs-item">
+          <span class="wb-qs-num">@Model.WeekPctInt%</span>
+          <span class="wb-qs-lbl">of goal</span>
         </div>
       </div>
     </div>
 
-    <!-- Today's saved entries -->
+    <!-- Week progress -->
+    <div class="wb-sc">
+      <div class="wb-sc-title">This Week</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="wb-week-ring">
+          <svg width="68" height="68" viewBox="0 0 68 68">
+            <circle cx="34" cy="34" r="27" fill="none" stroke="var(--line)" stroke-width="5"/>
+            <circle cx="34" cy="34" r="27" fill="none"
+                    stroke="@(Model.WeekPctInt >= 100 ? "#10b981" : "#6366f1")"
+                    stroke-width="5" stroke-linecap="round"
+                    stroke-dasharray="169.65"
+                    stroke-dashoffset="@ringOffset"
+                    transform="rotate(-90 34 34)"/>
+          </svg>
+          <div class="wb-ring-inner">
+            <span class="wb-ring-pct">@Model.WeekPctInt%</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:17px;font-weight:800;color:var(--text)">@Model.WeekTotalFormatted</div>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:2px">/ @((int)Model.WeekGoal)h goal</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4">@Model.ProgressMessage</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's log (editable) -->
     @if (todayLogs.Any())
     {
-      <div class="tl-today-saved">
-        <div class="tts-head">
-          <span class="tts-title">Today's log</span>
-          <span class="tts-badge">@todayLogs.Sum(l => l.Hours)h logged</span>
+      <div class="wb-sc">
+        <div class="wb-sc-title">
+          <span>Today's Log</span>
+          <span style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:1px 8px;border-radius:99px">@todayLogs.Sum(l => l.Hours) h</span>
         </div>
-        <div class="tts-cards" id="logCards">
+        <div class="wb-today-list">
           @foreach (var log in todayLogs)
           {
-            <div class="tts-card" id="lc-@log.Id" data-id="@log.Id">
-              <!-- View mode -->
-              <div class="tts-card-view">
-                <div class="tts-card-left">
-                  <span class="tts-dot" style="background:@CategoryColor(log.Tags)"></span>
-                  <div class="tts-card-body">
-                    <span class="tts-desc">@log.Description</span>
-                    <div class="tts-card-meta">
-                      @if (!string.IsNullOrWhiteSpace(log.Project))
-                      {
-                        <span class="tts-proj">@log.Project</span>
-                      }
-                      @if (!string.IsNullOrWhiteSpace(log.Tags))
-                      {
-                        <span class="tts-cat-pill" style="background:@CategoryColorBg(log.Tags);color:@CategoryColor(log.Tags)">@log.Tags</span>
-                      }
-                    </div>
-                  </div>
-                </div>
-                <div class="tts-card-right">
-                  <span class="tts-hrs">@log.Hours h</span>
-                  <button class="tts-edit-btn" onclick="startEdit(@log.Id)" title="Edit">✏️</button>
-                  <form asp-action="Delete" method="post" class="tts-del-form">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" value="@log.Id">
-                    <button type="submit" class="tts-del-btn" title="Delete">×</button>
-                  </form>
-                </div>
+            <div class="wb-tl-item" id="wbtl-@log.Id">
+              <div class="wb-tl-view">
+                <span class="wb-tl-dot" style="background:@CategoryColor(log.Tags)"></span>
+                <span class="wb-tl-desc" title="@log.Description">@log.Description</span>
+                <span class="wb-tl-hrs">@log.Hours h</span>
+                <button class="wb-tl-edit" onclick="wbStartEdit(@log.Id)" title="Edit">✏</button>
+                <form asp-action="Delete" method="post" class="wb-tl-del-form">
+                  @Html.AntiForgeryToken()
+                  <input type="hidden" name="id" value="@log.Id">
+                  <button type="submit" class="wb-tl-del" title="Delete">×</button>
+                </form>
               </div>
-              <!-- Edit mode (hidden by default) -->
-              <div class="tts-card-edit hidden" id="edit-@log.Id">
-                <div class="tce-row">
-                  <input type="text" class="tce-inp tce-desc" value="@log.Description" placeholder="Description">
-                  <input type="number" class="tce-inp tce-hrs" value="@log.Hours" step="0.25" min="0.25" max="24" placeholder="hrs">
-                </div>
-                <div class="tce-row">
-                  <input type="text" class="tce-inp tce-proj" value="@log.Project" placeholder="Project">
-                  <select class="tce-inp tce-cat">
+              <div class="wb-tl-editf hidden" id="wbedit-@log.Id">
+                <input type="text" class="wb-tl-inp wb-tl-idesc" value="@log.Description" placeholder="Description">
+                <div class="wb-tl-editrow">
+                  <input type="number" class="wb-tl-inp wb-tl-ihrs" value="@log.Hours" step="0.25" min="0.25" max="24">
+                  <select class="wb-tl-inp wb-tl-icat">
                     @foreach (var cat in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Other"})
                     {
                       <option value="@cat" selected="@(log.Tags == cat ? "selected" : null)">@cat</option>
                     }
                   </select>
                 </div>
-                <div class="tce-actions">
-                  <button type="button" class="tce-save-btn" onclick="saveEdit(@log.Id)">Save</button>
-                  <button type="button" class="tce-cancel-btn" onclick="cancelEdit(@log.Id)">Cancel</button>
+                <div class="wb-tl-editbtns">
+                  <button type="button" class="wb-tl-save" onclick="wbSaveEdit(@log.Id)">Save</button>
+                  <button type="button" class="wb-tl-cancel" onclick="wbCancelEdit(@log.Id)">Cancel</button>
                 </div>
               </div>
             </div>
@@ -127,144 +127,143 @@
       </div>
     }
 
-  </div>
-
-  <!-- ════ RIGHT: Sidebar ═══════════════════════════════════════════════ -->
-  <div class="tl-sidebar">
-
-    <!-- This Week -->
-    <div class="tl-card">
-      <div class="tlc-head">
-        <span class="tlc-title">This Week</span>
-        <a asp-controller="Timesheet" asp-action="Index" class="tlc-action" title="View full timesheet">📅</a>
+    <!-- Quick actions -->
+    <div class="wb-sc">
+      <div class="wb-sc-title">Quick Actions</div>
+      <div class="wb-qa-list">
+        <button class="wb-qa-btn" onclick="openShareModal()">
+          <span>✨</span> Share this week
+        </button>
+        <a href="/Recurring" class="wb-qa-btn">
+          <span>↺</span> Recurring tasks
+        </a>
+        <a href="/Timesheet" class="wb-qa-btn">
+          <span>📅</span> View timesheet
+        </a>
+        <button class="wb-qa-btn" onclick="wbToggleTeams()">
+          <span>⚡</span> Teams integration
+        </button>
       </div>
-      <div class="week-days">
-        @foreach (var day in Model.WeekDays)
-        {
-          <div class="wd-row @(day.IsToday ? "wd-today" : "") @(day.IsFuture ? "wd-future" : "")">
-            <span class="wd-name">@day.Name</span>
-            <div class="wd-bar-track">
-              @if (!day.IsFuture && day.Hours > 0)
+    </div>
+
+    <!-- AI insight -->
+    <div class="wb-sc">
+      <div class="wb-sc-title">✦ Weekly Insight</div>
+      <p class="wb-insight-text" id="wbInsightText">Loading…</p>
+    </div>
+
+    <!-- Teams card (toggle) -->
+    <div class="wb-sc" id="wbTeamsCard" style="display:none">
+      <div class="wb-sc-title">
+        <span>🔗 Teams Integration</span>
+        <button onclick="wbToggleTeams()" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);line-height:1">✕</button>
+      </div>
+      <p style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:8px">Log from Microsoft Teams via Power Automate. Your API key:</p>
+      <div id="wbApiKeyWrap" style="font-size:11px;color:var(--muted)">Loading…</div>
+      <button onclick="wbRegenerateKey()" style="margin-top:8px;font-size:11px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:var(--font)">↻ Regenerate key</button>
+      <details style="margin-top:10px">
+        <summary style="font-size:11.5px;color:var(--accent);cursor:pointer;font-weight:500">How to connect Teams →</summary>
+        <p style="font-size:10.5px;color:var(--muted);margin-top:6px;line-height:1.65">
+          Teams → Workflows → New → "When a message is posted" → HTTP POST to:<br>
+          <code style="background:var(--bg);padding:2px 5px;border-radius:4px;display:block;margin:4px 0;word-break:break-all;font-size:10px">/api/webhook/log</code>
+          Body: <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:10px">&#123;"apiKey":"KEY","text":"@@{triggerBody()}"&#125;</code>
+        </p>
+      </details>
+    </div>
+
+  </aside>
+
+  <!-- ════ MAIN CHAT ═══════════════════════════════════════════════════════ -->
+  <div class="wb-main">
+
+    <!-- Mobile top bar -->
+    <div class="wb-mobile-bar">
+      <button class="wb-sidebar-toggle" onclick="wbToggleSidebar()" aria-label="Menu">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-size:12px;flex-shrink:0">✦</div>
+        <span class="wb-mobile-title">WorkLog Bot</span>
+      </div>
+      <button class="wb-share-mini" onclick="openShareModal()" title="Share week">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </button>
+    </div>
+
+    <!-- Chat feed -->
+    <div class="wb-feed" id="wbFeed">
+
+      <!-- Bot greeting -->
+      <div class="wb-msg wb-msg-bot">
+        <div class="wb-av">✦</div>
+        <div class="wb-bub wb-bub-bot">
+          <strong>Hey @Model.FirstName! 👋</strong><br>
+          I'm <strong>WorkLog Bot</strong>. Just tell me what you worked on and I'll parse, categorize, and log everything — no forms needed.<br>
+          <span style="color:var(--muted);font-size:13px;margin-top:5px;display:block">
+            Try: <em>"Fixed auth bug 2h, standup 15min, reviewed 3 PRs 1h"</em><br>
+            Or ask: <em>"what did I log today?"</em> · <em>"show this week"</em> · <em>"share my progress"</em> · <em>"help"</em>
+          </span>
+        </div>
+      </div>
+
+      @if (todayLogs.Any())
+      {
+        <div class="wb-msg wb-msg-bot">
+          <div class="wb-av">✦</div>
+          <div class="wb-bub wb-bub-bot">
+            <strong>You've already logged <span style="color:var(--accent)">@todayLogs.Sum(l => l.Hours)h</span> today across @todayLogs.Count item@(todayLogs.Count != 1 ? "s" : ""):</strong>
+            <div class="wb-entries">
+              @foreach (var log in todayLogs)
               {
-                <div class="wd-bar" style="width:@((day.Hours / maxDayH * 100).ToString("F0"))%"></div>
+                <div class="wb-entry-row">
+                  <span class="wb-entry-dot" style="background:@CategoryColor(log.Tags)"></span>
+                  <span class="wb-entry-desc">@log.Description</span>
+                  <span class="wb-entry-proj">@log.Project</span>
+                  <span class="wb-entry-hrs">@log.Hours h</span>
+                </div>
               }
             </div>
-            <span class="wd-hours">@day.Formatted</span>
+            <div style="margin-top:8px;font-size:12.5px;color:var(--muted)">Keep going — tell me anything else you worked on and I'll add it.</div>
           </div>
-        }
-      </div>
-      <div class="week-total-row">
-        <span class="wtr-lbl">Total</span>
-        <span class="wtr-hrs">@Model.WeekTotalFormatted</span>
-      </div>
-    </div>
-
-    <!-- Weekly Progress -->
-    <div class="tl-card">
-      <div class="tlc-head">
-        <span class="tlc-title">Weekly Progress</span>
-        <span class="tlc-goal">@((int)Model.WeekGoal)h goal</span>
-      </div>
-      <div class="prog-ring-wrap">
-        <svg width="140" height="140" viewBox="0 0 120 120" class="prog-svg">
-          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--line)" stroke-width="9"/>
-          <circle cx="60" cy="60" r="50" fill="none"
-                  stroke="@(Model.WeekPctInt >= 100 ? "#10b981" : Model.WeekPctInt >= 50 ? "#6366f1" : "#f59e0b")"
-                  stroke-width="9" stroke-linecap="round"
-                  stroke-dasharray="314.159"
-                  stroke-dashoffset="@Model.SvgOffset.ToString("F1")"
-                  transform="rotate(-90 60 60)"/>
-        </svg>
-        <div class="prog-inner">
-          <div class="prog-pct">@Model.WeekPctInt<span class="prog-sym">%</span></div>
-          <div class="prog-hrs">@Model.WeekTotalFormatted</div>
-          <div class="prog-goal-lbl">/ @((int)Model.WeekGoal)h</div>
         </div>
-      </div>
-      <p class="prog-msg">@Model.ProgressMessage</p>
+      }
+
     </div>
 
-    <!-- AI Insight -->
-    <div class="tl-card ai-insight-card" id="insightCard">
-      <div class="tlc-head">
-        <span class="tlc-title">✦ Your week, in plain English</span>
-      </div>
-      <p class="ai-insight-text" id="insightText">Loading…</p>
+    <!-- Quick chips -->
+    <div class="wb-chips">
+      <button class="wb-chip" onclick="wbSendChip('Morning standup 15 min')">☕ Standup</button>
+      <button class="wb-chip" onclick="wbSendChip('Team meeting 1 hour')">💬 Meeting</button>
+      <button class="wb-chip" onclick="wbSendChip('Code review 1 hour')">🔍 Review</button>
+      <button class="wb-chip" onclick="wbSendChip('Bug fixing 2 hours')">🐛 Bug fix</button>
+      <button class="wb-chip" onclick="wbSendChip('Writing documentation 1 hour')">📝 Docs</button>
+      <button class="wb-chip" onclick="wbSendChip('what did I log today?')">📋 Today</button>
+      <button class="wb-chip" onclick="wbSendChip('show this week')">📊 This week</button>
+      <button class="wb-chip" onclick="openShareModal()">✨ Share</button>
     </div>
 
-    <!-- Export Timesheet -->
-    <div class="tl-card">
-      <div class="tlc-head">
-        <span class="tlc-title">Export Timesheet</span>
+    <!-- Input bar -->
+    <div class="wb-bar">
+      <button class="wb-mic" id="wbMicBtn" onclick="wbToggleVoice()" title="Voice input (hold to speak)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v6a2 2 0 0 0 4 0V5a2 2 0 0 0-2-2zm7 7a1 1 0 0 1 1 1 8 8 0 0 1-16 0 1 1 0 0 1 2 0 6 6 0 0 0 12 0 1 1 0 0 1 1-1zm-7 11v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 2 0z"/></svg>
+      </button>
+      <div class="wb-ta-wrap">
+        <textarea id="wbInput" class="wb-ta"
+                  placeholder="What did you work on? e.g. 'Fixed login bug 2h, reviewed 3 PRs 1h, sprint planning 45min…'"
+                  rows="1"
+                  onkeydown="wbKeydown(event)"
+                  oninput="wbAutosize(this)"></textarea>
+        <button class="wb-ta-send" id="wbSendBtn" onclick="wbSend()" title="Send (Enter)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
       </div>
-      <div class="exp-row">
-        <a asp-controller="Timesheet" asp-action="ExportCsv" class="exp-btn exp-csv">
-          📊 CSV
-        </a>
-        <a asp-controller="Timesheet" asp-action="Index" class="exp-btn exp-view">
-          📄 View
-        </a>
-        <a asp-controller="Timesheet" asp-action="ExportCsv" class="exp-btn exp-xl">
-          ⬇️ Excel
-        </a>
-      </div>
-    </div>
-
-    <!-- Quick stats -->
-    <div class="tl-card">
-      <div class="qs-row">
-        <div class="qs-stat">
-          <span class="qs-num">@Model.Streak</span>
-          <span class="qs-lbl">day streak 🔥</span>
-        </div>
-        <div class="qs-div"></div>
-        <div class="qs-stat">
-          <span class="qs-num">@Model.TodayHours h</span>
-          <span class="qs-lbl">today</span>
-        </div>
-        <div class="qs-div"></div>
-        <div class="qs-stat">
-          <span class="qs-num">@Model.ProjectsCount</span>
-          <span class="qs-lbl">projects</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Teams / Webhook integration -->
-    <div class="tl-card" id="teams-section" style="display:none">
-      <div class="tlc-head">
-        <span class="tlc-title">🔗 Teams Integration</span>
-        <button onclick="document.getElementById('teams-section').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--muted)">✕</button>
-      </div>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">Log from Microsoft Teams with one message. Your API key:</p>
-      <div id="apiKeyWrap" style="font-size:11.5px;color:var(--muted)">Loading…</div>
-      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">
-        <p style="font-size:11.5px;color:var(--muted);line-height:1.6">
-          <strong>How to connect Teams:</strong><br>
-          1. In Teams, go to a channel → <em>Workflows</em> → <em>+ New</em><br>
-          2. Use "When a message is posted" trigger<br>
-          3. Add HTTP action → POST to:<br>
-          <code style="font-size:10.5px;background:var(--surface);padding:2px 6px;border-radius:4px;display:block;margin:4px 0;word-break:break-all">https://your-domain.com/api/webhook/log</code>
-          4. Body: <code style="font-size:10.5px;background:var(--surface);padding:1px 5px;border-radius:4px">&#123;"apiKey":"YOUR_KEY","text":"@@message"&#125;</code>
-        </p>
-        <button onclick="regenerateKey()" style="margin-top:8px;font-size:11px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer">↻ Regenerate key</button>
-      </div>
-    </div>
-
-    <!-- Share your week -->
-    <div class="tl-card share-cta-card">
-      <div class="share-cta-inner">
-        <div class="share-cta-icon">✦</div>
-        <div>
-          <div class="share-cta-title">Share your week</div>
-          <div class="share-cta-sub">Post your progress to LinkedIn, Instagram &amp; more</div>
-        </div>
-      </div>
-      <button class="share-cta-btn" onclick="openShareModal()">Create share card →</button>
     </div>
 
   </div>
 </div>
+
+<!-- Mobile sidebar overlay -->
+<div class="wb-overlay" id="wbOverlay" onclick="wbCloseSidebar()"></div>
 
 <!-- ══ SHARE MODAL ═══════════════════════════════════════════════════════════ -->
 <div id="shareModal" class="sm-overlay hidden" onclick="if(event.target===this)closeShareModal()">
@@ -274,16 +273,13 @@
       <button class="sm-close" onclick="closeShareModal()">✕</button>
     </div>
 
-    <!-- The card that gets captured -->
     <div class="sm-card-wrap">
       <div id="shareCard" class="sc-card">
         <div class="sc-top">
           <span class="sc-logo">worklog<span>.</span></span>
           <span class="sc-week">Week of @weekLabel</span>
         </div>
-
         <div class="sc-name">@Model.FirstName's work week</div>
-
         <div class="sc-stats">
           <div class="sc-stat">
             <span class="sc-num">@Model.WeekTotalFormatted</span>
@@ -300,15 +296,12 @@
             <span class="sc-lbl">projects</span>
           </div>
         </div>
-
-        <!-- Progress bar -->
         <div class="sc-prog-wrap">
           <div class="sc-prog-bar">
             <div class="sc-prog-fill" style="width:@Math.Min(100,Model.WeekPctInt)%"></div>
           </div>
           <span class="sc-prog-lbl">@Model.WeekPctInt% of weekly goal</span>
         </div>
-
         @if (!string.IsNullOrWhiteSpace(Model.TopProject))
         {
           <div class="sc-top-proj">
@@ -317,41 +310,36 @@
             <span class="sc-proj-hrs">@Model.TopProjectHours h</span>
           </div>
         }
-
         <div class="sc-msg">@Model.ProgressMessage</div>
-
         <div class="sc-footer">Tracked with worklog · worklog.app</div>
       </div>
     </div>
 
-    <!-- Share actions -->
     <div class="sm-actions">
       <button class="sm-btn sm-li" onclick="shareLinkedIn()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
         LinkedIn
       </button>
-      <button class="sm-btn sm-fb" onclick="shareFacebook()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-        Facebook
-      </button>
       <button class="sm-btn sm-tw" onclick="shareTwitter()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
         X / Twitter
       </button>
+      <button class="sm-btn sm-fb" onclick="shareFacebook()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook
+      </button>
       <button class="sm-btn sm-ig" onclick="downloadCard()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-        Download for Instagram
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        Download
       </button>
     </div>
 
-    <!-- LinkedIn copy box -->
     <div id="liCopyBox" class="sm-copy-box hidden">
       <p class="sm-copy-label">Copy this text, then paste into your LinkedIn post:</p>
       <textarea id="liCopyText" class="sm-copy-ta" readonly></textarea>
       <button class="sm-copy-btn" onclick="copyLinkedInText()">📋 Copy to clipboard</button>
       <span id="copiedConfirm" class="sm-copied hidden">✓ Copied!</span>
     </div>
-
   </div>
 </div>
 
@@ -367,135 +355,374 @@
         "Design"        => "#ec4899",
         _               => "#94a3b8",
     };
-    static string CategoryColorBg(string cat) => cat switch {
-        "Development"   => "#dbeafe",
-        "Meeting"       => "#fef3c7",
-        "Code Review"   => "#d1fae5",
-        "Testing"       => "#ede9fe",
-        "Documentation" => "#cffafe",
-        "DevOps"        => "#fee2e2",
-        "Research"      => "#e0e7ff",
-        "Design"        => "#fce7f3",
-        _               => "#f1f5f9",
-    };
 }
 
 @section Scripts {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script>
+// ── Apply full-screen mode ────────────────────────────────────────────────
+document.body.classList.add('wb-page');
+
+// ── Server data ───────────────────────────────────────────────────────────
+const WB = {
+  firstName:  @Json.Serialize(Model.FirstName),
+  todayLogs:  @Html.Raw(System.Text.Json.JsonSerializer.Serialize(todayLogs.Select(l => new {
+                  id = l.Id, description = l.Description, project = l.Project,
+                  hours = l.Hours, category = l.Tags
+              }))),
+  weekDays:   @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.WeekDays.Select(d => new {
+                  name = d.Name, hours = d.Hours, isToday = d.IsToday,
+                  isFuture = d.IsFuture, formatted = d.Formatted
+              }))),
+  weekTotal:  @Json.Serialize(Model.WeekTotalFormatted),
+  weekPct:    @Model.WeekPctInt,
+  weekGoal:   @((int)Model.WeekGoal),
+  streak:     @Model.Streak,
+  todayHours: @Model.TodayHours,
+  topProject: @Json.Serialize(Model.TopProject),
+};
+
 const CAT_COLORS = {
   'Development':'#3b82f6','Meeting':'#f59e0b','Code Review':'#10b981',
   'Testing':'#8b5cf6','Documentation':'#06b6d4','DevOps':'#ef4444',
   'Research':'#6366f1','Design':'#ec4899','Other':'#94a3b8',
 };
 
-// ── Chat Log ──────────────────────────────────────────────────────────────────
-const clogFeed = document.getElementById('clogFeed');
+// ── DOM refs ──────────────────────────────────────────────────────────────
+const feed    = document.getElementById('wbFeed');
+const inp     = document.getElementById('wbInput');
+const sendBtn = document.getElementById('wbSendBtn');
+const micBtn  = document.getElementById('wbMicBtn');
 
-function clogEnter(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendLog(); }
+// ── Input helpers ─────────────────────────────────────────────────────────
+function wbKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wbSend(); }
+}
+function wbAutosize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+function wbSendChip(text) {
+  inp.value = text; wbAutosize(inp); inp.focus(); wbSend();
 }
 
-function sendChip(text) {
-  document.getElementById('clogInput').value = text;
-  sendLog();
-}
-
-function appendMsg(html) {
-  const d = document.createElement('div');
-  d.innerHTML = html;
-  clogFeed.appendChild(d.firstElementChild);
-  clogFeed.scrollTop = clogFeed.scrollHeight;
-}
-
-async function sendLog() {
-  const inp  = document.getElementById('clogInput');
+// ── Main send ─────────────────────────────────────────────────────────────
+async function wbSend() {
   const text = inp.value.trim();
   if (!text) return;
 
-  appendMsg(`<div class="cmsg cuser"><div class="cmsg-user-bub">${escHtml(text)}</div></div>`);
-  inp.value = '';
-  inp.disabled = true;
-  const sb = document.getElementById('clogSendBtn');
-  sb.disabled = true;
+  appendUser(text);
+  inp.value = ''; wbAutosize(inp);
+  inp.disabled = true; sendBtn.disabled = true;
 
-  const tid = 'ty' + Date.now();
-  appendMsg(`<div class="cmsg cbot" id="${tid}"><div class="cmsg-av">✦</div><div class="cmsg-bub cmsg-typing"><span></span><span></span><span></span></div></div>`);
+  const intent = detectIntent(text);
+  switch (intent) {
+    case 'today':     await handleToday();          break;
+    case 'week':      await handleWeek();           break;
+    case 'share':     handleShare();                break;
+    case 'recurring': handleRecurring();            break;
+    case 'help':      handleHelp();                 break;
+    default:          await handleLog(text);        break;
+  }
 
+  inp.disabled = false; sendBtn.disabled = false; inp.focus();
+}
+
+// ── Intent detection ──────────────────────────────────────────────────────
+function detectIntent(text) {
+  const t = text.toLowerCase().trim();
+  if (/^(today\??|what (did|have) i|show.*today|my.*log|log.*today|done today)/.test(t) || t === 'today') return 'today';
+  if (/\b(this week|weekly|show.*week|week.*stat|how.*week|week.*hour)\b/.test(t)) return 'week';
+  if (/\b(share|post to|linkedin|twitter|social media)\b/.test(t)) return 'share';
+  if (/\b(recurring|repeat|daily|scheduled|template)\b/.test(t)) return 'recurring';
+  if (/^(\?|help|what can|commands|how to use|\/help)/.test(t)) return 'help';
+  return 'log';
+}
+
+// ── Message builders ──────────────────────────────────────────────────────
+function appendUser(text) {
+  const div = document.createElement('div');
+  div.className = 'wb-msg wb-msg-user';
+  div.innerHTML = `<div class="wb-bub wb-bub-user">${escHtml(text).replace(/\n/g, '<br>')}</div>`;
+  feed.appendChild(div);
+  scrollFeed();
+}
+
+function showTyping() {
+  const id = 'wbty' + Date.now();
+  const div = document.createElement('div');
+  div.id = id; div.className = 'wb-msg wb-msg-bot';
+  div.innerHTML = `<div class="wb-av">✦</div><div class="wb-bub wb-bub-bot wb-typing"><span></span><span></span><span></span></div>`;
+  feed.appendChild(div);
+  scrollFeed();
+  return id;
+}
+
+function removeTyping(id) { document.getElementById(id)?.remove(); }
+
+function appendBot(html) {
+  const div = document.createElement('div');
+  div.className = 'wb-msg wb-msg-bot';
+  div.innerHTML = `<div class="wb-av">✦</div><div class="wb-bub wb-bub-bot">${html}</div>`;
+  feed.appendChild(div);
+  scrollFeed();
+  return div.querySelector('.wb-bub-bot');
+}
+
+async function appendBotTyped(text) {
+  const tid = showTyping();
+  await delay(420 + Math.random() * 280);
+  removeTyping(tid);
+  const bub = appendBot('');
+  const chars = [...text];
+  let i = 0;
+  await new Promise(resolve => {
+    const t = setInterval(() => {
+      bub.innerHTML = escHtml(chars.slice(0, ++i).join('')).replace(/\n/g, '<br>');
+      scrollFeed();
+      if (i >= chars.length) { clearInterval(t); resolve(); }
+    }, 14);
+  });
+  return bub;
+}
+
+function scrollFeed() { feed.scrollTop = feed.scrollHeight; }
+
+// ── Intent handlers ───────────────────────────────────────────────────────
+async function handleLog(text) {
+  const tid = showTyping();
   try {
     const res = await fetch('/Logs/ChatLog', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }),
     });
-    document.getElementById(tid)?.remove();
+    removeTyping(tid);
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      appendMsg(`<div class="cmsg cbot"><div class="cmsg-av">✦</div><div class="cmsg-bub cmsg-bub-err">⚠ ${escHtml(err.error ?? 'Something went wrong. Try again.')}</div></div>`);
+      appendBot(`<span style="color:var(--red)">⚠ ${escHtml(err.error ?? 'Something went wrong. Please try again.')}</span>`);
       return;
     }
 
     const data = await res.json();
-    const rows = [...data.entries].map(e =>
-      `<div class="cmsg-entry-row">
-        <span class="cmsg-dot" style="background:${CAT_COLORS[e.category] ?? '#94a3b8'}"></span>
-        <span class="cmsg-desc">${escHtml(e.description)}</span>
-        <span class="cmsg-proj">${escHtml(e.project)}</span>
-        <span class="cmsg-hrs">${e.hours}h</span>
+    const rows = data.entries.map(e =>
+      `<div class="wb-entry-row">
+        <span class="wb-entry-dot" style="background:${CAT_COLORS[e.category] ?? '#94a3b8'}"></span>
+        <span class="wb-entry-desc">${escHtml(e.description)}</span>
+        <span class="wb-entry-proj">${escHtml(e.project)}</span>
+        <span class="wb-entry-hrs">${e.hours}h</span>
       </div>`
     ).join('');
-
-    appendMsg(`<div class="cmsg cbot">
-      <div class="cmsg-av">✦</div>
-      <div class="cmsg-bub">
-        <strong>✅ Logged ${data.entries.length} item${data.entries.length !== 1 ? 's' : ''}!</strong>
-        <div class="cmsg-entries">${rows}</div>
-        <div class="cmsg-total">Total saved: <strong>${data.total}h</strong></div>
-      </div>
-    </div>`);
-
+    appendBot(
+      `<strong>✅ Logged ${data.entries.length} item${data.entries.length !== 1 ? 's' : ''}!</strong>` +
+      `<div class="wb-entries">${rows}</div>` +
+      `<div class="wb-log-total">Total saved: <strong>${data.total}h</strong> today · Page refreshes in a moment…</div>`
+    );
     showToast(`✓ ${data.entries.length} item${data.entries.length !== 1 ? 's' : ''} logged!`);
-    setTimeout(() => window.location.reload(), 1500);
+    setTimeout(() => location.reload(), 2200);
 
   } catch {
-    document.getElementById(tid)?.remove();
-    appendMsg(`<div class="cmsg cbot"><div class="cmsg-av">✦</div><div class="cmsg-bub cmsg-bub-err">⚠ Network error. Please try again.</div></div>`);
-  } finally {
-    inp.disabled = false;
-    sb.disabled = false;
-    inp.focus();
+    removeTyping(tid);
+    appendBot(`<span style="color:var(--red)">⚠ Network error. Please try again.</span>`);
   }
 }
 
-// ── AI Insight ────────────────────────────────────────────────────────────────
+async function handleToday() {
+  const tid = showTyping();
+  await delay(550);
+  removeTyping(tid);
+  if (!WB.todayLogs.length) {
+    appendBot("Nothing logged yet today. Tell me what you've been working on and I'll save it automatically!");
+    return;
+  }
+  const total = WB.todayLogs.reduce((s, e) => s + Number(e.hours), 0);
+  const rows = WB.todayLogs.map(e =>
+    `<div class="wb-entry-row">
+      <span class="wb-entry-dot" style="background:${CAT_COLORS[e.category] ?? '#94a3b8'}"></span>
+      <span class="wb-entry-desc">${escHtml(e.description)}</span>
+      <span class="wb-entry-proj">${escHtml(e.project)}</span>
+      <span class="wb-entry-hrs">${e.hours}h</span>
+    </div>`
+  ).join('');
+  appendBot(`<strong>📋 Today's log — ${total.toFixed(1)}h total</strong><div class="wb-entries">${rows}</div>`);
+}
+
+async function handleWeek() {
+  const tid = showTyping();
+  await delay(650);
+  removeTyping(tid);
+  const maxH = Math.max(...WB.weekDays.map(d => d.hours), 1);
+  const bars = WB.weekDays.map(d => {
+    const w = Math.round(d.hours / maxH * 100);
+    const color = d.isToday ? 'var(--accent)' : d.hours > 0 ? 'var(--accent-2)' : 'var(--line)';
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <span style="width:26px;font-size:11px;color:${d.isToday ? 'var(--accent)' : 'var(--muted)'};font-weight:${d.isToday ? 700 : 400};text-align:right;flex-shrink:0">${escHtml(d.name)}</span>
+      <div style="flex:1;height:7px;border-radius:99px;background:var(--line);overflow:hidden">
+        <div style="width:${w}%;height:100%;border-radius:99px;background:${color};transition:width .4s"></div>
+      </div>
+      <span style="font-size:12px;font-weight:${d.isToday ? 700 : 500};color:${d.isToday ? 'var(--accent)' : 'var(--text)'};width:32px;flex-shrink:0">${escHtml(d.formatted)}</span>
+    </div>`;
+  }).join('');
+  const streakLine = WB.streak > 1 ? `<div style="margin-top:8px;font-size:13px;color:var(--muted)">🔥 ${WB.streak}-day logging streak — keep it up!</div>` : '';
+  appendBot(
+    `<strong>📊 This week — ${escHtml(WB.weekTotal)} of ${WB.weekGoal}h goal (${WB.weekPct}%)</strong>` +
+    `<div style="margin-top:10px">${bars}</div>` +
+    streakLine
+  );
+}
+
+function handleShare() {
+  appendBot('Opening your share card ✨ Ready to post your progress to LinkedIn, Twitter, or download for Instagram!');
+  setTimeout(() => openShareModal(), 300);
+}
+
+function handleRecurring() {
+  appendBot(
+    `<strong>↺ Recurring Tasks</strong><br>` +
+    `<span style="font-size:13px;color:var(--muted)">Recurring entries auto-log daily, weekly, or on weekdays — you don't have to remember them.</span><br>` +
+    `<a href="/Recurring" style="color:var(--accent);font-size:13px;font-weight:600;margin-top:6px;display:inline-block">Manage recurring tasks →</a>`
+  );
+}
+
+function handleHelp() {
+  appendBot(
+    `<strong>Here's what I can do:</strong>` +
+    `<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;font-size:13px">` +
+    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">log work</span> <span style="color:var(--text-2);margin-left:6px">Just describe it: "Fixed auth bug 2h, standup 15min"</span></div>` +
+    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">today</span> <span style="color:var(--text-2);margin-left:6px">Show what you've logged today</span></div>` +
+    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">this week</span> <span style="color:var(--text-2);margin-left:6px">Week summary with day-by-day breakdown</span></div>` +
+    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">share</span> <span style="color:var(--text-2);margin-left:6px">Create a shareable card for LinkedIn, Twitter, Instagram</span></div>` +
+    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">recurring</span> <span style="color:var(--text-2);margin-left:6px">Manage auto-logging templates</span></div>` +
+    `</div>` +
+    `<div style="margin-top:10px;font-size:12px;color:var(--muted)">💡 Tip: Use the 🎤 mic button for voice input on mobile!</div>`
+  );
+}
+
+// ── Voice input ───────────────────────────────────────────────────────────
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null, recogActive = false;
+
+function wbToggleVoice() {
+  if (!SR) { showToast('Voice input requires Chrome or Safari.'); return; }
+  recogActive ? stopVoice() : startVoice();
+}
+
+function startVoice() {
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  recognition.onstart  = () => { recogActive = true;  micBtn.classList.add('wbmic-on'); };
+  recognition.onend    = () => stopVoice();
+  recognition.onerror  = () => stopVoice();
+  recognition.onresult = (e) => {
+    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    inp.value = transcript; wbAutosize(inp);
+    if (e.results[e.results.length - 1].isFinal) stopVoice();
+  };
+  recognition.start();
+}
+
+function stopVoice() {
+  recogActive = false;
+  micBtn.classList.remove('wbmic-on');
+  try { recognition?.stop(); } catch {}
+}
+
+// ── Sidebar (mobile) ──────────────────────────────────────────────────────
+function wbToggleSidebar() {
+  const sb = document.getElementById('wbSidebar');
+  const ov = document.getElementById('wbOverlay');
+  sb.classList.toggle('open'); ov.classList.toggle('open');
+}
+function wbCloseSidebar() {
+  document.getElementById('wbSidebar').classList.remove('open');
+  document.getElementById('wbOverlay').classList.remove('open');
+}
+
+// ── Today entry edit (sidebar) ────────────────────────────────────────────
+function wbStartEdit(id) {
+  document.getElementById(`wbtl-${id}`).querySelector('.wb-tl-view').classList.add('hidden');
+  document.getElementById(`wbedit-${id}`).classList.remove('hidden');
+  document.querySelector(`#wbedit-${id} .wb-tl-idesc`).focus();
+}
+function wbCancelEdit(id) {
+  document.getElementById(`wbedit-${id}`).classList.add('hidden');
+  document.getElementById(`wbtl-${id}`).querySelector('.wb-tl-view').classList.remove('hidden');
+}
+async function wbSaveEdit(id) {
+  const wrap = document.getElementById(`wbedit-${id}`);
+  const desc = wrap.querySelector('.wb-tl-idesc').value.trim();
+  const hrs  = parseFloat(wrap.querySelector('.wb-tl-ihrs').value);
+  const cat  = wrap.querySelector('.wb-tl-icat').value;
+  if (!desc || isNaN(hrs) || hrs <= 0) { showErr('Description and hours are required.'); return; }
+  try {
+    const res = await fetch('/Logs/EditLog', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, description: desc, hours: hrs, category: cat }),
+    });
+    if (res.ok) location.reload();
+    else showErr('Could not save — please try again.');
+  } catch { showErr('Network error.'); }
+}
+
+// ── Teams sidebar ─────────────────────────────────────────────────────────
+async function wbToggleTeams() {
+  const card = document.getElementById('wbTeamsCard');
+  const visible = card.style.display !== 'none';
+  card.style.display = visible ? 'none' : '';
+  if (!visible) {
+    const wrap = document.getElementById('wbApiKeyWrap');
+    try {
+      const res = await fetch('/Account/ApiKey');
+      if (!res.ok) { wrap.textContent = 'Could not load key.'; return; }
+      const { apiKey } = await res.json();
+      wrap.innerHTML = `<code style="font-size:10.5px;background:var(--bg);padding:4px 8px;border-radius:6px;display:block;word-break:break-all;font-family:monospace;letter-spacing:.3px">${escHtml(apiKey)}</code>`;
+    } catch { wrap.textContent = 'Error loading key.'; }
+  }
+}
+async function wbRegenerateKey() {
+  if (!confirm('Regenerate API key? Your Teams integration will stop working until updated.')) return;
+  const tok = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+  try {
+    const res = await fetch('/Account/RegenerateKey', { method: 'POST', headers: { 'RequestVerificationToken': tok } });
+    if (res.ok) { wbToggleTeams(); wbToggleTeams(); showToast('✓ API key regenerated'); }
+    else showErr('Could not regenerate.');
+  } catch { showErr('Network error.'); }
+}
+
+// ── AI Weekly Insight ─────────────────────────────────────────────────────
 (async () => {
   try {
     const res = await fetch('/Logs/WeeklyInsight');
     if (res.ok) {
       const { insight } = await res.json();
-      document.getElementById('insightText').textContent = insight;
+      document.getElementById('wbInsightText').textContent = insight;
     }
-  } catch { document.getElementById('insightText').textContent = 'Log more this week to see your patterns here.'; }
+  } catch { document.getElementById('wbInsightText').textContent = 'Log more to see weekly patterns here.'; }
 })();
 
-// ── Social share ──────────────────────────────────────────────────────────────
+// ── Share modal ───────────────────────────────────────────────────────────
 function openShareModal()  { document.getElementById('shareModal').classList.remove('hidden'); }
-function closeShareModal() { document.getElementById('shareModal').classList.add('hidden'); document.getElementById('liCopyBox').classList.add('hidden'); }
+function closeShareModal() {
+  document.getElementById('shareModal').classList.add('hidden');
+  document.getElementById('liCopyBox').classList.add('hidden');
+}
 
 function buildLinkedInText() {
-  const hrs     = @Json.Serialize(Model.WeekTotalFormatted);
-  const streak  = @Model.Streak;
-  const proj    = @Model.ProjectsCount;
-  const pct     = @Model.WeekPctInt;
-  const topProj = @Json.Serialize(Model.TopProject);
-  const weekOf  = @Json.Serialize(weekShort);
-  let lines = [
+  const hrs    = @Json.Serialize(Model.WeekTotalFormatted);
+  const streak = @Model.Streak;
+  const proj   = @Model.ProjectsCount;
+  const pct    = @Model.WeekPctInt;
+  const topPr  = @Json.Serialize(Model.TopProject);
+  const weekOf = @Json.Serialize(weekShort);
+  const lines  = [
     `📊 My work wrap for the week of ${weekOf}:`, ``,
-    `⏱ ${hrs} logged across ${proj} project${proj===1?'':'s'}`,
+    `⏱ ${hrs} logged across ${proj} project${proj === 1 ? '' : 's'}`,
     streak > 1 ? `🔥 ${streak}-day logging streak` : null,
     pct >= 100 ? `✅ Hit my weekly goal!` : `📈 ${pct}% of weekly goal reached`,
-    topProj ? `🚀 Top project: ${topProj}` : null, ``,
+    topPr ? `🚀 Top project: ${topPr}` : null, ``,
     `Tracking my work consistently has changed how I plan, reflect, and grow.`, ``,
     `#WorkLog #Productivity #CareerGrowth #WorkLife`,
   ].filter(l => l !== null);
@@ -505,18 +732,17 @@ function buildLinkedInText() {
 function shareLinkedIn() {
   document.getElementById('liCopyText').value = buildLinkedInText();
   document.getElementById('liCopyBox').classList.remove('hidden');
-  document.getElementById('liCopyBox').scrollIntoView({ behavior:'smooth' });
+  document.getElementById('liCopyBox').scrollIntoView({ behavior: 'smooth' });
   setTimeout(() => window.open('https://www.linkedin.com/feed/', '_blank'), 600);
 }
 function shareFacebook() {
-  const text = encodeURIComponent(buildLinkedInText());
-  window.open(`https://www.facebook.com/sharer/sharer.php?quote=${text}&u=https://worklog.app`, '_blank');
+  window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(buildLinkedInText())}&u=https://worklog.app`, '_blank');
 }
 function shareTwitter() {
   const hrs    = @Json.Serialize(Model.WeekTotalFormatted);
   const streak = @Model.Streak;
   const pct    = @Model.WeekPctInt;
-  const t = encodeURIComponent(`📊 This week: ${hrs} logged, ${streak}-day streak, ${pct}% of goal reached. Consistency is everything. #WorkLog #Productivity`);
+  const t      = encodeURIComponent(`📊 This week: ${hrs} logged, ${streak}-day streak, ${pct}% of goal reached. Consistency is everything. #WorkLog #Productivity`);
   window.open(`https://x.com/intent/tweet?text=${t}`, '_blank');
 }
 function copyLinkedInText() {
@@ -527,81 +753,27 @@ function copyLinkedInText() {
   c.classList.remove('hidden'); setTimeout(() => c.classList.add('hidden'), 2500);
 }
 async function downloadCard() {
-  if (!window.html2canvas) { showErr('Downloading…'); return; }
+  if (!window.html2canvas) { showErr('Image library still loading…'); return; }
   const card = document.getElementById('shareCard');
   try {
-    const canvas = await html2canvas(card, { scale:3, useCORS:true, backgroundColor:null });
-    const a = document.createElement('a'); a.download='worklog-week.png';
+    const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: null });
+    const a = document.createElement('a'); a.download = 'worklog-week.png';
     a.href = canvas.toDataURL('image/png'); a.click();
   } catch { showErr('Could not generate image — try a different browser.'); }
 }
 
-// ── Inline log card editing ───────────────────────────────────────────────────
-function startEdit(id) {
-  document.querySelector(`#lc-${id} .tts-card-view`).classList.add('hidden');
-  document.getElementById(`edit-${id}`).classList.remove('hidden');
-  document.querySelector(`#edit-${id} .tce-desc`).focus();
-}
-function cancelEdit(id) {
-  document.getElementById(`edit-${id}`).classList.add('hidden');
-  document.querySelector(`#lc-${id} .tts-card-view`).classList.remove('hidden');
-}
-
-async function saveEdit(id) {
-  const wrap = document.getElementById(`edit-${id}`);
-  const desc = wrap.querySelector('.tce-desc').value.trim();
-  const hrs  = parseFloat(wrap.querySelector('.tce-hrs').value);
-  const proj = wrap.querySelector('.tce-proj').value.trim();
-  const cat  = wrap.querySelector('.tce-cat').value;
-
-  if (!desc || isNaN(hrs) || hrs <= 0) { showErr('Description and hours are required.'); return; }
-
-  try {
-    const res = await fetch('/Logs/EditLog', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ id, description: desc, hours: hrs, project: proj, category: cat }),
-    });
-    if (res.ok) { window.location.reload(); }
-    else { showErr('Could not save — please try again.'); }
-  } catch { showErr('Network error.'); }
-}
-
-// ── Teams integration ─────────────────────────────────────────────────────────
-async function revealTeams(e) {
-  e.preventDefault();
-  const sec = document.getElementById('teams-section');
-  const visible = sec.style.display !== 'none';
-  sec.style.display = visible ? 'none' : '';
-  if (!visible) loadApiKey();
-}
-async function loadApiKey() {
-  const wrap = document.getElementById('apiKeyWrap');
-  try {
-    const res = await fetch('/Account/ApiKey');
-    if (!res.ok) { wrap.textContent = 'Could not load key.'; return; }
-    const { apiKey } = await res.json();
-    wrap.innerHTML = `<code style="font-size:11px;background:var(--surface);padding:4px 10px;border-radius:6px;display:block;letter-spacing:.6px;word-break:break-all;font-family:monospace">${escHtml(apiKey)}</code>`;
-  } catch { wrap.textContent = 'Error loading key.'; }
-}
-async function regenerateKey() {
-  if (!confirm('Regenerate API key? Your Teams integration will stop working until updated.')) return;
-  const tok = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
-  try {
-    const res = await fetch('/Account/RegenerateKey', { method:'POST', headers:{'RequestVerificationToken': tok } });
-    if (res.ok) { loadApiKey(); showToast('✓ API key regenerated'); }
-  } catch { showErr('Could not regenerate.'); }
-}
-
-function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+// ── Utils ─────────────────────────────────────────────────────────────────
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function showErr(msg) {
-  const d=document.createElement('div');
-  d.className='toast-wrap toast-err'; d.innerHTML=`<div class="toast">${msg}</div>`;
-  document.body.appendChild(d); setTimeout(()=>d.remove(),4500);
+  const d = document.createElement('div');
+  d.className = 'toast-wrap toast-err'; d.innerHTML = `<div class="toast">${msg}</div>`;
+  document.body.appendChild(d); setTimeout(() => d.remove(), 4500);
 }
 function showToast(msg) {
-  const d=document.createElement('div');
-  d.className='toast-wrap toast-ok'; d.innerHTML=`<div class="toast">${msg}</div>`;
-  document.body.appendChild(d); setTimeout(()=>d.remove(),3000);
+  const d = document.createElement('div');
+  d.className = 'toast-wrap toast-ok'; d.innerHTML = `<div class="toast">${msg}</div>`;
+  document.body.appendChild(d); setTimeout(() => d.remove(), 3000);
 }
 </script>
 }

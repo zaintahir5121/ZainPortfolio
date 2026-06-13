@@ -1,0 +1,222 @@
+@model WorkLogApp.Models.ViewModels.RegisterViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Create account";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create account — WorkLog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+  <style>
+    .reg-page {
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:24px; background:#080818;
+      background-image:
+        radial-gradient(ellipse 70% 55% at 20% 20%, rgba(99,102,241,.4) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 50% at 85% 80%, rgba(139,92,246,.28) 0%, transparent 60%);
+    }
+    .reg-wrap { width:100%; max-width:440px; }
+    .reg-logo { font-size:22px; font-weight:800; color:white; letter-spacing:-.5px; margin-bottom:32px; }
+    .reg-logo span { color:#a78bfa; }
+
+    /* chat bubbles */
+    .chat-bubble {
+      display:flex; gap:10px; align-items:flex-start; margin-bottom:24px;
+      animation:slideIn .3s ease;
+    }
+    .chat-avatar {
+      width:32px; height:32px; border-radius:50%;
+      background:linear-gradient(135deg,#6366f1,#8b5cf6);
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; font-weight:800; color:white; flex-shrink:0; margin-top:2px;
+    }
+    .chat-msg {
+      background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.1);
+      border-radius:0 14px 14px 14px; padding:12px 16px;
+      font-size:14px; color:rgba(255,255,255,.85); line-height:1.5;
+    }
+    .chat-msg strong { color:white; }
+
+    /* steps */
+    .reg-step { display:none; }
+    .reg-step.active { display:block; animation:slideIn .35s ease; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+    /* input card */
+    .reg-input-card {
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+      border-radius:16px; padding:20px; margin-bottom:16px;
+    }
+    .reg-input-card label { display:block; font-size:12px; font-weight:600; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+    .reg-input-card input {
+      width:100%; background:transparent; border:none; outline:none;
+      font-size:18px; font-weight:600; color:white; font-family:inherit;
+      padding:0; caret-color:#a78bfa;
+    }
+    .reg-input-card input::placeholder { color:rgba(255,255,255,.2); font-weight:400; }
+
+    .reg-err { font-size:13px; color:#f87171; margin-bottom:12px; padding:10px 14px; background:rgba(239,68,68,.1); border-radius:10px; border:1px solid rgba(239,68,68,.2); }
+
+    .reg-next-btn {
+      width:100%; padding:14px; border-radius:12px; font-size:15px; font-weight:700;
+      cursor:pointer; border:none; transition:all .15s;
+      background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white;
+      box-shadow:0 6px 24px rgba(99,102,241,.4);
+    }
+    .reg-next-btn:hover { transform:translateY(-1px); box-shadow:0 10px 32px rgba(99,102,241,.5); }
+    .reg-next-btn:disabled { opacity:.5; transform:none; cursor:not-allowed; }
+
+    .reg-progress { display:flex; gap:6px; margin-bottom:28px; }
+    .reg-progress span { height:3px; border-radius:99px; flex:1; background:rgba(255,255,255,.1); transition:background .3s; }
+    .reg-progress span.done { background:#6366f1; }
+    .reg-progress span.active { background:#a78bfa; }
+
+    .reg-login-link { text-align:center; margin-top:20px; font-size:13px; color:rgba(255,255,255,.4); }
+    .reg-login-link a { color:#a78bfa; text-decoration:none; font-weight:600; }
+    .reg-login-link a:hover { color:#c4b5fd; }
+  </style>
+</head>
+<body>
+
+<div class="reg-page">
+  <div class="reg-wrap">
+
+    <div class="reg-logo">worklog<span>.</span></div>
+
+    <!-- progress bar -->
+    <div class="reg-progress" id="progress">
+      <span class="active" id="p1"></span>
+      <span id="p2"></span>
+      <span id="p3"></span>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+      <div class="reg-err">
+        @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+          <div>@e.ErrorMessage</div>
+        }
+      </div>
+    }
+
+    <form asp-controller="Account" asp-action="Register" method="post" id="regForm">
+      @Html.AntiForgeryToken()
+      <input type="hidden" asp-for="Name"     id="hName">
+      <input type="hidden" asp-for="Username" id="hUsername">
+      <input type="hidden" asp-for="Password" id="hPassword">
+
+      <!-- Step 1: Name -->
+      <div class="reg-step active" id="step1">
+        <div class="chat-bubble">
+          <div class="chat-avatar">W</div>
+          <div class="chat-msg">👋 Hey! Welcome to WorkLog.<br>What's your <strong>name</strong>?</div>
+        </div>
+        <div class="reg-input-card">
+          <label>Your name</label>
+          <input type="text" id="inpName" placeholder="e.g. Alex Johnson" autocomplete="name" autofocus>
+        </div>
+        <button type="button" class="reg-next-btn" onclick="goStep2()">Continue →</button>
+      </div>
+
+      <!-- Step 2: Username -->
+      <div class="reg-step" id="step2">
+        <div class="chat-bubble">
+          <div class="chat-avatar">W</div>
+          <div class="chat-msg">Nice to meet you, <strong id="nameDisplay">there</strong>!<br>Pick a <strong>username</strong> for signing in.</div>
+        </div>
+        <div class="reg-input-card">
+          <label>Username</label>
+          <input type="text" id="inpUsername" placeholder="e.g. alexj" autocomplete="username" autocapitalize="none">
+        </div>
+        <button type="button" class="reg-next-btn" onclick="goStep3()">Continue →</button>
+      </div>
+
+      <!-- Step 3: Password -->
+      <div class="reg-step" id="step3">
+        <div class="chat-bubble">
+          <div class="chat-avatar">W</div>
+          <div class="chat-msg">Almost there! Set a <strong>password</strong> — at least 6 characters.</div>
+        </div>
+        <div class="reg-input-card">
+          <label>Password</label>
+          <input type="password" id="inpPassword" placeholder="min 6 characters" autocomplete="new-password">
+        </div>
+        <button type="submit" class="reg-next-btn" onclick="return prepSubmit()">Create my account →</button>
+      </div>
+
+    </form>
+
+    <div class="reg-login-link">
+      Already have an account? <a asp-controller="Account" asp-action="Login">Sign in</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function goStep2() {
+    const v = document.getElementById('inpName').value.trim();
+    if (!v) { document.getElementById('inpName').focus(); return; }
+    document.getElementById('hName').value = v;
+    document.getElementById('nameDisplay').textContent = v.split(' ')[0];
+    switchStep('step1', 'step2', 1);
+  }
+
+  function goStep3() {
+    const v = document.getElementById('inpUsername').value.trim();
+    if (!v || v.length < 2) { document.getElementById('inpUsername').focus(); return; }
+    if (!/^[a-zA-Z0-9_\-.]+$/.test(v)) {
+      alert('Username can only contain letters, numbers, _ - .');
+      return;
+    }
+    document.getElementById('hUsername').value = v;
+    switchStep('step2', 'step3', 2);
+  }
+
+  function prepSubmit() {
+    const v = document.getElementById('inpPassword').value;
+    if (v.length < 6) { document.getElementById('inpPassword').focus(); return false; }
+    document.getElementById('hPassword').value = v;
+    return true;
+  }
+
+  function switchStep(from, to, doneIdx) {
+    document.getElementById(from).classList.remove('active');
+    document.getElementById(to).classList.add('active');
+    // update progress bar
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById('p' + i);
+      el.className = i <= doneIdx ? 'done' : i === doneIdx + 1 ? 'active' : '';
+    }
+    document.querySelector('#' + to + ' input').focus();
+  }
+
+  // Allow Enter to advance steps
+  document.getElementById('inpName').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); goStep2(); } });
+  document.getElementById('inpUsername').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); goStep3(); } });
+  document.getElementById('inpPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); if (prepSubmit()) document.getElementById('regForm').submit(); }
+  });
+
+  // If server returned validation errors, pre-fill and show last step
+  @if (!ViewData.ModelState.IsValid)
+  {
+    <text>
+    document.getElementById('hName').value = '@Html.Raw(Model?.Name ?? "")';
+    document.getElementById('hUsername').value = '@Html.Raw(Model?.Username ?? "")';
+    document.getElementById('inpName').value = '@Html.Raw(Model?.Name ?? "")';
+    document.getElementById('inpUsername').value = '@Html.Raw(Model?.Username ?? "")';
+    document.getElementById('nameDisplay').textContent = '@Html.Raw((Model?.Name ?? "").Split(' ')[0])';
+    switchStep('step1', 'step3', 2);
+    </text>
+  }
+</script>
+</body>
+</html>

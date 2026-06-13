@@ -43,7 +43,7 @@
       <select name="month" class="ts-sel" onchange="this.form.submit()">
         @foreach (var m in months)
         {
-          <option value="@m.Value" @(m.Value == Model.Month ? "selected" : "")>@m.Name</option>
+          <option value="@m.Value" selected="@(m.Value == Model.Month ? "selected" : null)">@m.Name</option>
         }
       </select>
     </div>
@@ -51,9 +51,9 @@
     <div class="ts-period-group">
       <span class="ts-period-label">Year</span>
       <select name="year" class="ts-sel" onchange="this.form.submit()">
-        @for (int y = DateTime.Today.Year; y >= DateTime.Today.Year - 3; y--)
+        @for (int y = DateTime.Today.Year + 1; y >= DateTime.Today.Year - 9; y--)
         {
-          <option value="@y" @(y == Model.Year ? "selected" : "")>@y</option>
+          <option value="@y" selected="@(y == Model.Year ? "selected" : null)">@y</option>
         }
       </select>
     </div>

@@ -273,8 +273,26 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         return Ok(new { saved = req.Entries.Count });
     }
 
+    /* ── Edit a saved entry (AJAX) ── */
+    [HttpPost]
+    public async Task<IActionResult> EditLog([FromBody] EditLogRequest req)
+    {
+        var entry = await db.LogEntries.FindAsync(req.Id);
+        if (entry is null) return NotFound(new { error = "Not found" });
+        if (entry.UserId != CurrentUserId && !IsAdmin) return Forbid();
+
+        if (!string.IsNullOrWhiteSpace(req.Description)) entry.Description = req.Description.Trim();
+        if (req.Hours is > 0) entry.Hours = req.Hours.Value;
+        if (req.Project != null) entry.Project = req.Project.Trim();
+        if (req.Category != null) entry.Tags = req.Category.Trim();
+
+        await db.SaveChangesAsync();
+        return Ok(new { ok = true, hours = entry.Hours, description = entry.Description });
+    }
+
     public record AiTextRequest(string Text);
     public record AiParseRequest(string Text);
     public record BulkAddEntry(string Description, decimal Hours, string Category, string Project);
     public record BulkAddRequest(List<BulkAddEntry> Entries, DateOnly? Date = null);
+    public record EditLogRequest(int Id, string? Description, decimal? Hours, string? Project, string? Category);
 }

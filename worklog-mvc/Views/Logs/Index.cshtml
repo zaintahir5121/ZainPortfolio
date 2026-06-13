@@ -85,25 +85,61 @@
     {
       <div class="tl-today-saved">
         <div class="tts-head">
-          <span class="tts-title">Today's saved log</span>
+          <span class="tts-title">Today's log</span>
           <span class="tts-badge">@todayLogs.Sum(l => l.Hours)h logged</span>
         </div>
-        <div class="tts-list">
+        <div class="tts-cards" id="logCards">
           @foreach (var log in todayLogs)
           {
-            <div class="tts-item">
-              <span class="tts-dot" style="background:@CategoryColor(log.Tags)"></span>
-              <span class="tts-desc">@log.Description</span>
-              @if (!string.IsNullOrWhiteSpace(log.Project))
-              {
-                <span class="tts-proj">@log.Project</span>
-              }
-              <span class="tts-hrs">@log.Hours h</span>
-              <form asp-action="Delete" method="post" class="tts-del-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@log.Id">
-                <button type="submit" class="tts-del-btn" title="Delete">×</button>
-              </form>
+            <div class="tts-card" id="lc-@log.Id" data-id="@log.Id">
+              <!-- View mode -->
+              <div class="tts-card-view">
+                <div class="tts-card-left">
+                  <span class="tts-dot" style="background:@CategoryColor(log.Tags)"></span>
+                  <div class="tts-card-body">
+                    <span class="tts-desc">@log.Description</span>
+                    <div class="tts-card-meta">
+                      @if (!string.IsNullOrWhiteSpace(log.Project))
+                      {
+                        <span class="tts-proj">@log.Project</span>
+                      }
+                      @if (!string.IsNullOrWhiteSpace(log.Tags))
+                      {
+                        <span class="tts-cat-pill" style="background:@CategoryColorBg(log.Tags);color:@CategoryColor(log.Tags)">@log.Tags</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div class="tts-card-right">
+                  <span class="tts-hrs">@log.Hours h</span>
+                  <button class="tts-edit-btn" onclick="startEdit(@log.Id)" title="Edit">✏️</button>
+                  <form asp-action="Delete" method="post" class="tts-del-form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@log.Id">
+                    <button type="submit" class="tts-del-btn" title="Delete">×</button>
+                  </form>
+                </div>
+              </div>
+              <!-- Edit mode (hidden by default) -->
+              <div class="tts-card-edit hidden" id="edit-@log.Id">
+                <div class="tce-row">
+                  <input type="text" class="tce-inp tce-desc" value="@log.Description" placeholder="Description">
+                  <input type="number" class="tce-inp tce-hrs" value="@log.Hours" step="0.25" min="0.25" max="24" placeholder="hrs">
+                </div>
+                <div class="tce-row">
+                  <input type="text" class="tce-inp tce-proj" value="@log.Project" placeholder="Project">
+                  <select class="tce-inp tce-cat">
+                    @foreach (var cat in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Other"})
+                    {
+                      <option value="@cat" @(log.Tags == cat ? "selected" : "")>@cat</option>
+                    }
+                  </select>
+                </div>
+                <div class="tce-actions">
+                  <button type="button" class="tce-save-btn" onclick="saveEdit(@log.Id)">Save</button>
+                  <button type="button" class="tce-cancel-btn" onclick="cancelEdit(@log.Id)">Cancel</button>
+                </div>
+              </div>
             </div>
           }
         </div>
@@ -219,6 +255,17 @@
         "Research"      => "#6366f1",
         "Design"        => "#ec4899",
         _               => "#94a3b8",
+    };
+    static string CategoryColorBg(string cat) => cat switch {
+        "Development"   => "#dbeafe",
+        "Meeting"       => "#fef3c7",
+        "Code Review"   => "#d1fae5",
+        "Testing"       => "#ede9fe",
+        "Documentation" => "#cffafe",
+        "DevOps"        => "#fee2e2",
+        "Research"      => "#e0e7ff",
+        "Design"        => "#fce7f3",
+        _               => "#f1f5f9",
     };
 }
 
@@ -377,6 +424,37 @@ function showErr(msg) {
   const d=document.createElement('div');
   d.className='toast-wrap toast-err'; d.innerHTML=`<div class="toast">${msg}</div>`;
   document.body.appendChild(d); setTimeout(()=>d.remove(),4500);
+}
+
+// ── Inline log card editing ──────────────────────────────────────────────────
+function startEdit(id) {
+  document.querySelector(`#lc-${id} .tts-card-view`).classList.add('hidden');
+  document.getElementById(`edit-${id}`).classList.remove('hidden');
+  document.querySelector(`#edit-${id} .tce-desc`).focus();
+}
+
+function cancelEdit(id) {
+  document.getElementById(`edit-${id}`).classList.add('hidden');
+  document.querySelector(`#lc-${id} .tts-card-view`).classList.remove('hidden');
+}
+
+async function saveEdit(id) {
+  const wrap = document.getElementById(`edit-${id}`);
+  const desc = wrap.querySelector('.tce-desc').value.trim();
+  const hrs  = parseFloat(wrap.querySelector('.tce-hrs').value);
+  const proj = wrap.querySelector('.tce-proj').value.trim();
+  const cat  = wrap.querySelector('.tce-cat').value;
+
+  if (!desc || isNaN(hrs) || hrs <= 0) { showErr('Description and hours are required.'); return; }
+
+  try {
+    const res = await fetch('/Logs/EditLog', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, description: desc, hours: hrs, project: proj, category: cat }),
+    });
+    if (res.ok) { window.location.reload(); }
+    else { showErr('Could not save — please try again.'); }
+  } catch { showErr('Network error.'); }
 }
 </script>
 }

@@ -17,6 +17,12 @@
     var weekShort = $"{monShare:MMM d} – {sunShare:MMM d}";
     // SVG ring offset for sidebar (r=27 → circumference=169.65)
     var ringOffset = (169.65m * (1 - Math.Min(1m, Model.WeekPctInt / 100m))).ToString("F1");
+    // Board: last 14 days of logs grouped by date
+    var grouped = Model.Logs
+        .GroupBy(l => l.Date)
+        .OrderByDescending(g => g.Key)
+        .Take(14)
+        .ToList();
 }
 
 <div class="wb-app">
@@ -173,7 +179,7 @@
 
   </aside>
 
-  <!-- ════ MAIN CHAT ═══════════════════════════════════════════════════════ -->
+  <!-- ════ MAIN BOARD ══════════════════════════════════════════════════════ -->
   <div class="wb-main">
 
     <!-- Mobile top bar -->
@@ -190,44 +196,91 @@
       </button>
     </div>
 
-    <!-- Chat feed -->
-    <div class="wb-feed" id="wbFeed">
+    <!-- Bot status bar -->
+    <div class="wb-status-bar" id="wbStatus">
+      <span class="wb-status-icon">✦</span>
+      <span class="wb-status-text" id="wbStatusText">
+        Hey @Model.FirstName! Tell me what you worked on — I'll create cards below.
+      </span>
+    </div>
 
-      <!-- Bot greeting -->
-      <div class="wb-msg wb-msg-bot">
-        <div class="wb-av">✦</div>
-        <div class="wb-bub wb-bub-bot">
-          <strong>Hey @Model.FirstName! 👋</strong><br>
-          I'm <strong>WorkLog Bot</strong>. Just tell me what you worked on and I'll parse, categorize, and log everything — no forms needed.<br>
-          <span style="color:var(--muted);font-size:13px;margin-top:5px;display:block">
-            Try: <em>"Fixed auth bug 2h, standup 15min, reviewed 3 PRs 1h"</em><br>
-            Or ask: <em>"standup"</em> · <em>"today"</em> · <em>"show last Friday"</em> · <em>"this week"</em> · <em>"help"</em>
-          </span>
-        </div>
-      </div>
-
-      @if (todayLogs.Any())
+    <!-- ── Card board ── -->
+    <div class="wb-board" id="wbBoard">
+      @if (!grouped.Any())
       {
-        <div class="wb-msg wb-msg-bot">
-          <div class="wb-av">✦</div>
-          <div class="wb-bub wb-bub-bot">
-            <strong>You've already logged <span style="color:var(--accent)">@todayLogs.Sum(l => l.Hours)h</span> today across @todayLogs.Count item@(todayLogs.Count != 1 ? "s" : ""):</strong>
-            <div class="wb-entries">
-              @foreach (var log in todayLogs)
+        <div class="wb-board-empty" id="wbEmptyState">
+          <div class="wb-board-empty-ico">📋</div>
+          <div class="wb-board-empty-title">No logs yet</div>
+          <div class="wb-board-empty-sub">Tell me what you worked on and I'll create coloured cards here, grouped by day. You can edit, delete, and drag cards between days.</div>
+        </div>
+      }
+      else
+      {
+        var today  = DateOnly.FromDateTime(DateTime.Today);
+        var yester = today.AddDays(-1);
+        @foreach (var day in grouped)
+        {
+          var isToday  = day.Key == today;
+          var isYester = day.Key == yester;
+          var dayLabel = isToday ? "Today" : isYester ? "Yesterday" : day.Key.ToString("dddd");
+          var dayDate  = day.Key.ToString("MMM d");
+          <div class="wb-day-group @(isToday ? "wb-day-today" : "")"
+               data-date="@day.Key.ToString("yyyy-MM-dd")"
+               ondragover="wbDragOver(event)"
+               ondragleave="wbDragLeave(event)"
+               ondrop="wbDrop(event,'@day.Key.ToString("yyyy-MM-dd")')">
+            <div class="wb-day-hdr">
+              <span class="wb-day-label">@dayLabel · @dayDate</span>
+              <span class="wb-day-total" id="wbdt-@day.Key.ToString("yyyyMMdd")">@day.Sum(e => e.Hours) h</span>
+              <span class="wb-day-line"></span>
+            </div>
+            <div class="wb-day-cards" id="wbdc-@day.Key.ToString("yyyyMMdd")">
+              @foreach (var log in day.OrderBy(e => e.CreatedAt))
               {
-                <div class="wb-entry-row">
-                  <span class="wb-entry-dot" style="background:@CategoryColor(log.Tags)"></span>
-                  <span class="wb-entry-desc">@log.Description</span>
-                  <span class="wb-entry-proj">@log.Project</span>
-                  <span class="wb-entry-hrs">@log.Hours h</span>
+                var cc = CategoryColor(log.Tags);
+                <div class="wbcard" id="wbc-@log.Id" draggable="true"
+                     data-id="@log.Id" data-date="@log.Date.ToString("yyyy-MM-dd")"
+                     ondragstart="wbDragStart(event,@log.Id)">
+                  <div class="wbcard-stripe" style="background:@cc"></div>
+                  <div class="wbcard-body">
+                    <div class="wbcard-desc" id="wbcd-@log.Id">@log.Description</div>
+                    <div class="wbcard-meta">
+                      <span class="wbcard-proj" title="@log.Project">@log.Project</span>
+                      <span class="wbcard-hrs" id="wbch-@log.Id">@log.Hours h</span>
+                    </div>
+                    <span class="wbcard-badge" style="background:@cc" id="wbcb-@log.Id">@(string.IsNullOrWhiteSpace(log.Tags) ? "Other" : log.Tags)</span>
+                  </div>
+                  <div class="wbcard-foot">
+                    <span class="wbcard-drag" title="Drag to move">⋮⋮</span>
+                    <div class="wbcard-actions">
+                      <button class="wbcard-btn" onclick="wbStartCardEdit(@log.Id)" title="Edit">✏</button>
+                      <button class="wbcard-btn del" onclick="wbDeleteCard(@log.Id)" title="Delete">×</button>
+                    </div>
+                  </div>
+                  <!-- Inline edit -->
+                  <div class="wbcard-editf hidden" id="wbcef-@log.Id">
+                    <textarea class="wbcard-einp wb-ce-desc" rows="2">@log.Description</textarea>
+                    <div class="wbcard-erow">
+                      <input type="number" class="wbcard-einp wb-ce-hrs" value="@log.Hours" step="0.25" min="0.25" max="24" style="width:62px">
+                      <select class="wbcard-einp wb-ce-cat" style="flex:1">
+                        @foreach (var cat in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Other"})
+                        {
+                          <option value="@cat" selected="@(log.Tags == cat ? "selected" : null)">@cat</option>
+                        }
+                      </select>
+                    </div>
+                    <input type="text" class="wbcard-einp wb-ce-proj" value="@log.Project" placeholder="Project">
+                    <div class="wbcard-ebtns">
+                      <button class="wbcard-esave" onclick="wbSaveCardEdit(@log.Id)">Save</button>
+                      <button class="wbcard-ecancel" onclick="wbCancelCardEdit(@log.Id)">Cancel</button>
+                    </div>
+                  </div>
                 </div>
               }
             </div>
-            <div style="margin-top:8px;font-size:12.5px;color:var(--muted)">Keep going — tell me anything else you worked on and I'll add it.</div>
           </div>
-        </div>
+        }
       }
-
     </div>
 
     <!-- Quick chips -->
@@ -359,6 +412,17 @@
     };
 }
 
+<!-- Response modal -->
+<div class="wbmodal-overlay" id="wbModal" onclick="if(event.target===this)wbCloseModal()">
+  <div class="wbmodal-panel">
+    <div class="wbmodal-hdr">
+      <span class="wbmodal-title" id="wbModalTitle"></span>
+      <button class="wbmodal-close" onclick="wbCloseModal()">✕</button>
+    </div>
+    <div class="wbmodal-body" id="wbModalBody"></div>
+  </div>
+</div>
+
 @section Scripts {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script>
@@ -392,7 +456,6 @@ const CAT_COLORS = {
 const CAT_LIST = ['Development','Meeting','Code Review','Testing','Documentation','DevOps','Research','Design','Other'];
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
-const feed    = document.getElementById('wbFeed');
 const inp     = document.getElementById('wbInput');
 const sendBtn = document.getElementById('wbSendBtn');
 const micBtn  = document.getElementById('wbMicBtn');
@@ -406,14 +469,213 @@ function wbToggleAiFix() {
   showToast(wbAiFix ? '✨ AI Fix ON — Ollama will correct your text before logging' : 'AI Fix off');
 }
 
-// ── Reload control (cancel if user clicks edit) ───────────────────────────
-let reloadTimer = null;
-function scheduleReload(ms = 4000) {
-  cancelReload();
-  reloadTimer = setTimeout(() => location.reload(), ms);
+// ── Status bar ────────────────────────────────────────────────────────────
+let _statusTimer = null;
+function setStatus(msg, isErr = false) {
+  const bar  = document.getElementById('wbStatus');
+  const text = document.getElementById('wbStatusText');
+  if (msg === 'typing') {
+    text.innerHTML = '<span class="wb-status-dots"><span></span><span></span><span></span></span>';
+    bar.classList.remove('wb-status-err');
+    return;
+  }
+  text.textContent = msg;
+  bar.classList.toggle('wb-status-err', isErr);
+  if (_statusTimer) clearTimeout(_statusTimer);
+  _statusTimer = setTimeout(() => {
+    text.textContent = `✦ WorkLog Bot${WB.streak > 0 ? ' · ' + WB.streak + '-day streak 🔥' : ''}`;
+    bar.classList.remove('wb-status-err');
+  }, 5000);
 }
-function cancelReload() {
-  if (reloadTimer) { clearTimeout(reloadTimer); reloadTimer = null; }
+
+// ── Response modal ────────────────────────────────────────────────────────
+function wbShowModal(title, html) {
+  document.getElementById('wbModalTitle').textContent = title;
+  document.getElementById('wbModalBody').innerHTML = html;
+  document.getElementById('wbModal').classList.add('open');
+}
+function wbCloseModal() { document.getElementById('wbModal').classList.remove('open'); }
+
+// ── Card board functions ──────────────────────────────────────────────────
+function wbBuildCard(e) {
+  const color   = CAT_COLORS[e.category] ?? '#94a3b8';
+  const cat     = e.category || 'Other';
+  const date    = e.date ?? toIso(new Date());
+  const catOpts = CAT_LIST.map(c => `<option value="${c}" ${c===cat?'selected':''}>${c}</option>`).join('');
+  return `<div class="wbcard wbcard-new" id="wbc-${e.id}" draggable="true"
+               data-id="${e.id}" data-date="${date}"
+               ondragstart="wbDragStart(event,${e.id})">
+    <div class="wbcard-stripe" style="background:${color}"></div>
+    <div class="wbcard-body">
+      <div class="wbcard-desc" id="wbcd-${e.id}">${escHtml(e.description)}</div>
+      <div class="wbcard-meta">
+        <span class="wbcard-proj">${escHtml(e.project)}</span>
+        <span class="wbcard-hrs" id="wbch-${e.id}">${e.hours}h</span>
+      </div>
+      <span class="wbcard-badge" style="background:${color}" id="wbcb-${e.id}">${escHtml(cat)}</span>
+    </div>
+    <div class="wbcard-foot">
+      <span class="wbcard-drag" title="Drag to move day">⋮⋮</span>
+      <div class="wbcard-actions">
+        <button class="wbcard-btn" onclick="wbStartCardEdit(${e.id})" title="Edit">✏</button>
+        <button class="wbcard-btn del" onclick="wbDeleteCard(${e.id})" title="Delete">×</button>
+      </div>
+    </div>
+    <div class="wbcard-editf hidden" id="wbcef-${e.id}">
+      <textarea class="wbcard-einp wb-ce-desc" rows="2">${escHtml(e.description)}</textarea>
+      <div class="wbcard-erow">
+        <input type="number" class="wbcard-einp wb-ce-hrs" value="${e.hours}" step="0.25" min="0.25" max="24" style="width:62px">
+        <select class="wbcard-einp wb-ce-cat" style="flex:1">${catOpts}</select>
+      </div>
+      <input type="text" class="wbcard-einp wb-ce-proj" value="${escHtml(e.project)}" placeholder="Project">
+      <div class="wbcard-ebtns">
+        <button class="wbcard-esave" onclick="wbSaveCardEdit(${e.id})">Save</button>
+        <button class="wbcard-ecancel" onclick="wbCancelCardEdit(${e.id})">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function wbAddCards(entries, dateIso) {
+  document.getElementById('wbEmptyState')?.remove();
+  let group = document.querySelector(`.wb-day-group[data-date="${dateIso}"]`);
+  if (!group) {
+    const today  = new Date(dateIso + 'T12:00:00');
+    const now    = new Date();
+    const isToday = dateIso === toIso(now);
+    const label  = isToday ? 'Today' : today.toLocaleDateString('en-US', { weekday:'long' });
+    const dLabel = today.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+    const dKey   = dateIso.replace(/-/g,'');
+    group = document.createElement('div');
+    group.className = `wb-day-group${isToday ? ' wb-day-today' : ''}`;
+    group.dataset.date = dateIso;
+    group.setAttribute('ondragover',  'wbDragOver(event)');
+    group.setAttribute('ondragleave', 'wbDragLeave(event)');
+    group.setAttribute('ondrop',      `wbDrop(event,'${dateIso}')`);
+    group.innerHTML = `
+      <div class="wb-day-hdr">
+        <span class="wb-day-label">${label} · ${dLabel}</span>
+        <span class="wb-day-total" id="wbdt-${dKey}">0h</span>
+        <span class="wb-day-line"></span>
+      </div>
+      <div class="wb-day-cards" id="wbdc-${dKey}"></div>`;
+    document.getElementById('wbBoard').insertBefore(group, document.getElementById('wbBoard').firstChild);
+  }
+  const dKey    = dateIso.replace(/-/g,'');
+  const container = document.getElementById(`wbdc-${dKey}`) ?? group.querySelector('.wb-day-cards');
+  entries.forEach(e => {
+    container.insertAdjacentHTML('beforeend', wbBuildCard({ ...e, date: dateIso }));
+  });
+  wbUpdateDayTotal(dateIso);
+}
+
+function wbUpdateDayTotal(dateIso) {
+  const dKey = dateIso.replace(/-/g,'');
+  const container = document.getElementById(`wbdc-${dKey}`);
+  if (!container) return;
+  const cards = container.querySelectorAll('.wbcard');
+  let total = 0;
+  cards.forEach(c => { const h = c.querySelector('.wbcard-hrs'); if (h) total += parseFloat(h.textContent) || 0; });
+  const el = document.getElementById(`wbdt-${dKey}`);
+  if (el) el.textContent = total.toFixed(total % 1 === 0 ? 0 : 1) + 'h';
+}
+
+// Card edit
+function wbStartCardEdit(id) {
+  const card = document.getElementById(`wbc-${id}`);
+  card.querySelector('.wbcard-body')?.classList.add('hidden');
+  card.querySelector('.wbcard-foot')?.classList.add('hidden');
+  card.querySelector('.wbcard-editf')?.classList.remove('hidden');
+  card.setAttribute('draggable','false');
+  card.querySelector('.wb-ce-desc')?.focus();
+}
+function wbCancelCardEdit(id) {
+  const card = document.getElementById(`wbc-${id}`);
+  card.querySelector('.wbcard-editf')?.classList.add('hidden');
+  card.querySelector('.wbcard-body')?.classList.remove('hidden');
+  card.querySelector('.wbcard-foot')?.classList.remove('hidden');
+  card.setAttribute('draggable','true');
+}
+async function wbSaveCardEdit(id) {
+  const card = document.getElementById(`wbc-${id}`);
+  const wrap = card.querySelector('.wbcard-editf');
+  const desc = wrap.querySelector('.wb-ce-desc').value.trim();
+  const hrs  = parseFloat(wrap.querySelector('.wb-ce-hrs').value);
+  const cat  = wrap.querySelector('.wb-ce-cat').value;
+  const proj = wrap.querySelector('.wb-ce-proj').value.trim();
+  if (!desc || isNaN(hrs) || hrs <= 0) { showErr('Fill in description and hours.'); return; }
+  try {
+    const res = await fetch('/Logs/EditLog', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, description: desc, hours: hrs, category: cat, project: proj }),
+    });
+    if (!res.ok) { showErr('Could not save.'); return; }
+    const color = CAT_COLORS[cat] ?? '#94a3b8';
+    document.getElementById(`wbcd-${id}`).textContent = desc;
+    document.getElementById(`wbch-${id}`).textContent = hrs + 'h';
+    card.querySelector('.wbcard-stripe').style.background = color;
+    const badge = document.getElementById(`wbcb-${id}`);
+    if (badge) { badge.style.background = color; badge.textContent = cat; }
+    wbCancelCardEdit(id);
+    wbUpdateDayTotal(card.dataset.date);
+    showToast('✓ Entry updated');
+  } catch { showErr('Network error.'); }
+}
+async function wbDeleteCard(id) {
+  const card = document.getElementById(`wbc-${id}`);
+  if (!card) return;
+  const dateIso = card.dataset.date;
+  try {
+    const res = await fetch('/Logs/DeleteEntry', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id }),
+    });
+    if (res.ok) {
+      card.style.cssText += ';transform:scale(0);opacity:0;transition:transform .18s,opacity .18s';
+      setTimeout(() => { card.remove(); wbUpdateDayTotal(dateIso); }, 200);
+      showToast('✓ Entry deleted');
+    } else showErr('Could not delete.');
+  } catch { showErr('Network error.'); }
+}
+
+// Drag and drop between days
+let _dragId = null;
+function wbDragStart(e, id) {
+  _dragId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', String(id));
+  setTimeout(() => document.getElementById(`wbc-${id}`)?.classList.add('wbcard-dragging'), 0);
+}
+function wbDragOver(e) {
+  e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.querySelector('.wb-day-cards')?.classList.add('wb-drag-over');
+}
+function wbDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget))
+    e.currentTarget.querySelector('.wb-day-cards')?.classList.remove('wb-drag-over');
+}
+async function wbDrop(e, newDate) {
+  e.preventDefault();
+  e.currentTarget.querySelector('.wb-day-cards')?.classList.remove('wb-drag-over');
+  const id   = parseInt(e.dataTransfer.getData('text/plain'));
+  const card = document.getElementById(`wbc-${id}`);
+  if (!card) return;
+  card.classList.remove('wbcard-dragging');
+  const oldDate = card.dataset.date;
+  if (oldDate === newDate) return;
+  const dKey   = newDate.replace(/-/g,'');
+  const target = document.getElementById(`wbdc-${dKey}`) ?? e.currentTarget.querySelector('.wb-day-cards');
+  if (target) { target.appendChild(card); card.dataset.date = newDate; }
+  wbUpdateDayTotal(oldDate);
+  wbUpdateDayTotal(newDate);
+  try {
+    const newDateOnly = newDate; // ISO yyyy-MM-dd
+    await fetch('/Logs/EditLog', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, date: newDateOnly }),
+    });
+    showToast(`✓ Moved to ${new Date(newDate+'T12:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}`);
+  } catch { showErr('Could not save move.'); }
 }
 
 // ── Input helpers ─────────────────────────────────────────────────────────
@@ -433,11 +695,10 @@ async function wbSend() {
   const text = inp.value.trim();
   if (!text) return;
 
-  appendUser(text);
-  histSave('user', text);
   inp.value = ''; wbAutosize(inp);
   inp.disabled = true; sendBtn.disabled = true;
-
+  histSave('user', text);
+  setStatus('typing');
   const intent = detectIntent(text);
   switch (intent) {
     case 'standup':   await handleStandup();          break;
@@ -472,170 +733,65 @@ function detectIntent(text) {
   return 'log';
 }
 
-// ── Message builders ──────────────────────────────────────────────────────
-function appendUser(text) {
-  const div = document.createElement('div');
-  div.className = 'wb-msg wb-msg-user';
-  div.innerHTML = `<div class="wb-bub wb-bub-user">${escHtml(text).replace(/\n/g,'<br>')}</div>`;
-  feed.appendChild(div); scrollFeed();
-}
-
-function showTyping() {
-  const id = 'wbty' + Date.now();
-  const div = document.createElement('div');
-  div.id = id; div.className = 'wb-msg wb-msg-bot';
-  div.innerHTML = `<div class="wb-av">✦</div><div class="wb-bub wb-bub-bot wb-typing"><span></span><span></span><span></span></div>`;
-  feed.appendChild(div); scrollFeed();
-  return id;
-}
-
-function removeTyping(id) { document.getElementById(id)?.remove(); }
-
-function appendBot(html, saveToHistory = true) {
-  const div = document.createElement('div');
-  div.className = 'wb-msg wb-msg-bot';
-  div.innerHTML = `<div class="wb-av">✦</div><div class="wb-bub wb-bub-bot">${html}</div>`;
-  feed.appendChild(div); scrollFeed();
-  if (saveToHistory) {
-    const bub = div.querySelector('.wb-bub-bot');
-    histSave('bot', (bub?.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 300));
-  }
-  return div.querySelector('.wb-bub-bot');
-}
-
-async function appendBotTyped(text) {
-  const tid = showTyping();
-  await delay(420 + Math.random() * 280);
-  removeTyping(tid);
-  const bub = appendBot('');
-  const chars = [...text]; let i = 0;
-  await new Promise(resolve => {
-    const t = setInterval(() => {
-      bub.innerHTML = escHtml(chars.slice(0, ++i).join('')).replace(/\n/g,'<br>');
-      scrollFeed();
-      if (i >= chars.length) { clearInterval(t); resolve(); }
-    }, 14);
-  });
-  return bub;
-}
-
-function scrollFeed() { feed.scrollTop = feed.scrollHeight; }
-
-// ── Log handler ───────────────────────────────────────────────────────────
+// ── Log handler — adds cards to board ────────────────────────────────────
 async function handleLog(text) {
   let logText = text;
 
-  // AI Fix: correct English via Ollama before logging
   if (wbAiFix) {
-    const ftid = showTyping();
+    setStatus('typing');
     try {
       const fr = await fetch('/Logs/FixText', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ text }),
       });
-      removeTyping(ftid);
       if (fr.ok) {
         const { result } = await fr.json();
-        if (result && result.trim() && result.trim().toLowerCase() !== text.toLowerCase()) {
+        if (result && result.trim().toLowerCase() !== text.toLowerCase()) {
           logText = result.trim();
-          appendBot(`<em style="font-size:12px;color:var(--muted)">✨ AI understood:</em> <span style="color:var(--text)">${escHtml(logText)}</span>`);
-          await delay(350);
+          setStatus(`✨ AI understood: "${logText}"`);
+          await delay(700);
         }
       }
-    } catch { removeTyping(ftid); }
+    } catch {}
   }
 
-  const tid = showTyping();
+  setStatus('typing');
   try {
     const res = await fetch('/Logs/ChatLog', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ text: logText }),
     });
-    removeTyping(tid);
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      appendBot(`<span style="color:var(--red)">⚠ ${escHtml(err.error ?? 'Something went wrong.')}</span>`);
+      setStatus(`⚠ ${err.error ?? 'Something went wrong.'}`, true);
       return;
     }
 
     const data = await res.json();
+    const dateIso = toIso(new Date());
+    wbAddCards(data.entries.map(e => ({ ...e, date: dateIso })), dateIso);
 
-    const rows = data.entries.map(e =>
-      `<div class="wb-entry-row" id="wbce-${e.id}">
-        <span class="wb-entry-dot" style="background:${CAT_COLORS[e.category]??'#94a3b8'}"></span>
-        <span class="wb-entry-desc">${escHtml(e.description)}</span>
-        <span class="wb-entry-proj">${escHtml(e.project)}</span>
-        <span class="wb-entry-hrs">${e.hours}h</span>
-        <button class="wb-entry-edit" onclick="wbChatEdit(${e.id})" title="Edit this entry">✏</button>
-      </div>
-      <div class="wb-chat-editf hidden" id="wbcef-${e.id}">
-        <input type="text" class="wb-tl-inp wb-ce-desc" value="${escHtml(e.description)}" placeholder="Description">
-        <div class="wb-tl-editrow">
-          <input type="number" class="wb-tl-inp wb-ce-hrs" value="${e.hours}" step="0.25" min="0.25" max="24">
-          <select class="wb-tl-inp wb-ce-cat">${wbCatOptions(e.category)}</select>
-        </div>
-        <div class="wb-tl-editbtns">
-          <button type="button" class="wb-tl-save" onclick="wbChatSaveEdit(${e.id})">Save</button>
-          <button type="button" class="wb-tl-cancel" onclick="wbChatCancelEdit(${e.id})">Cancel</button>
-        </div>
-      </div>`
-    ).join('');
+    // Update sidebar today hours live
+    WB.todayHours += Number(data.total);
+    const todayEl = document.querySelector('.wb-qs-num');
+    if (todayEl) todayEl.textContent = WB.todayHours + 'h';
 
-    appendBot(
-      `<strong>✅ Logged ${data.entries.length} item${data.entries.length!==1?'s':''}!</strong>` +
-      `<div class="wb-entries">${rows}</div>` +
-      `<div class="wb-log-total">Total: <strong>${data.total}h</strong> · <button class="wb-log-refresh" onclick="location.reload()">↻ Refresh sidebar</button></div>`
-    );
-    showToast(`✓ ${data.entries.length} item${data.entries.length!==1?'s':''} logged!`);
-    scheduleReload();
+    const n = data.entries.length;
+    setStatus(`✅ Added ${n} card${n!==1?'s':''} — ${WB.todayHours.toFixed(1)}h today`);
+    showToast(`✓ ${n} card${n!==1?'s':''} added!`);
+    histSave('user', text);
+    histSave('bot', `Logged: ${data.entries.map(e=>e.description).join(', ')}`);
 
   } catch {
-    removeTyping(tid);
-    appendBot(`<span style="color:var(--red)">⚠ Network error. Please try again.</span>`);
+    setStatus('⚠ Network error. Please try again.', true);
   }
 }
 
-// ── Inline chat entry edit ────────────────────────────────────────────────
-function wbCatOptions(selected) {
-  return CAT_LIST.map(c => `<option value="${c}" ${c===selected?'selected':''}>${c}</option>`).join('');
-}
-function wbChatEdit(id) {
-  cancelReload();
-  document.getElementById(`wbce-${id}`)?.classList.add('hidden');
-  document.getElementById(`wbcef-${id}`)?.classList.remove('hidden');
-  document.querySelector(`#wbcef-${id} .wb-ce-desc`)?.focus();
-}
-function wbChatCancelEdit(id) {
-  document.getElementById(`wbcef-${id}`)?.classList.add('hidden');
-  document.getElementById(`wbce-${id}`)?.classList.remove('hidden');
-}
-async function wbChatSaveEdit(id) {
-  const wrap = document.getElementById(`wbcef-${id}`);
-  const desc = wrap.querySelector('.wb-ce-desc').value.trim();
-  const hrs  = parseFloat(wrap.querySelector('.wb-ce-hrs').value);
-  const cat  = wrap.querySelector('.wb-ce-cat').value;
-  if (!desc || isNaN(hrs) || hrs <= 0) { showErr('Fill in description and hours.'); return; }
-  try {
-    const res = await fetch('/Logs/EditLog', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ id, description: desc, hours: hrs, category: cat }),
-    });
-    if (res.ok) {
-      const row = document.getElementById(`wbce-${id}`);
-      row.querySelector('.wb-entry-desc').textContent = desc;
-      row.querySelector('.wb-entry-hrs').textContent = hrs + 'h';
-      wbChatCancelEdit(id);
-      showToast('✓ Entry updated');
-    } else showErr('Could not save — try again.');
-  } catch { showErr('Network error.'); }
-}
-
-// ── Today / Week handlers ─────────────────────────────────────────────────
+// ── Today / Week handlers → modal ────────────────────────────────────────
 async function handleToday() {
-  const tid = showTyping(); await delay(500); removeTyping(tid);
   if (!WB.todayLogs.length) {
-    appendBot("Nothing logged yet today. Tell me what you worked on and I'll save it automatically!");
+    setStatus("Nothing logged yet today — tell me what you worked on!");
     return;
   }
   const total = WB.todayLogs.reduce((s, e) => s + Number(e.hours), 0);
@@ -647,56 +803,54 @@ async function handleToday() {
       <span class="wb-entry-hrs">${e.hours}h</span>
     </div>`
   ).join('');
-  appendBot(`<strong>📋 Today's log — ${total.toFixed(1)}h total</strong><div class="wb-entries">${rows}</div>`);
+  wbShowModal(`📋 Today — ${total.toFixed(1)}h total`, `<div class="wb-entries">${rows}</div>`);
 }
 
 async function handleWeek() {
-  const tid = showTyping(); await delay(600); removeTyping(tid);
   const maxH = Math.max(...WB.weekDays.map(d => d.hours), 1);
   const bars = WB.weekDays.map(d => {
     const w = Math.round(d.hours / maxH * 100);
     const color = d.isToday ? 'var(--accent)' : d.hours > 0 ? 'var(--accent-2)' : 'var(--line)';
-    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-      <span style="width:26px;font-size:11px;color:${d.isToday?'var(--accent)':'var(--muted)'};font-weight:${d.isToday?700:400};text-align:right;flex-shrink:0">${escHtml(d.name)}</span>
-      <div style="flex:1;height:7px;border-radius:99px;background:var(--line);overflow:hidden">
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="width:30px;font-size:11px;color:${d.isToday?'var(--accent)':'var(--muted)'};font-weight:${d.isToday?700:400};flex-shrink:0">${escHtml(d.name)}</span>
+      <div style="flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden">
         <div style="width:${w}%;height:100%;border-radius:99px;background:${color}"></div>
       </div>
-      <span style="font-size:12px;font-weight:${d.isToday?700:500};color:${d.isToday?'var(--accent)':'var(--text)'};width:32px;flex-shrink:0">${escHtml(d.formatted)}</span>
+      <span style="font-size:12px;font-weight:${d.isToday?700:500};color:${d.isToday?'var(--accent)':'var(--text)'};width:36px;flex-shrink:0;text-align:right">${escHtml(d.formatted)}</span>
     </div>`;
   }).join('');
-  const streak = WB.streak > 1 ? `<div style="margin-top:8px;font-size:13px;color:var(--muted)">🔥 ${WB.streak}-day streak — keep it up!</div>` : '';
-  appendBot(
-    `<strong>📊 This week — ${escHtml(WB.weekTotal)} of ${WB.weekGoal}h goal (${WB.weekPct}%)</strong>` +
-    `<div style="margin-top:10px">${bars}</div>${streak}`
+  const streak = WB.streak > 1 ? `<div style="margin-top:12px;font-size:13px;color:var(--muted)">🔥 ${WB.streak}-day logging streak — keep it up!</div>` : '';
+  wbShowModal(
+    `📊 This week — ${escHtml(WB.weekTotal)} / ${WB.weekGoal}h (${WB.weekPct}%)`,
+    `<div>${bars}</div>${streak}`
   );
 }
 
 // ── Standup generator ─────────────────────────────────────────────────────
 async function handleStandup() {
-  const tid = showTyping();
+  setStatus('typing');
   try {
     const res = await fetch('/Logs/AiSummary', { method:'POST' });
-    removeTyping(tid);
-    const sid = 'wbsu' + Date.now();
     let body = '';
     if (res.ok) {
       const { result } = await res.json();
       body = result;
     } else {
       if (!WB.todayLogs.length) {
-        appendBot("Nothing logged today yet — log some work first and I'll write your standup!");
+        setStatus("Nothing logged today yet — log some work first and I'll write your standup!");
         return;
       }
       body = buildFallbackStandup();
     }
-    appendBot(
-      `<strong>📋 Your daily standup</strong>` +
-      `<div style="margin:8px 0;padding:10px 12px;background:var(--bg);border-radius:8px;border-left:3px solid var(--accent);font-size:13px;line-height:1.65;white-space:pre-wrap" id="${sid}">${escHtml(body)}</div>` +
+    const sid = 'wbsu' + Date.now();
+    wbShowModal('📋 Daily Standup',
+      `<div style="padding:10px 12px;background:var(--bg);border-radius:8px;border-left:3px solid var(--accent);font-size:13px;line-height:1.65;white-space:pre-wrap;margin-bottom:10px" id="${sid}">${escHtml(body)}</div>` +
       `<button class="wb-standup-copy" onclick="wbCopyStandup('${sid}')">📋 Copy to clipboard</button>`
     );
+    setStatus('✅ Standup ready — copy and paste to Slack/Teams!');
+    histSave('bot', body.slice(0, 200));
   } catch {
-    removeTyping(tid);
-    appendBot('<span style="color:var(--red)">⚠ Could not generate standup — log some work first or check Ollama.</span>');
+    setStatus('⚠ Could not generate standup — log some work first or check Ollama.', true);
   }
 }
 
@@ -722,17 +876,17 @@ function wbCopyStandup(id) {
 async function handleDateQuery(text, isoDate = null) {
   const dateStr = isoDate ?? parseNaturalDate(text);
   if (!dateStr) {
-    await appendBotTyped("I couldn't figure out which date you mean. Try 'show me June 10', 'yesterday', 'last Friday', or use the 🗓 date chip.");
+    setStatus("I couldn't figure out which date. Try 'show me June 10', 'yesterday', 'last Friday', or use the 🗓 chip.", true);
     return;
   }
-  const tid = showTyping();
+  setStatus('typing');
   try {
     const res = await fetch(`/Logs/DateLogs?date=${encodeURIComponent(dateStr)}`);
-    removeTyping(tid);
-    if (!res.ok) { appendBot('Could not load logs for that date.'); return; }
+    if (!res.ok) { setStatus('Could not load logs for that date.', true); return; }
     const data = await res.json();
     if (!data.entries.length) {
-      appendBot(`<strong>📅 ${escHtml(data.date)}</strong><br><span style="color:var(--muted);font-size:13px">Nothing logged on this day.</span>`);
+      wbShowModal(`📅 ${data.date}`, `<span style="color:var(--muted);font-size:13px">Nothing logged on this day.</span>`);
+      setStatus(`No logs found for ${data.date}`);
       return;
     }
     const rows = data.entries.map(e =>
@@ -743,8 +897,9 @@ async function handleDateQuery(text, isoDate = null) {
         <span class="wb-entry-hrs">${e.hours}h</span>
       </div>`
     ).join('');
-    appendBot(`<strong>📅 ${escHtml(data.date)} — ${data.total}h total</strong><div class="wb-entries">${rows}</div>`);
-  } catch { removeTyping(tid); appendBot('<span style="color:var(--red)">⚠ Network error.</span>'); }
+    wbShowModal(`📅 ${data.date} — ${data.total}h total`, `<div class="wb-entries">${rows}</div>`);
+    setStatus(`Showing logs for ${data.date}`);
+  } catch { setStatus('⚠ Network error.', true); }
 }
 
 function parseNaturalDate(text) {
@@ -802,7 +957,7 @@ function wbDatePicked(val) {
   if (!val) return;
   document.getElementById('wbDatePick').value = '';
   const label = new Date(val + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-  appendUser(`Show me logs for ${label}`);
+  setStatus(`Showing logs for ${label}…`);
   inp.disabled = true; sendBtn.disabled = true;
   handleDateQuery(null, val).then(() => { inp.disabled = false; sendBtn.disabled = false; inp.focus(); });
 }
@@ -810,39 +965,39 @@ function wbDatePicked(val) {
 // ── Conversation history ──────────────────────────────────────────────────
 function handleHistory() {
   const h = histLoad();
-  if (!h.length) {
-    appendBot("No conversation history yet. Everything you say here is saved automatically. Type 'clear history' to reset it.");
-    return;
-  }
   const t = inp.value.toLowerCase();
   if (/clear/.test(t)) {
     histClear();
-    appendBot("✓ Conversation history cleared.");
+    setStatus('✓ Conversation history cleared.');
     return;
   }
-  // Show recent messages grouped by day
+  if (!h.length) {
+    setStatus("No conversation history yet. Everything you type here is saved automatically.");
+    return;
+  }
   const byDay = {};
   h.slice(-60).forEach(m => {
     const day = new Date(m.ts).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
     if (!byDay[day]) byDay[day] = [];
     byDay[day].push(m);
   });
-  const days = Object.entries(byDay).slice(-7); // last 7 days
-  let html = `<strong>📖 Your conversation history (last ${h.length} messages)</strong>`;
+  const days = Object.entries(byDay).slice(-7);
+  let html = '';
   days.forEach(([day, msgs]) => {
-    html += `<div style="margin-top:10px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">${day}</div>`;
+    html += `<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">${day}</div>`;
     msgs.forEach(m => {
       const isUser = m.role === 'user';
-      html += `<div style="margin-top:4px;font-size:12.5px;padding:4px 8px;border-radius:6px;background:${isUser?'var(--accent-bg)':'var(--bg)'};color:${isUser?'var(--accent)':'var(--text-2)'}">
+      html += `<div style="margin-bottom:4px;font-size:12.5px;padding:4px 8px;border-radius:6px;background:${isUser?'var(--accent-bg)':'var(--bg)'};color:${isUser?'var(--accent)':'var(--text-2)'}">
         <span style="font-weight:600;margin-right:6px">${isUser?'You':'Bot'}:</span>${escHtml(m.text.slice(0,140))}${m.text.length>140?'…':''}
       </div>`;
     });
+    html += '<div style="height:6px"></div>';
   });
-  html += `<div style="margin-top:10px;display:flex;gap:8px">
+  html += `<div style="margin-top:6px;display:flex;gap:8px">
     <button onclick="wbExportHistory()" style="font-size:12px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:6px;padding:3px 10px;cursor:pointer;font-family:var(--font)">📥 Export</button>
-    <button onclick="histClear();appendBot('✓ History cleared.')" style="font-size:12px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer;font-family:var(--font)">🗑 Clear</button>
+    <button onclick="histClear();wbCloseModal();setStatus('✓ History cleared.')" style="font-size:12px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer;font-family:var(--font)">🗑 Clear</button>
   </div>`;
-  appendBot(html);
+  wbShowModal(`📖 History (${h.length} messages)`, html);
 }
 
 function wbExportHistory() {
@@ -861,32 +1016,31 @@ function wbExportHistory() {
 
 // ── Other intents ─────────────────────────────────────────────────────────
 function handleShare() {
-  appendBot('Opening your share card ✨ Post your progress to LinkedIn, Twitter, or download for Instagram!');
-  setTimeout(() => openShareModal(), 300);
+  setStatus('Opening share card ✨');
+  setTimeout(() => openShareModal(), 250);
 }
 
 function handleRecurring() {
-  appendBot(
-    `<strong>↺ Recurring Tasks</strong><br>` +
-    `<span style="font-size:13px;color:var(--muted)">Recurring entries auto-log daily, weekly, or on weekdays — you don't have to remember them.</span><br>` +
-    `<a href="/Recurring" style="color:var(--accent);font-size:13px;font-weight:600;margin-top:6px;display:inline-block">Manage recurring tasks →</a>`
+  wbShowModal('↺ Recurring Tasks',
+    `<p style="font-size:13px;color:var(--muted);margin-bottom:10px">Recurring entries auto-log daily, weekly, or on weekdays — you don't have to remember them.</p>` +
+    `<a href="/Recurring" style="color:var(--accent);font-size:13px;font-weight:600">Manage recurring tasks →</a>`
   );
 }
 
 function handleHelp() {
-  appendBot(
-    `<strong>Here's what I can do:</strong>` +
-    `<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;font-size:13px">` +
-    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">log work</span> <span style="color:var(--text-2);margin-left:6px">Describe it naturally: "Fixed auth bug 2h, standup 15min, reviewed 3 PRs 1h"</span></div>` +
-    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">standup</span> <span style="color:var(--text-2);margin-left:6px">AI-generates your daily standup from today's logs — copy and paste to Slack/Teams</span></div>` +
-    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">today</span> <span style="color:var(--text-2);margin-left:6px">Show what you've logged today</span></div>` +
-    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">this week</span> <span style="color:var(--text-2);margin-left:6px">Week summary with day-by-day chart</span></div>` +
-    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">show June 10</span> <span style="color:var(--text-2);margin-left:6px">View logs for any date: "yesterday", "last Friday", "June 10", or use 🗓 chip</span></div>` +
-    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">share</span> <span style="color:var(--text-2);margin-left:6px">Create a shareable card for LinkedIn, Twitter, Instagram</span></div>` +
-    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">✨ AI Fix</span> <span style="color:var(--text-2);margin-left:6px">Toggle the AI Fix button — Ollama auto-corrects your English before logging</span></div>` +
-    `<div><span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">history</span> <span style="color:var(--text-2);margin-left:6px">View your full conversation history with export · say "clear history" to reset</span></div>` +
+  const kw = (label) => `<span style="background:var(--accent-bg);color:var(--accent);padding:2px 9px;border-radius:6px;font-size:11.5px;font-weight:600">${label}</span>`;
+  wbShowModal('Help — What can I do?',
+    `<div style="display:flex;flex-direction:column;gap:8px;font-size:13px">` +
+    `<div>${kw('log work')} <span style="color:var(--text-2);margin-left:6px">Describe naturally: "Fixed auth bug 2h, standup 15min, reviewed 3 PRs 1h"</span></div>` +
+    `<div>${kw('standup')} <span style="color:var(--text-2);margin-left:6px">AI-generates your daily standup — copy to Slack/Teams</span></div>` +
+    `<div>${kw('today')} <span style="color:var(--text-2);margin-left:6px">Show everything logged today</span></div>` +
+    `<div>${kw('this week')} <span style="color:var(--text-2);margin-left:6px">Week summary with day-by-day bar chart</span></div>` +
+    `<div>${kw('show June 10')} <span style="color:var(--text-2);margin-left:6px">View logs for any date: "yesterday", "last Friday", "June 10", or use 🗓 chip</span></div>` +
+    `<div>${kw('share')} <span style="color:var(--text-2);margin-left:6px">Create a shareable card for LinkedIn, Twitter, Instagram</span></div>` +
+    `<div>${kw('✨ AI Fix')} <span style="color:var(--text-2);margin-left:6px">Toggle AI Fix — Ollama auto-corrects your English before logging</span></div>` +
+    `<div>${kw('history')} <span style="color:var(--text-2);margin-left:6px">View conversation history · say "clear history" to reset</span></div>` +
     `</div>` +
-    `<div style="margin-top:10px;font-size:12px;color:var(--muted)">💡 Use 🎤 for voice · ✏ to edit any entry · 🗓 to browse any date · 📖 "history" to review sessions</div>`
+    `<p style="margin-top:12px;font-size:12px;color:var(--muted)">💡 Use 🎤 for voice · ✏ to edit any card · drag cards between days · 🗓 to browse any date</p>`
   );
 }
 

@@ -457,15 +457,29 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         if (req.Hours is > 0) entry.Hours = req.Hours.Value;
         if (req.Project != null) entry.Project = req.Project.Trim();
         if (req.Category != null) entry.Tags = req.Category.Trim();
+        if (req.Date.HasValue) entry.Date = req.Date.Value;
 
         await db.SaveChangesAsync();
         return Ok(new { ok = true, hours = entry.Hours, description = entry.Description });
+    }
+
+    /* ── AJAX delete (card board) ── */
+    [HttpPost]
+    public async Task<IActionResult> DeleteEntry([FromBody] DeleteEntryRequest req)
+    {
+        var entry = await db.LogEntries.FindAsync(req.Id);
+        if (entry is null) return NotFound(new { error = "Not found" });
+        if (entry.UserId != CurrentUserId && !IsAdmin) return Forbid();
+        db.LogEntries.Remove(entry);
+        await db.SaveChangesAsync();
+        return Ok(new { ok = true });
     }
 
     public record AiTextRequest(string Text);
     public record AiParseRequest(string Text);
     public record BulkAddEntry(string Description, decimal Hours, string Category, string Project);
     public record BulkAddRequest(List<BulkAddEntry> Entries, DateOnly? Date = null);
-    public record EditLogRequest(int Id, string? Description, decimal? Hours, string? Project, string? Category);
+    public record EditLogRequest(int Id, string? Description, decimal? Hours, string? Project, string? Category, DateOnly? Date = null);
+    public record DeleteEntryRequest(int Id);
     public record ChatLogRequest(string Text, string? Date = null);
 }

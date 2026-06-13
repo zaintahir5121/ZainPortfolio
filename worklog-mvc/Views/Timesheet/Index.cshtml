@@ -1,4 +1,51 @@
 @model WorkLogApp.Models.ViewModels.TimesheetViewModel
+@section Styles {
+<style>
+/* Clickable day rows */
+.ts-day-row { cursor: pointer; transition: background .12s; }
+.ts-day-row:hover td { background: var(--accent-bg) !important; }
+.ts-day-row.ts-day-active td { background: var(--accent-bg) !important; }
+.ts-day-row.ts-day-active .td-date { border-left: 3px solid var(--accent); }
+
+/* Day detail panel */
+.ts-day-panel {
+  background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 16px; margin-bottom: 18px; animation: tsDpIn .18s ease;
+}
+@@keyframes tsDpIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+.ts-dp-hdr {
+  display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px;
+}
+.ts-dp-date { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.ts-dp-hrs  { font-size: 22px; font-weight: 800; color: var(--accent); line-height: 1; }
+.ts-dp-close {
+  background: none; border: none; cursor: pointer; font-size: 14px; color: var(--muted);
+  padding: 2px 6px; border-radius: 6px; margin-left: 6px; flex-shrink: 0;
+}
+.ts-dp-close:hover { background: var(--bg); color: var(--text); }
+.ts-dp-entries { display: flex; flex-direction: column; gap: 1px; margin-bottom: 10px; }
+.ts-dp-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 0;
+  border-bottom: 1px solid var(--bg); font-size: 13px;
+}
+.ts-dp-row:last-child { border-bottom: none; }
+.ts-dp-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ts-dp-desc { flex: 1; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ts-dp-proj { font-size: 11px; color: var(--muted); flex-shrink: 0; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: var(--bg); padding: 1px 6px; border-radius: 5px; }
+.ts-dp-h    { font-size: 13px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+.ts-dp-ai-btn {
+  width: 100%; padding: 7px; border-radius: 8px; font-family: var(--font);
+  background: var(--accent-bg); border: 1px solid var(--accent); color: var(--accent);
+  font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.ts-dp-ai-btn:hover { background: var(--accent); color: white; }
+.ts-dp-ai-btn:disabled { opacity: .5; cursor: default; }
+.ts-dp-ai-out {
+  margin-top: 10px; padding: 10px 12px; background: var(--bg); border-radius: 8px;
+  border-left: 3px solid var(--accent); font-size: 13px; line-height: 1.65; color: var(--text-2);
+}
+</style>
+}
 @{
     ViewData["Title"] = "Timesheet";
     var months = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.MonthNames
@@ -157,7 +204,9 @@ else
             @for (int i = 0; i < dayEntries.Count; i++)
             {
               var e = dayEntries[i];
-              <tr class="@(i == 0 ? "tr-day-first" : "tr-day-cont")">
+              var dateKey = day.Key.ToString("yyyy-MM-dd");
+              <tr class="@(i == 0 ? "tr-day-first ts-day-row" : "tr-day-cont")"
+                  @(i == 0 ? Html.Raw($"id=\"tdr-{dateKey}\" onclick=\"tsSelectDay('{dateKey}')\" title=\"Click to see {day.Key:dddd, MMMM d} summary\"") : Html.Raw(""))>
                 @if (i == 0)
                 {
                   <td class="td-date" rowspan="@dayEntries.Count">
@@ -198,8 +247,23 @@ else
       </table>
     </div>
 
-    <!-- Project breakdown -->
+    <!-- Right column: day detail + project breakdown -->
     <div>
+
+      <!-- Day detail panel — shown when a day row is clicked -->
+      <div id="ts-day-panel" class="ts-day-panel" style="display:none">
+        <div class="ts-dp-hdr">
+          <div>
+            <div class="ts-dp-date" id="ts-dp-date">—</div>
+            <div class="ts-dp-hrs" id="ts-dp-hrs">0h</div>
+          </div>
+          <button class="ts-dp-close" onclick="tsClosePanel()" title="Close">✕</button>
+        </div>
+        <div class="ts-dp-entries" id="ts-dp-entries"></div>
+        <button class="ts-dp-ai-btn" id="ts-dp-ai-btn" onclick="tsDayAi()">✦ AI Summary for this day</button>
+        <div class="ts-dp-ai-out" id="ts-dp-ai-out" style="display:none"></div>
+      </div>
+
       <div class="ts-section-title">By project</div>
       <div class="ts-proj-list">
         @{
@@ -271,6 +335,109 @@ else
 
 @section Scripts {
 <script>
+// ── Embedded entries (for client-side day panel) ───────────────────────────
+const TS_ENTRIES = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+  Model.Entries.Select(e => new {
+    date      = e.Date.ToString("yyyy-MM-dd"),
+    dateLabel = e.Date.ToString("dddd, MMMM d"),
+    project   = e.Project,
+    description = e.Description,
+    hours     = e.Hours,
+    category  = e.Tags,
+  }).ToList()
+));
+
+const TS_CAT_COLORS = {
+  'Development':'#3b82f6','Meeting':'#f59e0b','Code Review':'#10b981',
+  'Testing':'#8b5cf6','Documentation':'#06b6d4','DevOps':'#ef4444',
+  'Research':'#6366f1','Design':'#ec4899','Other':'#94a3b8',
+};
+
+let tsActiveDate = null;
+
+// ── Day row click ─────────────────────────────────────────────────────────
+function tsSelectDay(date) {
+  const entries = TS_ENTRIES.filter(e => e.date === date);
+  const panel   = document.getElementById('ts-day-panel');
+  const aiOut   = document.getElementById('ts-dp-ai-out');
+
+  // Deactivate previous active row
+  if (tsActiveDate) {
+    document.getElementById(`tdr-${tsActiveDate}`)?.classList.remove('ts-day-active');
+    if (tsActiveDate === date) { tsClosePanel(); return; } // toggle off
+  }
+
+  tsActiveDate = date;
+  document.getElementById(`tdr-${date}`)?.classList.add('ts-day-active');
+
+  const total = entries.reduce((s, e) => s + Number(e.hours), 0);
+  document.getElementById('ts-dp-date').textContent = entries[0]?.dateLabel ?? date;
+  document.getElementById('ts-dp-hrs').textContent  = total.toFixed(1) + 'h';
+
+  const rows = entries.map(e => `
+    <div class="ts-dp-row">
+      <span class="ts-dp-dot" style="background:${TS_CAT_COLORS[e.category]??'#94a3b8'}"></span>
+      <span class="ts-dp-desc" title="${esc(e.description)}">${esc(e.description)}</span>
+      <span class="ts-dp-proj" title="${esc(e.project)}">${esc(e.project)}</span>
+      <span class="ts-dp-h">${e.hours}h</span>
+    </div>`
+  ).join('');
+
+  document.getElementById('ts-dp-entries').innerHTML = rows || '<div style="color:var(--muted);font-size:13px">Nothing logged this day.</div>';
+
+  // Reset AI section
+  aiOut.style.display  = 'none';
+  aiOut.textContent    = '';
+  const aiBtn          = document.getElementById('ts-dp-ai-btn');
+  aiBtn.textContent    = '✦ AI Summary for this day';
+  aiBtn.disabled       = false;
+  aiBtn.dataset.date   = date;
+
+  panel.style.display  = '';
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function tsClosePanel() {
+  if (tsActiveDate) {
+    document.getElementById(`tdr-${tsActiveDate}`)?.classList.remove('ts-day-active');
+    tsActiveDate = null;
+  }
+  document.getElementById('ts-day-panel').style.display = 'none';
+}
+
+// ── AI day summary ────────────────────────────────────────────────────────
+async function tsDayAi() {
+  const btn  = document.getElementById('ts-dp-ai-btn');
+  const out  = document.getElementById('ts-dp-ai-out');
+  const date = btn.dataset.date;
+  if (!date) return;
+
+  btn.textContent = '… writing';
+  btn.disabled    = true;
+
+  try {
+    const r = await fetch(`/Timesheet/AiDaySummary?date=${encodeURIComponent(date)}`);
+    const d = await r.json();
+    if (d.result) {
+      out.textContent    = d.result;
+      out.style.display  = '';
+      btn.textContent    = '✦ Regenerate';
+    } else {
+      out.textContent    = d.error ?? 'AI error';
+      out.style.display  = '';
+      btn.textContent    = '✦ AI Summary for this day';
+    }
+  } catch {
+    out.textContent    = 'Could not reach AI service.';
+    out.style.display  = '';
+    btn.textContent    = '✦ AI Summary for this day';
+  }
+  btn.disabled = false;
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Period selector ───────────────────────────────────────────────────────
 function setPeriod(val) {
   document.getElementById('period-input').value = val;
   document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('seg-on', b.dataset.val === val));

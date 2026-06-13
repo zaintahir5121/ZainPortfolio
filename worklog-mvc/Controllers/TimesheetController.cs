@@ -68,6 +68,28 @@ public class TimesheetController(AppDbContext db, IOllamaService ollama) : Contr
         }
     }
 
+    /* ── AI summary for a single day ── */
+    [HttpGet]
+    public async Task<IActionResult> AiDaySummary(string date)
+    {
+        if (!DateOnly.TryParse(date, out var d))
+            return BadRequest(new { error = "Invalid date" });
+
+        var entries = await db.LogEntries
+            .Where(l => l.UserId == UserId && l.Date == d)
+            .ToListAsync();
+
+        if (!entries.Any())
+            return BadRequest(new { error = "No entries for this day." });
+
+        try
+        {
+            var result = await ollama.GenerateSummaryAsync(entries);
+            return Ok(new { result });
+        }
+        catch { return StatusCode(503, new { error = "AI unavailable — make sure Ollama is running." }); }
+    }
+
     /* ─────────────── helpers ─────────────── */
 
     private async Task<TimesheetViewModel> BuildViewModel(string period, int? month, int? year)

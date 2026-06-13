@@ -6,6 +6,10 @@
   <title>@(ViewData["Title"] ?? "WorkLog")</title>
   <meta name="description" content="@(ViewData["Description"] ?? "WorkLog — simple, AI-powered work logging for teams and individuals.")">
   <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="WorkLog">
+  <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -106,5 +110,6 @@
 </script>
 
 @RenderSection("Scripts", required: false)
+<a href="https://buymeacoffee.com/worklog" target="_blank" rel="noopener" class="bmc-float" title="Support WorkLog — Buy me a coffee">☕</a>
 </body>
 </html>

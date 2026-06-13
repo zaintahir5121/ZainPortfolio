@@ -1,8 +1,18 @@
 User-agent: *
 Allow: /
+Allow: /Home/
+Allow: /Account/Login
+Allow: /Account/Register
+
 Disallow: /Logs/
 Disallow: /Timesheet/
 Disallow: /Recurring/
-Disallow: /Account/
+Disallow: /Account/Logout
+Disallow: /Growth/
+Disallow: /Achievements/
+Disallow: /Experience/
+Disallow: /Learning/
+
+Crawl-delay: 2
 
 Sitemap: https://worklog.app/sitemap.xml

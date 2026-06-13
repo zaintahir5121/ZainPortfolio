@@ -7,9 +7,67 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WorkLog — Know exactly where your day went</title>
-  <meta name="description" content="WorkLog is the simplest work journal you'll ever use. Log what you did each day, see where your time goes, export timesheets, and track your career growth.">
-  <meta name="robots" content="index, follow">
+
+  <!-- Primary SEO — targeting low-competition keywords -->
+  <title>WorkLog — Free Daily Work Journal &amp; Employee Time Tracker</title>
+  <meta name="description" content="The simplest free work log app for employees and freelancers. Type what you did, AI structures it. Export timesheets in one click. No credit card, no subscription — your data stays private.">
+  <meta name="keywords" content="free work log app, daily work journal, employee time tracker free, simple timesheet app, work hours tracker, daily standup tracker, work activity log, time tracking software free, work log software, free employee time log">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="author" content="WorkLog">
+  <link rel="canonical" href="https://worklog.app/">
+
+  <!-- Open Graph (LinkedIn, Facebook preview) -->
+  <meta property="og:type"         content="website">
+  <meta property="og:url"          content="https://worklog.app/">
+  <meta property="og:title"        content="WorkLog — Free Daily Work Journal &amp; Time Tracker">
+  <meta property="og:description"  content="Log your day in seconds. AI parses it automatically. Export timesheets, track your streak, see your week at a glance. Free, private, no subscription.">
+  <meta property="og:image"        content="https://worklog.app/og-image.png">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name"    content="WorkLog">
+  <meta property="og:locale"       content="en_US">
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="WorkLog — Free Daily Work Journal">
+  <meta name="twitter:description" content="Log your work in seconds. AI parses it. Timesheets in one click. Free, private, no subscription.">
+  <meta name="twitter:image"       content="https://worklog.app/og-image.png">
+
+  <!-- PWA / Mobile install -->
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="WorkLog">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Structured data: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@@context": "https://schema.org",
+    "@@type": "SoftwareApplication",
+    "name": "WorkLog",
+    "description": "Free daily work journal and time tracker for employees and freelancers.",
+    "url": "https://worklog.app",
+    "applicationCategory": "ProductivityApplication",
+    "operatingSystem": "Web",
+    "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": ["AI daily log parsing", "Timesheet export", "Voice input", "Weekly progress", "Recurring entries", "Privacy-first"]
+  }
+  </script>
+
+  <!-- FAQ schema — boosts Google rich results -->
+  <script type="application/ld+json">
+  {
+    "@@context": "https://schema.org",
+    "@@type": "FAQPage",
+    "mainEntity": [
+      { "@@type":"Question","name":"Is WorkLog free?","acceptedAnswer":{"@@type":"Answer","text":"Yes — completely free. No credit card, no subscription, no limits."}},
+      { "@@type":"Question","name":"Is my work data private?","acceptedAnswer":{"@@type":"Answer","text":"Yes. Your journal lives in your own database. Nothing is sent to third-party servers."}},
+      { "@@type":"Question","name":"How do I export a timesheet?","acceptedAnswer":{"@@type":"Answer","text":"One click. WorkLog generates CSV timesheets for payroll, invoicing, or sharing with your manager."}},
+      { "@@type":"Question","name":"Does it work on mobile?","acceptedAnswer":{"@@type":"Answer","text":"Yes. WorkLog works in any browser and can be installed on your home screen like a native app."}}
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -177,11 +235,17 @@
         <a asp-controller="Home" asp-action="Terms">Terms</a>
         <a asp-controller="Home" asp-action="Contact">Contact</a>
       </nav>
-      <span class="lf-copy">&copy; 2025 WorkLog</span>
+      <div class="lf-right">
+        <a href="https://buymeacoffee.com/worklog" target="_blank" rel="noopener" class="lf-bmc">☕ Buy me a coffee</a>
+        <span class="lf-copy">&copy; 2025 WorkLog</span>
+      </div>
     </div>
   </footer>
 
 </div>
+
+<!-- Floating Buy Me a Coffee -->
+<a href="https://buymeacoffee.com/worklog" target="_blank" rel="noopener" class="bmc-float" title="Support WorkLog">☕</a>
 
 <script>
   // Smooth scroll for anchor links

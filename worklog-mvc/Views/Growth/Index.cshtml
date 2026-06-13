@@ -79,30 +79,24 @@
     <div class="gp-add-form" id="xp-form" style="display:none">
       <form asp-action="AddExperience" method="post">
         @Html.AntiForgeryToken()
-        <input name="role" placeholder="Job title *" class="gp-inp" required>
-        <input name="company" placeholder="Company *" class="gp-inp" required>
-        <input name="location" placeholder="Location (optional)" class="gp-inp">
+        <div class="gp-row2">
+          <input name="role" placeholder="Job title *" class="gp-inp" required>
+          <input name="company" placeholder="Company *" class="gp-inp" required>
+        </div>
         <div class="gp-row2">
           <div>
-            <label class="gp-lbl">Start date</label>
+            <label class="gp-lbl">Started</label>
             <input name="startDate" type="date" class="gp-inp" required>
           </div>
-          <div>
-            <label class="gp-lbl">End date</label>
-            <input name="endDate" type="date" class="gp-inp" id="xp-end-date">
+          <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+            <label class="gp-check">
+              <input type="checkbox" name="isCurrent" value="true"> Currently here
+            </label>
           </div>
         </div>
-        <label class="gp-check">
-          <input type="checkbox" name="isCurrent" value="true"
-                 onchange="document.getElementById('xp-end-date').disabled=this.checked">
-          I currently work here
-        </label>
-        <textarea name="description" placeholder="Brief description (optional)"
-                  class="gp-inp gp-ta" rows="2"></textarea>
         <div class="gp-form-foot">
           <button type="submit" class="gp-save-btn">Save role</button>
-          <button type="button" class="gp-cancel-btn"
-                  onclick="toggleGpForm('xp-form', null)">Cancel</button>
+          <button type="button" class="gp-cancel-btn" onclick="toggleGpForm('xp-form', null)">Cancel</button>
         </div>
       </form>
     </div>
@@ -143,26 +137,15 @@
       <form asp-action="AddAchievement" method="post">
         @Html.AntiForgeryToken()
         <input name="title" placeholder="What did you achieve? *" class="gp-inp" required>
-        <input name="description" placeholder="Short description (optional)" class="gp-inp">
-        <div class="gp-row2">
-          <div>
-            <label class="gp-lbl">Category</label>
-            <select name="category" class="gp-inp">
-              <option value="work">💼 Work win</option>
-              <option value="cert">🎓 Certification</option>
-              <option value="award">🏅 Award</option>
-              <option value="personal">⭐ Personal</option>
-            </select>
-          </div>
-          <div>
-            <label class="gp-lbl">Date</label>
-            <input name="date" type="date" class="gp-inp">
-          </div>
+        <div class="gp-cat-pills">
+          <label class="gp-cat-pill"><input type="radio" name="category" value="work" checked> 💼 Work</label>
+          <label class="gp-cat-pill"><input type="radio" name="category" value="cert"> 🎓 Cert</label>
+          <label class="gp-cat-pill"><input type="radio" name="category" value="award"> 🏅 Award</label>
+          <label class="gp-cat-pill"><input type="radio" name="category" value="personal"> ⭐ Personal</label>
         </div>
         <div class="gp-form-foot">
           <button type="submit" class="gp-save-btn">Save win</button>
-          <button type="button" class="gp-cancel-btn"
-                  onclick="toggleGpForm('ach-form', null)">Cancel</button>
+          <button type="button" class="gp-cancel-btn" onclick="toggleGpForm('ach-form', null)">Cancel</button>
         </div>
       </form>
     </div>
@@ -215,34 +198,18 @@
     <div class="gp-add-form" id="learn-form" style="display:none">
       <form asp-action="AddLearning" method="post">
         @Html.AntiForgeryToken()
+        <input type="hidden" name="status" value="in-progress">
         <input name="title" placeholder="What are you learning? *" class="gp-inp" required>
-        <div class="gp-row2">
-          <div>
-            <label class="gp-lbl">Type</label>
-            <select name="type" class="gp-inp">
-              <option value="course">🎓 Course</option>
-              <option value="book">📖 Book</option>
-              <option value="video">🎬 Video</option>
-              <option value="article">📄 Article</option>
-              <option value="tutorial">💻 Tutorial</option>
-              <option value="podcast">🎙️ Podcast</option>
-              <option value="other">💡 Other</option>
-            </select>
-          </div>
-          <div>
-            <label class="gp-lbl">Status</label>
-            <select name="status" class="gp-inp">
-              <option value="in-progress">In progress</option>
-              <option value="want">Want to learn</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
+        <div class="gp-cat-pills">
+          <label class="gp-cat-pill"><input type="radio" name="type" value="course" checked> 🎓 Course</label>
+          <label class="gp-cat-pill"><input type="radio" name="type" value="book"> 📖 Book</label>
+          <label class="gp-cat-pill"><input type="radio" name="type" value="video"> 🎬 Video</label>
+          <label class="gp-cat-pill"><input type="radio" name="type" value="tutorial"> 💻 Tutorial</label>
+          <label class="gp-cat-pill"><input type="radio" name="type" value="other"> 💡 Other</label>
         </div>
-        <input name="source" placeholder="Source or URL (optional)" class="gp-inp">
         <div class="gp-form-foot">
           <button type="submit" class="gp-save-btn">Save item</button>
-          <button type="button" class="gp-cancel-btn"
-                  onclick="toggleGpForm('learn-form', null)">Cancel</button>
+          <button type="button" class="gp-cancel-btn" onclick="toggleGpForm('learn-form', null)">Cancel</button>
         </div>
       </form>
     </div>

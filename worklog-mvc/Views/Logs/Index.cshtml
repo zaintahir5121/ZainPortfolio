@@ -15,7 +15,17 @@
     <!-- Greeting -->
     <div class="tl-greet">
       <h1 class="tl-hi">Hi @Model.FirstName! What did you work on today?</h1>
-      <p class="tl-sub">Type or speak — Ollama will structure it automatically.</p>
+      <p class="tl-sub">Type a summary, speak, or tap a quick-log below.</p>
+    </div>
+
+    <!-- Quick-log chips -->
+    <div class="ql-chips">
+      <button class="ql-chip" onclick="quickLog('Morning standup','Meeting',0.25)">☕ Standup <span>15m</span></button>
+      <button class="ql-chip" onclick="quickLog('Team meeting','Meeting',1)">💬 Meeting <span>1h</span></button>
+      <button class="ql-chip" onclick="quickLog('Code review','Code Review',1)">🔍 Review <span>1h</span></button>
+      <button class="ql-chip" onclick="quickLog('Bug fixing','Development',2)">🐛 Bug fix <span>2h</span></button>
+      <button class="ql-chip" onclick="quickLog('Writing documentation','Documentation',1)">📝 Docs <span>1h</span></button>
+      <button class="ql-chip" onclick="quickLog('Deployment','DevOps',0.5)">🚀 Deploy <span>30m</span></button>
     </div>
 
     <!-- Input card -->
@@ -32,7 +42,7 @@
           Voice
         </button>
         <div class="tl-input-right">
-          <span id="charCount" class="tl-char-count">0 words</span>
+          <span id="autoHint" class="tl-char-count"></span>
           <button id="parseBtn" class="tl-parse-btn" disabled>
             <span id="parseBtnIcon">✦</span> <span id="parseBtnText">Parse with AI</span>
           </button>
@@ -283,6 +293,7 @@ const CAT_BG = {
 };
 
 let parsedEntries = [];
+let autoParseTimer = null;
 
 const dayInput   = document.getElementById('dayInput');
 const parseBtn   = document.getElementById('parseBtn');
@@ -293,16 +304,22 @@ const totalTime  = document.getElementById('totalTime');
 const sendBtn    = document.getElementById('sendBtn');
 const voiceBtn   = document.getElementById('voiceBtn');
 const voiceWave  = document.getElementById('voiceWave');
-const charCount  = document.getElementById('charCount');
+const autoHint   = document.getElementById('autoHint');
 
-// word count
+// Auto-parse: trigger 2.5 seconds after typing stops
 dayInput.addEventListener('input', () => {
-  const words = dayInput.value.trim().split(/\s+/).filter(Boolean).length;
-  charCount.textContent = words === 0 ? '0 words' : `${words} word${words===1?'':'s'}`;
-  parseBtn.disabled = dayInput.value.trim().length < 8;
+  const len = dayInput.value.trim().length;
+  parseBtn.disabled = len < 8;
+  clearTimeout(autoParseTimer);
+  if (len >= 15) {
+    autoHint.textContent = 'parsing in 2s…';
+    autoParseTimer = setTimeout(() => { autoHint.textContent = ''; parseDay(); }, 2500);
+  } else {
+    autoHint.textContent = '';
+  }
 });
 
-parseBtn.addEventListener('click', parseDay);
+parseBtn.addEventListener('click', () => { clearTimeout(autoParseTimer); autoHint.textContent = ''; parseDay(); });
 
 async function parseDay() {
   const text = dayInput.value.trim();
@@ -329,6 +346,20 @@ async function parseDay() {
     document.getElementById('parseBtnIcon').textContent = '✦';
     processing.classList.add('hidden');
   }
+}
+
+// Quick-log: one-click instant save
+async function quickLog(description, category, hours) {
+  try {
+    const res = await fetch('/Logs/BulkAdd', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ entries: [{ description, category, hours, project: category }] }),
+    });
+    if (res.ok) {
+      showToast(`✓ ${description} logged`);
+      setTimeout(() => window.location.reload(), 800);
+    } else { showErr('Could not log — please try again.'); }
+  } catch { showErr('Network error.'); }
 }
 
 function renderSummary() {
@@ -424,6 +455,11 @@ function showErr(msg) {
   const d=document.createElement('div');
   d.className='toast-wrap toast-err'; d.innerHTML=`<div class="toast">${msg}</div>`;
   document.body.appendChild(d); setTimeout(()=>d.remove(),4500);
+}
+function showToast(msg) {
+  const d=document.createElement('div');
+  d.className='toast-wrap toast-ok'; d.innerHTML=`<div class="toast">${msg}</div>`;
+  document.body.appendChild(d); setTimeout(()=>d.remove(),3000);
 }
 
 // ── Inline log card editing ──────────────────────────────────────────────────

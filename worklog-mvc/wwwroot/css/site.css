@@ -307,6 +307,7 @@ button { font-family:var(--font); cursor:pointer; }
 .toast-wrap { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); z-index:9999; pointer-events:none; }
 .toast { background:var(--text); color:white; padding:10px 22px; border-radius:99px; font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,.18); animation:fadeup .22s ease; }
 .toast-err .toast { background:#dc2626; }
+.toast-ok  .toast { background:#059669; }
 @keyframes fadeup { from { transform:translateY(10px); opacity:0; } to { transform:translateY(0); opacity:1; } }
 
 /* ═══ LANDING ═══ */
@@ -909,6 +910,18 @@ button { font-family:var(--font); cursor:pointer; }
 .tl-hi    { font-size:1.65rem; font-weight:800; color:var(--text); line-height:1.2; margin-bottom:.35rem; }
 .tl-sub   { font-size:.9rem; color:var(--muted); }
 
+/* Quick-log chips */
+.ql-chips  { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.25rem; }
+.ql-chip   {
+  display:inline-flex; align-items:center; gap:.3rem; padding:.45rem .85rem;
+  background:var(--white); border:1.5px solid var(--line); border-radius:99px;
+  font-size:.8rem; font-weight:600; color:var(--text-2); cursor:pointer;
+  transition:all .15s; font-family:var(--font); box-shadow:var(--sh-3d);
+}
+.ql-chip:hover  { border-color:var(--accent); color:var(--accent); background:var(--accent-bg); transform:translateY(-1px); }
+.ql-chip span   { font-weight:400; color:var(--muted); font-size:.75rem; }
+.ql-chip:hover span { color:var(--accent); opacity:.7; }
+
 /* Input card */
 .tl-input-card {
   background:var(--white); border-radius:18px; box-shadow:var(--sh-3d);
@@ -1299,6 +1312,19 @@ button { font-family:var(--font); cursor:pointer; }
   font-size:.84rem; color:var(--text-2); display:flex; align-items:center;
   gap:.4rem; cursor:pointer; margin-bottom:.6rem;
 }
+/* Category emoji pill selectors */
+.gp-cat-pills { display:flex; gap:.4rem; flex-wrap:wrap; margin:.4rem 0; }
+.gp-cat-pill  {
+  display:inline-flex; align-items:center; gap:.3rem; padding:.35rem .75rem;
+  border:1.5px solid var(--line); border-radius:99px; font-size:.8rem; font-weight:600;
+  color:var(--text-2); cursor:pointer; transition:all .15s; user-select:none;
+}
+.gp-cat-pill input[type=radio] { display:none; }
+.gp-cat-pill:has(input:checked) { border-color:var(--accent); background:var(--accent-bg); color:var(--accent); }
+.gp-cat-pill:hover { border-color:var(--accent); }
+
+.lfield-hint { font-size:.72rem; color:var(--muted); margin-top:.25rem; display:block; }
+
 .gp-form-foot { display:flex; gap:.5rem; justify-content:flex-end; margin-top:.25rem; }
 .gp-save-btn {
   padding:.5rem 1.1rem; background:var(--accent); color:#fff;

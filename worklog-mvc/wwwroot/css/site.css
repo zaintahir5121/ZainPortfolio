@@ -1447,3 +1447,51 @@ button { font-family:var(--font); cursor:pointer; }
   color:var(--muted); font-size:.85rem; text-align:center;
   padding:1.25rem 0; line-height:1.6;
 }
+
+/* ── Chat Log Input (clog-*) ──────────────────────────────────────────────── */
+.clog-box { background:var(--white); border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-bottom:20px; }
+.clog-head { display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line); background:var(--surface); }
+.clog-head-av { width:32px; height:32px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; flex-shrink:0; }
+.clog-head-name { font-size:13px; font-weight:700; color:var(--text); }
+.clog-head-dot { font-size:8px; color:#22c55e; margin:0 4px; }
+.clog-head-sub { font-size:11px; color:var(--muted); }
+
+.clog-feed { display:flex; flex-direction:column; gap:8px; padding:16px 18px; max-height:320px; overflow-y:auto; }
+
+.cmsg { display:flex; align-items:flex-start; gap:8px; animation:cmsgIn .3s ease both; }
+.cbot { flex-direction:row; }
+.cuser { flex-direction:row-reverse; }
+
+.cmsg-av { width:28px; height:28px; flex-shrink:0; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; }
+.cmsg-bub { background:var(--surface); border:1px solid var(--line); border-radius:4px 12px 12px 12px; padding:10px 14px; font-size:13px; color:var(--text); line-height:1.55; max-width:320px; }
+.cmsg-bub small { display:block; font-size:11px; color:var(--muted); margin-top:4px; }
+.cmsg-user-bub { background:var(--accent); color:#fff; border-radius:12px 4px 12px 12px; padding:10px 14px; font-size:13px; max-width:280px; word-break:break-word; }
+.cmsg-bub-err { background:#fef2f2 !important; border-color:#fecaca !important; color:#dc2626 !important; }
+
+.cmsg-typing { display:flex; gap:5px; align-items:center; padding:12px 16px !important; }
+.cmsg-typing span { width:6px; height:6px; background:var(--muted); border-radius:50%; animation:typeDot 1.2s infinite; }
+.cmsg-typing span:nth-child(2) { animation-delay:.2s; }
+.cmsg-typing span:nth-child(3) { animation-delay:.4s; }
+@keyframes typeDot { 0%,60%,100%{transform:translateY(0);opacity:.5} 30%{transform:translateY(-5px);opacity:1} }
+
+.cmsg-entries { margin-top:8px; display:flex; flex-direction:column; gap:3px; }
+.cmsg-entry-row { display:flex; align-items:center; gap:6px; font-size:12px; padding:4px 0; border-top:1px solid var(--line); }
+.cmsg-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+.cmsg-desc { flex:1; color:var(--text); }
+.cmsg-proj { color:var(--muted); font-size:11px; background:#f0f0f5; padding:1px 6px; border-radius:99px; white-space:nowrap; }
+.cmsg-hrs { font-weight:700; color:var(--text); white-space:nowrap; }
+.cmsg-total { margin-top:6px; font-size:12px; color:var(--muted); border-top:1px solid var(--line); padding-top:6px; }
+
+.clog-chips { display:flex; gap:6px; flex-wrap:wrap; padding:10px 18px; border-top:1px solid var(--line); background:var(--surface); }
+.clog-chip { background:var(--white); border:1px solid var(--line); border-radius:99px; padding:5px 12px; font-size:12px; font-family:var(--font); color:var(--text); cursor:pointer; transition:all .15s; white-space:nowrap; }
+.clog-chip:hover { border-color:var(--accent); color:var(--accent); background:rgba(99,102,241,.04); }
+
+.clog-bar { display:flex; align-items:flex-end; gap:8px; padding:12px 18px 14px; border-top:1px solid var(--line); }
+.clog-ta { flex:1; background:var(--surface); border:1.5px solid var(--line); border-radius:10px; padding:10px 14px; font-size:13.5px; font-family:var(--font); color:var(--text); resize:none; outline:none; line-height:1.5; transition:border-color .2s; max-height:120px; overflow-y:auto; }
+.clog-ta:focus { border-color:var(--accent); }
+.clog-ta::placeholder { color:var(--muted); }
+.clog-send { width:40px; height:40px; flex-shrink:0; background:var(--accent); color:#fff; border:none; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.clog-send:hover { background:var(--accent-2); transform:scale(1.05); }
+.clog-send:disabled { opacity:.4; cursor:default; transform:none; }
+
+@keyframes cmsgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }

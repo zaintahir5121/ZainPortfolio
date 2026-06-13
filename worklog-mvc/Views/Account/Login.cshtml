@@ -2,6 +2,7 @@
 @{
     Layout = null;
     ViewData["Title"] = "Sign in";
+    bool hasErrors = !ViewData.ModelState.IsValid;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -11,71 +12,180 @@
   <title>Sign in — WorkLog</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
-</head>
-<body>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #080818;
+      min-height: 100dvh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px 20px;
+      background-image: radial-gradient(ellipse 90% 60% at 50% -5%, rgba(99,102,241,.22), transparent 65%);
+    }
+    .cw { width: 100%; max-width: 420px; }
 
-<div class="login-page">
-  <div class="login-card">
+    .cw-back {
+      display: block; text-align: center;
+      font-size: 12px; color: #28284a; text-decoration: none; margin-bottom: 18px;
+      animation: riseIn .4s ease 0s both;
+    }
+    .cw-back:hover { color: #5a5a88; }
 
-    <a asp-controller="Home" asp-action="Index" class="back-link">
-      ← back
-    </a>
+    .cw-brand {
+      font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -1px;
+      text-align: center; margin-bottom: 34px;
+      animation: riseIn .4s ease .08s both;
+    }
+    .cw-brand em { opacity: .25; font-style: normal; }
 
-    <div class="login-logo">worklog<span>.</span></div>
-    <p class="login-tag">Sign in to your workspace</p>
+    .cf { display: flex; flex-direction: column; gap: 6px; }
 
-    @if (!ViewData.ModelState.IsValid)
-    {
-      <div class="login-err">
-        @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-        {
-          <span>@e.ErrorMessage</span>
-        }
-      </div>
+    .cf-bot { display: flex; align-items: flex-start; gap: 10px; }
+    .cf-av {
+      width: 32px; height: 32px; flex-shrink: 0;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px;
+    }
+    .cf-bub {
+      background: #10102c; border: 1px solid #1e1e48;
+      border-radius: 4px 16px 16px 16px;
+      padding: 12px 16px; color: #c0c0e0;
+      font-size: 14px; line-height: 1.6; max-width: 300px;
+    }
+    .cf-bub small { display: block; font-size: 11px; color: #40405a; margin-top: 5px; }
+
+    .cf-user { display: flex; justify-content: flex-end; }
+    .cf-inp {
+      background: #12123c; border: 1.5px solid #282860;
+      border-radius: 16px 4px 16px 16px;
+      padding: 11px 18px; color: #fff;
+      font-size: 14px; font-family: 'Inter', sans-serif;
+      width: 265px; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .cf-inp:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+    .cf-inp::placeholder { color: #282852; }
+
+    .cf-err {
+      margin-left: 42px; margin-bottom: 8px;
+      background: #160505; border: 1px solid #3e0a0a;
+      border-radius: 4px 16px 16px 16px;
+      padding: 10px 16px; color: #f87171; font-size: 13px;
+      animation: riseIn .3s ease .05s both;
     }
 
-    <form asp-controller="Account" asp-action="Login"
-          asp-route-returnUrl="@ViewBag.ReturnUrl" method="post"
-          class="login-form">
-      @Html.AntiForgeryToken()
+    .cf-submit-row { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .cf-btn {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff;
+      border: none; border-radius: 99px; padding: 12px 30px;
+      font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif;
+      cursor: pointer; transition: all .2s;
+      box-shadow: 0 4px 20px rgba(99,102,241,.45);
+    }
+    .cf-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(99,102,241,.65); }
 
-      <div class="lfield">
-        <label asp-for="Username">Username</label>
-        <input asp-for="Username" placeholder="your username"
-               autocomplete="username" autofocus>
+    .cf-footer { text-align: center; margin-top: 26px; font-size: 13px; color: #30305a; animation: riseIn .4s ease 1s both; }
+    .cf-footer a { color: #7c83f5; text-decoration: none; font-weight: 600; }
+    .cf-footer a:hover { color: #a5b4fc; }
+
+    .cf-demo { text-align: center; margin-top: 14px; font-size: 11.5px; color: #22224a; animation: riseIn .4s ease 1.1s both; }
+    .cf-demo code { background: #0c0c22; border-radius: 6px; padding: 2px 8px; color: #33335a; cursor: pointer; }
+    .cf-demo code:hover { color: #7c83f5; }
+
+    .hidden { display: none !important; }
+
+    @@keyframes riseIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .a1 { animation: riseIn .4s ease .15s both; }
+    .a2 { animation: riseIn .4s ease .32s both; }
+    .a3 { animation: riseIn .4s ease .50s both; }
+    .a4 { animation: riseIn .4s ease .68s both; }
+    .a5 { animation: riseIn .4s ease .80s both; }
+  </style>
+</head>
+<body>
+<div class="cw">
+  <a href="/" class="cw-back">← worklog home</a>
+  <div class="cw-brand">worklog<em>.</em></div>
+
+  @if (hasErrors)
+  {
+    <div class="cf-err">
+      @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+      { <div>@e.ErrorMessage</div> }
+    </div>
+  }
+
+  <form asp-controller="Account" asp-action="Login"
+        asp-route-returnUrl="@ViewBag.ReturnUrl" method="post" autocomplete="on">
+    @Html.AntiForgeryToken()
+
+    <div class="cf">
+      <div class="cf-bot a1">
+        <div class="cf-av">✦</div>
+        <div class="cf-bub">Hey! 👋 Welcome back.<br>What's your <strong>username</strong>?</div>
+      </div>
+      <div class="cf-user a2">
+        <input class="cf-inp" asp-for="Username" id="Username"
+               placeholder="your username…" autocomplete="username" autofocus
+               onkeydown="usernameKey(event)">
       </div>
 
-      <div class="lfield">
-        <label asp-for="Password">Password</label>
-        <input asp-for="Password" type="password"
-               placeholder="your password" autocomplete="current-password">
+      <div class="cf-bot a3 @(hasErrors ? "" : "hidden")" id="pwdPrompt">
+        <div class="cf-av">✦</div>
+        <div class="cf-bub">Got it! Now your <strong>password</strong> 🔒</div>
+      </div>
+      <div class="cf-user a4 @(hasErrors ? "" : "hidden")" id="pwdRow">
+        <input class="cf-inp" asp-for="Password" id="Password" type="password"
+               placeholder="••••••••" autocomplete="current-password"
+               onkeydown="pwdKey(event)">
       </div>
 
-      <button type="submit" class="login-btn">Continue</button>
-    </form>
-
-    <div class="login-register-link">
-      New here? <a asp-controller="Account" asp-action="Register">Create a free account →</a>
+      <div class="cf-submit-row @(hasErrors ? "" : "hidden")" id="submitRow">
+        <button type="submit" class="cf-btn a5">Sign in →</button>
+      </div>
     </div>
+  </form>
 
-    <div class="demo-hint">
-      <span>Try a demo account:</span><br>
-      <code onclick="fill('admin','admin123')">admin / admin123</code>
-      &nbsp;·&nbsp;
-      <code onclick="fill('john','pass123')">john / pass123</code>
-    </div>
+  <div class="cf-demo">
+    Demo accounts:
+    <code onclick="fill('admin','admin123')">admin / admin123</code>
+    &nbsp;·&nbsp;
+    <code onclick="fill('john','pass123')">john / pass123</code>
+  </div>
 
+  <div class="cf-footer">
+    New here? <a asp-controller="Account" asp-action="Register">Create a free account →</a>
   </div>
 </div>
 
 <script>
+  function showPwd() {
+    ['pwdPrompt','pwdRow','submitRow'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('hidden');
+      el.style.animation = 'riseIn .35s ease 0s both';
+    });
+    setTimeout(() => document.getElementById('Password')?.focus(), 200);
+  }
+  function usernameKey(e) {
+    if ((e.key === 'Enter' || e.key === 'Tab') && document.getElementById('Username').value.trim()) {
+      e.preventDefault(); showPwd();
+    }
+  }
+  function pwdKey(e) {
+    if (e.key === 'Enter') { e.preventDefault(); e.target.closest('form').submit(); }
+  }
   function fill(u, p) {
     document.getElementById('Username').value = u;
+    showPwd();
     document.getElementById('Password').value = p;
   }
 </script>
-
 </body>
 </html>

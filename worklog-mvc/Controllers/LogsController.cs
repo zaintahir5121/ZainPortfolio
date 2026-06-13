@@ -273,6 +273,61 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         return Ok(new { saved = req.Entries.Count });
     }
 
+    /* ── Chat: parse + save in one shot ── */
+    [HttpPost]
+    public async Task<IActionResult> ChatLog([FromBody] ChatLogRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Text))
+            return BadRequest(new { error = "text required" });
+
+        List<ParsedDayEntry> parsed;
+        bool usedAi = true;
+        try
+        {
+            parsed = await ollama.ParseDayLogAsync(req.Text);
+            if (parsed.Count == 0) throw new Exception("empty");
+        }
+        catch
+        {
+            usedAi = false;
+            parsed = [new ParsedDayEntry(req.Text.Trim(), 1, "Other", "General")];
+        }
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var saved = new List<LogEntry>();
+
+        foreach (var e in parsed.Where(e => !string.IsNullOrWhiteSpace(e.Description)))
+        {
+            var entry = new LogEntry
+            {
+                UserId      = CurrentUserId,
+                Date        = today,
+                Project     = !string.IsNullOrWhiteSpace(e.Project) ? e.Project.Trim() : (e.Category ?? "General"),
+                Description = e.Description.Trim(),
+                Hours       = e.Hours > 0 ? e.Hours : 1,
+                Tags        = e.Category?.Trim() ?? "",
+                CreatedAt   = DateTime.UtcNow,
+            };
+            db.LogEntries.Add(entry);
+            saved.Add(entry);
+        }
+        await db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            entries = saved.Select(e => new
+            {
+                id          = e.Id,
+                description = e.Description,
+                project     = e.Project,
+                hours       = e.Hours,
+                category    = e.Tags,
+            }),
+            total  = saved.Sum(e => e.Hours),
+            usedAi,
+        });
+    }
+
     /* ── Weekly AI insight (data-driven, no Ollama required) ── */
     [HttpGet]
     public async Task<IActionResult> WeeklyInsight()
@@ -368,4 +423,5 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
     public record BulkAddEntry(string Description, decimal Hours, string Category, string Project);
     public record BulkAddRequest(List<BulkAddEntry> Entries, DateOnly? Date = null);
     public record EditLogRequest(int Id, string? Description, decimal? Hours, string? Project, string? Category);
+    public record ChatLogRequest(string Text, string? Date = null);
 }

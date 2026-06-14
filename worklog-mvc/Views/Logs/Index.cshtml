@@ -230,43 +230,35 @@
             <div class="wb-day-cards" id="wbdc-@day.Key.ToString("yyyyMMdd")">
               @foreach (var log in day.OrderBy(e => e.CreatedAt))
               {
-                var cc = CategoryColor(log.Tags);
+                var cc  = CategoryColor(log.Tags);
+                var cat = string.IsNullOrWhiteSpace(log.Tags) ? "Other" : log.Tags;
                 <div class="wbcard" id="wbc-@log.Id" draggable="true"
                      data-id="@log.Id" data-date="@log.Date.ToString("yyyy-MM-dd")"
-                     ondragstart="wbDragStart(event,@log.Id)">
-                  <div class="wbcard-stripe" style="background:@cc"></div>
-                  <button class="wbcard-toggle" onclick="wbToggleCollapse(@log.Id)" title="Minimize">‒</button>
-                  <div class="wbcard-compact" id="wbcc-@log.Id" onclick="wbToggleCollapse(@log.Id)">
-                    <span class="wbcard-compact-txt">@log.Description</span>
-                    <span class="wbcard-compact-hrs">@log.Hours h</span>
-                    <span class="wbcard-compact-arr">▸</span>
-                  </div>
+                     ondragstart="wbDragStart(event,@log.Id)"
+                     onclick="wbCardClick(event,@log.Id)">
+                  <div class="wbcard-accent" style="background:@cc"></div>
                   <div class="wbcard-body">
                     <div class="wbcard-desc" id="wbcd-@log.Id">@log.Description</div>
                     <div class="wbcard-meta">
-                      <span class="wbcard-proj" title="@log.Project">@log.Project</span>
-                      <span class="wbcard-hrs" id="wbch-@log.Id">@log.Hours h</span>
+                      <span class="wbcard-proj" id="wbcp-@log.Id" title="@log.Project">@log.Project</span>
                     </div>
-                    <span class="wbcard-badge" style="background:@cc" id="wbcb-@log.Id">@(string.IsNullOrWhiteSpace(log.Tags) ? "Other" : log.Tags)</span>
                   </div>
                   <div class="wbcard-foot">
-                    <span class="wbcard-drag" title="Drag to move">⋮⋮</span>
-                    <div class="wbcard-actions">
-                      <button class="wbcard-btn expand" onclick="wbExpandCard(@log.Id)" title="Full view">⤢</button>
-                      <button class="wbcard-btn" onclick="wbStartCardEdit(@log.Id)" title="Edit">✏</button>
-                      <button class="wbcard-btn del" onclick="wbDeleteCard(@log.Id)" title="Delete">×</button>
-                    </div>
+                    <span class="wbcard-badge" style="background:@cc;color:#fff" id="wbcb-@log.Id">@cat</span>
+                    <span class="wbcard-hrs" id="wbch-@log.Id">@log.Hours h</span>
                   </div>
-                  <!-- Inline edit -->
-                  <div class="wbcard-editf hidden" id="wbcef-@log.Id">
-                    <textarea class="wbcard-einp wb-ce-desc" rows="2">@log.Description</textarea>
+                  <div class="wbcard-hover-actions" onclick="event.stopPropagation()">
+                    <span class="wbcard-drag-ico" draggable="false" title="Drag">⠿</span>
+                    <button class="wbcard-ha-btn" onclick="wbStartCardEdit(@log.Id)" title="Quick edit">✏</button>
+                    <button class="wbcard-ha-btn del" onclick="wbDeleteCard(@log.Id)" title="Delete">🗑</button>
+                  </div>
+                  <div class="wbcard-editf hidden" id="wbcef-@log.Id" onclick="event.stopPropagation()">
+                    <textarea class="wbcard-einp wb-ce-desc" rows="3">@log.Description</textarea>
                     <div class="wbcard-erow">
-                      <input type="number" class="wbcard-einp wb-ce-hrs" value="@log.Hours" step="0.25" min="0.25" max="24" style="width:62px">
+                      <input type="number" class="wbcard-einp wb-ce-hrs" value="@log.Hours" step="0.25" min="0.25" max="24" style="width:60px">
                       <select class="wbcard-einp wb-ce-cat" style="flex:1">
-                        @foreach (var cat in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Other"})
-                        {
-                          <option value="@cat" selected="@(log.Tags == cat ? "selected" : null)">@cat</option>
-                        }
+                        @foreach (var c in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Other"})
+                        { <option value="@c" selected="@(log.Tags == c ? "selected" : null)">@c</option> }
                       </select>
                     </div>
                     <input type="text" class="wbcard-einp wb-ce-proj" value="@log.Project" placeholder="Project" list="wbProjectList">
@@ -565,7 +557,7 @@ function wbExpandCard(id) {
   const badge   = document.getElementById(`wbcb-${id}`);
   const cat     = badge?.textContent?.trim() ?? 'Other';
   const color   = badge?.style.background ?? '#94a3b8';
-  const proj    = card.querySelector('.wbcard-proj')?.textContent ?? '';
+  const proj    = document.getElementById(`wbcp-${id}`)?.textContent ?? '';
   const dateIso = card.dataset.date ?? '';
   const dateLabel = dateIso
     ? new Date(dateIso + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' })
@@ -651,16 +643,10 @@ async function wbExpandSaveEdit(id) {
     const card  = document.getElementById(`wbc-${id}`);
     document.getElementById(`wbcd-${id}`).textContent = desc;
     document.getElementById(`wbch-${id}`).textContent = hrs + ' h';
-    card?.querySelector('.wbcard-stripe')?.setAttribute('style', `background:${color}`);
+    document.getElementById(`wbcp-${id}`).textContent = proj;
+    card?.querySelector('.wbcard-accent')?.setAttribute('style', `background:${color}`);
     const badge = document.getElementById(`wbcb-${id}`);
     if (badge) { badge.style.background = color; badge.textContent = cat; }
-    const compact = document.getElementById(`wbcc-${id}`);
-    if (compact) {
-      compact.querySelector('.wbcard-compact-txt').textContent = desc;
-      compact.querySelector('.wbcard-compact-hrs').textContent = hrs + ' h';
-    }
-    const projEl = card?.querySelector('.wbcard-proj');
-    if (projEl) projEl.textContent = proj;
     if (card?.dataset.date) wbUpdateDayTotal(card.dataset.date);
 
     wbCloseModal();
@@ -771,34 +757,28 @@ function wbBuildCard(e) {
   const catOpts = CAT_LIST.map(c => `<option value="${c}" ${c===cat?'selected':''}>${c}</option>`).join('');
   return `<div class="wbcard wbcard-new" id="wbc-${e.id}" draggable="true"
                data-id="${e.id}" data-date="${date}"
-               ondragstart="wbDragStart(event,${e.id})">
-    <div class="wbcard-stripe" style="background:${color}"></div>
-    <button class="wbcard-toggle" onclick="wbToggleCollapse(${e.id})" title="Minimize">‒</button>
-    <div class="wbcard-compact" id="wbcc-${e.id}" onclick="wbToggleCollapse(${e.id})">
-      <span class="wbcard-compact-txt">${escHtml(e.description)}</span>
-      <span class="wbcard-compact-hrs">${e.hours} h</span>
-      <span class="wbcard-compact-arr">▸</span>
-    </div>
+               ondragstart="wbDragStart(event,${e.id})"
+               onclick="wbCardClick(event,${e.id})">
+    <div class="wbcard-accent" style="background:${color}"></div>
     <div class="wbcard-body">
       <div class="wbcard-desc" id="wbcd-${e.id}">${escHtml(e.description)}</div>
       <div class="wbcard-meta">
-        <span class="wbcard-proj">${escHtml(e.project)}</span>
-        <span class="wbcard-hrs" id="wbch-${e.id}">${e.hours} h</span>
+        <span class="wbcard-proj" id="wbcp-${e.id}">${escHtml(e.project)}</span>
       </div>
-      <span class="wbcard-badge" style="background:${color}" id="wbcb-${e.id}">${escHtml(cat)}</span>
     </div>
     <div class="wbcard-foot">
-      <span class="wbcard-drag" title="Drag to move day">⋮⋮</span>
-      <div class="wbcard-actions">
-        <button class="wbcard-btn expand" onclick="wbExpandCard(${e.id})" title="Full view">⤢</button>
-        <button class="wbcard-btn" onclick="wbStartCardEdit(${e.id})" title="Edit">✏</button>
-        <button class="wbcard-btn del" onclick="wbDeleteCard(${e.id})" title="Delete">×</button>
-      </div>
+      <span class="wbcard-badge" style="background:${color};color:#fff" id="wbcb-${e.id}">${escHtml(cat)}</span>
+      <span class="wbcard-hrs" id="wbch-${e.id}">${e.hours} h</span>
     </div>
-    <div class="wbcard-editf hidden" id="wbcef-${e.id}">
-      <textarea class="wbcard-einp wb-ce-desc" rows="2">${escHtml(e.description)}</textarea>
+    <div class="wbcard-hover-actions" onclick="event.stopPropagation()">
+      <span class="wbcard-drag-ico" title="Drag">⠿</span>
+      <button class="wbcard-ha-btn" onclick="wbStartCardEdit(${e.id})" title="Quick edit">✏</button>
+      <button class="wbcard-ha-btn del" onclick="wbDeleteCard(${e.id})" title="Delete">🗑</button>
+    </div>
+    <div class="wbcard-editf hidden" id="wbcef-${e.id}" onclick="event.stopPropagation()">
+      <textarea class="wbcard-einp wb-ce-desc" rows="3">${escHtml(e.description)}</textarea>
       <div class="wbcard-erow">
-        <input type="number" class="wbcard-einp wb-ce-hrs" value="${e.hours}" step="0.25" min="0.25" max="24" style="width:62px">
+        <input type="number" class="wbcard-einp wb-ce-hrs" value="${e.hours}" step="0.25" min="0.25" max="24" style="width:60px">
         <select class="wbcard-einp wb-ce-cat" style="flex:1">${catOpts}</select>
       </div>
       <input type="text" class="wbcard-einp wb-ce-proj" value="${escHtml(e.project)}" placeholder="Project" list="wbProjectList">
@@ -854,11 +834,20 @@ function wbUpdateDayTotal(dateIso) {
   if (el) el.textContent = total.toFixed(total % 1 === 0 ? 0 : 1) + 'h';
 }
 
-// Card edit
+// Card click — open modal unless in edit mode
+function wbCardClick(event, id) {
+  const card = document.getElementById(`wbc-${id}`);
+  if (!card.querySelector('.wbcard-editf.hidden') === false) return; // in edit mode
+  if (card.querySelector('.wbcard-editf:not(.hidden)')) return;
+  wbExpandCard(id);
+}
+
+// Card inline edit (hover ✏ button)
 function wbStartCardEdit(id) {
   const card = document.getElementById(`wbc-${id}`);
   card.querySelector('.wbcard-body')?.classList.add('hidden');
   card.querySelector('.wbcard-foot')?.classList.add('hidden');
+  card.querySelector('.wbcard-hover-actions')?.classList.add('hidden');
   card.querySelector('.wbcard-editf')?.classList.remove('hidden');
   card.setAttribute('draggable','false');
   card.querySelector('.wb-ce-desc')?.focus();
@@ -868,6 +857,7 @@ function wbCancelCardEdit(id) {
   card.querySelector('.wbcard-editf')?.classList.add('hidden');
   card.querySelector('.wbcard-body')?.classList.remove('hidden');
   card.querySelector('.wbcard-foot')?.classList.remove('hidden');
+  card.querySelector('.wbcard-hover-actions')?.classList.remove('hidden');
   card.setAttribute('draggable','true');
 }
 async function wbSaveCardEdit(id) {
@@ -887,14 +877,10 @@ async function wbSaveCardEdit(id) {
     const color = CAT_COLORS[cat] ?? '#94a3b8';
     document.getElementById(`wbcd-${id}`).textContent = desc;
     document.getElementById(`wbch-${id}`).textContent = hrs + ' h';
-    card.querySelector('.wbcard-stripe').style.background = color;
+    document.getElementById(`wbcp-${id}`).textContent = proj;
+    card.querySelector('.wbcard-accent').style.background = color;
     const badge = document.getElementById(`wbcb-${id}`);
     if (badge) { badge.style.background = color; badge.textContent = cat; }
-    const compact = document.getElementById(`wbcc-${id}`);
-    if (compact) {
-      compact.querySelector('.wbcard-compact-txt').textContent = desc;
-      compact.querySelector('.wbcard-compact-hrs').textContent = hrs + ' h';
-    }
     wbCancelCardEdit(id);
     wbUpdateDayTotal(card.dataset.date);
     showToast('✓ Entry updated');

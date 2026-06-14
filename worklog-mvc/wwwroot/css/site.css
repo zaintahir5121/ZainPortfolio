@@ -2180,6 +2180,7 @@ body.wb-page .bmc-float:hover { opacity: 1; transform: scale(1.1) translateY(0);
 .wbcard[data-cat="DevOps"]        { background: #fff1f2; border-color: #fecdd3; }
 .wbcard[data-cat="Research"]      { background: #eef2ff; border-color: #c7d2fe; }
 .wbcard[data-cat="Design"]        { background: #fdf2f8; border-color: #fbcfe8; }
+.wbcard[data-cat="Notes"]         { background: #fefce8; border-color: #fde68a; }
 .wbcard[data-cat="Other"]         { background: var(--white); border-color: var(--line); }
 .wbcard.wbcard-new {
   animation: wbCardPop .22s cubic-bezier(.22,1,.36,1);

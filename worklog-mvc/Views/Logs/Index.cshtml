@@ -116,7 +116,7 @@
                 <div class="wb-tl-editrow">
                   <input type="number" class="wb-tl-inp wb-tl-ihrs" value="@log.Hours" step="0.25" min="0.25" max="24">
                   <select class="wb-tl-inp wb-tl-icat">
-                    @foreach (var cat in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Other"})
+                    @foreach (var cat in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Notes","Other"})
                     {
                       <option value="@cat" selected="@(log.Tags == cat ? "selected" : null)">@cat</option>
                     }
@@ -243,6 +243,7 @@
               <option value="DevOps">DevOps</option>
               <option value="Research">Research</option>
               <option value="Design">Design</option>
+              <option value="Notes">Notes</option>
               <option value="Other" selected>Other</option>
             </select>
           </div>
@@ -327,7 +328,7 @@
                     <div class="wbcard-erow">
                       <input type="number" class="wbcard-einp wb-ce-hrs" value="@log.Hours" step="0.25" min="0.25" max="24" style="width:60px">
                       <select class="wbcard-einp wb-ce-cat" style="flex:1">
-                        @foreach (var c in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Other"})
+                        @foreach (var c in new[]{"Development","Meeting","Code Review","Testing","Documentation","DevOps","Research","Design","Notes","Other"})
                         { <option value="@c" selected="@(log.Tags == c ? "selected" : null)">@c</option> }
                       </select>
                     </div>
@@ -452,6 +453,7 @@
         "DevOps"        => "#ef4444",
         "Research"      => "#6366f1",
         "Design"        => "#ec4899",
+        "Notes"         => "#d97706",
         _               => "#94a3b8",
     };
 }
@@ -496,9 +498,9 @@ const WB = {
 const CAT_COLORS = {
   'Development':'#3b82f6','Meeting':'#f59e0b','Code Review':'#10b981',
   'Testing':'#8b5cf6','Documentation':'#06b6d4','DevOps':'#ef4444',
-  'Research':'#6366f1','Design':'#ec4899','Other':'#94a3b8',
+  'Research':'#6366f1','Design':'#ec4899','Notes':'#d97706','Other':'#94a3b8',
 };
-const CAT_LIST = ['Development','Meeting','Code Review','Testing','Documentation','DevOps','Research','Design','Other'];
+const CAT_LIST = ['Development','Meeting','Code Review','Testing','Documentation','DevOps','Research','Design','Notes','Other'];
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
 const inp     = document.getElementById('gkInput');

@@ -493,6 +493,30 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         return Ok(new { ok = true });
     }
 
+    /* ── Sticky Notes Widget ── */
+    [HttpGet]
+    public async Task<IActionResult> Sticky()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var allMine = db.LogEntries.Where(l => l.UserId == CurrentUserId);
+        var todayLogs = await allMine
+            .Where(l => l.Date == today)
+            .OrderByDescending(l => l.CreatedAt)
+            .ToListAsync();
+        var recentProjects = await allMine
+            .GroupBy(l => l.Project)
+            .Select(g => new { Name = g.Key, LastDate = g.Max(e => e.Date) })
+            .OrderByDescending(x => x.LastDate)
+            .Select(x => x.Name)
+            .Take(10)
+            .ToListAsync();
+        ViewBag.TodayHours     = todayLogs.Sum(l => l.Hours);
+        ViewBag.FirstName      = (User.FindFirstValue(ClaimTypes.Name) ?? "there").Split(' ')[0];
+        ViewBag.RecentProjects = recentProjects;
+        ViewBag.Date           = DateTime.Today.ToString("ddd, MMM d");
+        return View(todayLogs);
+    }
+
     /* ── Quick add — instant save, no AI ── */
     [HttpPost]
     public async Task<IActionResult> QuickAdd([FromBody] QuickAddRequest req)

@@ -1,0 +1,339 @@
+@{
+    ViewData["Title"] = "AI Assistant";
+    string firstName = ViewBag.FirstName as string ?? "there";
+    decimal todayH   = ViewBag.TodayHours is decimal h ? h : 0m;
+    int todayCount   = ViewBag.TodayCount is int c ? c : 0;
+}
+
+@section Styles {
+<style>
+  body { overflow: hidden !important }
+  .main-wrap {
+    max-width: none !important; margin: 0 !important; padding: 0 !important;
+    height: calc(100dvh - 54px); overflow: hidden !important;
+  }
+  .app-footer { display: none !important }
+
+  /* ── Layout ── */
+  .ai-wrap {
+    display: flex; flex-direction: column; height: 100%;
+    background: var(--bg);
+  }
+  .ai-header {
+    flex-shrink: 0;
+    padding: 14px 20px 12px;
+    border-bottom: 1px solid var(--line);
+    background: var(--white);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .ai-avatar {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px; font-weight: 800; flex-shrink: 0;
+  }
+  .ai-hdr-info { flex: 1 }
+  .ai-hdr-name { font-size: 15px; font-weight: 800; color: var(--text) }
+  .ai-hdr-sub  { font-size: 12px; color: var(--muted); margin-top: 1px }
+  .ai-status {
+    font-size: 11px; font-weight: 600;
+    background: #dcfce7; color: #16a34a;
+    padding: 3px 10px; border-radius: 99px;
+  }
+  .ai-status.thinking { background: #fef3c7; color: #d97706 }
+
+  /* ── Messages ── */
+  .ai-msgs {
+    flex: 1; overflow-y: auto; padding: 20px 16px;
+    display: flex; flex-direction: column; gap: 14px;
+    scroll-behavior: smooth;
+  }
+  .ai-msgs::-webkit-scrollbar { width: 5px }
+  .ai-msgs::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px }
+
+  /* Welcome / suggestions */
+  .ai-welcome {
+    text-align: center; padding: 28px 16px 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .ai-welcome-logo {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: #fff; box-shadow: 0 4px 20px rgba(99,102,241,.3);
+  }
+  .ai-welcome-title { font-size: 18px; font-weight: 800; color: var(--text) }
+  .ai-welcome-sub   { font-size: 13.5px; color: var(--muted); line-height: 1.55; max-width: 360px }
+  .ai-chips {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    margin-top: 4px;
+  }
+  .ai-chip {
+    padding: 7px 14px; border-radius: 99px;
+    border: 1.5px solid var(--line); background: var(--white);
+    font-size: 12.5px; font-weight: 600; color: var(--text-2);
+    cursor: pointer; font-family: var(--font);
+    transition: border-color .12s, color .12s, background .12s;
+  }
+  .ai-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg) }
+
+  /* Message bubble */
+  .ai-msg {
+    display: flex; gap: 10px; align-items: flex-start;
+    animation: msgIn .2s cubic-bezier(.22,1,.36,1);
+  }
+  .ai-msg.user { flex-direction: row-reverse }
+  @@keyframes msgIn {
+    from { opacity:0; transform:translateY(8px) }
+    to   { opacity:1; transform:translateY(0) }
+  }
+
+  .ai-msg-av {
+    width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800;
+  }
+  .ai-msg.bot  .ai-msg-av { background: linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff }
+  .ai-msg.user .ai-msg-av { background: var(--accent-bg); color: var(--accent) }
+
+  .ai-bubble {
+    max-width: min(72%, 520px);
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13.5px; line-height: 1.65; color: var(--text);
+  }
+  .ai-msg.bot  .ai-bubble {
+    background: var(--white);
+    border: 1.5px solid var(--line);
+    border-bottom-left-radius: 4px;
+  }
+  .ai-msg.user .ai-bubble {
+    background: var(--accent);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .ai-bubble p   { margin: 0 0 8px }
+  .ai-bubble p:last-child { margin-bottom: 0 }
+  .ai-bubble ul  { margin: 4px 0 8px 16px }
+  .ai-bubble li  { margin-bottom: 4px }
+  .ai-bubble strong { font-weight: 700 }
+
+  /* Typing indicator */
+  .ai-typing { display: flex; gap: 4px; align-items: center; padding: 4px 0 }
+  .ai-typing span {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--muted); display: inline-block;
+    animation: aiDot 1.2s ease-in-out infinite;
+  }
+  .ai-typing span:nth-child(2) { animation-delay: .2s }
+  .ai-typing span:nth-child(3) { animation-delay: .4s }
+  @@keyframes aiDot {
+    0%,60%,100% { transform:translateY(0); opacity:.4 }
+    30%         { transform:translateY(-6px); opacity:1 }
+  }
+
+  /* ── Input bar ── */
+  .ai-input-wrap {
+    flex-shrink: 0;
+    padding: 10px 16px max(12px, calc(10px + env(safe-area-inset-bottom)));
+    border-top: 1px solid var(--line);
+    background: var(--white);
+    display: flex; align-items: flex-end; gap: 8px;
+  }
+  .ai-input-box {
+    flex: 1;
+    border: 1.5px solid var(--line); border-radius: 14px;
+    padding: 10px 14px; font-size: 14px; font-family: var(--font);
+    color: var(--text); background: var(--bg);
+    resize: none; outline: none; min-height: 44px; max-height: 140px;
+    transition: border-color .18s;
+    line-height: 1.55;
+  }
+  .ai-input-box:focus { border-color: rgba(99,102,241,.5); background: var(--white) }
+  .ai-input-box::placeholder { color: var(--muted) }
+  .ai-send-btn {
+    width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+    border: none; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    transition: box-shadow .18s, transform .14s, opacity .15s;
+    box-shadow: 0 2px 12px rgba(99,102,241,.35);
+  }
+  .ai-send-btn:hover { box-shadow: 0 4px 20px rgba(99,102,241,.52); transform: translateY(-1px) }
+  .ai-send-btn:disabled { opacity: .4; cursor: default; transform: none; box-shadow: none }
+
+  .ai-input-hint {
+    font-size: 10.5px; color: var(--muted); text-align: center;
+    padding-bottom: 4px; flex-shrink: 0;
+  }
+
+  @@media (max-width: 600px) {
+    .ai-bubble { max-width: 85% }
+    .ai-welcome-title { font-size: 16px }
+    .ai-header { padding: 10px 14px }
+  }
+</style>
+}
+
+<div class="ai-wrap" id="aiWrap">
+
+  <!-- Header -->
+  <div class="ai-header">
+    <div class="ai-avatar">✦</div>
+    <div class="ai-hdr-info">
+      <div class="ai-hdr-name">WorkLog AI</div>
+      <div class="ai-hdr-sub">Work-focused assistant · powered by Ollama</div>
+    </div>
+    <span class="ai-status" id="aiStatus">● Ready</span>
+  </div>
+
+  <!-- Messages -->
+  <div class="ai-msgs" id="aiMsgs">
+    <div class="ai-welcome" id="aiWelcome">
+      <div class="ai-welcome-logo">✦</div>
+      <div class="ai-welcome-title">Hi @firstName! I'm WorkLog AI</div>
+      <div class="ai-welcome-sub">
+        I know your work logs and can help you write standups, analyze your week,
+        improve productivity, or answer any work-related question.
+        @if (todayH > 0)
+        {
+          <br><strong>Today: @todayH h logged across @todayCount @(todayCount == 1 ? "entry" : "entries")</strong>
+        }
+      </div>
+      <div class="ai-chips">
+        <button class="ai-chip" onclick="aiSendPrompt('Write my standup for today')">📋 Write my standup</button>
+        <button class="ai-chip" onclick="aiSendPrompt('Summarize my work this week')">📊 Week summary</button>
+        <button class="ai-chip" onclick="aiSendPrompt('How am I tracking against my weekly goal?')">🎯 Goal progress</button>
+        <button class="ai-chip" onclick="aiSendPrompt('What did I spend the most time on this week?')">⏱ Time breakdown</button>
+        <button class="ai-chip" onclick="aiSendPrompt('Give me productivity tips based on my logs')">💡 Productivity tips</button>
+        <button class="ai-chip" onclick="aiSendPrompt('What should I focus on tomorrow?')">🌅 Tomorrow focus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="ai-input-wrap">
+    <textarea id="aiInput" class="ai-input-box" rows="1"
+              placeholder="Ask me anything about your work…"
+              onkeydown="aiKeydown(event)"
+              oninput="aiAutosize(this)"></textarea>
+    <button id="aiSend" class="ai-send-btn" onclick="aiSend()" title="Send (Enter)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+
+</div>
+
+@section Scripts {
+<script>
+const aiMsgs  = document.getElementById('aiMsgs');
+const aiInput = document.getElementById('aiInput');
+const aiSendBtn = document.getElementById('aiSend');
+let aiThinking = false;
+
+function aiKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSend(); }
+}
+
+function aiAutosize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function aiSendPrompt(text) {
+  document.getElementById('aiWelcome')?.remove();
+  aiInput.value = text;
+  aiAutosize(aiInput);
+  aiSend();
+}
+
+function aiAppend(role, html) {
+  const initials = role === 'bot' ? '✦' : '@firstName[0]'.toUpperCase();
+  const cls = role === 'bot' ? 'bot' : 'user';
+  const div = document.createElement('div');
+  div.className = `ai-msg ${cls}`;
+  div.innerHTML = `
+    <div class="ai-msg-av">${escHtml(initials)}</div>
+    <div class="ai-bubble">${html}</div>`;
+  aiMsgs.appendChild(div);
+  aiMsgs.scrollTop = aiMsgs.scrollHeight;
+  return div;
+}
+
+function aiShowTyping() {
+  const div = document.createElement('div');
+  div.className = 'ai-msg bot'; div.id = 'aiTyping';
+  div.innerHTML = `<div class="ai-msg-av">✦</div>
+    <div class="ai-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>`;
+  aiMsgs.appendChild(div);
+  aiMsgs.scrollTop = aiMsgs.scrollHeight;
+}
+
+function aiRemoveTyping() {
+  document.getElementById('aiTyping')?.remove();
+}
+
+function markdownToHtml(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/^•\s(.+)$/gm, '<li>$1</li>')
+    .replace(/^-\s(.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    .replace(/\n\n+/g, '</p><p>')
+    .replace(/^(.)/m, '<p>$1')
+    .replace(/(.)\n?$/m, '$1</p>')
+    .replace(/<p><\/p>/g, '');
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function setStatus(txt, isThinking) {
+  const s = document.getElementById('aiStatus');
+  s.textContent = txt;
+  s.classList.toggle('thinking', !!isThinking);
+}
+
+async function aiSend() {
+  const text = aiInput.value.trim();
+  if (!text || aiThinking) return;
+  document.getElementById('aiWelcome')?.remove();
+  aiInput.value = ''; aiAutosize(aiInput);
+  aiAppend('user', escHtml(text));
+  aiThinking = true;
+  aiSendBtn.disabled = true;
+  setStatus('⌛ Thinking…', true);
+  aiShowTyping();
+
+  try {
+    const res = await fetch('/Assistant/Chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text }),
+    });
+    aiRemoveTyping();
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({error:'Something went wrong'}));
+      aiAppend('bot', `<span style="color:#ef4444">⚠ ${escHtml(e.error)}</span>`);
+      setStatus('● Ready', false);
+    } else {
+      const { response } = await res.json();
+      aiAppend('bot', markdownToHtml(response));
+      setStatus('● Ready', false);
+    }
+  } catch {
+    aiRemoveTyping();
+    aiAppend('bot', '<span style="color:#ef4444">⚠ Network error. Make sure Ollama is running locally.</span>');
+    setStatus('● Offline', false);
+  }
+  aiThinking = false;
+  aiSendBtn.disabled = false;
+  aiInput.focus();
+}
+</script>
+}

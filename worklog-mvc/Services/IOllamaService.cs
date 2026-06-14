@@ -10,6 +10,7 @@ public interface IOllamaService
     Task<string>      GenerateTimesheetSummaryAsync(string employeeName, DateOnly start, DateOnly end, IEnumerable<LogEntry> entries);
     Task<ParsedEntry>          ParseLogEntryAsync(string text);
     Task<List<ParsedDayEntry>> ParseDayLogAsync(string text);
+    Task<string> ChatAsync(string message, string? context = null);
 }
 
 public record ParsedEntry(string? Project, decimal? Hours, string Description, string Tags);

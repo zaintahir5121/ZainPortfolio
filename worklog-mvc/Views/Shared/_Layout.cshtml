@@ -22,7 +22,11 @@
   <a href="/" class="t-logo">worklog<span>.</span></a>
   <div class="t-links">
     <a asp-controller="Logs" asp-action="Index"
-       class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Logs" ? "t-link-on" : "")">Logs</a>
+       class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Logs" && ViewContext.RouteData.Values["action"]?.ToString() != "Sticky" ? "t-link-on" : "")">WorkLog</a>
+    <a asp-controller="Logs" asp-action="Sticky"
+       class="t-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Sticky" ? "t-link-on" : "")">📝 Notes</a>
+    <a asp-controller="Assistant" asp-action="Index"
+       class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Assistant" ? "t-link-on" : "")">✦ AI</a>
     <a asp-controller="Timesheet" asp-action="Index"
        class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Timesheet" ? "t-link-on" : "")">Timesheet</a>
     <a asp-controller="Recurring" asp-action="Index"
@@ -52,7 +56,11 @@
 
 <div class="t-mobile-drawer" id="tMobileDrawer">
   <a asp-controller="Logs" asp-action="Index"
-     class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Logs" ? "t-link-on" : "")">Logs</a>
+     class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Logs" && ViewContext.RouteData.Values["action"]?.ToString() != "Sticky" ? "t-link-on" : "")">WorkLog</a>
+  <a asp-controller="Logs" asp-action="Sticky"
+     class="t-drawer-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Sticky" ? "t-link-on" : "")">📝 Notes</a>
+  <a asp-controller="Assistant" asp-action="Index"
+     class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Assistant" ? "t-link-on" : "")">✦ AI Assistant</a>
   <a asp-controller="Timesheet" asp-action="Index"
      class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Timesheet" ? "t-link-on" : "")">Timesheet</a>
   <a asp-controller="Recurring" asp-action="Index"

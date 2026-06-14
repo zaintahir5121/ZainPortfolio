@@ -106,6 +106,22 @@ public class OllamaService(HttpClient http, IConfiguration cfg) : IOllamaService
         catch { return [new ParsedDayEntry(text.Trim(), 0, "Other", "General")]; }
     }
 
+    public async Task<string> ChatAsync(string message, string? context = null)
+    {
+        const string system = "You are WorkLog AI, a focused productivity assistant built into the WorkLog app. " +
+            "You help users with: work log summaries, standup updates, time management tips, productivity insights, " +
+            "and analysis of their logged work entries.\n\n" +
+            "Rules:\n" +
+            "1. ONLY answer questions related to work, productivity, time tracking, standup updates, career growth, or the user's work data shown below.\n" +
+            "2. If asked about anything unrelated (sports, cooking, general knowledge, etc.), respond: \"I'm WorkLog AI and I focus only on work-related topics. Ask me about your logs, standup, or productivity!\"\n" +
+            "3. Keep answers concise, practical, and use bullet points where helpful.\n" +
+            "4. If the user shares work data, reference it specifically in your answer.";
+
+        var ctx = string.IsNullOrWhiteSpace(context) ? "" : $"\n\nUser's recent work data:\n{context}";
+        var prompt = $"{system}{ctx}\n\nUser: {message}\n\nWorkLog AI:";
+        return await CallOllamaAsync(prompt, timeout: 90);
+    }
+
     private async Task<string> CallOllamaAsync(string prompt, int timeout = 40)
     {
         using var cts  = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));

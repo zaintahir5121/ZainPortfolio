@@ -411,7 +411,7 @@
           </div>
         }
         <div class="sc-msg">@Model.ProgressMessage</div>
-        <div class="sc-footer">Tracked with worklog · worklog.app</div>
+        <div class="sc-footer">Tracked with worklog · worklog.today</div>
       </div>
     </div>
 
@@ -1554,11 +1554,11 @@ function shareLinkedIn() {
   setTimeout(() => window.open('https://www.linkedin.com/feed/', '_blank'), 600);
 }
 function shareFacebook() {
-  window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(buildLinkedInText())}&u=https://worklog.app`, '_blank');
+  window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(buildLinkedInText())}&u=https://worklog.today`, '_blank');
 }
 function shareTwitter() {
   const hrs = @Json.Serialize(Model.WeekTotalFormatted);
-  const t   = encodeURIComponent(`📊 This week: ${hrs} logged, @Model.Streak-day streak, @Model.WeekPctInt% of goal. Consistency is everything. #WorkLog #Productivity`);
+  const t   = encodeURIComponent(`📊 This week: ${hrs} logged, @Model.Streak-day streak, @Model.WeekPctInt% of goal. Consistency is everything. worklog.today #WorkLog #Productivity`);
   window.open(`https://x.com/intent/tweet?text=${t}`, '_blank');
 }
 function copyLinkedInText() {

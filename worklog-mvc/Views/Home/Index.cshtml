@@ -7,26 +7,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WorkLog — Free Daily Work Journal &amp; Employee Time Tracker</title>
-  <meta name="description" content="Stop scrambling for Friday's timesheet. Log work in seconds, AI structures it, timesheets export in one click. Free, private, no credit card.">
-  <meta name="keywords" content="free work log app, daily work journal, employee time tracker free, simple timesheet app, work hours tracker, daily standup tracker">
-  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <title>WorkLog — Free Daily Work Log App | worklog.today</title>
+  <meta name="description" content="Stop scrambling for Friday's timesheet. Log work in seconds at worklog.today — AI structures it, timesheets export in one click. Free forever, private, no credit card.">
+  <meta name="keywords" content="work log app, daily work journal, employee time tracker, free timesheet app, work hours tracker, daily standup log, AI work logger, worklog.today">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <meta name="author" content="WorkLog">
-  <link rel="canonical" href="https://worklog.app/">
+  <link rel="canonical" href="https://worklog.today/">
+  <link rel="alternate" hreflang="en" href="https://worklog.today/">
 
   <meta property="og:type"         content="website">
-  <meta property="og:url"          content="https://worklog.app/">
+  <meta property="og:url"          content="https://worklog.today/">
   <meta property="og:title"        content="WorkLog — Free Daily Work Journal &amp; Time Tracker">
-  <meta property="og:description"  content="Log your day in seconds. AI parses it automatically. Export timesheets, track your streak, see your week at a glance. Free, private, no subscription.">
-  <meta property="og:image"        content="https://worklog.app/og-image.png">
+  <meta property="og:description"  content="Log your day in seconds. AI parses it automatically. Export timesheets, track your streak, see your week at a glance. Free forever, private, no subscription.">
+  <meta property="og:image"        content="https://worklog.today/og-image.png">
   <meta property="og:image:width"  content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt"    content="WorkLog — Daily work journal and time tracker">
   <meta property="og:site_name"    content="WorkLog">
+  <meta property="og:locale"       content="en_US">
 
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="WorkLog — Free Daily Work Journal">
-  <meta name="twitter:description" content="Log your work in seconds. AI parses it. Timesheets in one click. Free, private.">
-  <meta name="twitter:image"       content="https://worklog.app/og-image.png">
+  <meta name="twitter:site"        content="@@worklogtoday">
+  <meta name="twitter:title"       content="WorkLog — Free Daily Work Log App">
+  <meta name="twitter:description" content="Log your work in seconds. AI parses it. Timesheets in one click. Free, private. worklog.today">
+  <meta name="twitter:image"       content="https://worklog.today/og-image.png">
+  <meta name="twitter:image:alt"   content="WorkLog app screenshot">
 
   <meta name="theme-color" content="#6366f1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,17 +39,67 @@
   <link rel="manifest" href="/manifest.json">
 
   <script type="application/ld+json">
-  {
-    "@@context": "https://schema.org",
-    "@@type": "SoftwareApplication",
-    "name": "WorkLog",
-    "description": "Free daily work journal and time tracker for employees and freelancers.",
-    "url": "https://worklog.app",
-    "applicationCategory": "ProductivityApplication",
-    "operatingSystem": "Web",
-    "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "featureList": ["AI daily log parsing", "Timesheet export", "Voice input", "Weekly progress", "Recurring entries", "Privacy-first"]
-  }
+  [
+    {
+      "@@context": "https://schema.org",
+      "@@type": "WebSite",
+      "url": "https://worklog.today",
+      "name": "WorkLog",
+      "description": "Free daily work journal and AI-powered time tracker for employees and freelancers.",
+      "potentialAction": {
+        "@@type": "SearchAction",
+        "target": "https://worklog.today/Logs?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@@context": "https://schema.org",
+      "@@type": "SoftwareApplication",
+      "name": "WorkLog",
+      "alternateName": "worklog.today",
+      "description": "Free daily work journal and time tracker for employees and freelancers. Log work in seconds, AI structures it, timesheets export in one click.",
+      "url": "https://worklog.today",
+      "applicationCategory": "ProductivityApplication",
+      "applicationSubCategory": "Time Tracking",
+      "operatingSystem": "Web, iOS, Android, Windows, macOS",
+      "browserRequirements": "Requires a modern web browser",
+      "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": ["AI daily log parsing", "Timesheet export", "Voice input", "Weekly progress charts", "Recurring entries", "Desktop PWA widget", "CSV export", "Privacy-first"],
+      "screenshot": "https://worklog.today/og-image.png",
+      "author": { "@@type": "Organization", "name": "WorkLog", "url": "https://worklog.today" }
+    },
+    {
+      "@@context": "https://schema.org",
+      "@@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@@type": "Question",
+          "name": "Is WorkLog free?",
+          "acceptedAnswer": { "@@type": "Answer", "text": "Yes — completely free. No credit card, no subscription, no usage limits. WorkLog is a free work log app built for people who believe their data should stay private." }
+        },
+        {
+          "@@type": "Question",
+          "name": "How is WorkLog different from other time trackers?",
+          "acceptedAnswer": { "@@type": "Answer", "text": "Most time trackers require you to start and stop timers. WorkLog works the other way — you write what you did at the end of the day, and AI structures it for you automatically. It takes 60 seconds, not 60 interruptions." }
+        },
+        {
+          "@@type": "Question",
+          "name": "Is my work data private?",
+          "acceptedAnswer": { "@@type": "Answer", "text": "Yes. Your journal lives in your own database. Nothing is sent to third-party analytics or advertising servers. The AI runs locally — your work entries are never shared." }
+        },
+        {
+          "@@type": "Question",
+          "name": "Can I export timesheets from WorkLog?",
+          "acceptedAnswer": { "@@type": "Answer", "text": "Yes. WorkLog exports CSV timesheets for any date range — compatible with payroll software, invoicing tools, and HR systems. One click, instant download." }
+        },
+        {
+          "@@type": "Question",
+          "name": "Does WorkLog work on mobile and desktop?",
+          "acceptedAnswer": { "@@type": "Answer", "text": "WorkLog works in any browser on any device. You can install it as a PWA on your phone's home screen or as a desktop widget on Windows — it behaves like a native app." }
+        }
+      ]
+    }
+  ]
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">

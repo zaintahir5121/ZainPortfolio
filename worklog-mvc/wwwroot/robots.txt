@@ -15,4 +15,4 @@ Disallow: /Learning/
 
 Crawl-delay: 2
 
-Sitemap: https://worklog.app/sitemap.xml
+Sitemap: https://worklog.today/sitemap.xml

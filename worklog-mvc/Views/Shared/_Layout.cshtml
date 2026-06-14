@@ -187,5 +187,10 @@ async function submitFeedback() {
 
 @RenderSection("Scripts", required: false)
 <a href="https://buymeacoffee.com/zaintahir512" target="_blank" rel="noopener" class="bmc-float" title="Support WorkLog — Buy me a coffee">☕</a>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+  }
+</script>
 </body>
 </html>

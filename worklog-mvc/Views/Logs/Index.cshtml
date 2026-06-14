@@ -204,6 +204,68 @@
       </button>
     </div>
 
+    <!-- ── Google Keep-style note creator ── -->
+    <div class="gk-creator" id="gkCreator">
+      <!-- Idle: single-line prompt -->
+      <div class="gk-idle" id="gkIdle" onclick="gkExpand()">
+        <svg class="gk-idle-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        <span class="gk-idle-ph">What did you work on today?</span>
+        <span class="gk-idle-hint">Click or press N</span>
+      </div>
+      <!-- Expanded card -->
+      <div class="gk-open" id="gkOpen">
+        <div class="gk-acc-top" id="gkAccent"></div>
+        <div class="wb-proj-row" id="wbProjRow"></div>
+        <textarea id="gkInput" class="gk-ta"
+                  placeholder="What did you work on today?"
+                  rows="2"
+                  onkeydown="gkKeydown(event)"
+                  oninput="gkAutosize(this)"></textarea>
+        <div class="gk-foot">
+          <div class="gk-hrs-wrap">
+            <button class="gk-hrs-btn" onclick="gkStep(-0.5)" tabindex="-1" title="Fewer hours">−</button>
+            <input type="number" id="gkHrs" class="gk-hrs-inp" value="1" min="0.25" max="24" step="0.25">
+            <span class="gk-hrs-lbl">h</span>
+            <button class="gk-hrs-btn" onclick="gkStep(0.5)" tabindex="-1" title="More hours">+</button>
+          </div>
+          <span class="gk-sep"></span>
+          <div class="gk-cat-wrap">
+            <span class="gk-cat-dot" id="gkDot"></span>
+            <select id="gkCat" class="gk-cat-sel" onchange="gkUpdateAccent()">
+              <option value="Development">Development</option>
+              <option value="Meeting">Meeting</option>
+              <option value="Code Review">Code Review</option>
+              <option value="Testing">Testing</option>
+              <option value="Documentation">Docs</option>
+              <option value="DevOps">DevOps</option>
+              <option value="Research">Research</option>
+              <option value="Design">Design</option>
+              <option value="Other" selected>Other</option>
+            </select>
+          </div>
+          <span class="gk-sep"></span>
+          <div class="gk-proj-wrap">
+            <svg class="gk-proj-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+            <input type="text" id="gkProj" class="gk-proj-inp" placeholder="Project" list="wbProjectList">
+          </div>
+          <div class="gk-actions">
+            <button class="gk-close-btn" onclick="gkClose()">Close</button>
+            <button class="gk-log-btn" id="gkSaveBtn" onclick="wbQuickAdd()">
+              Log it
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── Card board ── -->
     <div class="wb-board" id="wbBoard">
       @if (!grouped.Any())
@@ -241,6 +303,7 @@
                 var cat = string.IsNullOrWhiteSpace(log.Tags) ? "Other" : log.Tags;
                 <div class="wbcard" id="wbc-@log.Id" draggable="true"
                      data-id="@log.Id" data-date="@log.Date.ToString("yyyy-MM-dd")"
+                     data-cat="@log.Tags"
                      ondragstart="wbDragStart(event,@log.Id)"
                      onclick="wbCardClick(event,@log.Id)">
                   <div class="wbcard-accent" style="background:@cc"></div>
@@ -282,74 +345,10 @@
       }
     </div>
 
-    <!-- ── Composer capture bar ── -->
-    <div class="wb-capture" id="wbCapture">
-      <!-- Recent category/project chips (auto-populated) -->
-      <div class="wb-proj-row" id="wbProjRow"></div>
-
-      <!-- Composer card -->
-      <div class="wb-composer" id="wbComposer">
-        <!-- Accent stripe — color tracks selected category -->
-        <div class="wb-comp-accent" id="wbCompAccent"></div>
-        <!-- Main textarea -->
-        <textarea id="wbInput" class="wb-comp-desc"
-                  placeholder="What did you work on today?"
-                  rows="1"
-                  onkeydown="wbQKeydown(event)"
-                  oninput="wbAutosize(this)"></textarea>
-        <!-- Footer controls -->
-        <div class="wb-comp-foot">
-          <!-- Hours stepper -->
-          <div class="wb-comp-hrs-group">
-            <button class="wb-comp-step" onclick="wbStepHrs(-0.5)" tabindex="-1" title="Less">−</button>
-            <div class="wb-comp-hval-wrap">
-              <input type="number" id="wbQHrs" class="wb-comp-hval" value="1" min="0.25" max="24" step="0.25">
-              <span class="wb-comp-hlbl">h</span>
-            </div>
-            <button class="wb-comp-step" onclick="wbStepHrs(0.5)" tabindex="-1" title="More">+</button>
-          </div>
-
-          <span class="wb-comp-sep"></span>
-
-          <!-- Category — colored dot + select -->
-          <div class="wb-comp-cat-wrap">
-            <span class="wb-comp-cat-dot" id="wbCompDot"></span>
-            <select id="wbQCat" class="wb-comp-cat" onchange="wbUpdateAccent()">
-              <option value="Development">Development</option>
-              <option value="Meeting">Meeting</option>
-              <option value="Code Review">Code Review</option>
-              <option value="Testing">Testing</option>
-              <option value="Documentation">Docs</option>
-              <option value="DevOps">DevOps</option>
-              <option value="Research">Research</option>
-              <option value="Design">Design</option>
-              <option value="Other" selected>Other</option>
-            </select>
-          </div>
-
-          <span class="wb-comp-sep"></span>
-
-          <!-- Project with folder icon -->
-          <div class="wb-comp-proj-wrap">
-            <svg class="wb-comp-proj-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            <input type="text" id="wbQProj" class="wb-comp-proj" placeholder="Project" list="wbProjectList">
-          </div>
-
-          <div class="wb-comp-spacer"></div>
-
-          <!-- Submit -->
-          <button class="wb-comp-submit" id="wbSendBtn" onclick="wbQuickAdd()">
-            Log it
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <input type="date" id="wbDatePick" class="wb-date-inp" onchange="wbDatePicked(this.value)">
-    </div>
-
   </div>
 </div>
+<!-- Hidden date picker -->
+<input type="date" id="wbDatePick" class="wb-date-inp" onchange="wbDatePicked(this.value)" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
 
 <!-- Mobile sidebar overlay -->
 <div class="wb-overlay" id="wbOverlay" onclick="wbCloseSidebar()"></div>
@@ -502,8 +501,8 @@ const CAT_COLORS = {
 const CAT_LIST = ['Development','Meeting','Code Review','Testing','Documentation','DevOps','Research','Design','Other'];
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
-const inp     = document.getElementById('wbInput');
-const sendBtn = document.getElementById('wbSendBtn');
+const inp     = document.getElementById('gkInput');
+const sendBtn = document.getElementById('gkSaveBtn');
 const micBtn  = document.getElementById('wbMicBtn');
 
 // ── AI Fix state (kept for AI parse flow) ────────────────────────────────
@@ -527,10 +526,49 @@ function setStatus(msg, isErr = false) {
   }, 5000);
 }
 
-// ── New log bottom sheet ──────────────────────────────────────────────────
-// Keyboard: Escape blurs the capture bar
+// ── GK creator open/close ─────────────────────────────────────────────────
+function gkExpand() {
+  document.getElementById('gkIdle').style.display = 'none';
+  const open = document.getElementById('gkOpen');
+  open.style.display = 'flex';
+  gkUpdateAccent();
+  setTimeout(() => inp?.focus(), 30);
+}
+function gkClose() {
+  document.getElementById('gkOpen').style.display = 'none';
+  document.getElementById('gkIdle').style.display = 'flex';
+}
+function gkKeydown(e) {
+  if (e.key === 'Escape') { e.preventDefault(); gkClose(); return; }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wbQuickAdd(); }
+}
+function gkAutosize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+}
+function gkStep(delta) {
+  const el = document.getElementById('gkHrs');
+  if (!el) return;
+  let v = Math.round((parseFloat(el.value) || 1) * 4) / 4;
+  v = Math.max(0.25, Math.min(24, v + delta));
+  el.value = v % 1 === 0 ? String(v) : v.toFixed(2);
+}
+function gkUpdateAccent() {
+  const cat   = document.getElementById('gkCat')?.value || 'Other';
+  const color = CAT_COLORS[cat] || '#94a3b8';
+  const accentEl = document.getElementById('gkAccent');
+  const dotEl    = document.getElementById('gkDot');
+  if (accentEl) accentEl.style.background = color;
+  if (dotEl)    dotEl.style.background    = color;
+}
+
+// Global shortcut: N opens creator, Escape closes it
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.activeElement === inp) inp.blur();
+  if (e.key === 'Escape' && document.activeElement === inp) { gkClose(); return; }
+  if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !e.altKey &&
+      !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) {
+    e.preventDefault(); gkExpand();
+  }
 });
 
 // ── Response modal ────────────────────────────────────────────────────────
@@ -675,6 +713,7 @@ async function wbExpandSaveEdit(id) {
     card?.querySelector('.wbcard-accent')?.setAttribute('style', `background:${color}`);
     const badge = document.getElementById(`wbcb-${id}`);
     if (badge) { badge.style.background = color; badge.textContent = cat; }
+    if (card) card.dataset.cat = cat;
     if (card?.dataset.date) wbUpdateDayTotal(card.dataset.date);
 
     wbCloseModal();
@@ -784,7 +823,7 @@ function wbBuildCard(e) {
   const date    = e.date ?? toIso(new Date());
   const catOpts = CAT_LIST.map(c => `<option value="${c}" ${c===cat?'selected':''}>${c}</option>`).join('');
   return `<div class="wbcard wbcard-new" id="wbc-${e.id}" draggable="true"
-               data-id="${e.id}" data-date="${date}"
+               data-id="${e.id}" data-date="${date}" data-cat="${escHtml(e.category || 'Other')}"
                ondragstart="wbDragStart(event,${e.id})"
                onclick="wbCardClick(event,${e.id})">
     <div class="wbcard-accent" style="background:${color}"></div>
@@ -909,6 +948,7 @@ async function wbSaveCardEdit(id) {
     card.querySelector('.wbcard-accent').style.background = color;
     const badge = document.getElementById(`wbcb-${id}`);
     if (badge) { badge.style.background = color; badge.textContent = cat; }
+    card.dataset.cat = cat;
     wbCancelCardEdit(id);
     wbUpdateDayTotal(card.dataset.date);
     showToast('✓ Entry updated');
@@ -971,30 +1011,8 @@ async function wbDrop(e, newDate) {
   } catch { showErr('Could not save move.'); }
 }
 
-// ── Input helpers ─────────────────────────────────────────────────────────
-function wbQKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wbQuickAdd(); }
-}
-function wbAutosize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
-// ── Composer helpers ──────────────────────────────────────────────────────
-function wbUpdateAccent() {
-  const cat   = document.getElementById('wbQCat')?.value || 'Other';
-  const color = CAT_COLORS[cat] || '#94a3b8';
-  const accentEl = document.getElementById('wbCompAccent');
-  const dotEl    = document.getElementById('wbCompDot');
-  if (accentEl) accentEl.style.background = color;
-  if (dotEl)    dotEl.style.background    = color;
-}
-function wbStepHrs(delta) {
-  const el = document.getElementById('wbQHrs');
-  if (!el) return;
-  let v = Math.round((parseFloat(el.value) || 1) * 4) / 4;
-  v = Math.max(0.25, Math.min(24, v + delta));
-  el.value = v % 1 === 0 ? String(v) : v.toFixed(2);
-}
+// ── Legacy aliases (kept for wbAiParse compatibility) ─────────────────────
+function wbAutosize(el) { gkAutosize(el); }
 
 // ── Standup chip helper ───────────────────────────────────────────────────
 async function wbStandupChip() {
@@ -1027,9 +1045,9 @@ async function wbQuickAdd() {
     return;
   }
 
-  const hrs  = parseFloat(document.getElementById('wbQHrs').value) || 1;
-  const cat  = document.getElementById('wbQCat').value || 'Other';
-  const proj = document.getElementById('wbQProj').value.trim() || wbSelectedProject || '';
+  const hrs  = parseFloat(document.getElementById('gkHrs').value) || 1;
+  const cat  = document.getElementById('gkCat').value || 'Other';
+  const proj = document.getElementById('gkProj').value.trim() || wbSelectedProject || '';
 
   inp.value = ''; wbAutosize(inp);
   sendBtn.disabled = true;
@@ -1060,7 +1078,7 @@ async function wbQuickAdd() {
       wbInitProjectPicker();
     }
   } catch { showErr('Network error. Check your connection.'); }
-  finally { sendBtn.disabled = false; inp.focus(); }
+  finally { sendBtn.disabled = false; gkClose(); }
 }
 
 // ── AI Parse — Ollama parses a paragraph into multiple cards ──────────────
@@ -1490,9 +1508,9 @@ async function wbSaveEdit(id) {
   } catch { showErr('Network error.'); }
 }
 
-// ── Init project picker on load ───────────────────────────────────────────
+// ── Init on load ──────────────────────────────────────────────────────────
 wbInitProjectPicker();
-wbUpdateAccent();
+gkUpdateAccent();
 
 // ── Weekly Insight (non-blocking, loads after page ready) ─────────────────
 (async () => {

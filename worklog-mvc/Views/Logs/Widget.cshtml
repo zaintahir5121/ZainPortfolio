@@ -1,8 +1,10 @@
 @using WorkLogApp.Models
 @{
     Layout = null;
-    var  todayLogs     = ViewBag.TodayLogs     as List<LogEntry> ?? new();
-    var  yesterdayLogs = ViewBag.YesterdayLogs as List<LogEntry> ?? new();
+    var  todayWork     = ViewBag.TodayLogs     as List<LogEntry> ?? new();
+    var  todayNotes    = ViewBag.TodayNotes    as List<LogEntry> ?? new();
+    var  ydayWork      = ViewBag.YesterdayLogs as List<LogEntry> ?? new();
+    var  ydayNotes     = ViewBag.YesterdayNotes as List<LogEntry> ?? new();
     decimal todayH     = ViewBag.TodayHours    is decimal th ? th : 0m;
     decimal ydayH      = ViewBag.YesterdayHours is decimal yh ? yh : 0m;
     decimal goal       = ViewBag.DailyGoal     is decimal dg ? dg : 8m;
@@ -30,6 +32,9 @@
     :root {
       --accent:  #6366f1;
       --accent2: #8b5cf6;
+      --note-bg: #fefce8;
+      --note-bd: #fde68a;
+      --note-acc:#d97706;
       --bg:      #f5f5fa;
       --card:    #ffffff;
       --text:    #1e1e2e;
@@ -47,108 +52,121 @@
       font-size: 13px;
       -webkit-font-smoothing: antialiased;
       min-width: 260px;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       height: 100dvh;
     }
 
     /* ── Top accent strip ── */
     .wg-strip { height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); flex-shrink: 0; }
+    .wg-strip.notes { background: linear-gradient(90deg, #f59e0b, #d97706); }
 
     /* ── Top bar ── */
     .wg-bar {
       display: flex; align-items: center; gap: 8px;
-      padding: 9px 13px 8px;
+      padding: 8px 12px 0;
       background: var(--card);
-      border-bottom: 1px solid var(--line);
       flex-shrink: 0;
     }
-    .wg-logo { font-size: 14px; font-weight: 800; color: var(--text); text-decoration: none; letter-spacing: -.3px; }
+    .wg-logo { font-size: 14px; font-weight: 800; color: var(--text); text-decoration: none; letter-spacing: -.3px; flex-shrink: 0; }
     .wg-logo span { color: var(--accent); }
-    .wg-date { flex: 1; font-size: 11.5px; color: var(--muted); font-weight: 500; text-align: center; }
+    .wg-date { flex: 1; font-size: 11px; color: var(--muted); font-weight: 500; text-align: center; }
     .wg-icon-btn {
       width: 26px; height: 26px; border-radius: 7px;
       border: 1px solid var(--line); background: var(--bg);
-      cursor: pointer; font-size: 13px;
+      cursor: pointer; font-size: 12px;
       display: flex; align-items: center; justify-content: center;
-      color: var(--muted); transition: color .15s, background .15s;
+      color: var(--muted); flex-shrink: 0; transition: color .15s, background .15s;
     }
     .wg-icon-btn:hover { background: var(--card); color: var(--accent); }
 
-    /* ── Setup drawer ── */
-    .wg-setup-drawer {
-      background: var(--card);
+    /* ── Tabs ── */
+    .wg-tabs {
+      display: flex; background: var(--card);
       border-bottom: 1px solid var(--line);
-      padding: 13px 14px 12px;
+      padding: 0 12px;
       flex-shrink: 0;
     }
-    .wg-setup-title { font-size: 12.5px; font-weight: 800; color: var(--text); margin-bottom: 9px; }
-    .wg-setup-step { display: flex; gap: 9px; align-items: flex-start; margin-bottom: 7px; }
+    .wg-tab {
+      flex: 1; padding: 7px 4px 6px; text-align: center;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      border: none; background: none; font-family: var(--font);
+      color: var(--muted); border-bottom: 2.5px solid transparent;
+      transition: color .15s, border-color .15s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .wg-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .wg-tab.notes-tab.active { color: var(--note-acc); border-bottom-color: var(--note-acc); }
+    .wg-tab-count {
+      font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 99px;
+      background: var(--bg); color: var(--muted);
+    }
+    .wg-tab.active .wg-tab-count { background: #eef2ff; color: var(--accent); }
+    .wg-tab.notes-tab.active .wg-tab-count { background: #fef3c7; color: var(--note-acc); }
+
+    /* ── Setup drawer ── */
+    .wg-setup-drawer {
+      background: var(--card); border-bottom: 1px solid var(--line);
+      padding: 12px 13px 11px; flex-shrink: 0;
+    }
+    .wg-setup-title { font-size: 12px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+    .wg-dl-btn {
+      display: flex; align-items: center; gap: 8px; width: 100%;
+      padding: 9px 12px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; text-decoration: none; font-size: 12.5px; font-weight: 700;
+      margin-bottom: 9px; transition: opacity .15s;
+    }
+    .wg-dl-btn:hover { opacity: .9; }
+    .wg-dl-sub { font-size: 11px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+    .wg-dl-sub strong { color: var(--text); }
+    .wg-setup-divider { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); margin: 7px 0 6px; }
+    .wg-setup-step { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 5px; }
     .wg-step-num {
-      width: 18px; height: 18px; border-radius: 50%;
-      background: var(--accent); color: #fff;
-      font-size: 10px; font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 1px;
+      width: 16px; height: 16px; border-radius: 50%; background: var(--line); color: var(--muted);
+      font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
     }
-    .wg-step-text { font-size: 11.5px; color: var(--text2); line-height: 1.5; flex: 1; }
+    .wg-step-text { font-size: 11px; color: var(--text2); line-height: 1.45; flex: 1; }
     .wg-step-text strong { color: var(--text); font-weight: 700; }
-    .wg-step-code {
-      display: block; margin-top: 3px; padding: 4px 7px;
-      background: var(--bg); border: 1px solid var(--line); border-radius: 5px;
-      font-family: 'Consolas', monospace; font-size: 10.5px; color: var(--accent);
-      word-break: break-all; line-height: 1.4;
-    }
     .wg-setup-close {
-      margin-top: 8px; width: 100%; padding: 6px; border-radius: 7px;
+      margin-top: 8px; width: 100%; padding: 5px; border-radius: 7px;
       border: 1px solid var(--line); background: var(--bg);
-      cursor: pointer; font-size: 11.5px; font-weight: 600; font-family: var(--font);
-      color: var(--muted);
+      cursor: pointer; font-size: 11px; font-weight: 600; font-family: var(--font); color: var(--muted);
     }
-    .wg-setup-close:hover { background: var(--card); color: var(--text); }
+    .wg-setup-close:hover { color: var(--text); }
 
     /* ── Scrollable body ── */
-    .wg-body { flex: 1; overflow-y: auto; }
+    .wg-body { flex: 1; overflow-y: auto; min-height: 0; }
     .wg-body::-webkit-scrollbar { width: 4px }
     .wg-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px }
+
+    /* ── Tab pane visibility ── */
+    .wg-pane { display: none; }
+    .wg-pane.active { display: block; }
 
     .wg-section { border-bottom: 1px solid var(--line); }
 
     /* ── Section header ── */
-    .wg-sec-hdr { display: flex; align-items: center; gap: 8px; padding: 10px 13px 7px; }
-    .wg-sec-label {
-      font-size: 9.5px; font-weight: 700; letter-spacing: .8px;
-      color: var(--muted); text-transform: uppercase;
-    }
+    .wg-sec-hdr { display: flex; align-items: center; gap: 8px; padding: 9px 13px 7px; }
+    .wg-sec-label { font-size: 9.5px; font-weight: 700; letter-spacing: .7px; color: var(--muted); text-transform: uppercase; }
     .wg-sec-h {
-      font-size: 12.5px; font-weight: 700; color: var(--accent);
-      background: #eef2ff; padding: 1px 8px; border-radius: 99px;
-      margin-left: auto;
+      font-size: 12px; font-weight: 700; color: var(--accent);
+      background: #eef2ff; padding: 1px 8px; border-radius: 99px; margin-left: auto;
     }
     .wg-chevron { font-size: 11px; color: var(--muted); user-select: none; }
 
     /* ── Progress bar ── */
     .wg-prog-wrap { padding: 0 13px 3px; }
     .wg-prog-track { height: 4px; background: var(--line); border-radius: 99px; overflow: hidden; }
-    .wg-prog-fill {
-      height: 100%; border-radius: 99px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      transition: width .6s cubic-bezier(.22,1,.36,1);
-      min-width: 2px;
-    }
+    .wg-prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg,var(--accent),var(--accent2)); transition: width .6s cubic-bezier(.22,1,.36,1); min-width: 2px; }
     .wg-prog-sub { font-size: 10px; color: var(--muted); padding: 3px 13px 5px; }
 
-    /* ── Entry rows ── */
+    /* ── Work entry rows ── */
     .wg-entry {
       display: flex; align-items: flex-start; gap: 8px;
       padding: 5px 13px; transition: background .1s;
     }
     .wg-entry:hover { background: #f0f0f8; }
-    .wg-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      flex-shrink: 0; margin-top: 4px;
-      background: #94a3b8;
-    }
+    .wg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; background: #94a3b8; }
     .wg-dot[data-cat="Development"]   { background: #6366f1 }
     .wg-dot[data-cat="Meeting"]        { background: #f59e0b }
     .wg-dot[data-cat="Code Review"]    { background: #10b981 }
@@ -157,25 +175,36 @@
     .wg-dot[data-cat="DevOps"]         { background: #ef4444 }
     .wg-dot[data-cat="Research"]       { background: #818cf8 }
     .wg-dot[data-cat="Design"]         { background: #ec4899 }
-    .wg-dot[data-cat="Notes"]          { background: #f59e0b }
-
     .wg-desc { flex: 1; font-size: 12px; line-height: 1.4; color: var(--text2); word-break: break-word; }
     .wg-desc .wg-proj { opacity: .5; font-size: 10.5px; }
     .wg-emeta { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
     .wg-hrs { font-size: 11px; font-weight: 600; color: var(--muted); white-space: nowrap; }
     .wg-del {
-      width: 18px; height: 18px; border-radius: 5px; border: none;
-      background: transparent; cursor: pointer; color: var(--muted);
-      font-size: 11px; opacity: 0; transition: opacity .15s, background .1s;
+      width: 18px; height: 18px; border-radius: 5px; border: none; background: transparent;
+      cursor: pointer; color: var(--muted); font-size: 11px; opacity: 0; transition: opacity .15s, background .1s;
       display: flex; align-items: center; justify-content: center;
     }
-    .wg-entry:hover .wg-del { opacity: 1; }
+    .wg-entry:hover .wg-del,
+    .wg-note-card:hover .wg-del { opacity: 1; }
     .wg-del:hover { background: #fee2e2; color: #ef4444; opacity: 1 !important; }
 
+    /* ── Note cards ── */
+    .wg-notes-list { padding: 8px 11px 4px; display: flex; flex-direction: column; gap: 7px; }
+    .wg-note-card {
+      background: var(--note-bg); border: 1px solid var(--note-bd); border-radius: 8px;
+      border-left: 3px solid var(--note-acc);
+      padding: 8px 10px; position: relative; transition: box-shadow .15s;
+    }
+    .wg-note-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.07); }
+    .wg-note-text { font-size: 12.5px; line-height: 1.5; color: var(--text); word-break: break-word; padding-right: 20px; }
+    .wg-note-meta { font-size: 10px; color: var(--muted); margin-top: 4px; }
+    .wg-note-card .wg-del { position: absolute; top: 6px; right: 6px; opacity: 0; }
+
+    /* ── Empty state ── */
     .wg-empty { padding: 10px 13px 6px; font-size: 11.5px; color: var(--muted); font-style: italic; }
 
-    /* ── Add button ── */
-    .wg-addbtn-wrap { padding: 5px 13px 11px; }
+    /* ── Add / form (shared) ── */
+    .wg-addbtn-wrap { padding: 5px 13px 10px; }
     .wg-addbtn {
       width: 100%; padding: 7px; border-radius: 7px;
       border: 1.5px dashed var(--line); background: transparent;
@@ -184,13 +213,14 @@
       transition: border-color .15s, color .15s, background .15s;
     }
     .wg-addbtn:hover { border-color: var(--accent); color: var(--accent); background: #eef2ff; }
+    .wg-addbtn.notes-btn:hover { border-color: var(--note-acc); color: var(--note-acc); background: #fef9c3; }
 
-    /* ── Form ── */
     .wg-form {
-      margin: 0 13px 11px;
+      margin: 0 13px 10px;
       border: 1.5px solid var(--accent); border-radius: var(--r);
       background: var(--card); overflow: hidden;
     }
+    .wg-form.notes-form { border-color: var(--note-acc); background: var(--note-bg); }
     .wg-ta {
       width: 100%; border: none; outline: none; resize: none;
       padding: 9px 11px 4px; font-size: 12.5px; font-family: var(--font);
@@ -198,34 +228,23 @@
       min-height: 38px; max-height: 90px;
     }
     .wg-ta::placeholder { color: var(--muted); }
-    .wg-form-row {
-      display: flex; align-items: center; gap: 5px;
-      padding: 3px 7px 7px;
-    }
+    .wg-form-row { display: flex; align-items: center; gap: 5px; padding: 3px 7px 7px; }
     .wg-form-sel {
       flex: 1; min-width: 90px; border: 1px solid var(--line); border-radius: 6px;
       padding: 4px 6px; font-size: 11.5px; font-family: var(--font);
       color: var(--text); background: var(--bg); outline: none;
     }
-    .wg-hrs-ctrl {
-      display: flex; align-items: center; gap: 0;
-      border: 1px solid var(--line); border-radius: 6px;
-      overflow: hidden; background: var(--bg); flex-shrink: 0;
-    }
-    .wg-hrs-ctrl button {
-      width: 24px; height: 26px; border: none; background: transparent;
-      cursor: pointer; font-size: 14px; color: var(--muted); font-family: var(--font);
-      line-height: 1;
-    }
+    .wg-hrs-ctrl { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--bg); flex-shrink: 0; }
+    .wg-hrs-ctrl button { width: 24px; height: 26px; border: none; background: transparent; cursor: pointer; font-size: 14px; color: var(--muted); font-family: var(--font); line-height: 1; }
     .wg-hrs-ctrl button:hover { background: var(--line); color: var(--text); }
     .wg-hrs-val { font-size: 12px; font-weight: 700; color: var(--text); min-width: 22px; text-align: center; }
     .wg-save-btn {
       padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff; font-size: 11.5px; font-weight: 700; font-family: var(--font);
-      flex-shrink: 0; transition: opacity .15s;
+      color: #fff; font-size: 11.5px; font-weight: 700; font-family: var(--font); flex-shrink: 0;
     }
     .wg-save-btn:disabled { opacity: .4; cursor: default; }
+    .wg-save-btn.notes-btn { background: linear-gradient(135deg, #f59e0b, #d97706); }
     .wg-proj-inp {
       width: 100%; border: none; border-top: 1px solid var(--line);
       outline: none; padding: 5px 11px; font-size: 11.5px; font-family: var(--font);
@@ -234,45 +253,27 @@
     .wg-proj-inp::placeholder { color: var(--muted); }
 
     /* ── Week chart ── */
-    .wg-week-wrap { padding: 10px 13px 12px; }
-    .wg-week-title {
-      font-size: 9.5px; font-weight: 700; letter-spacing: .8px;
-      color: var(--muted); text-transform: uppercase; margin-bottom: 7px;
-    }
-    .wg-week-chart { display: flex; gap: 3px; align-items: flex-end; height: 40px; }
+    .wg-week-wrap { padding: 9px 13px 11px; }
+    .wg-week-title { font-size: 9.5px; font-weight: 700; letter-spacing: .7px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+    .wg-week-chart { display: flex; gap: 3px; align-items: flex-end; height: 38px; }
     .wg-week-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-    .wg-week-bar-wrap {
-      flex: 1; width: 100%; display: flex; align-items: flex-end;
-      background: var(--bg); border-radius: 3px 3px 0 0;
-    }
-    .wg-week-bar {
-      width: 100%; border-radius: 3px 3px 0 0; min-height: 2px;
-      background: linear-gradient(180deg, var(--accent2), var(--accent));
-      transition: height .5s cubic-bezier(.22,1,.36,1);
-    }
+    .wg-week-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; background: var(--bg); border-radius: 3px 3px 0 0; }
+    .wg-week-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 2px; background: linear-gradient(180deg,var(--accent2),var(--accent)); transition: height .5s cubic-bezier(.22,1,.36,1); }
     .wg-week-day { font-size: 9px; color: var(--muted); font-weight: 600; }
 
     /* ── Footer ── */
     .wg-footer {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 13px 9px;
-      background: var(--card);
-      border-top: 1px solid var(--line);
-      flex-shrink: 0;
+      padding: 7px 13px 8px; background: var(--card); border-top: 1px solid var(--line); flex-shrink: 0;
     }
-    .wg-setup-link {
-      font-size: 11px; color: var(--muted); background: none; border: none;
-      cursor: pointer; font-family: var(--font); font-weight: 600; padding: 0;
-    }
+    .wg-setup-link { font-size: 11px; color: var(--muted); background: none; border: none; cursor: pointer; font-family: var(--font); font-weight: 600; padding: 0; }
     .wg-setup-link:hover { color: var(--accent); }
-    .wg-full-link {
-      font-size: 11px; font-weight: 700; color: var(--accent); text-decoration: none;
-    }
+    .wg-full-link { font-size: 11px; font-weight: 700; color: var(--accent); text-decoration: none; }
     .wg-full-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <div class="wg-strip"></div>
+  <div class="wg-strip" id="wgStrip"></div>
 
   <!-- Top bar -->
   <div class="wg-bar">
@@ -281,24 +282,36 @@
     <button class="wg-icon-btn" onclick="wgToggleSetup()" title="Auto-start setup">⚡</button>
   </div>
 
+  <!-- Tabs -->
+  <div class="wg-tabs">
+    <button class="wg-tab active" id="tabLog" onclick="wgSwitchTab('log')">
+      📋 Log
+      <span class="wg-tab-count" id="tabLogCount">@todayWork.Count</span>
+    </button>
+    <button class="wg-tab notes-tab" id="tabNotes" onclick="wgSwitchTab('notes')">
+      📝 Notes
+      <span class="wg-tab-count" id="tabNotesCount">@todayNotes.Count</span>
+    </button>
+  </div>
+
   <!-- Setup drawer -->
   <div class="wg-setup-drawer" id="wgSetup" style="display:none">
     <div class="wg-setup-title">⚡ Auto-start with Windows</div>
+    <a href="/Logs/SetupScript" class="wg-dl-btn" download="setup-worklog-widget.ps1">
+      ⬇ Download setup script (.ps1)
+    </a>
+    <div class="wg-dl-sub">
+      Download → right-click → <strong>Run with PowerShell</strong><br>
+      Creates startup + desktop shortcuts automatically. One time, then it opens on every login.
+    </div>
+    <div class="wg-setup-divider">Or manual steps</div>
     <div class="wg-setup-step">
       <div class="wg-step-num">1</div>
-      <div class="wg-step-text"><strong>Install as a PWA</strong> — In Edge or Chrome click the install
-        icon <strong>⊕</strong> in the address bar, or browser menu → Apps → Install WorkLog.</div>
+      <div class="wg-step-text">Install as PWA — click <strong>⊕</strong> in Edge/Chrome address bar</div>
     </div>
     <div class="wg-setup-step">
       <div class="wg-step-num">2</div>
-      <div class="wg-step-text"><strong>Enable "Open at login"</strong> — After installing, click the
-        three-dot menu inside the app window → <em>Open at login</em>.</div>
-    </div>
-    <div class="wg-setup-step">
-      <div class="wg-step-num">3</div>
-      <div class="wg-step-text"><strong>Or manually (Win+R → shell:startup)</strong> — create a shortcut with target:
-        <code class="wg-step-code" id="wgStartupCmd">msedge --app=…/Logs/Widget</code>
-      </div>
+      <div class="wg-step-text">Three-dot menu inside the app → <strong>Open at login</strong></div>
     </div>
     <button class="wg-setup-close" onclick="wgToggleSetup()">✕ Close</button>
   </div>
@@ -306,97 +319,154 @@
   <!-- Scrollable body -->
   <div class="wg-body">
 
-    <!-- TODAY -->
-    <div class="wg-section">
-      <div class="wg-sec-hdr">
-        <span class="wg-sec-label">Today</span>
-        <span class="wg-sec-h" id="wgTodayPill">@todayH.ToString("F1") h</span>
-      </div>
-      <div class="wg-prog-wrap">
-        <div class="wg-prog-track">
-          <div class="wg-prog-fill" id="wgProgFill" style="width:@pct.ToString("F0")%"></div>
-        </div>
-      </div>
-      <div class="wg-prog-sub" id="wgProgSub">@pct.ToString("F0")% of @goal h daily goal</div>
+    <!-- ═══════ LOG TAB ═══════ -->
+    <div class="wg-pane active" id="paneLog">
 
-      @foreach (var e in todayLogs)
-      {
-        <div class="wg-entry" id="wge-@e.Id">
-          <span class="wg-dot" data-cat="@e.Tags"></span>
-          <span class="wg-desc">@e.Description@if (!string.IsNullOrWhiteSpace(e.Project) && e.Project != e.Tags){<span class="wg-proj"> · @e.Project</span>}</span>
-          <div class="wg-emeta">
-            <span class="wg-hrs">@e.Hours h</span>
-            <button class="wg-del" onclick="wgDelete(@e.Id)">✕</button>
+      <!-- Today work -->
+      <div class="wg-section">
+        <div class="wg-sec-hdr">
+          <span class="wg-sec-label">Today</span>
+          <span class="wg-sec-h" id="wgTodayPill">@todayH.ToString("F1") h</span>
+        </div>
+        <div class="wg-prog-wrap">
+          <div class="wg-prog-track">
+            <div class="wg-prog-fill" id="wgProgFill" style="width:@pct.ToString("F0")%"></div>
           </div>
         </div>
-      }
-      @if (!todayLogs.Any())
-      {
-        <div class="wg-empty" id="wgEmpty">Nothing logged yet. Add your first entry!</div>
-      }
+        <div class="wg-prog-sub" id="wgProgSub">@pct.ToString("F0")% of @goal h daily goal</div>
 
-      <div class="wg-addbtn-wrap">
-        <button class="wg-addbtn" id="wgAddBtn" onclick="wgToggleForm()">+ Log entry for today</button>
-      </div>
-      <div class="wg-form" id="wgForm" style="display:none">
-        <textarea class="wg-ta" id="wgDesc" rows="2"
-          placeholder="What did you work on?"
-          oninput="wgAutosize(this)"
-          onkeydown="wgKeydown(event)"></textarea>
-        <div class="wg-form-row">
-          <select class="wg-form-sel" id="wgCat">
-            <option>Development</option>
-            <option>Meeting</option>
-            <option>Code Review</option>
-            <option>Notes</option>
-            <option>Testing</option>
-            <option>Documentation</option>
-            <option>Research</option>
-            <option>Design</option>
-            <option>DevOps</option>
-            <option>Other</option>
-          </select>
-          <div class="wg-hrs-ctrl">
-            <button type="button" onclick="wgStep(-0.5)">−</button>
-            <span class="wg-hrs-val" id="wgHrsVal">1</span>
-            <button type="button" onclick="wgStep(0.5)">+</button>
-          </div>
-          <button class="wg-save-btn" id="wgSaveBtn" onclick="wgSave()">Add →</button>
-        </div>
-        <input class="wg-proj-inp" id="wgProj" placeholder="Project (optional)" list="wgProjList">
-        <datalist id="wgProjList">
-          @foreach (var p in projects) { <option value="@p"></option> }
-        </datalist>
-      </div>
-    </div>
-
-    @if (yesterdayLogs.Any())
-    {
-    <!-- YESTERDAY -->
-    <div class="wg-section">
-      <div class="wg-sec-hdr wg-yday-hdr" onclick="wgToggleYday()" style="cursor:pointer">
-        <span class="wg-sec-label">Yesterday</span>
-        <span class="wg-sec-h">@ydayH.ToString("F1") h</span>
-        <span class="wg-chevron" id="wgChev">▾</span>
-      </div>
-      <div id="wgYday">
-        @foreach (var e in yesterdayLogs)
+        @foreach (var e in todayWork)
         {
-          <div class="wg-entry">
+          <div class="wg-entry" id="wge-@e.Id">
             <span class="wg-dot" data-cat="@e.Tags"></span>
             <span class="wg-desc">@e.Description@if (!string.IsNullOrWhiteSpace(e.Project) && e.Project != e.Tags){<span class="wg-proj"> · @e.Project</span>}</span>
-            <span class="wg-hrs">@e.Hours h</span>
+            <div class="wg-emeta">
+              <span class="wg-hrs">@e.Hours h</span>
+              <button class="wg-del" onclick="wgDelete(@e.Id, 'log')">✕</button>
+            </div>
           </div>
         }
+        @if (!todayWork.Any()) { <div class="wg-empty" id="wgLogEmpty">Nothing logged yet today.</div> }
+
+        <div class="wg-addbtn-wrap">
+          <button class="wg-addbtn" id="wgAddLogBtn" onclick="wgToggleLogForm()">+ Log entry for today</button>
+        </div>
+        <div class="wg-form" id="wgLogForm" style="display:none">
+          <textarea class="wg-ta" id="wgLogDesc" rows="2" placeholder="What did you work on?"
+            oninput="wgAutosize(this)" onkeydown="wgLogKeydown(event)"></textarea>
+          <div class="wg-form-row">
+            <select class="wg-form-sel" id="wgCat">
+              <option>Development</option><option>Meeting</option><option>Code Review</option>
+              <option>Testing</option><option>Documentation</option><option>Research</option>
+              <option>Design</option><option>DevOps</option><option>Other</option>
+            </select>
+            <div class="wg-hrs-ctrl">
+              <button type="button" onclick="wgStep(-0.5)">−</button>
+              <span class="wg-hrs-val" id="wgHrsVal">1</span>
+              <button type="button" onclick="wgStep(0.5)">+</button>
+            </div>
+            <button class="wg-save-btn" id="wgLogSaveBtn" onclick="wgSaveLog()">Add →</button>
+          </div>
+          <input class="wg-proj-inp" id="wgProj" placeholder="Project (optional)" list="wgProjList">
+          <datalist id="wgProjList">
+            @foreach (var p in projects) { <option value="@p"></option> }
+          </datalist>
+        </div>
+      </div>
+
+      @if (ydayWork.Any())
+      {
+      <!-- Yesterday work -->
+      <div class="wg-section">
+        <div class="wg-sec-hdr" onclick="wgToggleYday()" style="cursor:pointer">
+          <span class="wg-sec-label">Yesterday</span>
+          <span class="wg-sec-h">@ydayH.ToString("F1") h</span>
+          <span class="wg-chevron" id="wgChev">▾</span>
+        </div>
+        <div id="wgYday">
+          @foreach (var e in ydayWork)
+          {
+            <div class="wg-entry">
+              <span class="wg-dot" data-cat="@e.Tags"></span>
+              <span class="wg-desc">@e.Description@if (!string.IsNullOrWhiteSpace(e.Project) && e.Project != e.Tags){<span class="wg-proj"> · @e.Project</span>}</span>
+              <span class="wg-hrs">@e.Hours h</span>
+            </div>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- Week chart -->
+      <div class="wg-week-wrap">
+        <div class="wg-week-title">This Week</div>
+        <div class="wg-week-chart" id="wgWeekChart"></div>
       </div>
     </div>
-    }
 
-    <!-- WEEK mini chart -->
-    <div class="wg-week-wrap">
-      <div class="wg-week-title">This Week</div>
-      <div class="wg-week-chart" id="wgWeekChart"></div>
-    </div>
+    <!-- ═══════ NOTES TAB ═══════ -->
+    <div class="wg-pane" id="paneNotes">
+
+      <!-- Today notes -->
+      <div class="wg-section">
+        <div class="wg-sec-hdr">
+          <span class="wg-sec-label" style="color:#d97706">Today's Notes</span>
+          <span class="wg-sec-h" id="wgNotesPill" style="background:#fef3c7;color:#d97706">@todayNotes.Count</span>
+        </div>
+
+        <div class="wg-notes-list" id="wgNotesList">
+          @foreach (var e in todayNotes)
+          {
+            <div class="wg-note-card" id="wge-@e.Id">
+              <div class="wg-note-text">@e.Description</div>
+              @if (!string.IsNullOrWhiteSpace(e.Project) && e.Project != "Notes")
+              {
+                <div class="wg-note-meta">@e.Project</div>
+              }
+              <button class="wg-del" onclick="wgDelete(@e.Id, 'note')">✕</button>
+            </div>
+          }
+        </div>
+        @if (!todayNotes.Any()) { <div class="wg-empty" id="wgNotesEmpty">No notes yet today.</div> }
+
+        <div class="wg-addbtn-wrap">
+          <button class="wg-addbtn notes-btn" id="wgAddNoteBtn" onclick="wgToggleNoteForm()">+ Add note</button>
+        </div>
+        <div class="wg-form notes-form" id="wgNoteForm" style="display:none">
+          <textarea class="wg-ta" id="wgNoteDesc" rows="3" placeholder="Write a note…"
+            oninput="wgAutosize(this)" onkeydown="wgNoteKeydown(event)"></textarea>
+          <div class="wg-form-row">
+            <input style="flex:1;border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:11.5px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none"
+              id="wgNoteProj" placeholder="Tag / project (optional)" list="wgProjList">
+            <button class="wg-save-btn notes-btn" id="wgNoteSaveBtn" onclick="wgSaveNote()">Add →</button>
+          </div>
+        </div>
+      </div>
+
+      @if (ydayNotes.Any())
+      {
+      <!-- Yesterday notes -->
+      <div class="wg-section">
+        <div class="wg-sec-hdr" onclick="wgToggleYdayNotes()" style="cursor:pointer">
+          <span class="wg-sec-label" style="color:#d97706">Yesterday's Notes</span>
+          <span class="wg-sec-h" style="background:#fef3c7;color:#d97706">@ydayNotes.Count</span>
+          <span class="wg-chevron" id="wgNotesChev">▾</span>
+        </div>
+        <div id="wgYdayNotes">
+          @foreach (var e in ydayNotes)
+          {
+            <div class="wg-note-card" style="margin:0 11px 7px">
+              <div class="wg-note-text">@e.Description</div>
+              @if (!string.IsNullOrWhiteSpace(e.Project) && e.Project != "Notes")
+              {
+                <div class="wg-note-meta">@e.Project</div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      }
+
+    </div><!-- /paneNotes -->
 
   </div><!-- /wg-body -->
 
@@ -407,29 +477,25 @@
   </div>
 
   <script>
-  let _wgHrs  = 1;
-  let _wgToday = @todayH;
+  let _wgHrs    = 1;
+  let _wgToday  = @todayH;
   const _wgGoal = @goal;
+  let _logCount = @todayWork.Count;
+  let _noteCount = @todayNotes.Count;
 
-  // Auto-start command uses current origin
-  document.getElementById('wgStartupCmd').textContent =
-    `msedge --app=${location.origin}/Logs/Widget`;
-
-  // Resize to widget dimensions when running as installed PWA
+  // Resize to widget size when running as installed PWA
   if (window.matchMedia('(display-mode: standalone)').matches) {
     try { window.resizeTo(400, 660); } catch {}
   }
 
-  // Build week bar chart
+  // Week bar chart
   const _weekData = @Html.Raw(weekJson);
   const _chartEl  = document.getElementById('wgWeekChart');
   if (_weekData.length) {
     _chartEl.innerHTML = _weekData.map(w => {
-      const pct = Math.min((w.h / _wgGoal) * 100, 100);
+      const p = Math.min((w.h / _wgGoal) * 100, 100);
       return `<div class="wg-week-col">
-        <div class="wg-week-bar-wrap">
-          <div class="wg-week-bar" style="height:${pct.toFixed(0)}%"></div>
-        </div>
+        <div class="wg-week-bar-wrap"><div class="wg-week-bar" style="height:${p.toFixed(0)}%"></div></div>
         <div class="wg-week-day">${w.d}</div>
       </div>`;
     }).join('');
@@ -437,30 +503,172 @@
     _chartEl.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:4px 0">No data yet</div>';
   }
 
+  /* ── Tab switching ── */
+  function wgSwitchTab(tab) {
+    document.getElementById('tabLog').classList.toggle('active', tab === 'log');
+    document.getElementById('tabNotes').classList.toggle('active', tab === 'notes');
+    document.getElementById('paneLog').classList.toggle('active', tab === 'log');
+    document.getElementById('paneNotes').classList.toggle('active', tab === 'notes');
+    document.getElementById('wgStrip').className = tab === 'notes' ? 'wg-strip notes' : 'wg-strip';
+    // close any open forms on tab switch
+    _wgCloseLogForm(); _wgCloseNoteForm(); wgToggleSetup(); document.getElementById('wgSetup').style.display = 'none';
+  }
+
+  /* ── Setup drawer ── */
   function wgToggleSetup() {
     const d = document.getElementById('wgSetup');
     d.style.display = d.style.display === 'none' ? 'block' : 'none';
   }
 
-  function wgToggleForm() {
-    const f = document.getElementById('wgForm');
-    const b = document.getElementById('wgAddBtn');
+  /* ── LOG TAB forms ── */
+  function wgToggleLogForm() {
+    const f = document.getElementById('wgLogForm');
     if (f.style.display === 'none') {
       f.style.display = 'block';
-      b.style.display = 'none';
-      document.getElementById('wgDesc').focus();
-    } else {
-      _wgCloseForm();
+      document.getElementById('wgAddLogBtn').style.display = 'none';
+      document.getElementById('wgLogDesc').focus();
+    } else { _wgCloseLogForm(); }
+  }
+  function _wgCloseLogForm() {
+    document.getElementById('wgLogForm').style.display = 'none';
+    document.getElementById('wgAddLogBtn').style.display = '';
+    document.getElementById('wgLogDesc').value = '';
+    document.getElementById('wgProj').value = '';
+    _wgHrs = 1; document.getElementById('wgHrsVal').textContent = '1';
+  }
+  function wgLogKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wgSaveLog(); }
+    if (e.key === 'Escape') _wgCloseLogForm();
+  }
+  function wgStep(delta) {
+    _wgHrs = Math.max(0.25, Math.round((_wgHrs + delta) * 4) / 4);
+    document.getElementById('wgHrsVal').textContent = _wgHrs % 1 === 0 ? String(_wgHrs) : _wgHrs.toFixed(2);
+  }
+  async function wgSaveLog() {
+    const desc = document.getElementById('wgLogDesc').value.trim();
+    if (!desc) { document.getElementById('wgLogDesc').focus(); return; }
+    const btn = document.getElementById('wgLogSaveBtn');
+    btn.disabled = true; btn.textContent = '…';
+    try {
+      const res = await fetch('/Logs/QuickAdd', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: desc, hours: _wgHrs,
+          category: document.getElementById('wgCat').value,
+          project: document.getElementById('wgProj').value.trim() || null })
+      });
+      if (res.ok) {
+        const e = await res.json();
+        _wgAddLogRow(e); _wgUpdateProgress(e.hours); _wgCloseLogForm();
+      }
+    } finally { btn.disabled = false; btn.textContent = 'Add →'; }
+  }
+  function _wgAddLogRow(e) {
+    document.getElementById('wgLogEmpty')?.remove();
+    const proj = e.project && e.project !== e.category ? `<span class="wg-proj"> · ${_esc(e.project)}</span>` : '';
+    const row = document.createElement('div');
+    row.className = 'wg-entry'; row.id = `wge-${e.id}`;
+    row.innerHTML = `<span class="wg-dot" data-cat="${_esc(e.category)}"></span>
+      <span class="wg-desc">${_esc(e.description)}${proj}</span>
+      <div class="wg-emeta"><span class="wg-hrs">${e.hours} h</span>
+      <button class="wg-del" onclick="wgDelete(${e.id},'log')">✕</button></div>`;
+    document.getElementById('wgAddLogBtn').closest('.wg-addbtn-wrap').before(row);
+    _logCount++;
+    document.getElementById('tabLogCount').textContent = _logCount;
+  }
+  function _wgUpdateProgress(delta) {
+    _wgToday += Number(delta);
+    const p = Math.min(_wgToday / _wgGoal * 100, 100);
+    document.getElementById('wgProgFill').style.width  = p.toFixed(0) + '%';
+    document.getElementById('wgProgSub').textContent   = `${p.toFixed(0)}% of ${_wgGoal} h daily goal`;
+    document.getElementById('wgTodayPill').textContent = _wgToday.toFixed(1) + ' h';
+  }
+
+  /* ── NOTES TAB forms ── */
+  function wgToggleNoteForm() {
+    const f = document.getElementById('wgNoteForm');
+    if (f.style.display === 'none') {
+      f.style.display = 'block';
+      document.getElementById('wgAddNoteBtn').style.display = 'none';
+      document.getElementById('wgNoteDesc').focus();
+    } else { _wgCloseNoteForm(); }
+  }
+  function _wgCloseNoteForm() {
+    document.getElementById('wgNoteForm').style.display = 'none';
+    document.getElementById('wgAddNoteBtn').style.display = '';
+    document.getElementById('wgNoteDesc').value = '';
+    document.getElementById('wgNoteProj').value = '';
+  }
+  function wgNoteKeydown(e) {
+    if (e.key === 'Escape') _wgCloseNoteForm();
+  }
+  async function wgSaveNote() {
+    const desc = document.getElementById('wgNoteDesc').value.trim();
+    if (!desc) { document.getElementById('wgNoteDesc').focus(); return; }
+    const btn = document.getElementById('wgNoteSaveBtn');
+    btn.disabled = true; btn.textContent = '…';
+    try {
+      const res = await fetch('/Logs/QuickAdd', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: desc, hours: 0.25,
+          category: 'Notes',
+          project: document.getElementById('wgNoteProj').value.trim() || null })
+      });
+      if (res.ok) {
+        const e = await res.json();
+        _wgAddNoteCard(e); _wgCloseNoteForm();
+      }
+    } finally { btn.disabled = false; btn.textContent = 'Add →'; }
+  }
+  function _wgAddNoteCard(e) {
+    document.getElementById('wgNotesEmpty')?.remove();
+    const proj = e.project && e.project !== 'Notes'
+      ? `<div class="wg-note-meta">${_esc(e.project)}</div>` : '';
+    const card = document.createElement('div');
+    card.className = 'wg-note-card'; card.id = `wge-${e.id}`;
+    card.innerHTML = `<div class="wg-note-text">${_esc(e.description)}</div>${proj}
+      <button class="wg-del" onclick="wgDelete(${e.id},'note')">✕</button>`;
+    document.getElementById('wgNotesList').appendChild(card);
+    _noteCount++;
+    document.getElementById('tabNotesCount').textContent = _noteCount;
+    document.getElementById('wgNotesPill').textContent = _noteCount;
+  }
+
+  /* ── Delete ── */
+  async function wgDelete(id, type) {
+    if (!confirm('Remove this entry?')) return;
+    const res = await fetch('/Logs/DeleteEntry', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    if (res.ok) {
+      document.getElementById(`wge-${id}`)?.remove();
+      if (type === 'log') {
+        _logCount = Math.max(0, _logCount - 1);
+        document.getElementById('tabLogCount').textContent = _logCount;
+      } else {
+        _noteCount = Math.max(0, _noteCount - 1);
+        document.getElementById('tabNotesCount').textContent = _noteCount;
+        document.getElementById('wgNotesPill').textContent = _noteCount;
+      }
     }
   }
 
-  function _wgCloseForm() {
-    document.getElementById('wgForm').style.display = 'none';
-    document.getElementById('wgAddBtn').style.display = '';
-    document.getElementById('wgDesc').value = '';
-    document.getElementById('wgProj').value = '';
-    _wgHrs = 1;
-    document.getElementById('wgHrsVal').textContent = '1';
+  /* ── Yesterday toggles ── */
+  function wgToggleYday() {
+    const l = document.getElementById('wgYday');
+    const c = document.getElementById('wgChev');
+    if (!l) return;
+    const h = l.style.display === 'none';
+    l.style.display = h ? '' : 'none';
+    if (c) c.textContent = h ? '▾' : '▸';
+  }
+  function wgToggleYdayNotes() {
+    const l = document.getElementById('wgYdayNotes');
+    const c = document.getElementById('wgNotesChev');
+    if (!l) return;
+    const h = l.style.display === 'none';
+    l.style.display = h ? '' : 'none';
+    if (c) c.textContent = h ? '▾' : '▸';
   }
 
   function wgAutosize(el) {
@@ -468,100 +676,15 @@
     el.style.height = Math.min(el.scrollHeight, 90) + 'px';
   }
 
-  function wgKeydown(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wgSave(); }
-    if (e.key === 'Escape') _wgCloseForm();
-  }
-
-  function wgStep(delta) {
-    _wgHrs = Math.max(0.25, Math.round((_wgHrs + delta) * 4) / 4);
-    document.getElementById('wgHrsVal').textContent =
-      _wgHrs % 1 === 0 ? String(_wgHrs) : _wgHrs.toFixed(2);
-  }
-
-  async function wgSave() {
-    const desc = document.getElementById('wgDesc').value.trim();
-    if (!desc) { document.getElementById('wgDesc').focus(); return; }
-    const btn = document.getElementById('wgSaveBtn');
-    btn.disabled = true; btn.textContent = '…';
-    try {
-      const res = await fetch('/Logs/QuickAdd', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description: desc,
-          hours: _wgHrs,
-          category: document.getElementById('wgCat').value,
-          project: document.getElementById('wgProj').value.trim() || null
-        })
-      });
-      if (res.ok) {
-        const e = await res.json();
-        _wgAddRow(e);
-        _wgUpdateProgress(e.hours);
-        _wgCloseForm();
-      }
-    } finally {
-      btn.disabled = false; btn.textContent = 'Add →';
-    }
-  }
-
-  function _wgAddRow(e) {
-    document.getElementById('wgEmpty')?.remove();
-    const proj = e.project && e.project !== e.category
-      ? `<span class="wg-proj"> · ${_esc(e.project)}</span>` : '';
-    const row = document.createElement('div');
-    row.className = 'wg-entry'; row.id = `wge-${e.id}`;
-    row.innerHTML = `<span class="wg-dot" data-cat="${_esc(e.category)}"></span>
-      <span class="wg-desc">${_esc(e.description)}${proj}</span>
-      <div class="wg-emeta">
-        <span class="wg-hrs">${e.hours} h</span>
-        <button class="wg-del" onclick="wgDelete(${e.id})">✕</button>
-      </div>`;
-    document.getElementById('wgAddBtn').closest('.wg-addbtn-wrap').before(row);
-  }
-
-  function _wgUpdateProgress(delta) {
-    _wgToday += Number(delta);
-    const pct = Math.min(_wgToday / _wgGoal * 100, 100);
-    document.getElementById('wgProgFill').style.width  = pct.toFixed(0) + '%';
-    document.getElementById('wgProgSub').textContent   = `${pct.toFixed(0)}% of ${_wgGoal} h daily goal`;
-    document.getElementById('wgTodayPill').textContent = _wgToday.toFixed(1) + ' h';
-  }
-
-  async function wgDelete(id) {
-    if (!confirm('Remove this entry?')) return;
-    const res = await fetch('/Logs/DeleteEntry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id })
-    });
-    if (res.ok) {
-      document.getElementById(`wge-${id}`)?.remove();
-    }
-  }
-
-  function wgToggleYday() {
-    const list = document.getElementById('wgYday');
-    const chev = document.getElementById('wgChev');
-    if (!list) return;
-    const hidden = list.style.display === 'none';
-    list.style.display = hidden ? '' : 'none';
-    if (chev) chev.textContent = hidden ? '▾' : '▸';
-  }
-
   function _esc(s) {
-    return String(s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;');
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // Press N to open quick-add
+  // Press N to open quick-add in active tab
   document.addEventListener('keydown', e => {
     const tag = document.activeElement.tagName;
-    if (e.key === 'n' && !e.ctrlKey && !e.metaKey &&
-        tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
-      wgToggleForm();
+    if (e.key === 'n' && !e.ctrlKey && !e.metaKey && tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+      document.getElementById('paneLog').classList.contains('active') ? wgToggleLogForm() : wgToggleNoteForm();
     }
   });
   </script>

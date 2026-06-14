@@ -555,10 +555,17 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
             .Take(8)
             .ToListAsync();
 
-        ViewBag.TodayLogs      = todayLogs;
-        ViewBag.YesterdayLogs  = yesterdayLogs;
-        ViewBag.TodayHours     = todayLogs.Sum(l => l.Hours);
-        ViewBag.YesterdayHours = yesterdayLogs.Sum(l => l.Hours);
+        var todayWork  = todayLogs.Where(l => l.Tags != "Notes").ToList();
+        var todayNotes = todayLogs.Where(l => l.Tags == "Notes").ToList();
+        var ydayNotes  = yesterdayLogs.Where(l => l.Tags == "Notes").ToList();
+        var ydayWork   = yesterdayLogs.Where(l => l.Tags != "Notes").ToList();
+
+        ViewBag.TodayLogs      = todayWork;
+        ViewBag.TodayNotes     = todayNotes;
+        ViewBag.YesterdayLogs  = ydayWork;
+        ViewBag.YesterdayNotes = ydayNotes;
+        ViewBag.TodayHours     = todayWork.Sum(l => l.Hours);
+        ViewBag.YesterdayHours = ydayWork.Sum(l => l.Hours);
         ViewBag.DailyGoal      = 8m;
         ViewBag.FirstName      = (User.FindFirstValue(ClaimTypes.Name) ?? "there").Split(' ')[0];
         ViewBag.Date           = DateTime.Today.ToString("ddd, MMM d");
@@ -567,6 +574,56 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
             weekGrouped.Select(x => new { d = x.Date.ToString("ddd")[..1], h = (double)x.Hours }));
 
         return View();
+    }
+
+    /* ── Auto-start setup script download ── */
+    [HttpGet]
+    public IActionResult SetupScript()
+    {
+        var origin = $"{Request.Scheme}://{Request.Host}";
+        // Use verbatim string so PowerShell $ / { } are not interpreted by C#
+        var script = @"# WorkLog Widget — Auto-Start Setup
+# Right-click this file and choose ""Run with PowerShell""
+# (or: powershell -ExecutionPolicy Bypass -File setup-worklog-widget.ps1)
+
+$widgetUrl = ""__WIDGET_URL__""
+
+$candidates = @(
+  ""${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe"",
+  ""$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe"",
+  ""$env:ProgramFiles\Google\Chrome\Application\chrome.exe"",
+  ""${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe""
+)
+$browser = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+if (-not $browser) {
+  Write-Host ""Edge or Chrome not found. Please install one first."" -ForegroundColor Red
+  Read-Host ""Press Enter to exit""; exit 1
+}
+
+$browserArgs = ""--app=$widgetUrl --window-size=400,660""
+$startupDir  = [Environment]::GetFolderPath('Startup')
+$desktopDir  = [Environment]::GetFolderPath('Desktop')
+
+function Set-Lnk([string]$Dest, [string]$Tgt, [string]$Arg, [string]$Desc) {
+  $wsh = New-Object -ComObject WScript.Shell
+  $sc  = $wsh.CreateShortcut($Dest)
+  $sc.TargetPath = $Tgt; $sc.Arguments = $Arg; $sc.Description = $Desc
+  $sc.Save()
+}
+
+Set-Lnk ""$startupDir\WorkLog Widget.lnk"" $browser $browserArgs ""WorkLog Widget""
+Set-Lnk ""$desktopDir\WorkLog Widget.lnk"" $browser $browserArgs ""WorkLog Widget""
+
+Write-Host """"
+Write-Host ""WorkLog Widget is set up!"" -ForegroundColor Green
+Write-Host ""  Startup : $startupDir\WorkLog Widget.lnk""
+Write-Host ""  Desktop : $desktopDir\WorkLog Widget.lnk""
+Write-Host """"
+Write-Host ""It will open automatically on next login."" -ForegroundColor Cyan
+Read-Host ""Press Enter to close""
+".Replace("__WIDGET_URL__", origin + "/Logs/Widget");
+        return File(System.Text.Encoding.UTF8.GetBytes(script), "application/octet-stream", "setup-worklog-widget.ps1");
     }
 
     /* ── Quick add — instant save, no AI ── */

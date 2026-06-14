@@ -79,6 +79,10 @@ app.post('/api/logs', auth, (req, res) => {
   if (!date || !project || !description || !hours)
     return res.status(400).json({ error: 'date, project, description and hours are required' });
 
+  const parsedHours = parseFloat(hours);
+  if (!isFinite(parsedHours) || parsedHours <= 0 || parsedHours > 24)
+    return res.status(400).json({ error: 'hours must be a finite number between 0 and 24' });
+
   const log = {
     id:          Date.now().toString(),
     userId:      req.user.id,
@@ -86,7 +90,7 @@ app.post('/api/logs', auth, (req, res) => {
     date,
     project:     project.trim(),
     description: description.trim(),
-    hours:       parseFloat(hours),
+    hours:       parsedHours,
     tags:        tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
     createdAt:   new Date().toISOString(),
   };

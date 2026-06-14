@@ -104,7 +104,10 @@ function initDashboard() {
 }
 
 function todayStr() {
-  return new Date().toISOString().split('T')[0];
+  const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${mm}-${dd}`;
 }
 
 /* ══════════════════════════════════════
@@ -127,6 +130,7 @@ function updateStats(logs) {
 
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+  weekStart.setHours(0, 0, 0, 0);
   const weekLogs  = logs.filter(l => new Date(l.date + 'T00:00:00') >= weekStart);
 
   const projects  = new Set(logs.map(l => l.project));

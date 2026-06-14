@@ -2289,3 +2289,118 @@ body.wb-page .bmc-float:hover { opacity: 1; transform: scale(1.1) translateY(0);
   /* Active task widget sits above the input bar */
   .wb-active-task { bottom: 86px; right: 10px; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Quick-add form — instant logging, no AI wait
+   ═══════════════════════════════════════════════════════════ */
+.wb-quick {
+  border-top: 1px solid var(--line);
+  background: var(--white);
+  padding: 10px 14px 8px;
+  flex-shrink: 0;
+}
+.wb-q-desc {
+  width: 100%; box-sizing: border-box;
+  border: 1.5px solid var(--line); border-radius: 9px;
+  background: var(--faint);
+  padding: 9px 14px; font-size: 14px; font-family: var(--font);
+  color: var(--text); resize: none; outline: none;
+  transition: border-color .15s, background .15s;
+  line-height: 1.45; max-height: 120px; overflow-y: auto;
+}
+.wb-q-desc:focus {
+  border-color: var(--accent); background: var(--white);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.08);
+}
+.wb-q-desc::placeholder { color: var(--muted); }
+
+.wb-q-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-top: 8px;
+}
+.wb-q-left {
+  display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;
+}
+.wb-q-right {
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+
+/* Hours input */
+.wb-q-hrs-wrap { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.wb-q-hrs {
+  width: 46px; padding: 5px 6px; font-size: 13px; text-align: center;
+  border: 1.5px solid var(--line); border-radius: 7px;
+  background: var(--white); color: var(--text); font-family: var(--font);
+  outline: none;
+  -moz-appearance: textfield;
+}
+.wb-q-hrs::-webkit-inner-spin-button,
+.wb-q-hrs::-webkit-outer-spin-button { opacity: 0; }
+.wb-q-hrs:focus { border-color: var(--accent); }
+.wb-q-hlbl { font-size: 12px; font-weight: 700; color: var(--muted); }
+
+/* Category dropdown */
+.wb-q-cat {
+  padding: 5px 7px; font-size: 12.5px; font-family: var(--font);
+  border: 1.5px solid var(--line); border-radius: 7px;
+  background: var(--white); color: var(--text-2); outline: none;
+  cursor: pointer; max-width: 110px;
+}
+.wb-q-cat:focus { border-color: var(--accent); }
+
+/* Project input */
+.wb-q-proj {
+  flex: 1; min-width: 0; padding: 5px 9px; font-size: 12.5px;
+  font-family: var(--font); border: 1.5px solid var(--line);
+  border-radius: 7px; background: var(--white); color: var(--text);
+  outline: none;
+}
+.wb-q-proj:focus { border-color: var(--accent); }
+.wb-q-proj::placeholder { color: var(--muted); }
+
+/* Mic icon button */
+.wb-q-ico {
+  width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--line);
+  background: var(--white); color: var(--muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color .12s, border-color .12s, background .12s;
+  flex-shrink: 0;
+}
+.wb-q-ico:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-bg); }
+.wb-q-ico.wbmic-on { color: #ef4444; border-color: #ef4444; background: #fee2e2; }
+
+/* AI Parse button */
+.wb-q-ai {
+  padding: 6px 11px; font-size: 12px; font-weight: 700;
+  font-family: var(--font); border-radius: 8px;
+  background: var(--bg); border: 1.5px solid var(--line);
+  color: var(--accent); cursor: pointer;
+  transition: background .12s, border-color .12s;
+  white-space: nowrap;
+}
+.wb-q-ai:hover { background: var(--accent-bg); border-color: var(--accent); }
+
+/* Add / Log button */
+.wb-q-add {
+  padding: 6px 16px; font-size: 13px; font-weight: 700;
+  font-family: var(--font); border-radius: 8px;
+  background: var(--accent); color: #fff; border: none;
+  cursor: pointer; white-space: nowrap;
+  transition: background .12s, transform .1s, opacity .12s;
+  letter-spacing: -.2px;
+}
+.wb-q-add:hover { background: var(--accent-2); transform: translateY(-1px); }
+.wb-q-add:active { transform: translateY(0); }
+.wb-q-add:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .wb-q-cat { max-width: 90px; font-size: 11.5px; padding: 5px 5px; }
+  .wb-q-proj { font-size: 11.5px; }
+  .wb-q-ai   { padding: 6px 9px; font-size: 11.5px; }
+  .wb-q-add  { padding: 6px 12px; font-size: 12.5px; }
+}
+@media (max-width: 440px) {
+  .wb-q-left { flex-wrap: wrap; }
+  .wb-q-proj { width: 100%; }
+}

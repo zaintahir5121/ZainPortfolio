@@ -493,6 +493,30 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         return Ok(new { ok = true });
     }
 
+    /* ── Quick add — instant save, no AI ── */
+    [HttpPost]
+    public async Task<IActionResult> QuickAdd([FromBody] QuickAddRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Description))
+            return BadRequest(new { error = "description required" });
+
+        var entry = new LogEntry
+        {
+            UserId      = CurrentUserId,
+            Date        = DateOnly.FromDateTime(DateTime.Today),
+            Description = req.Description.Trim(),
+            Hours       = req.Hours > 0 ? req.Hours : 1,
+            Tags        = string.IsNullOrWhiteSpace(req.Category) ? "Other" : req.Category.Trim(),
+            Project     = string.IsNullOrWhiteSpace(req.Project)
+                              ? (string.IsNullOrWhiteSpace(req.Category) ? "General" : req.Category.Trim())
+                              : req.Project.Trim(),
+            CreatedAt   = DateTime.UtcNow,
+        };
+        db.LogEntries.Add(entry);
+        await db.SaveChangesAsync();
+        return Ok(new { id = entry.Id, description = entry.Description, hours = entry.Hours, category = entry.Tags, project = entry.Project });
+    }
+
     public record AiTextRequest(string Text);
     public record AiParseRequest(string Text);
     public record BulkAddEntry(string Description, decimal Hours, string Category, string Project);
@@ -500,4 +524,5 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
     public record EditLogRequest(int Id, string? Description, decimal? Hours, string? Project, string? Category, DateOnly? Date = null);
     public record DeleteEntryRequest(int Id);
     public record ChatLogRequest(string Text, string? Date = null, string? ProjectOverride = null);
+    public record QuickAddRequest(string Description, decimal Hours = 1, string? Category = null, string? Project = null);
 }

@@ -283,38 +283,54 @@
       }
     </div>
 
-    <!-- Quick chips -->
-    <div class="wb-chips">
-      <button class="wb-chip" onclick="wbSendChip('generate my standup')">📋 Standup</button>
-      <button class="wb-chip" onclick="wbSendChip('what did I log today?')">📅 Today</button>
-      <button class="wb-chip" onclick="wbSendChip('show this week')">📊 This week</button>
-      <button class="wb-chip" onclick="wbOpenDatePicker()">🗓 Pick date</button>
-      <button class="wb-chip" onclick="wbSendChip('Team meeting 1 hour')">💬 Meeting</button>
-      <button class="wb-chip" onclick="wbSendChip('Code review 1 hour')">🔍 Review</button>
-      <button class="wb-chip" onclick="wbSendChip('Bug fixing 2 hours')">🐛 Bug fix</button>
-      <button class="wb-chip" onclick="openShareModal()">✨ Share</button>
-      <input type="date" id="wbDatePick" class="wb-date-inp" onchange="wbDatePicked(this.value)">
-    </div>
-
     <!-- Project context picker -->
     <div class="wb-proj-row" id="wbProjRow"></div>
 
-    <!-- Input bar -->
-    <div class="wb-bar">
-      <button class="wb-mic" id="wbMicBtn" onclick="wbToggleVoice()" title="Voice input">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v6a2 2 0 0 0 4 0V5a2 2 0 0 0-2-2zm7 7a1 1 0 0 1 1 1 8 8 0 0 1-16 0 1 1 0 0 1 2 0 6 6 0 0 0 12 0 1 1 0 0 1 1-1zm-7 11v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 2 0z"/></svg>
-      </button>
-      <button class="wb-aifix" id="wbAiFixBtn" onclick="wbToggleAiFix()" title="AI Fix — AI will correct your English before logging">✨ AI Fix</button>
-      <div class="wb-ta-wrap">
-        <textarea id="wbInput" class="wb-ta"
-                  placeholder="What did you work on? e.g. 'Fixed login bug 2h, PRs 1h, planning 30min' — or paste a full paragraph and AI will split it into multiple cards."
-                  rows="1"
-                  onkeydown="wbKeydown(event)"
-                  oninput="wbAutosize(this)"></textarea>
-        <button class="wb-ta-send" id="wbSendBtn" onclick="wbSend()" title="Send (Enter)">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-        </button>
+    <!-- Quick-add form — instant, no AI required -->
+    <div class="wb-quick">
+      <textarea id="wbInput" class="wb-q-desc"
+                placeholder="What did you work on?"
+                rows="1"
+                onkeydown="wbQKeydown(event)"
+                oninput="wbAutosize(this)"></textarea>
+      <div class="wb-q-row">
+        <div class="wb-q-left">
+          <div class="wb-q-hrs-wrap">
+            <input type="number" id="wbQHrs" class="wb-q-hrs" value="1" min="0.25" max="24" step="0.25" title="Hours spent">
+            <span class="wb-q-hlbl">h</span>
+          </div>
+          <select id="wbQCat" class="wb-q-cat">
+            <option value="Other">Category</option>
+            <option value="Development">Development</option>
+            <option value="Meeting">Meeting</option>
+            <option value="Code Review">Code Review</option>
+            <option value="Testing">Testing</option>
+            <option value="Documentation">Docs</option>
+            <option value="DevOps">DevOps</option>
+            <option value="Research">Research</option>
+            <option value="Design">Design</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="text" id="wbQProj" class="wb-q-proj" placeholder="Project" list="wbProjectList">
+        </div>
+        <div class="wb-q-right">
+          <button class="wb-q-ico" id="wbMicBtn" onclick="wbToggleVoice()" title="Voice input">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v6a2 2 0 0 0 4 0V5a2 2 0 0 0-2-2zm7 7a1 1 0 0 1 1 1 8 8 0 0 1-16 0 1 1 0 0 1 2 0 6 6 0 0 0 12 0 1 1 0 0 1 1-1zm-7 11v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 2 0z"/></svg>
+          </button>
+          <button class="wb-q-ai" onclick="wbAiParse()" title="Paste a paragraph — AI splits into multiple cards (Ctrl+Enter)">✦ AI</button>
+          <button class="wb-q-add" id="wbSendBtn" onclick="wbQuickAdd()">+ Log</button>
+        </div>
       </div>
+    </div>
+
+    <!-- Shortcuts -->
+    <div class="wb-chips">
+      <button class="wb-chip" onclick="wbStandupChip()">📋 Standup</button>
+      <button class="wb-chip" onclick="handleToday()">📅 Today</button>
+      <button class="wb-chip" onclick="handleWeek()">📊 Week</button>
+      <button class="wb-chip" onclick="wbOpenDatePicker()">🗓 Date</button>
+      <button class="wb-chip" onclick="openShareModal()">✨ Share</button>
+      <input type="date" id="wbDatePick" class="wb-date-inp" onchange="wbDatePicked(this.value)">
     </div>
 
   </div>
@@ -475,14 +491,8 @@ const inp     = document.getElementById('wbInput');
 const sendBtn = document.getElementById('wbSendBtn');
 const micBtn  = document.getElementById('wbMicBtn');
 
-// ── AI Fix toggle ─────────────────────────────────────────────────────────
+// ── AI Fix state (kept for AI parse flow) ────────────────────────────────
 let wbAiFix = false;
-function wbToggleAiFix() {
-  wbAiFix = !wbAiFix;
-  const btn = document.getElementById('wbAiFixBtn');
-  btn.classList.toggle('on', wbAiFix);
-  showToast(wbAiFix ? '✨ AI Fix ON — AI will correct your text before logging' : 'AI Fix off');
-}
 
 // ── Status bar ────────────────────────────────────────────────────────────
 let _statusTimer = null;
@@ -948,39 +958,86 @@ async function wbDrop(e, newDate) {
 }
 
 // ── Input helpers ─────────────────────────────────────────────────────────
-function wbKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wbSend(); }
+function wbQKeydown(e) {
+  if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); wbAiParse(); return; }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wbQuickAdd(); }
 }
 function wbAutosize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
-function wbSendChip(text) {
-  inp.value = text; wbAutosize(inp); inp.focus(); wbSend();
+
+// ── Standup chip helper ───────────────────────────────────────────────────
+async function wbStandupChip() {
+  sendBtn.disabled = true;
+  await handleStandup();
+  sendBtn.disabled = false;
 }
 
-// ── Main send ─────────────────────────────────────────────────────────────
-async function wbSend() {
+// ── Quick add — instant, no AI ────────────────────────────────────────────
+async function wbQuickAdd() {
   const text = inp.value.trim();
   if (!text) return;
 
-  inp.value = ''; wbAutosize(inp);
-  inp.disabled = true; sendBtn.disabled = true;
-  histSave('user', text);
-  setStatus('typing');
+  // Route commands to appropriate handlers
   const intent = detectIntent(text);
-  switch (intent) {
-    case 'standup':   await handleStandup();          break;
-    case 'today':     await handleToday();            break;
-    case 'week':      await handleWeek();             break;
-    case 'date':      await handleDateQuery(text);    break;
-    case 'share':     handleShare();                  break;
-    case 'recurring': handleRecurring();              break;
-    case 'history':   handleHistory();                break;
-    case 'help':      handleHelp();                   break;
-    default:          await handleLog(text);          break;
+  if (intent !== 'log') {
+    inp.value = ''; wbAutosize(inp);
+    sendBtn.disabled = true;
+    switch (intent) {
+      case 'standup':   await handleStandup();          break;
+      case 'today':     await handleToday();            break;
+      case 'week':      await handleWeek();             break;
+      case 'date':      await handleDateQuery(text);    break;
+      case 'share':     handleShare();                  break;
+      case 'recurring': handleRecurring();              break;
+      case 'history':   handleHistory();                break;
+      case 'help':      handleHelp();                   break;
+    }
+    sendBtn.disabled = false; inp.focus();
+    return;
   }
 
+  const hrs  = parseFloat(document.getElementById('wbQHrs').value) || 1;
+  const cat  = document.getElementById('wbQCat').value || 'Other';
+  const proj = document.getElementById('wbQProj').value.trim() || wbSelectedProject || '';
+
+  inp.value = ''; wbAutosize(inp);
+  sendBtn.disabled = true;
+
+  try {
+    const res = await fetch('/Logs/QuickAdd', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: text, hours: hrs, category: cat, project: proj }),
+    });
+    if (!res.ok) { showErr('Could not save — try again.'); return; }
+    const entry = await res.json();
+    const dateIso = toIso(new Date());
+    wbAddCards([{ ...entry, date: dateIso }], dateIso);
+    WB.todayHours = +((WB.todayHours || 0) + hrs).toFixed(2);
+    const todayEl = document.querySelector('.wb-qs-num');
+    if (todayEl) todayEl.textContent = WB.todayHours + 'h';
+    setStatus(`✅ Logged — ${WB.todayHours.toFixed(1)}h today`);
+    showToast(`✓ ${text.slice(0, 50)}${text.length > 50 ? '…' : ''}`);
+    histSave('user', text);
+    // add new project to picker if not already there
+    if (proj && !WB.recentProjects.includes(proj)) {
+      WB.recentProjects.unshift(proj);
+      const dl = document.getElementById('wbProjectList');
+      if (dl) { const o = document.createElement('option'); o.value = proj; dl.prepend(o); }
+      wbInitProjectPicker();
+    }
+  } catch { showErr('Network error. Check your connection.'); }
+  finally { sendBtn.disabled = false; inp.focus(); }
+}
+
+// ── AI Parse — Ollama parses a paragraph into multiple cards ──────────────
+async function wbAiParse() {
+  const text = inp.value.trim();
+  if (!text) { showErr('Type or paste a paragraph first, then click ✦ AI.'); return; }
+  inp.value = ''; wbAutosize(inp);
+  inp.disabled = true; sendBtn.disabled = true;
+  await handleLog(text);
   inp.disabled = false; sendBtn.disabled = false; inp.focus();
 }
 

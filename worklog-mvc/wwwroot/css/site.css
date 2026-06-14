@@ -1958,69 +1958,123 @@ body.wb-page .bmc-float:hover { opacity: 1; transform: scale(1.1) translateY(0);
    WorkLog Bot — Card Board
    ════════════════════════════════════════════════════════════ */
 
-/* ── Persistent capture bar ───────────────────────────────────────────────── */
+/* ── Capture bar outer shell ───────────────────────────────────────────────── */
 .wb-capture {
-  background: var(--white);
-  border-top: 1.5px solid var(--line);
-  padding: 10px 18px;
-  padding-bottom: max(12px, calc(10px + env(safe-area-inset-bottom)));
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  padding: 10px 16px;
+  padding-bottom: max(14px, calc(10px + env(safe-area-inset-bottom)));
   flex-shrink: 0;
 }
-.wb-cap-inner {
-  display: flex; align-items: flex-start; gap: 12px;
-}
-.wb-cap-desc {
-  flex: 1; border: none; background: transparent; outline: none;
-  font-size: 14px; font-family: var(--font); color: var(--text); line-height: 1.6;
-  resize: none; overflow: hidden; min-height: 22px; max-height: 100px; padding: 0;
-}
-.wb-cap-desc::placeholder { color: var(--muted); }
-.wb-cap-fields {
-  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
-}
-.wb-cap-hrs-wrap { display: flex; align-items: center; gap: 2px; }
-.wb-cap-hrs {
-  width: 42px; text-align: center;
-  border: 1px solid var(--line); border-radius: 7px;
-  background: var(--bg); padding: 5px 4px;
-  font-size: 13px; font-family: var(--font); color: var(--text); outline: none;
-  transition: border-color .15s;
-}
-.wb-cap-hrs:focus { border-color: var(--accent); }
-.wb-cap-hlbl { font-size: 12px; color: var(--muted); }
-.wb-cap-cat {
-  border: 1px solid var(--line); border-radius: 7px;
-  background: var(--bg); padding: 5px 8px;
-  font-size: 12px; font-family: var(--font); color: var(--text);
-  outline: none; cursor: pointer; transition: border-color .15s;
-}
-.wb-cap-cat:focus { border-color: var(--accent); }
-.wb-cap-proj {
-  border: 1px solid var(--line); border-radius: 7px;
-  background: var(--bg); padding: 5px 10px;
-  font-size: 12px; font-family: var(--font); color: var(--text);
-  width: 120px; outline: none; transition: border-color .15s;
-}
-.wb-cap-proj:focus { border-color: var(--accent); }
-.wb-cap-proj::placeholder { color: var(--muted); }
-.wb-cap-add {
-  padding: 5px 16px; background: var(--accent); color: #fff;
-  border: none; border-radius: 8px;
-  font-size: 13px; font-weight: 700; font-family: var(--font);
-  cursor: pointer; white-space: nowrap; flex-shrink: 0;
-  transition: background .15s, transform .12s;
-}
-.wb-cap-add:hover { background: var(--accent-2); }
-.wb-cap-add:active { transform: scale(.96); }
-.wb-cap-add:disabled { opacity: .45; cursor: default; transform: none; }
 
-/* Mobile: stack description above fields */
-@media (max-width: 620px) {
-  .wb-cap-inner { flex-direction: column; gap: 8px; }
-  .wb-cap-desc { width: 100%; }
-  .wb-cap-fields { flex-wrap: wrap; width: 100%; }
-  .wb-cap-proj { flex: 1; width: auto; min-width: 80px; }
-  .wb-cap-add { margin-left: auto; }
+/* ── Composer card ───────────────────────────────────────────────────────── */
+.wb-composer {
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.06);
+  transition: border-color .2s, box-shadow .22s;
+}
+.wb-composer:focus-within {
+  border-color: rgba(99,102,241,.45);
+  box-shadow: 0 4px 24px rgba(99,102,241,.1), 0 0 0 3px rgba(99,102,241,.07);
+}
+
+/* colour stripe — updated live with category */
+.wb-comp-accent {
+  height: 3px; width: 100%;
+  background: #94a3b8;
+  transition: background .22s;
+}
+
+/* main textarea */
+.wb-comp-desc {
+  display: block; width: 100%; box-sizing: border-box;
+  border: none; outline: none; background: transparent;
+  padding: 13px 16px 6px;
+  font-size: 14.5px; font-family: var(--font); color: var(--text); line-height: 1.55;
+  resize: none; overflow: hidden; min-height: 46px; max-height: 120px;
+}
+.wb-comp-desc::placeholder { color: var(--muted); }
+
+/* footer controls row */
+.wb-comp-foot {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 10px 9px;
+  border-top: 1px solid var(--bg);
+  flex-wrap: wrap; row-gap: 6px;
+}
+
+/* hours stepper */
+.wb-comp-hrs-group {
+  display: flex; align-items: center; gap: 0;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 9px; overflow: hidden;
+  flex-shrink: 0;
+}
+.wb-comp-step {
+  width: 26px; height: 30px; border: none; background: transparent;
+  color: var(--muted); font-size: 15px; font-weight: 600; line-height: 1;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .12s, color .12s; padding: 0; flex-shrink: 0;
+}
+.wb-comp-step:hover { background: var(--line); color: var(--text); }
+.wb-comp-hval-wrap { display: flex; align-items: baseline; gap: 1px; padding: 0 3px; }
+.wb-comp-hval {
+  width: 28px; border: none; background: transparent; outline: none;
+  text-align: center; font-size: 13px; font-weight: 700; font-family: var(--font);
+  color: var(--text); padding: 0;
+  -moz-appearance: textfield;
+}
+.wb-comp-hval::-webkit-outer-spin-button,
+.wb-comp-hval::-webkit-inner-spin-button { -webkit-appearance: none; }
+.wb-comp-hlbl { font-size: 11px; font-weight: 600; color: var(--muted); }
+
+/* separators */
+.wb-comp-sep { width: 1px; height: 16px; background: var(--line); flex-shrink: 0; margin: 0 4px; }
+.wb-comp-spacer { flex: 1; min-width: 8px; }
+
+/* category selector */
+.wb-comp-cat-wrap { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.wb-comp-cat-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #94a3b8; flex-shrink: 0; transition: background .22s;
+}
+.wb-comp-cat {
+  border: none; background: transparent; outline: none;
+  font-size: 12.5px; font-family: var(--font); color: var(--text-2);
+  cursor: pointer; padding: 0; max-width: 110px;
+}
+
+/* project input */
+.wb-comp-proj-wrap { display: flex; align-items: center; gap: 5px; min-width: 80px; flex: 1; }
+.wb-comp-proj-ico { color: var(--muted); flex-shrink: 0; }
+.wb-comp-proj {
+  border: none; background: transparent; outline: none;
+  font-size: 12.5px; font-family: var(--font); color: var(--text-2);
+  width: 100%; min-width: 50px;
+}
+.wb-comp-proj::placeholder { color: var(--muted); }
+
+/* gradient submit button */
+.wb-comp-submit {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 18px; border: none; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: #fff; font-size: 13px; font-weight: 700; font-family: var(--font);
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(99,102,241,.38);
+  transition: box-shadow .18s, transform .14s, opacity .15s;
+}
+.wb-comp-submit:hover { box-shadow: 0 4px 20px rgba(99,102,241,.52); transform: translateY(-1px); }
+.wb-comp-submit:active { transform: scale(.96) translateY(0); }
+.wb-comp-submit:disabled { opacity: .4; cursor: default; transform: none; box-shadow: none; }
+
+/* Mobile: footer wraps, submit goes full-width last */
+@media (max-width: 520px) {
+  .wb-comp-spacer { display: none; }
+  .wb-comp-submit { margin-left: auto; }
+  .wb-comp-cat { max-width: 80px; }
 }
 
 /* ── Status bar (kept for backward compat, now hidden) ── */

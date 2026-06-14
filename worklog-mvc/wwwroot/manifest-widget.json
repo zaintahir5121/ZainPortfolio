@@ -3,7 +3,7 @@
   "short_name": "WorkLog",
   "description": "Daily work preview — today's log at a glance. Resizable, moveable, auto-start ready.",
   "start_url": "/Logs/Widget",
-  "scope": "/",
+  "scope": "/Logs/Widget",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#f5f5fa",

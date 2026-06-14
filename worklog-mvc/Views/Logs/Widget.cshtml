@@ -47,7 +47,7 @@
     body {
       font-family: var(--font); background: var(--bg); color: var(--text);
       font-size: 13px; -webkit-font-smoothing: antialiased;
-      min-width: 260px; display: flex; flex-direction: column; height: 100dvh;
+      min-width: 260px; display: flex; flex-direction: column; height: 100%;
     }
 
     /* ── Accent strip (hidden under WCO) ── */
@@ -76,21 +76,32 @@
     .wg-icon-btn:hover { background: var(--card); color: var(--accent); }
     .wg-pin-btn.pinned { color: var(--accent); border-color: var(--accent); background: #eef2ff; }
 
-    /* ── WCO: remove OS title bar chrome, use our bar as drag region ── */
+    /* ── Standalone: hide our header bar — OS provides thin title bar for dragging ── */
+    @@media (display-mode: standalone) {
+      .wg-bar   { display: none; }
+      .wg-strip { -webkit-app-region: drag; app-region: drag; height: 6px; }
+      .wg-tabs  { -webkit-app-region: drag; app-region: drag; }
+      .wg-tabs > * { -webkit-app-region: no-drag; app-region: no-drag; }
+    }
+    /* ── WCO: tabs fill the OS title-bar area — truly header-less ── */
     @@media (display-mode: window-controls-overlay) {
       .wg-strip { display: none; }
-      .wg-bar {
+      .wg-bar   { display: none; }
+      .wg-tabs {
         position: fixed; z-index: 50;
         top: env(titlebar-area-y, 0px);
         left: env(titlebar-area-x, 0px);
         width: env(titlebar-area-width, 100%);
         height: env(titlebar-area-height, 36px);
-        padding: 0 11px;
         border-bottom: 1px solid var(--line);
+        -webkit-app-region: drag; app-region: drag;
         box-sizing: border-box;
       }
-      .wg-tabs { margin-top: calc(env(titlebar-area-height, 36px) + 3px); }
+      .wg-tabs > * { -webkit-app-region: no-drag; app-region: no-drag; }
+      .wg-wco-spacer { display: block; }
     }
+    /* WCO spacer: pushes flex content below the fixed tab bar */
+    .wg-wco-spacer { display: none; flex-shrink: 0; height: env(titlebar-area-height, 36px); }
 
     /* ── Tabs ── */
     .wg-tabs {
@@ -206,7 +217,7 @@
       border-left: 3px solid var(--note-acc); padding: 8px 10px;
       position: relative; cursor: pointer; transition: box-shadow .15s, transform .12s;
     }
-    .wg-note-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,.08); transform: translateY(-1px); }
+    .wg-note-card:hover { box-shadow: 0 3px 14px rgba(0,0,0,.12); }
     .wg-note-card.pinned { border-left-color: #6366f1; }
     .wg-note-text { font-size: 12px; line-height: 1.5; color: var(--text); word-break: break-word; padding-right: 40px; }
     .wg-note-meta { font-size: 9.5px; color: var(--muted); margin-top: 4px; }
@@ -324,17 +335,30 @@
       display: flex; gap: 8px; padding: 10px 16px 14px; border-top: 1px solid var(--line);
     }
     .wg-exp-del-btn {
-      flex: 1; padding: 7px; border-radius: 8px; border: 1px solid #fecaca;
+      padding: 7px 11px; border-radius: 8px; border: 1px solid #fecaca;
       background: #fff1f2; color: #ef4444; font-size: 11.5px; font-weight: 700;
       cursor: pointer; font-family: var(--font);
     }
     .wg-exp-del-btn:hover { background: #fee2e2; }
     .wg-exp-pin-btn {
-      padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line);
+      padding: 7px 11px; border-radius: 8px; border: 1px solid var(--line);
       background: var(--bg); color: var(--muted); font-size: 11.5px; font-weight: 600;
       cursor: pointer; font-family: var(--font);
     }
     .wg-exp-pin-btn.active { background: #eef2ff; color: var(--accent); border-color: var(--accent); }
+    .wg-exp-save-btn {
+      flex: 1; padding: 7px; border-radius: 8px; border: none;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer; font-family: var(--font);
+    }
+    .wg-exp-save-btn.note { background: linear-gradient(135deg,#f59e0b,#d97706); }
+    .wg-exp-save-btn:disabled { opacity: .45; cursor: default; }
+    /* Editable text in the modal */
+    .wg-exp-desc[contenteditable], .wg-exp-note-text[contenteditable] {
+      outline: none; border-radius: 6px; padding: 4px 6px; margin: -4px -6px;
+      background: rgba(99,102,241,.05); cursor: text;
+    }
+    .wg-expand-card.note-card .wg-exp-note-text[contenteditable] { background: rgba(217,119,6,.06); }
   </style>
 </head>
 <body>
@@ -342,7 +366,7 @@
 
   <!-- Top bar — draggable region in WCO mode -->
   <div class="wg-bar">
-    <a href="/Logs" class="wg-logo" target="_blank">worklog<span>.</span></a>
+    <a href="/Logs" class="wg-logo" target="_blank" rel="noopener">worklog<span>.</span></a>
     <span class="wg-date">@date · @firstName</span>
     <button class="wg-icon-btn wg-pin-btn" id="wgPinWin" onclick="wgToggleWindowPin()" title="Keep on top (re-open as pinned)">📌</button>
     <button class="wg-icon-btn" onclick="wgToggleSetup()" title="Auto-start setup">⚡</button>
@@ -357,6 +381,9 @@
       📝 Notes <span class="wg-tab-badge" id="tabNotesBadge">@todayNotes.Count</span>
     </button>
   </div>
+
+  <!-- WCO spacer: invisible flex item that offsets content below fixed tab bar -->
+  <div class="wg-wco-spacer"></div>
 
   <!-- Setup drawer -->
   <div class="wg-setup-drawer" id="wgSetup" style="display:none">
@@ -524,8 +551,8 @@
 
   <!-- Footer -->
   <div class="wg-footer">
-    <button class="wg-setup-link" onclick="wgToggleSetup()">⚡ Auto-start</button>
-    <a href="/Logs" class="wg-full-link" target="_blank">Full app →</a>
+    <button class="wg-setup-link" id="wgSetupFooterBtn" onclick="wgToggleSetup()">⚡ Auto-start</button>
+    <a href="/Logs" class="wg-full-link" target="_blank" rel="noopener">Full app →</a>
   </div>
 
   <!-- ═══ EXPAND MODAL ═══ -->
@@ -543,7 +570,8 @@
       </div>
       <div class="wg-exp-footer" id="wgExpFooter">
         <button class="wg-exp-pin-btn" id="wgExpPinBtn" style="display:none" onclick="wgExpPinToggle()">📌 Pin</button>
-        <button class="wg-exp-del-btn" id="wgExpDelBtn" onclick="wgExpDelete()">🗑 Delete</button>
+        <button class="wg-exp-del-btn" id="wgExpDelBtn" onclick="wgExpDelete()">🗑</button>
+        <button class="wg-exp-save-btn" id="wgExpSaveBtn" onclick="wgExpSave()">Save</button>
       </div>
     </div>
   </div>
@@ -558,10 +586,22 @@
   let _modalType = null;
   const _pins    = new Set(JSON.parse(localStorage.getItem('wg_pins') || '[]'));
 
-  // PWA resize
+  // PWA resize — restore saved size or default 400×660 (sticky-note style)
   if (window.matchMedia('(display-mode: standalone)').matches ||
       window.matchMedia('(display-mode: window-controls-overlay)').matches) {
-    try { window.resizeTo(400, 660); } catch {}
+    try {
+      const savedW = parseInt(localStorage.getItem('wg_w') || '0');
+      const savedH = parseInt(localStorage.getItem('wg_h') || '0');
+      window.resizeTo(savedW > 260 ? savedW : 400, savedH > 200 ? savedH : 660);
+    } catch {}
+    // Save size when user resizes
+    let _rsTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(_rsTimer);
+      _rsTimer = setTimeout(() => {
+        try { localStorage.setItem('wg_w', window.outerWidth); localStorage.setItem('wg_h', window.outerHeight); } catch {}
+      }, 400);
+    });
   }
 
   // Apply pins on load
@@ -590,8 +630,12 @@
     document.getElementById('tabNotes').classList.toggle('active', tab==='notes');
     document.getElementById('paneLog').classList.toggle('active', tab==='log');
     document.getElementById('paneNotes').classList.toggle('active', tab==='notes');
-    document.getElementById('wgStrip').className = tab==='notes' ? 'wg-strip notes' : 'wg-strip';
+    const strip = document.getElementById('wgStrip');
+    if (strip) strip.className = tab==='notes' ? 'wg-strip notes' : 'wg-strip';
     document.getElementById('wgSetup').style.display = 'none';
+    // Hide auto-start button on Notes tab (it's a Log/setup feature)
+    const setupBtn = document.getElementById('wgSetupFooterBtn');
+    if (setupBtn) setupBtn.style.display = tab==='log' ? '' : 'none';
     _closeLogForm(); _closeNoteForm();
   }
 
@@ -657,7 +701,7 @@
     const proj = e.project && e.project!==e.category ? `<span class="wg-proj"> · ${_esc(e.project)}</span>`:'';
     const row = document.createElement('div');
     row.className='wg-entry'; row.id=`wge-${e.id}`;
-    row.setAttribute('onclick', `wgOpenLogModal(${e.id},'${_esc(e.description)}','${_esc(e.category)}','${e.hours}','')`);
+    row.setAttribute('onclick', `wgOpenLogModal(${e.id},'${_jsStr(e.description)}','${_jsStr(e.category)}','${e.hours}','')`);
     row.innerHTML=`<span class="wg-dot" data-cat="${_esc(e.category)}"></span>
       <span class="wg-desc">${_esc(e.description)}${proj}</span>
       <div class="wg-emeta"><span class="wg-hrs">${e.hours} h</span>
@@ -708,7 +752,7 @@
     const proj = e.project && e.project!=='Notes' ? `<div class="wg-note-meta">${_esc(e.project)}</div>`:'';
     const card = document.createElement('div');
     card.className='wg-note-card'; card.id=`wge-${e.id}`;
-    card.setAttribute('onclick',`wgOpenNoteModal(${e.id},'${_esc(e.description)}','')`);
+    card.setAttribute('onclick',`wgOpenNoteModal(${e.id},'${_jsStr(e.description)}','')`);
     card.innerHTML=`<div class="wg-note-text">${_esc(e.description)}</div>${proj}
       <div class="wg-note-actions" onclick="event.stopPropagation()">
         <button class="wg-pin" onclick="wgPinNote(${e.id})" title="Pin">📌</button>
@@ -775,17 +819,23 @@
     _modalId=id; _modalType='log';
     const card = document.getElementById('wgExpandCard');
     card.classList.remove('note-card');
+    document.getElementById('wgExpSaveBtn').className='wg-exp-save-btn';
     document.getElementById('wgExpDot').style.background = _dotColors[cat]||'#94a3b8';
     document.getElementById('wgExpCat').textContent = cat;
-    document.getElementById('wgExpDesc').textContent = desc;
-    document.getElementById('wgExpDesc').style.display='block';
+    const descEl = document.getElementById('wgExpDesc');
+    descEl.textContent = desc;
+    descEl.contentEditable = 'true';
+    descEl.style.display='block';
     document.getElementById('wgExpNoteText').style.display='none';
+    document.getElementById('wgExpNoteText').contentEditable='false';
     const meta = document.getElementById('wgExpMeta');
     meta.innerHTML = `<span class="wg-exp-chip">${hrs} h</span>${proj?`<span class="wg-exp-chip">${_esc(proj)}</span>`:''}`;
     document.getElementById('wgExpPinBtn').style.display='none';
     document.getElementById('wgExpDelBtn').style.display='';
+    document.getElementById('wgExpSaveBtn').style.display='';
     document.getElementById('wgOverlay').style.display='flex';
-    document.body.style.overflow='hidden';
+    // Focus and place cursor at end
+    setTimeout(() => { descEl.focus(); const r=document.createRange(); r.selectNodeContents(descEl); r.collapse(false); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }, 80);
   }
 
   /* ── Note expand modal ── */
@@ -793,11 +843,15 @@
     _modalId=id; _modalType='note';
     const card = document.getElementById('wgExpandCard');
     card.classList.add('note-card');
+    document.getElementById('wgExpSaveBtn').className='wg-exp-save-btn note';
     document.getElementById('wgExpDot').style.background='#f59e0b';
     document.getElementById('wgExpCat').textContent='Note';
     document.getElementById('wgExpDesc').style.display='none';
-    document.getElementById('wgExpNoteText').textContent=text;
-    document.getElementById('wgExpNoteText').style.display='block';
+    document.getElementById('wgExpDesc').contentEditable='false';
+    const noteEl = document.getElementById('wgExpNoteText');
+    noteEl.textContent=text;
+    noteEl.contentEditable='true';
+    noteEl.style.display='block';
     const meta=document.getElementById('wgExpMeta');
     meta.innerHTML=proj?`<span class="wg-exp-chip">${_esc(proj)}</span>`:'';
     const pinBtn=document.getElementById('wgExpPinBtn');
@@ -805,13 +859,15 @@
     pinBtn.textContent=_pins.has(id)?'📌 Unpin':'📌 Pin';
     pinBtn.classList.toggle('active',_pins.has(id));
     document.getElementById('wgExpDelBtn').style.display='';
+    document.getElementById('wgExpSaveBtn').style.display='';
     document.getElementById('wgOverlay').style.display='flex';
-    document.body.style.overflow='hidden';
+    setTimeout(() => { noteEl.focus(); const r=document.createRange(); r.selectNodeContents(noteEl); r.collapse(false); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }, 80);
   }
 
   function wgCloseModal() {
     document.getElementById('wgOverlay').style.display='none';
-    document.body.style.overflow='';
+    document.getElementById('wgExpDesc').contentEditable='false';
+    document.getElementById('wgExpNoteText').contentEditable='false';
     _modalId=null; _modalType=null;
   }
   function wgExpPinToggle() {
@@ -822,6 +878,34 @@
   }
   function wgExpDelete() {
     if (_modalId!=null) wgDelete(_modalId, _modalType);
+  }
+  async function wgExpSave() {
+    if (_modalId==null) return;
+    const isNote = _modalType==='note';
+    const el = isNote ? document.getElementById('wgExpNoteText') : document.getElementById('wgExpDesc');
+    const newText = el.textContent.trim();
+    if (!newText) return;
+    const btn = document.getElementById('wgExpSaveBtn');
+    btn.disabled=true; btn.textContent='Saving…';
+    try {
+      const res = await fetch('/Logs/UpdateEntry', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id:_modalId, description:newText })
+      });
+      if (res.ok) {
+        // Update the card in the list
+        const card = document.getElementById(`wge-${_modalId}`);
+        if (card) {
+          const textEl = card.querySelector(isNote ? '.wg-note-text' : '.wg-desc');
+          if (textEl) textEl.childNodes[0].textContent = newText;
+          // Update onclick with new text
+          const escaped = _jsStr(newText);
+          if (isNote) card.setAttribute('onclick',`wgOpenNoteModal(${_modalId},'${escaped}','')`);
+          else { const prev = card.getAttribute('onclick'); card.setAttribute('onclick', prev.replace(/^wgOpenLogModal\(\d+,'[^']*'/, `wgOpenLogModal(${_modalId},'${escaped}'`)); }
+        }
+        wgCloseModal();
+      } else { btn.disabled=false; btn.textContent='Save'; }
+    } catch { btn.disabled=false; btn.textContent='Save'; }
   }
 
   // N key → open active tab's form; Escape → close modal
@@ -835,6 +919,10 @@
 
   function _esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  // Safe for embedding in single-quoted JS string literals inside onclick attributes
+  function _jsStr(s) {
+    return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n').replace(/\r/g,'');
   }
   </script>
 </body>

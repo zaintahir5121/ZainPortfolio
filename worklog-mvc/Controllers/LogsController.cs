@@ -493,6 +493,20 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         return Ok(new { ok = true });
     }
 
+    /* ── Widget inline edit ── */
+    [HttpPost]
+    public async Task<IActionResult> UpdateEntry([FromBody] UpdateEntryRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Description))
+            return BadRequest(new { error = "description required" });
+        var entry = await db.LogEntries.FindAsync(req.Id);
+        if (entry is null) return NotFound(new { error = "Not found" });
+        if (entry.UserId != CurrentUserId && !IsAdmin) return Forbid();
+        entry.Description = req.Description.Trim();
+        await db.SaveChangesAsync();
+        return Ok(new { ok = true });
+    }
+
     /* ── Sticky Notes Widget ── */
     [HttpGet]
     public async Task<IActionResult> Sticky()
@@ -656,6 +670,7 @@ Read-Host ""Press Enter to close""
     public record BulkAddRequest(List<BulkAddEntry> Entries, DateOnly? Date = null);
     public record EditLogRequest(int Id, string? Description, decimal? Hours, string? Project, string? Category, DateOnly? Date = null);
     public record DeleteEntryRequest(int Id);
+    public record UpdateEntryRequest(int Id, string Description);
     public record ChatLogRequest(string Text, string? Date = null, string? ProjectOverride = null);
     public record QuickAddRequest(string Description, decimal Hours = 1, string? Category = null, string? Project = null);
 }

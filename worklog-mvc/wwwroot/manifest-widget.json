@@ -5,6 +5,7 @@
   "start_url": "/Logs/Widget",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#f5f5fa",
   "theme_color": "#6366f1",
   "orientation": "any",

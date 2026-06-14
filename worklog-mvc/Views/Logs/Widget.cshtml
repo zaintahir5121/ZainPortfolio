@@ -592,7 +592,7 @@
     try {
       const savedW = parseInt(localStorage.getItem('wg_w') || '0');
       const savedH = parseInt(localStorage.getItem('wg_h') || '0');
-      window.resizeTo(savedW > 260 ? savedW : 400, savedH > 200 ? savedH : 660);
+      window.resizeTo(savedW > 260 ? savedW : 360, savedH > 200 ? savedH : 560);
     } catch {}
     // Save size when user resizes
     let _rsTimer;

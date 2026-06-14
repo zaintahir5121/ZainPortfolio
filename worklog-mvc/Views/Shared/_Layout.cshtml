@@ -31,6 +31,8 @@
        class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Timesheet" ? "t-link-on" : "")">Timesheet</a>
     <a asp-controller="Recurring" asp-action="Index"
        class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Recurring" ? "t-link-on" : "")">↺ Recurring</a>
+    <a asp-controller="Logs" asp-action="Widget"
+       class="t-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Widget" ? "t-link-on" : "")">⊞ Widget</a>
     @* Growth hidden — re-enable by uncommenting:
     @{
       var growthActive = new[]{"Growth","Achievements","Experience","Learning"}
@@ -65,6 +67,8 @@
      class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Timesheet" ? "t-link-on" : "")">Timesheet</a>
   <a asp-controller="Recurring" asp-action="Index"
      class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Recurring" ? "t-link-on" : "")">↺ Recurring</a>
+  <a asp-controller="Logs" asp-action="Widget"
+     class="t-drawer-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Widget" ? "t-link-on" : "")">⊞ Widget</a>
   <div class="t-drawer-divider"></div>
   @* Growth hidden — uncomment to restore:
   <a asp-controller="Growth" asp-action="Index" class="t-drawer-link">🌱 Growth</a>

@@ -18,10 +18,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Sticky Notes",
-      "short_name": "Notes",
-      "description": "Quick sticky notes widget — log today's work at a glance",
-      "url": "/Logs/Sticky",
+      "name": "Today Widget",
+      "short_name": "Widget",
+      "description": "Day-preview widget — today's work, progress bar, yesterday summary",
+      "url": "/Logs/Widget",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
@@ -30,6 +30,16 @@
       "description": "Full WorkLog dashboard",
       "url": "/Logs",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Sticky Notes",
+      "short_name": "Notes",
+      "description": "Quick sticky notes panel",
+      "url": "/Logs/Sticky",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
-  ]
+  ],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
 }

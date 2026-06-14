@@ -1,0 +1,569 @@
+@using WorkLogApp.Models
+@{
+    Layout = null;
+    var  todayLogs     = ViewBag.TodayLogs     as List<LogEntry> ?? new();
+    var  yesterdayLogs = ViewBag.YesterdayLogs as List<LogEntry> ?? new();
+    decimal todayH     = ViewBag.TodayHours    is decimal th ? th : 0m;
+    decimal ydayH      = ViewBag.YesterdayHours is decimal yh ? yh : 0m;
+    decimal goal       = ViewBag.DailyGoal     is decimal dg ? dg : 8m;
+    decimal pct        = goal > 0 ? Math.Min(todayH / goal * 100, 100) : 0;
+    string  date       = ViewBag.Date          as string ?? "";
+    string  firstName  = ViewBag.FirstName     as string ?? "";
+    var     projects   = ViewBag.RecentProjects as List<string> ?? new();
+    string  weekJson   = ViewBag.WeekJson      as string ?? "[]";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkLog · Today</title>
+  <link rel="manifest" href="/manifest-widget.json">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="WorkLog">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    :root {
+      --accent:  #6366f1;
+      --accent2: #8b5cf6;
+      --bg:      #f5f5fa;
+      --card:    #ffffff;
+      --text:    #1e1e2e;
+      --text2:   #4a4a6a;
+      --muted:   #8b8ea6;
+      --line:    #e8e8f0;
+      --font:    'Inter', system-ui, sans-serif;
+      --r:       10px;
+    }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+    }
+
+    /* ── Top accent strip ── */
+    .wg-strip { height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); flex-shrink: 0; }
+
+    /* ── Top bar ── */
+    .wg-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 13px 8px;
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .wg-logo { font-size: 14px; font-weight: 800; color: var(--text); text-decoration: none; letter-spacing: -.3px; }
+    .wg-logo span { color: var(--accent); }
+    .wg-date { flex: 1; font-size: 11.5px; color: var(--muted); font-weight: 500; text-align: center; }
+    .wg-icon-btn {
+      width: 26px; height: 26px; border-radius: 7px;
+      border: 1px solid var(--line); background: var(--bg);
+      cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); transition: color .15s, background .15s;
+    }
+    .wg-icon-btn:hover { background: var(--card); color: var(--accent); }
+
+    /* ── Setup drawer ── */
+    .wg-setup-drawer {
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      padding: 13px 14px 12px;
+      flex-shrink: 0;
+    }
+    .wg-setup-title { font-size: 12.5px; font-weight: 800; color: var(--text); margin-bottom: 9px; }
+    .wg-setup-step { display: flex; gap: 9px; align-items: flex-start; margin-bottom: 7px; }
+    .wg-step-num {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      font-size: 10px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .wg-step-text { font-size: 11.5px; color: var(--text2); line-height: 1.5; flex: 1; }
+    .wg-step-text strong { color: var(--text); font-weight: 700; }
+    .wg-step-code {
+      display: block; margin-top: 3px; padding: 4px 7px;
+      background: var(--bg); border: 1px solid var(--line); border-radius: 5px;
+      font-family: 'Consolas', monospace; font-size: 10.5px; color: var(--accent);
+      word-break: break-all; line-height: 1.4;
+    }
+    .wg-setup-close {
+      margin-top: 8px; width: 100%; padding: 6px; border-radius: 7px;
+      border: 1px solid var(--line); background: var(--bg);
+      cursor: pointer; font-size: 11.5px; font-weight: 600; font-family: var(--font);
+      color: var(--muted);
+    }
+    .wg-setup-close:hover { background: var(--card); color: var(--text); }
+
+    /* ── Scrollable body ── */
+    .wg-body { flex: 1; overflow-y: auto; }
+    .wg-body::-webkit-scrollbar { width: 4px }
+    .wg-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px }
+
+    .wg-section { border-bottom: 1px solid var(--line); }
+
+    /* ── Section header ── */
+    .wg-sec-hdr { display: flex; align-items: center; gap: 8px; padding: 10px 13px 7px; }
+    .wg-sec-label {
+      font-size: 9.5px; font-weight: 700; letter-spacing: .8px;
+      color: var(--muted); text-transform: uppercase;
+    }
+    .wg-sec-h {
+      font-size: 12.5px; font-weight: 700; color: var(--accent);
+      background: #eef2ff; padding: 1px 8px; border-radius: 99px;
+      margin-left: auto;
+    }
+    .wg-chevron { font-size: 11px; color: var(--muted); user-select: none; }
+
+    /* ── Progress bar ── */
+    .wg-prog-wrap { padding: 0 13px 3px; }
+    .wg-prog-track { height: 4px; background: var(--line); border-radius: 99px; overflow: hidden; }
+    .wg-prog-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width .6s cubic-bezier(.22,1,.36,1);
+      min-width: 2px;
+    }
+    .wg-prog-sub { font-size: 10px; color: var(--muted); padding: 3px 13px 5px; }
+
+    /* ── Entry rows ── */
+    .wg-entry {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 5px 13px; transition: background .1s;
+    }
+    .wg-entry:hover { background: #f0f0f8; }
+    .wg-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 4px;
+      background: #94a3b8;
+    }
+    .wg-dot[data-cat="Development"]   { background: #6366f1 }
+    .wg-dot[data-cat="Meeting"]        { background: #f59e0b }
+    .wg-dot[data-cat="Code Review"]    { background: #10b981 }
+    .wg-dot[data-cat="Testing"]        { background: #8b5cf6 }
+    .wg-dot[data-cat="Documentation"]  { background: #06b6d4 }
+    .wg-dot[data-cat="DevOps"]         { background: #ef4444 }
+    .wg-dot[data-cat="Research"]       { background: #818cf8 }
+    .wg-dot[data-cat="Design"]         { background: #ec4899 }
+    .wg-dot[data-cat="Notes"]          { background: #f59e0b }
+
+    .wg-desc { flex: 1; font-size: 12px; line-height: 1.4; color: var(--text2); word-break: break-word; }
+    .wg-desc .wg-proj { opacity: .5; font-size: 10.5px; }
+    .wg-emeta { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+    .wg-hrs { font-size: 11px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+    .wg-del {
+      width: 18px; height: 18px; border-radius: 5px; border: none;
+      background: transparent; cursor: pointer; color: var(--muted);
+      font-size: 11px; opacity: 0; transition: opacity .15s, background .1s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .wg-entry:hover .wg-del { opacity: 1; }
+    .wg-del:hover { background: #fee2e2; color: #ef4444; opacity: 1 !important; }
+
+    .wg-empty { padding: 10px 13px 6px; font-size: 11.5px; color: var(--muted); font-style: italic; }
+
+    /* ── Add button ── */
+    .wg-addbtn-wrap { padding: 5px 13px 11px; }
+    .wg-addbtn {
+      width: 100%; padding: 7px; border-radius: 7px;
+      border: 1.5px dashed var(--line); background: transparent;
+      cursor: pointer; font-size: 11.5px; font-weight: 600;
+      color: var(--muted); font-family: var(--font);
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .wg-addbtn:hover { border-color: var(--accent); color: var(--accent); background: #eef2ff; }
+
+    /* ── Form ── */
+    .wg-form {
+      margin: 0 13px 11px;
+      border: 1.5px solid var(--accent); border-radius: var(--r);
+      background: var(--card); overflow: hidden;
+    }
+    .wg-ta {
+      width: 100%; border: none; outline: none; resize: none;
+      padding: 9px 11px 4px; font-size: 12.5px; font-family: var(--font);
+      color: var(--text); background: transparent; line-height: 1.45;
+      min-height: 38px; max-height: 90px;
+    }
+    .wg-ta::placeholder { color: var(--muted); }
+    .wg-form-row {
+      display: flex; align-items: center; gap: 5px;
+      padding: 3px 7px 7px;
+    }
+    .wg-form-sel {
+      flex: 1; min-width: 90px; border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 6px; font-size: 11.5px; font-family: var(--font);
+      color: var(--text); background: var(--bg); outline: none;
+    }
+    .wg-hrs-ctrl {
+      display: flex; align-items: center; gap: 0;
+      border: 1px solid var(--line); border-radius: 6px;
+      overflow: hidden; background: var(--bg); flex-shrink: 0;
+    }
+    .wg-hrs-ctrl button {
+      width: 24px; height: 26px; border: none; background: transparent;
+      cursor: pointer; font-size: 14px; color: var(--muted); font-family: var(--font);
+      line-height: 1;
+    }
+    .wg-hrs-ctrl button:hover { background: var(--line); color: var(--text); }
+    .wg-hrs-val { font-size: 12px; font-weight: 700; color: var(--text); min-width: 22px; text-align: center; }
+    .wg-save-btn {
+      padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-size: 11.5px; font-weight: 700; font-family: var(--font);
+      flex-shrink: 0; transition: opacity .15s;
+    }
+    .wg-save-btn:disabled { opacity: .4; cursor: default; }
+    .wg-proj-inp {
+      width: 100%; border: none; border-top: 1px solid var(--line);
+      outline: none; padding: 5px 11px; font-size: 11.5px; font-family: var(--font);
+      color: var(--text); background: #fafafa;
+    }
+    .wg-proj-inp::placeholder { color: var(--muted); }
+
+    /* ── Week chart ── */
+    .wg-week-wrap { padding: 10px 13px 12px; }
+    .wg-week-title {
+      font-size: 9.5px; font-weight: 700; letter-spacing: .8px;
+      color: var(--muted); text-transform: uppercase; margin-bottom: 7px;
+    }
+    .wg-week-chart { display: flex; gap: 3px; align-items: flex-end; height: 40px; }
+    .wg-week-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .wg-week-bar-wrap {
+      flex: 1; width: 100%; display: flex; align-items: flex-end;
+      background: var(--bg); border-radius: 3px 3px 0 0;
+    }
+    .wg-week-bar {
+      width: 100%; border-radius: 3px 3px 0 0; min-height: 2px;
+      background: linear-gradient(180deg, var(--accent2), var(--accent));
+      transition: height .5s cubic-bezier(.22,1,.36,1);
+    }
+    .wg-week-day { font-size: 9px; color: var(--muted); font-weight: 600; }
+
+    /* ── Footer ── */
+    .wg-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 13px 9px;
+      background: var(--card);
+      border-top: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .wg-setup-link {
+      font-size: 11px; color: var(--muted); background: none; border: none;
+      cursor: pointer; font-family: var(--font); font-weight: 600; padding: 0;
+    }
+    .wg-setup-link:hover { color: var(--accent); }
+    .wg-full-link {
+      font-size: 11px; font-weight: 700; color: var(--accent); text-decoration: none;
+    }
+    .wg-full-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wg-strip"></div>
+
+  <!-- Top bar -->
+  <div class="wg-bar">
+    <a href="/Logs" class="wg-logo" target="_blank">worklog<span>.</span></a>
+    <span class="wg-date">@date · @firstName</span>
+    <button class="wg-icon-btn" onclick="wgToggleSetup()" title="Auto-start setup">⚡</button>
+  </div>
+
+  <!-- Setup drawer -->
+  <div class="wg-setup-drawer" id="wgSetup" style="display:none">
+    <div class="wg-setup-title">⚡ Auto-start with Windows</div>
+    <div class="wg-setup-step">
+      <div class="wg-step-num">1</div>
+      <div class="wg-step-text"><strong>Install as a PWA</strong> — In Edge or Chrome click the install
+        icon <strong>⊕</strong> in the address bar, or browser menu → Apps → Install WorkLog.</div>
+    </div>
+    <div class="wg-setup-step">
+      <div class="wg-step-num">2</div>
+      <div class="wg-step-text"><strong>Enable "Open at login"</strong> — After installing, click the
+        three-dot menu inside the app window → <em>Open at login</em>.</div>
+    </div>
+    <div class="wg-setup-step">
+      <div class="wg-step-num">3</div>
+      <div class="wg-step-text"><strong>Or manually (Win+R → shell:startup)</strong> — create a shortcut with target:
+        <code class="wg-step-code" id="wgStartupCmd">msedge --app=…/Logs/Widget</code>
+      </div>
+    </div>
+    <button class="wg-setup-close" onclick="wgToggleSetup()">✕ Close</button>
+  </div>
+
+  <!-- Scrollable body -->
+  <div class="wg-body">
+
+    <!-- TODAY -->
+    <div class="wg-section">
+      <div class="wg-sec-hdr">
+        <span class="wg-sec-label">Today</span>
+        <span class="wg-sec-h" id="wgTodayPill">@todayH.ToString("F1") h</span>
+      </div>
+      <div class="wg-prog-wrap">
+        <div class="wg-prog-track">
+          <div class="wg-prog-fill" id="wgProgFill" style="width:@pct.ToString("F0")%"></div>
+        </div>
+      </div>
+      <div class="wg-prog-sub" id="wgProgSub">@pct.ToString("F0")% of @goal h daily goal</div>
+
+      @foreach (var e in todayLogs)
+      {
+        <div class="wg-entry" id="wge-@e.Id">
+          <span class="wg-dot" data-cat="@e.Tags"></span>
+          <span class="wg-desc">@e.Description@if (!string.IsNullOrWhiteSpace(e.Project) && e.Project != e.Tags){<span class="wg-proj"> · @e.Project</span>}</span>
+          <div class="wg-emeta">
+            <span class="wg-hrs">@e.Hours h</span>
+            <button class="wg-del" onclick="wgDelete(@e.Id)">✕</button>
+          </div>
+        </div>
+      }
+      @if (!todayLogs.Any())
+      {
+        <div class="wg-empty" id="wgEmpty">Nothing logged yet. Add your first entry!</div>
+      }
+
+      <div class="wg-addbtn-wrap">
+        <button class="wg-addbtn" id="wgAddBtn" onclick="wgToggleForm()">+ Log entry for today</button>
+      </div>
+      <div class="wg-form" id="wgForm" style="display:none">
+        <textarea class="wg-ta" id="wgDesc" rows="2"
+          placeholder="What did you work on?"
+          oninput="wgAutosize(this)"
+          onkeydown="wgKeydown(event)"></textarea>
+        <div class="wg-form-row">
+          <select class="wg-form-sel" id="wgCat">
+            <option>Development</option>
+            <option>Meeting</option>
+            <option>Code Review</option>
+            <option>Notes</option>
+            <option>Testing</option>
+            <option>Documentation</option>
+            <option>Research</option>
+            <option>Design</option>
+            <option>DevOps</option>
+            <option>Other</option>
+          </select>
+          <div class="wg-hrs-ctrl">
+            <button type="button" onclick="wgStep(-0.5)">−</button>
+            <span class="wg-hrs-val" id="wgHrsVal">1</span>
+            <button type="button" onclick="wgStep(0.5)">+</button>
+          </div>
+          <button class="wg-save-btn" id="wgSaveBtn" onclick="wgSave()">Add →</button>
+        </div>
+        <input class="wg-proj-inp" id="wgProj" placeholder="Project (optional)" list="wgProjList">
+        <datalist id="wgProjList">
+          @foreach (var p in projects) { <option value="@p"></option> }
+        </datalist>
+      </div>
+    </div>
+
+    @if (yesterdayLogs.Any())
+    {
+    <!-- YESTERDAY -->
+    <div class="wg-section">
+      <div class="wg-sec-hdr wg-yday-hdr" onclick="wgToggleYday()" style="cursor:pointer">
+        <span class="wg-sec-label">Yesterday</span>
+        <span class="wg-sec-h">@ydayH.ToString("F1") h</span>
+        <span class="wg-chevron" id="wgChev">▾</span>
+      </div>
+      <div id="wgYday">
+        @foreach (var e in yesterdayLogs)
+        {
+          <div class="wg-entry">
+            <span class="wg-dot" data-cat="@e.Tags"></span>
+            <span class="wg-desc">@e.Description@if (!string.IsNullOrWhiteSpace(e.Project) && e.Project != e.Tags){<span class="wg-proj"> · @e.Project</span>}</span>
+            <span class="wg-hrs">@e.Hours h</span>
+          </div>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- WEEK mini chart -->
+    <div class="wg-week-wrap">
+      <div class="wg-week-title">This Week</div>
+      <div class="wg-week-chart" id="wgWeekChart"></div>
+    </div>
+
+  </div><!-- /wg-body -->
+
+  <!-- Footer -->
+  <div class="wg-footer">
+    <button class="wg-setup-link" onclick="wgToggleSetup()">⚡ Auto-start setup</button>
+    <a href="/Logs" class="wg-full-link" target="_blank">Full app →</a>
+  </div>
+
+  <script>
+  let _wgHrs  = 1;
+  let _wgToday = @todayH;
+  const _wgGoal = @goal;
+
+  // Auto-start command uses current origin
+  document.getElementById('wgStartupCmd').textContent =
+    `msedge --app=${location.origin}/Logs/Widget`;
+
+  // Resize to widget dimensions when running as installed PWA
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    try { window.resizeTo(400, 660); } catch {}
+  }
+
+  // Build week bar chart
+  const _weekData = @Html.Raw(weekJson);
+  const _chartEl  = document.getElementById('wgWeekChart');
+  if (_weekData.length) {
+    _chartEl.innerHTML = _weekData.map(w => {
+      const pct = Math.min((w.h / _wgGoal) * 100, 100);
+      return `<div class="wg-week-col">
+        <div class="wg-week-bar-wrap">
+          <div class="wg-week-bar" style="height:${pct.toFixed(0)}%"></div>
+        </div>
+        <div class="wg-week-day">${w.d}</div>
+      </div>`;
+    }).join('');
+  } else {
+    _chartEl.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:4px 0">No data yet</div>';
+  }
+
+  function wgToggleSetup() {
+    const d = document.getElementById('wgSetup');
+    d.style.display = d.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function wgToggleForm() {
+    const f = document.getElementById('wgForm');
+    const b = document.getElementById('wgAddBtn');
+    if (f.style.display === 'none') {
+      f.style.display = 'block';
+      b.style.display = 'none';
+      document.getElementById('wgDesc').focus();
+    } else {
+      _wgCloseForm();
+    }
+  }
+
+  function _wgCloseForm() {
+    document.getElementById('wgForm').style.display = 'none';
+    document.getElementById('wgAddBtn').style.display = '';
+    document.getElementById('wgDesc').value = '';
+    document.getElementById('wgProj').value = '';
+    _wgHrs = 1;
+    document.getElementById('wgHrsVal').textContent = '1';
+  }
+
+  function wgAutosize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 90) + 'px';
+  }
+
+  function wgKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wgSave(); }
+    if (e.key === 'Escape') _wgCloseForm();
+  }
+
+  function wgStep(delta) {
+    _wgHrs = Math.max(0.25, Math.round((_wgHrs + delta) * 4) / 4);
+    document.getElementById('wgHrsVal').textContent =
+      _wgHrs % 1 === 0 ? String(_wgHrs) : _wgHrs.toFixed(2);
+  }
+
+  async function wgSave() {
+    const desc = document.getElementById('wgDesc').value.trim();
+    if (!desc) { document.getElementById('wgDesc').focus(); return; }
+    const btn = document.getElementById('wgSaveBtn');
+    btn.disabled = true; btn.textContent = '…';
+    try {
+      const res = await fetch('/Logs/QuickAdd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          description: desc,
+          hours: _wgHrs,
+          category: document.getElementById('wgCat').value,
+          project: document.getElementById('wgProj').value.trim() || null
+        })
+      });
+      if (res.ok) {
+        const e = await res.json();
+        _wgAddRow(e);
+        _wgUpdateProgress(e.hours);
+        _wgCloseForm();
+      }
+    } finally {
+      btn.disabled = false; btn.textContent = 'Add →';
+    }
+  }
+
+  function _wgAddRow(e) {
+    document.getElementById('wgEmpty')?.remove();
+    const proj = e.project && e.project !== e.category
+      ? `<span class="wg-proj"> · ${_esc(e.project)}</span>` : '';
+    const row = document.createElement('div');
+    row.className = 'wg-entry'; row.id = `wge-${e.id}`;
+    row.innerHTML = `<span class="wg-dot" data-cat="${_esc(e.category)}"></span>
+      <span class="wg-desc">${_esc(e.description)}${proj}</span>
+      <div class="wg-emeta">
+        <span class="wg-hrs">${e.hours} h</span>
+        <button class="wg-del" onclick="wgDelete(${e.id})">✕</button>
+      </div>`;
+    document.getElementById('wgAddBtn').closest('.wg-addbtn-wrap').before(row);
+  }
+
+  function _wgUpdateProgress(delta) {
+    _wgToday += Number(delta);
+    const pct = Math.min(_wgToday / _wgGoal * 100, 100);
+    document.getElementById('wgProgFill').style.width  = pct.toFixed(0) + '%';
+    document.getElementById('wgProgSub').textContent   = `${pct.toFixed(0)}% of ${_wgGoal} h daily goal`;
+    document.getElementById('wgTodayPill').textContent = _wgToday.toFixed(1) + ' h';
+  }
+
+  async function wgDelete(id) {
+    if (!confirm('Remove this entry?')) return;
+    const res = await fetch('/Logs/DeleteEntry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    if (res.ok) {
+      document.getElementById(`wge-${id}`)?.remove();
+    }
+  }
+
+  function wgToggleYday() {
+    const list = document.getElementById('wgYday');
+    const chev = document.getElementById('wgChev');
+    if (!list) return;
+    const hidden = list.style.display === 'none';
+    list.style.display = hidden ? '' : 'none';
+    if (chev) chev.textContent = hidden ? '▾' : '▸';
+  }
+
+  function _esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  // Press N to open quick-add
+  document.addEventListener('keydown', e => {
+    const tag = document.activeElement.tagName;
+    if (e.key === 'n' && !e.ctrlKey && !e.metaKey &&
+        tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+      wgToggleForm();
+    }
+  });
+  </script>
+</body>
+</html>

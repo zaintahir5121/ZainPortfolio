@@ -517,6 +517,58 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         return View(todayLogs);
     }
 
+    /* ── Day-Preview Widget (moveable PWA standalone window) ── */
+    [HttpGet]
+    public async Task<IActionResult> Widget()
+    {
+        var today     = DateOnly.FromDateTime(DateTime.Today);
+        var yesterday = today.AddDays(-1);
+        var weekStart = today.AddDays(-6);
+        var allMine   = db.LogEntries.Where(l => l.UserId == CurrentUserId);
+
+        var todayLogs = await allMine
+            .Where(l => l.Date == today)
+            .OrderByDescending(l => l.CreatedAt)
+            .ToListAsync();
+
+        var yesterdayLogs = await allMine
+            .Where(l => l.Date == yesterday)
+            .OrderByDescending(l => l.CreatedAt)
+            .ToListAsync();
+
+        // Fetch week raw entries in memory, then group (EF can't translate GroupBy+Select+OrderBy together)
+        var weekEntries = await allMine
+            .Where(l => l.Date >= weekStart && l.Date <= today)
+            .Select(l => new { l.Date, l.Hours })
+            .ToListAsync();
+        var weekGrouped = weekEntries
+            .GroupBy(l => l.Date)
+            .Select(g => new { Date = g.Key, Hours = g.Sum(x => x.Hours) })
+            .OrderBy(x => x.Date)
+            .ToList();
+
+        var recentProjects = await allMine
+            .GroupBy(l => l.Project)
+            .Select(g => new { Name = g.Key, LastDate = g.Max(e => e.Date) })
+            .OrderByDescending(x => x.LastDate)
+            .Select(x => x.Name)
+            .Take(8)
+            .ToListAsync();
+
+        ViewBag.TodayLogs      = todayLogs;
+        ViewBag.YesterdayLogs  = yesterdayLogs;
+        ViewBag.TodayHours     = todayLogs.Sum(l => l.Hours);
+        ViewBag.YesterdayHours = yesterdayLogs.Sum(l => l.Hours);
+        ViewBag.DailyGoal      = 8m;
+        ViewBag.FirstName      = (User.FindFirstValue(ClaimTypes.Name) ?? "there").Split(' ')[0];
+        ViewBag.Date           = DateTime.Today.ToString("ddd, MMM d");
+        ViewBag.RecentProjects = recentProjects;
+        ViewBag.WeekJson       = System.Text.Json.JsonSerializer.Serialize(
+            weekGrouped.Select(x => new { d = x.Date.ToString("ddd")[..1], h = (double)x.Hours }));
+
+        return View();
+    }
+
     /* ── Quick add — instant save, no AI ── */
     [HttpPost]
     public async Task<IActionResult> QuickAdd([FromBody] QuickAddRequest req)

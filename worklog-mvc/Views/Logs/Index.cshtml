@@ -4,10 +4,35 @@
   body{overflow:hidden!important}
   .main-wrap{max-width:none!important;margin:0!important;padding:0!important;height:calc(100dvh - 54px);height:calc(100vh - 54px);overflow:hidden!important}
   .app-footer{display:none!important}
+  /* ── Notes section ── */
+  .wb-sc-title{display:flex;align-items:center;gap:6px}
+  .wb-notes-add-btn{width:22px;height:22px;border-radius:50%;border:none;background:#d97706;color:#fff;cursor:pointer;font-size:17px;line-height:1;font-weight:300;display:inline-flex;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0}
+  .wb-notes-badge{font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#fef3c7;color:#d97706;margin-left:2px}
+  .wb-sidebar-note{position:relative;cursor:pointer;padding:7px 10px;background:#fefce8;border:1px solid #fde68a;border-left:3px solid #d97706;border-radius:8px;margin-bottom:6px;transition:box-shadow .15s}
+  .wb-sidebar-note:hover{box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .wb-sidebar-note.wb-note-pinned{border-left-color:#6366f1}
+  .wb-sn-text{font-size:12.5px;line-height:1.4;color:var(--text);word-break:break-word;padding-right:46px}
+  .wb-sn-meta{font-size:10.5px;color:var(--muted);margin-top:3px}
+  .wb-sn-actions{position:absolute;top:5px;right:4px;display:flex;gap:2px;opacity:0;transition:opacity .15s}
+  .wb-sidebar-note:hover .wb-sn-actions{opacity:1}
+  .wb-sn-pin,.wb-sn-del{width:20px;height:20px;border:none;background:transparent;cursor:pointer;border-radius:4px;font-size:12px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+  .wb-sn-pin:hover,.wb-sidebar-note.wb-note-pinned .wb-sn-pin{color:#6366f1}
+  .wb-sn-del:hover{background:#fee2e2;color:#ef4444}
+  .wb-notes-empty{font-size:11.5px;color:var(--muted);font-style:italic;padding:2px 0 8px}
+  .wb-note-form{margin-top:8px;background:#fefce8;border:1.5px solid #d97706;border-radius:9px;overflow:hidden}
+  .wb-note-ta{width:100%;border:none;outline:none;resize:none;padding:8px 10px 3px;font-size:12.5px;font-family:var(--font);background:transparent;color:var(--text);min-height:38px;max-height:80px;line-height:1.45}
+  .wb-note-ta::placeholder{color:var(--muted)}
+  .wb-note-form-row{display:flex;gap:4px;padding:3px 6px 6px;align-items:center}
+  .wb-note-proj-inp{flex:1;border:1px solid #fde68a;border-radius:6px;padding:3px 7px;font-size:11px;font-family:var(--font);background:rgba(255,255,255,.7);outline:none;color:var(--text)}
+  .wb-note-proj-inp::placeholder{color:var(--muted)}
+  .wb-note-save-btn{padding:4px 10px;border-radius:6px;border:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)}
+  .wb-note-save-btn:disabled{opacity:.5;cursor:default}
+  .wb-note-cancel-btn{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:12px;color:var(--muted);font-family:var(--font)}
 </style>
 }
 @{
-    var todayLogs = Model.Logs.Where(l => l.Date == DateOnly.FromDateTime(DateTime.Today)).ToList();
+    var todayLogs   = Model.Logs.Where(l => l.Date == DateOnly.FromDateTime(DateTime.Today)).ToList();
+    var todayNotes  = todayLogs.Where(l => l.Tags == "Notes").OrderByDescending(l => l.CreatedAt).ToList();
     var maxDayH   = Model.WeekDays.Count > 0 ? Model.WeekDays.Max(d => d.Hours) : 1m;
     if (maxDayH == 0) maxDayH = 1m;
     var dowShare  = (int)DateTime.Today.DayOfWeek;
@@ -132,6 +157,44 @@
         </div>
       </div>
     }
+
+    <!-- Notes -->
+    <div class="wb-sc">
+      <div class="wb-sc-title">
+        <span>📝 Notes <span class="wb-notes-badge" id="wbNotesBadge">@todayNotes.Count</span></span>
+        <button class="wb-notes-add-btn" onclick="wbToggleNoteForm()" title="Add note">+</button>
+      </div>
+      <div id="wbSideNotesList">
+        @foreach (var note in todayNotes)
+        {
+          <div class="wb-sidebar-note" id="wbsn-@note.Id"
+               onclick="wbOpenNoteModal(@note.Id,'@System.Web.HttpUtility.JavaScriptStringEncode(note.Description)','@System.Web.HttpUtility.JavaScriptStringEncode(note.Project ?? "")')">
+            <div class="wb-sn-text" id="wbsnt-@note.Id">@note.Description</div>
+            @if (!string.IsNullOrWhiteSpace(note.Project) && note.Project != "Notes")
+            {
+              <div class="wb-sn-meta">@note.Project</div>
+            }
+            <div class="wb-sn-actions" onclick="event.stopPropagation()">
+              <button class="wb-sn-pin" onclick="wbPinNote(@note.Id)" title="Pin">📌</button>
+              <button class="wb-sn-del" onclick="wbDeleteNote(@note.Id)" title="Delete">×</button>
+            </div>
+          </div>
+        }
+        @if (!todayNotes.Any())
+        {
+          <div class="wb-notes-empty" id="wbSideNotesEmpty">No notes yet — click + to jot one down.</div>
+        }
+      </div>
+      <div class="wb-note-form" id="wbNoteForm" style="display:none">
+        <textarea class="wb-note-ta" id="wbNoteInput" placeholder="Quick note…" rows="2"
+                  onkeydown="wbNoteKey(event)" oninput="wbNoteAutosize(this)"></textarea>
+        <div class="wb-note-form-row">
+          <input type="text" id="wbNoteProj" class="wb-note-proj-inp" placeholder="Tag (optional)" list="wbProjectList">
+          <button class="wb-note-save-btn" id="wbNoteSaveBtn" onclick="wbSaveNote()">Add</button>
+          <button class="wb-note-cancel-btn" onclick="wbToggleNoteForm()">✕</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Quick actions -->
     <div class="wb-sc">
@@ -906,8 +969,13 @@ function wbUpdateDayTotal(dateIso) {
 // Card click — open modal unless in edit mode
 function wbCardClick(event, id) {
   const card = document.getElementById(`wbc-${id}`);
-  if (!card.querySelector('.wbcard-editf.hidden') === false) return; // in edit mode
   if (card.querySelector('.wbcard-editf:not(.hidden)')) return;
+  if (card?.dataset.cat === 'Notes') {
+    const text = document.getElementById(`wbcd-${id}`)?.textContent ?? '';
+    const proj = document.getElementById(`wbcp-${id}`)?.textContent ?? '';
+    wbOpenNoteModal(id, text, proj);
+    return;
+  }
   wbExpandCard(id);
 }
 
@@ -1610,6 +1678,7 @@ function histClear() {
 // ── Utils ─────────────────────────────────────────────────────────────────
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _jsStrN(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n').replace(/\r/g,''); }
 function showErr(msg) {
   const d = document.createElement('div');
   d.className = 'toast-wrap toast-err'; d.innerHTML = `<div class="toast">${msg}</div>`;
@@ -1619,6 +1688,206 @@ function showToast(msg) {
   const d = document.createElement('div');
   d.className = 'toast-wrap toast-ok'; d.innerHTML = `<div class="toast">${msg}</div>`;
   document.body.appendChild(d); setTimeout(() => d.remove(), 3000);
+}
+
+// ── Notes ──────────────────────────────────────────────────────────────────
+const _wbNotePins = new Set(JSON.parse(localStorage.getItem('wb_note_pins') || '[]'));
+
+// Apply pins + sort on load
+(function _initNotePins() {
+  const list = document.getElementById('wbSideNotesList');
+  if (!list) return;
+  _wbNotePins.forEach(id => {
+    document.getElementById(`wbsn-${id}`)?.classList.add('wb-note-pinned');
+  });
+  _wbSortNotes();
+})();
+
+function _wbSortNotes() {
+  const list = document.getElementById('wbSideNotesList');
+  if (!list) return;
+  const cards = [...list.querySelectorAll('.wb-sidebar-note')];
+  cards.sort((a, b) => {
+    const aPin = _wbNotePins.has(parseInt(a.id.replace('wbsn-',''))) ? 0 : 1;
+    const bPin = _wbNotePins.has(parseInt(b.id.replace('wbsn-',''))) ? 0 : 1;
+    return aPin - bPin;
+  });
+  cards.forEach(c => list.appendChild(c));
+}
+
+function wbPinNote(id) {
+  id = parseInt(id);
+  const card = document.getElementById(`wbsn-${id}`);
+  if (_wbNotePins.has(id)) {
+    _wbNotePins.delete(id);
+    card?.classList.remove('wb-note-pinned');
+  } else {
+    _wbNotePins.add(id);
+    card?.classList.add('wb-note-pinned');
+  }
+  localStorage.setItem('wb_note_pins', JSON.stringify([..._wbNotePins]));
+  _wbSortNotes();
+}
+
+function wbToggleNoteForm() {
+  const form = document.getElementById('wbNoteForm');
+  const open = form.style.display !== 'none' && form.style.display !== '';
+  if (open) {
+    form.style.display = 'none';
+    document.getElementById('wbNoteInput').value = '';
+    document.getElementById('wbNoteProj').value = '';
+  } else {
+    form.style.display = 'block';
+    setTimeout(() => document.getElementById('wbNoteInput').focus(), 50);
+  }
+}
+
+function wbNoteKey(e) {
+  if (e.key === 'Escape') { wbToggleNoteForm(); return; }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wbSaveNote(); }
+}
+
+function wbNoteAutosize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+}
+
+async function wbSaveNote() {
+  const text = document.getElementById('wbNoteInput').value.trim();
+  if (!text) return;
+  const proj = document.getElementById('wbNoteProj').value.trim();
+  const btn = document.getElementById('wbNoteSaveBtn');
+  btn.disabled = true;
+  try {
+    const res = await fetch('/Logs/QuickAdd', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: text, hours: 0.25, category: 'Notes', project: proj || null }),
+    });
+    if (!res.ok) { showErr('Could not save note.'); return; }
+    const entry = await res.json();
+    _wbAddSidebarNote(entry);
+    wbAddCards([{ ...entry, date: toIso(new Date()) }], toIso(new Date()));
+    wbToggleNoteForm();
+    showToast('✓ Note added');
+  } catch { showErr('Network error.'); }
+  finally { btn.disabled = false; }
+}
+
+function _wbAddSidebarNote(e) {
+  const list = document.getElementById('wbSideNotesList');
+  if (!list) return;
+  document.getElementById('wbSideNotesEmpty')?.remove();
+  const proj = e.project && e.project !== 'Notes'
+    ? `<div class="wb-sn-meta">${escHtml(e.project)}</div>` : '';
+  const card = document.createElement('div');
+  card.className = 'wb-sidebar-note';
+  card.id = `wbsn-${e.id}`;
+  card.setAttribute('onclick', `wbOpenNoteModal(${e.id},'${_jsStrN(e.description)}','${_jsStrN(e.project||'')}')`);
+  card.innerHTML = `<div class="wb-sn-text" id="wbsnt-${e.id}">${escHtml(e.description)}</div>${proj}
+    <div class="wb-sn-actions" onclick="event.stopPropagation()">
+      <button class="wb-sn-pin" onclick="wbPinNote(${e.id})" title="Pin">📌</button>
+      <button class="wb-sn-del" onclick="wbDeleteNote(${e.id})" title="Delete">×</button>
+    </div>`;
+  list.prepend(card);
+  const badge = document.getElementById('wbNotesBadge');
+  if (badge) badge.textContent = parseInt(badge.textContent || '0') + 1;
+}
+
+async function wbDeleteNote(id) {
+  if (!confirm('Delete this note?')) return;
+  const res = await fetch('/Logs/DeleteEntry', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+  if (!res.ok) { showErr('Could not delete.'); return; }
+  document.getElementById(`wbsn-${id}`)?.remove();
+  const boardCard = document.getElementById(`wbc-${id}`);
+  if (boardCard) { const d = boardCard.dataset.date; boardCard.remove(); wbUpdateDayTotal(d); }
+  _wbNotePins.delete(id);
+  localStorage.setItem('wb_note_pins', JSON.stringify([..._wbNotePins]));
+  const badge = document.getElementById('wbNotesBadge');
+  if (badge) badge.textContent = Math.max(0, parseInt(badge.textContent || '1') - 1);
+  showToast('✓ Note deleted');
+  if (document.getElementById('wbModal').classList.contains('open')) wbCloseModal();
+}
+
+function wbOpenNoteModal(id, text, proj) {
+  id = parseInt(id);
+  const isPinned = _wbNotePins.has(id);
+  wbShowModal('📝 Note',
+    `<div>
+      <div id="wbnm-text-${id}" contenteditable="true"
+           style="font-size:14.5px;line-height:1.6;color:var(--text);min-height:54px;word-break:break-word;
+                  outline:none;border-radius:7px;padding:9px 11px;background:#fefce8;
+                  border:1.5px solid #fde68a;cursor:text;margin-bottom:10px">
+        ${escHtml(text)}
+      </div>
+      ${proj ? `<div style="font-size:11.5px;color:var(--muted);margin-bottom:10px">📁 ${escHtml(proj)}</div>` : ''}
+      <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid var(--line)">
+        <button id="wbnm-pin-${id}" onclick="wbNoteModalPin(${id})"
+                style="padding:7px 12px;border-radius:8px;border:1px solid var(--line);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--font);background:${isPinned?'#eef2ff':'var(--bg)'};color:${isPinned?'var(--accent)':'var(--muted)'}">
+          ${isPinned ? '📌 Unpin' : '📌 Pin'}
+        </button>
+        <button onclick="wbNoteModalDelete(${id})"
+                style="padding:7px 12px;border-radius:8px;border:1px solid #fecaca;background:#fff1f2;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">
+          🗑
+        </button>
+        <button id="wbnm-save-${id}" onclick="wbNoteModalSave(${id})"
+                style="flex:1;padding:7px;border-radius:8px;border:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">
+          Save
+        </button>
+      </div>
+    </div>`
+  );
+  // Focus + cursor at end
+  setTimeout(() => {
+    const el = document.getElementById(`wbnm-text-${id}`);
+    if (!el) return;
+    el.focus();
+    const r = document.createRange(); r.selectNodeContents(el); r.collapse(false);
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  }, 80);
+}
+
+function wbNoteModalPin(id) {
+  id = parseInt(id);
+  wbPinNote(id);
+  const btn = document.getElementById(`wbnm-pin-${id}`);
+  if (btn) {
+    const pinned = _wbNotePins.has(id);
+    btn.textContent = pinned ? '📌 Unpin' : '📌 Pin';
+    btn.style.background = pinned ? '#eef2ff' : 'var(--bg)';
+    btn.style.color = pinned ? 'var(--accent)' : 'var(--muted)';
+  }
+}
+
+function wbNoteModalDelete(id) { wbDeleteNote(id); }
+
+async function wbNoteModalSave(id) {
+  id = parseInt(id);
+  const el = document.getElementById(`wbnm-text-${id}`);
+  if (!el) return;
+  const newText = el.textContent.trim();
+  if (!newText) return;
+  const saveBtn = document.getElementById(`wbnm-save-${id}`);
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+  try {
+    const res = await fetch('/Logs/UpdateEntry', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, description: newText }),
+    });
+    if (!res.ok) { if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; } showErr('Could not save.'); return; }
+    // Update sidebar card text + onclick
+    const sideText = document.getElementById(`wbsnt-${id}`);
+    if (sideText) sideText.textContent = newText;
+    const sideCard = document.getElementById(`wbsn-${id}`);
+    if (sideCard) sideCard.setAttribute('onclick', `wbOpenNoteModal(${id},'${_jsStrN(newText)}','')`);
+    // Update board card
+    const boardDesc = document.getElementById(`wbcd-${id}`);
+    if (boardDesc) boardDesc.textContent = newText;
+    wbCloseModal();
+    showToast('✓ Note saved');
+  } catch { if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; } showErr('Network error.'); }
 }
 </script>
 }

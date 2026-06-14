@@ -269,7 +269,7 @@
                         }
                       </select>
                     </div>
-                    <input type="text" class="wbcard-einp wb-ce-proj" value="@log.Project" placeholder="Project">
+                    <input type="text" class="wbcard-einp wb-ce-proj" value="@log.Project" placeholder="Project" list="wbProjectList">
                     <div class="wbcard-ebtns">
                       <button class="wbcard-esave" onclick="wbSaveCardEdit(@log.Id)">Save</button>
                       <button class="wbcard-ecancel" onclick="wbCancelCardEdit(@log.Id)">Cancel</button>
@@ -296,6 +296,9 @@
       <input type="date" id="wbDatePick" class="wb-date-inp" onchange="wbDatePicked(this.value)">
     </div>
 
+    <!-- Project context picker -->
+    <div class="wb-proj-row" id="wbProjRow"></div>
+
     <!-- Input bar -->
     <div class="wb-bar">
       <button class="wb-mic" id="wbMicBtn" onclick="wbToggleVoice()" title="Voice input">
@@ -319,6 +322,17 @@
 
 <!-- Mobile sidebar overlay -->
 <div class="wb-overlay" id="wbOverlay" onclick="wbCloseSidebar()"></div>
+
+<!-- Project autocomplete datalist -->
+<datalist id="wbProjectList"></datalist>
+
+<!-- Floating active-task widget -->
+<div class="wb-active-task hidden" id="wbActiveTask">
+  <span class="wb-at-dot"></span>
+  <span class="wb-at-label">On:</span>
+  <span class="wb-at-proj" id="wbAtProj"></span>
+  <button class="wb-at-clear" onclick="wbClearProject()" title="Clear project context">×</button>
+</div>
 
 <!-- ══ SHARE MODAL ═══════════════════════════════════════════════════════════ -->
 <div id="shareModal" class="sm-overlay hidden" onclick="if(event.target===this)closeShareModal()">
@@ -440,12 +454,13 @@ const WB = {
                   name = d.Name, hours = d.Hours, isToday = d.IsToday,
                   isFuture = d.IsFuture, formatted = d.Formatted
               }))),
-  weekTotal:  @Json.Serialize(Model.WeekTotalFormatted),
-  weekPct:    @Model.WeekPctInt,
-  weekGoal:   @((int)Model.WeekGoal),
-  streak:     @Model.Streak,
-  todayHours: @Model.TodayHours,
-  topProject: @Json.Serialize(Model.TopProject),
+  weekTotal:      @Json.Serialize(Model.WeekTotalFormatted),
+  weekPct:        @Model.WeekPctInt,
+  weekGoal:       @((int)Model.WeekGoal),
+  streak:         @Model.Streak,
+  todayHours:     @Model.TodayHours,
+  topProject:     @Json.Serialize(Model.TopProject),
+  recentProjects: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RecentProjects)),
 };
 
 const CAT_COLORS = {
@@ -572,14 +587,18 @@ function wbExpandCard(id) {
     // ── Edit pane (hidden until Edit clicked) ──
     <div id="wbex-edit-${id}" style="display:none">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Edit entry</div>
-      <textarea class="wbex-desc" rows="3" style="${inputStyle};resize:vertical">${escHtml(desc)}</textarea>
+      <div style="position:relative">
+        <textarea class="wbex-desc" rows="3" id="wbexd-${id}" style="${inputStyle};resize:vertical;padding-right:100px">${escHtml(desc)}</textarea>
+        <button onclick="wbImproveDesc(document.getElementById('wbexd-${id}'),this)"
+                style="position:absolute;top:7px;right:7px;font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-bg);border:none;border-radius:5px;padding:3px 8px;cursor:pointer;white-space:nowrap">✦ AI Improve</button>
+      </div>
       <div style="${rowStyle}">
         <input type="number" class="wbex-hrs" value="${hrs}" step="0.25" min="0.25" max="24"
                style="${inputStyle};width:80px;flex-shrink:0" placeholder="Hours">
         <select class="wbex-cat" style="${inputStyle};flex:1">${catOpts}</select>
       </div>
       <input type="text" class="wbex-proj" value="${escHtml(proj)}" placeholder="Project"
-             style="${inputStyle};margin-top:8px">
+             list="wbProjectList" style="${inputStyle};margin-top:8px">
       <div style="${rowStyle};margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
         <button onclick="wbExpandSaveEdit(${id})" style="flex:1;padding:8px;font-size:12.5px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:7px;cursor:pointer">Save changes</button>
         <button onclick="wbExpandCancelEdit(${id})" style="padding:8px 12px;font-size:12.5px;font-weight:600;background:var(--bg);color:var(--muted);border:1px solid var(--line);border-radius:7px;cursor:pointer">Cancel</button>
@@ -642,6 +661,98 @@ async function wbExpandSaveEdit(id) {
   }
 }
 
+// ── Project context picker ────────────────────────────────────────────────
+let wbSelectedProject = null;
+
+function wbInitProjectPicker() {
+  const projects = WB.recentProjects ?? [];
+
+  // Populate datalist for all project input fields
+  const dl = document.getElementById('wbProjectList');
+  if (dl) projects.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; dl.appendChild(opt);
+  });
+
+  const row = document.getElementById('wbProjRow');
+  if (!row || !projects.length) return;
+
+  // "📁" icon + up to 6 project chips + "＋ New" button
+  let html = `<span class="wb-pr-label">📁</span>`;
+  projects.slice(0, 6).forEach(p => {
+    html += `<button class="wb-pr-chip" data-proj="${escHtml(p)}" onclick="wbSelectProject('${escHtml(p)}')">${escHtml(p)}</button>`;
+  });
+  html += `<button class="wb-pr-chip wb-pr-new" onclick="wbAddNewProject()">＋ project</button>`;
+  row.innerHTML = html;
+}
+
+function wbSelectProject(name) {
+  wbSelectedProject = wbSelectedProject === name ? null : name;
+  document.querySelectorAll('.wb-pr-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.proj === wbSelectedProject);
+  });
+  // Update floating widget
+  const widget = document.getElementById('wbActiveTask');
+  const label  = document.getElementById('wbAtProj');
+  if (wbSelectedProject) {
+    label.textContent = wbSelectedProject;
+    widget.classList.remove('hidden');
+  } else {
+    widget.classList.add('hidden');
+  }
+  setStatus(wbSelectedProject ? `📁 Project context: ${wbSelectedProject} — next entries will use this project` : 'Project context cleared.');
+}
+
+function wbClearProject() { wbSelectProject(null); }
+
+function wbAddNewProject() {
+  const name = prompt('Enter new project name:');
+  if (!name?.trim()) return;
+  const p = name.trim();
+  if (!WB.recentProjects.includes(p)) {
+    WB.recentProjects.unshift(p);
+    // Add to datalist
+    const dl = document.getElementById('wbProjectList');
+    if (dl) { const opt = document.createElement('option'); opt.value = p; dl.prepend(opt); }
+    // Add chip
+    const row = document.getElementById('wbProjRow');
+    if (row) {
+      const btn = document.createElement('button');
+      btn.className = 'wb-pr-chip';
+      btn.dataset.proj = p;
+      btn.textContent = p;
+      btn.onclick = () => wbSelectProject(p);
+      const newBtn = row.querySelector('.wb-pr-new');
+      row.insertBefore(btn, newBtn);
+    }
+  }
+  wbSelectProject(p);
+}
+
+// ── AI description improver ───────────────────────────────────────────────
+async function wbImproveDesc(textareaEl, btnEl) {
+  const original = textareaEl.value.trim();
+  if (!original) { showErr('Write something first, then let AI improve it.'); return; }
+  const origText = btnEl.textContent;
+  btnEl.disabled = true; btnEl.textContent = '…';
+  try {
+    const res = await fetch('/Logs/ImproveDescription', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text: original }),
+    });
+    if (res.ok) {
+      const { result } = await res.json();
+      if (result && result !== original) {
+        textareaEl.value = result;
+        textareaEl.style.height = 'auto';
+        textareaEl.style.height = Math.min(textareaEl.scrollHeight, 200) + 'px';
+        showToast('✦ Description improved');
+      }
+    }
+  } catch { showErr('AI not available right now.'); }
+  btnEl.disabled = false; btnEl.textContent = origText;
+}
+
 // ── Card board functions ──────────────────────────────────────────────────
 function wbBuildCard(e) {
   const color   = CAT_COLORS[e.category] ?? '#94a3b8';
@@ -680,7 +791,7 @@ function wbBuildCard(e) {
         <input type="number" class="wbcard-einp wb-ce-hrs" value="${e.hours}" step="0.25" min="0.25" max="24" style="width:62px">
         <select class="wbcard-einp wb-ce-cat" style="flex:1">${catOpts}</select>
       </div>
-      <input type="text" class="wbcard-einp wb-ce-proj" value="${escHtml(e.project)}" placeholder="Project">
+      <input type="text" class="wbcard-einp wb-ce-proj" value="${escHtml(e.project)}" placeholder="Project" list="wbProjectList">
       <div class="wbcard-ebtns">
         <button class="wbcard-esave" onclick="wbSaveCardEdit(${e.id})">Save</button>
         <button class="wbcard-ecancel" onclick="wbCancelCardEdit(${e.id})">Cancel</button>
@@ -914,7 +1025,7 @@ async function handleLog(text) {
 
     const res = await fetch('/Logs/ChatLog', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ text: logText }),
+      body: JSON.stringify({ text: logText, projectOverride: wbSelectedProject ?? undefined }),
     });
 
     hideThinking();
@@ -1290,7 +1401,10 @@ async function wbSaveEdit(id) {
   } catch { showErr('Network error.'); }
 }
 
-// ── Weekly Insight ────────────────────────────────────────────────────────
+// ── Init project picker on load ───────────────────────────────────────────
+wbInitProjectPicker();
+
+// ── Weekly Insight (non-blocking, loads after page ready) ─────────────────
 (async () => {
   try {
     const res = await fetch('/Logs/WeeklyInsight');

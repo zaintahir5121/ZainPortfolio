@@ -302,7 +302,9 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
             {
                 UserId      = CurrentUserId,
                 Date        = today,
-                Project     = !string.IsNullOrWhiteSpace(e.Project) ? e.Project.Trim() : (e.Category ?? "General"),
+                Project     = !string.IsNullOrWhiteSpace(req.ProjectOverride)
+                    ? req.ProjectOverride.Trim()
+                    : (!string.IsNullOrWhiteSpace(e.Project) ? e.Project.Trim() : (e.Category ?? "General")),
                 Description = e.Description.Trim(),
                 Hours       = e.Hours > 0 ? e.Hours : 1,
                 Tags        = e.Category?.Trim() ?? "",
@@ -445,6 +447,22 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
         }
     }
 
+    /* ── AI: improve a task description ── */
+    [HttpPost]
+    public async Task<IActionResult> ImproveDescription([FromBody] AiTextRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Text)) return BadRequest(new { error = "text required" });
+        try
+        {
+            var result = await ollama.ImproveDescriptionAsync(req.Text);
+            return Ok(new { result });
+        }
+        catch
+        {
+            return Ok(new { result = req.Text });
+        }
+    }
+
     /* ── Edit a saved entry (AJAX) ── */
     [HttpPost]
     public async Task<IActionResult> EditLog([FromBody] EditLogRequest req)
@@ -481,5 +499,5 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
     public record BulkAddRequest(List<BulkAddEntry> Entries, DateOnly? Date = null);
     public record EditLogRequest(int Id, string? Description, decimal? Hours, string? Project, string? Category, DateOnly? Date = null);
     public record DeleteEntryRequest(int Id);
-    public record ChatLogRequest(string Text, string? Date = null);
+    public record ChatLogRequest(string Text, string? Date = null, string? ProjectOverride = null);
 }

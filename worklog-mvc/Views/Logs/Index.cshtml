@@ -175,26 +175,33 @@
       </div>
     </div>
 
-    <!-- Mobile top bar -->
-    <div class="wb-mobile-bar">
-      <button class="wb-sidebar-toggle" onclick="wbToggleSidebar()" aria-label="Menu">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <!-- ── Top bar (always visible, hamburger → drawer) ── -->
+    <div class="wb-topbar" id="wbTopbar">
+      <button class="wb-topbar-toggle" onclick="wbToggleSidebar()" aria-label="Menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-size:12px;flex-shrink:0">✦</div>
-        <span class="wb-mobile-title">WorkLog Bot</span>
+      <div class="wb-topbar-brand">
+        <div class="wb-topbar-logo">✦</div>
+        <span class="wb-topbar-name">WorkLog</span>
       </div>
-      <button class="wb-share-mini" onclick="openShareModal()" title="Share week">
+      <div class="wb-topbar-stats">
+        <div class="wb-topbar-stat">
+          <span class="wb-topbar-num">@Model.TodayHours h</span>
+          <span class="wb-topbar-lbl">today</span>
+        </div>
+        <div class="wb-topbar-stat wb-topbar-stat-opt">
+          <span class="wb-topbar-num">@Model.Streak @(Model.Streak >= 3 ? "🔥" : "📅")</span>
+          <span class="wb-topbar-lbl">streak</span>
+        </div>
+        <div class="wb-topbar-stat wb-topbar-stat-opt">
+          <span class="wb-topbar-num">@Model.WeekPctInt%</span>
+          <span class="wb-topbar-lbl">goal</span>
+        </div>
+      </div>
+      <span class="wb-topbar-status" id="wbStatusText">Hey @Model.FirstName! Ready to log.</span>
+      <button class="wb-topbar-share" onclick="openShareModal()" title="Share week">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       </button>
-    </div>
-
-    <!-- Bot status bar -->
-    <div class="wb-status-bar" id="wbStatus">
-      <span class="wb-status-icon">✦</span>
-      <span class="wb-status-text" id="wbStatusText">
-        Hey @Model.FirstName! Tell me what you worked on — I'll create cards below.
-      </span>
     </div>
 
     <!-- ── Card board ── -->
@@ -275,56 +282,73 @@
       }
     </div>
 
-    <!-- Project context picker -->
-    <div class="wb-proj-row" id="wbProjRow"></div>
+    <!-- FAB — click or press N to create a new log entry -->
+    <button class="wb-fab" id="wbFab" onclick="wbOpenNewLog()" title="New log entry  (N)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
 
-    <!-- Quick-add form — instant, no AI required -->
-    <div class="wb-quick">
-      <textarea id="wbInput" class="wb-q-desc"
-                placeholder="What did you work on?"
-                rows="1"
-                onkeydown="wbQKeydown(event)"
-                oninput="wbAutosize(this)"></textarea>
-      <div class="wb-q-row">
-        <div class="wb-q-left">
-          <div class="wb-q-hrs-wrap">
-            <input type="number" id="wbQHrs" class="wb-q-hrs" value="1" min="0.25" max="24" step="0.25" title="Hours spent">
-            <span class="wb-q-hlbl">h</span>
-          </div>
-          <select id="wbQCat" class="wb-q-cat">
-            <option value="Other">Category</option>
-            <option value="Development">Development</option>
-            <option value="Meeting">Meeting</option>
-            <option value="Code Review">Code Review</option>
-            <option value="Testing">Testing</option>
-            <option value="Documentation">Docs</option>
-            <option value="DevOps">DevOps</option>
-            <option value="Research">Research</option>
-            <option value="Design">Design</option>
-            <option value="Other">Other</option>
-          </select>
-          <input type="text" id="wbQProj" class="wb-q-proj" placeholder="Project" list="wbProjectList">
+    <!-- Hidden date picker anchor -->
+    <input type="date" id="wbDatePick" class="wb-date-inp" onchange="wbDatePicked(this.value)">
+
+  </div>
+</div>
+
+<!-- ══ NEW LOG BOTTOM SHEET ════════════════════════════════════════════════ -->
+<div class="wb-newlog" id="wbNewLog">
+  <div class="wb-newlog-bd" onclick="wbCloseNewLog()"></div>
+  <div class="wb-newlog-panel">
+    <div class="wb-newlog-drag"></div>
+    <div class="wb-newlog-hdr">
+      <span class="wb-newlog-title">New log entry</span>
+      <kbd class="wb-newlog-hint">N</kbd>
+      <div style="flex:1"></div>
+      <button class="wb-newlog-close" onclick="wbCloseNewLog()" title="Close (Esc)">×</button>
+    </div>
+    <!-- Project context chips -->
+    <div class="wb-proj-row" id="wbProjRow"></div>
+    <!-- Description -->
+    <textarea id="wbInput" class="wb-q-desc"
+              placeholder="What did you work on?"
+              rows="2"
+              onkeydown="wbQKeydown(event)"
+              oninput="wbAutosize(this)"></textarea>
+    <!-- Fields row -->
+    <div class="wb-q-row">
+      <div class="wb-q-left">
+        <div class="wb-q-hrs-wrap">
+          <input type="number" id="wbQHrs" class="wb-q-hrs" value="1" min="0.25" max="24" step="0.25" title="Hours spent">
+          <span class="wb-q-hlbl">h</span>
         </div>
-        <div class="wb-q-right">
-          <button class="wb-q-ico" id="wbMicBtn" onclick="wbToggleVoice()" title="Voice input">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v6a2 2 0 0 0 4 0V5a2 2 0 0 0-2-2zm7 7a1 1 0 0 1 1 1 8 8 0 0 1-16 0 1 1 0 0 1 2 0 6 6 0 0 0 12 0 1 1 0 0 1 1-1zm-7 11v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 2 0z"/></svg>
-          </button>
-          <button class="wb-q-ai" onclick="wbAiParse()" title="Paste a paragraph — AI splits into multiple cards (Ctrl+Enter)">✦ AI</button>
-          <button class="wb-q-add" id="wbSendBtn" onclick="wbQuickAdd()">+ Log</button>
-        </div>
+        <select id="wbQCat" class="wb-q-cat">
+          <option value="Other">Category</option>
+          <option value="Development">Development</option>
+          <option value="Meeting">Meeting</option>
+          <option value="Code Review">Code Review</option>
+          <option value="Testing">Testing</option>
+          <option value="Documentation">Docs</option>
+          <option value="DevOps">DevOps</option>
+          <option value="Research">Research</option>
+          <option value="Design">Design</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="text" id="wbQProj" class="wb-q-proj" placeholder="Project" list="wbProjectList">
+      </div>
+      <div class="wb-q-right">
+        <button class="wb-q-ico" id="wbMicBtn" onclick="wbToggleVoice()" title="Voice input">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v6a2 2 0 0 0 4 0V5a2 2 0 0 0-2-2zm7 7a1 1 0 0 1 1 1 8 8 0 0 1-16 0 1 1 0 0 1 2 0 6 6 0 0 0 12 0 1 1 0 0 1 1-1zm-7 11v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 2 0z"/></svg>
+        </button>
+        <button class="wb-q-ai" onclick="wbAiParse()" title="AI Parse (Ctrl+Enter)">✦ AI</button>
+        <button class="wb-q-add" id="wbSendBtn" onclick="wbQuickAdd()">+ Log</button>
       </div>
     </div>
-
-    <!-- Shortcuts -->
+    <!-- Shortcut chips -->
     <div class="wb-chips">
       <button class="wb-chip" onclick="wbStandupChip()">📋 Standup</button>
       <button class="wb-chip" onclick="handleToday()">📅 Today</button>
       <button class="wb-chip" onclick="handleWeek()">📊 Week</button>
       <button class="wb-chip" onclick="wbOpenDatePicker()">🗓 Date</button>
       <button class="wb-chip" onclick="openShareModal()">✨ Share</button>
-      <input type="date" id="wbDatePick" class="wb-date-inp" onchange="wbDatePicked(this.value)">
     </div>
-
   </div>
 </div>
 
@@ -489,21 +513,38 @@ let wbAiFix = false;
 // ── Status bar ────────────────────────────────────────────────────────────
 let _statusTimer = null;
 function setStatus(msg, isErr = false) {
-  const bar  = document.getElementById('wbStatus');
   const text = document.getElementById('wbStatusText');
   if (msg === 'typing') {
     text.innerHTML = '<span class="wb-status-dots"><span></span><span></span><span></span></span>';
-    bar.classList.remove('wb-status-err');
+    text.classList.remove('wb-status-err');
     return;
   }
   text.textContent = msg;
-  bar.classList.toggle('wb-status-err', isErr);
+  text.classList.toggle('wb-status-err', isErr);
   if (_statusTimer) clearTimeout(_statusTimer);
   _statusTimer = setTimeout(() => {
-    text.textContent = `✦ WorkLog Bot${WB.streak > 0 ? ' · ' + WB.streak + '-day streak 🔥' : ''}`;
-    bar.classList.remove('wb-status-err');
+    text.textContent = `Hey @Model.FirstName! Ready to log.`;
+    text.classList.remove('wb-status-err');
   }, 5000);
 }
+
+// ── New log bottom sheet ──────────────────────────────────────────────────
+function wbOpenNewLog() {
+  document.getElementById('wbNewLog').classList.add('open');
+  document.getElementById('wbFab').classList.add('active');
+  setTimeout(() => { if (inp) inp.focus(); }, 240);
+}
+function wbCloseNewLog() {
+  document.getElementById('wbNewLog').classList.remove('open');
+  document.getElementById('wbFab').classList.remove('active');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { wbCloseNewLog(); return; }
+  const tag = document.activeElement.tagName;
+  if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !e.altKey && tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+    e.preventDefault(); wbOpenNewLog();
+  }
+});
 
 // ── Response modal ────────────────────────────────────────────────────────
 function wbShowModal(title, html) {
@@ -1006,6 +1047,7 @@ async function wbQuickAdd() {
     setStatus(`✅ Logged — ${WB.todayHours.toFixed(1)}h today`);
     showToast(`✓ ${text.slice(0, 50)}${text.length > 50 ? '…' : ''}`);
     histSave('user', text);
+    wbCloseNewLog();
     // add new project to picker if not already there
     if (proj && !WB.recentProjects.includes(proj)) {
       WB.recentProjects.unshift(proj);
@@ -1014,7 +1056,7 @@ async function wbQuickAdd() {
       wbInitProjectPicker();
     }
   } catch { showErr('Network error. Check your connection.'); }
-  finally { sendBtn.disabled = false; inp.focus(); }
+  finally { sendBtn.disabled = false; }
 }
 
 // ── AI Parse — Ollama parses a paragraph into multiple cards ──────────────

@@ -186,7 +186,7 @@
       </div>
       <div class="wb-topbar-stats">
         <div class="wb-topbar-stat">
-          <span class="wb-topbar-num">@Model.TodayHours h</span>
+          <span class="wb-topbar-num" id="wbTopbarHours">@Model.TodayHours h</span>
           <span class="wb-topbar-lbl">today</span>
         </div>
         <div class="wb-topbar-stat wb-topbar-stat-opt">
@@ -282,73 +282,39 @@
       }
     </div>
 
-    <!-- FAB — click or press N to create a new log entry -->
-    <button class="wb-fab" id="wbFab" onclick="wbOpenNewLog()" title="New log entry  (N)">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
-
-    <!-- Hidden date picker anchor -->
-    <input type="date" id="wbDatePick" class="wb-date-inp" onchange="wbDatePicked(this.value)">
-
-  </div>
-</div>
-
-<!-- ══ NEW LOG BOTTOM SHEET ════════════════════════════════════════════════ -->
-<div class="wb-newlog" id="wbNewLog">
-  <div class="wb-newlog-bd" onclick="wbCloseNewLog()"></div>
-  <div class="wb-newlog-panel">
-    <div class="wb-newlog-drag"></div>
-    <div class="wb-newlog-hdr">
-      <span class="wb-newlog-title">New log entry</span>
-      <kbd class="wb-newlog-hint">N</kbd>
-      <div style="flex:1"></div>
-      <button class="wb-newlog-close" onclick="wbCloseNewLog()" title="Close (Esc)">×</button>
-    </div>
-    <!-- Project context chips -->
-    <div class="wb-proj-row" id="wbProjRow"></div>
-    <!-- Description -->
-    <textarea id="wbInput" class="wb-q-desc"
-              placeholder="What did you work on?"
-              rows="2"
-              onkeydown="wbQKeydown(event)"
-              oninput="wbAutosize(this)"></textarea>
-    <!-- Fields row -->
-    <div class="wb-q-row">
-      <div class="wb-q-left">
-        <div class="wb-q-hrs-wrap">
-          <input type="number" id="wbQHrs" class="wb-q-hrs" value="1" min="0.25" max="24" step="0.25" title="Hours spent">
-          <span class="wb-q-hlbl">h</span>
+    <!-- ── Persistent capture bar ── -->
+    <div class="wb-capture" id="wbCapture">
+      <!-- Recent project chips (auto-populated) -->
+      <div class="wb-proj-row" id="wbProjRow"></div>
+      <div class="wb-cap-inner">
+        <textarea id="wbInput" class="wb-cap-desc"
+                  placeholder="What did you work on?  ·  Enter to log"
+                  rows="1"
+                  onkeydown="wbQKeydown(event)"
+                  oninput="wbAutosize(this)"></textarea>
+        <div class="wb-cap-fields">
+          <div class="wb-cap-hrs-wrap">
+            <input type="number" id="wbQHrs" class="wb-cap-hrs" value="1" min="0.25" max="24" step="0.25" title="Hours">
+            <span class="wb-cap-hlbl">h</span>
+          </div>
+          <select id="wbQCat" class="wb-cap-cat">
+            <option value="Development">Dev</option>
+            <option value="Meeting">Meeting</option>
+            <option value="Code Review">Review</option>
+            <option value="Testing">Testing</option>
+            <option value="Documentation">Docs</option>
+            <option value="DevOps">DevOps</option>
+            <option value="Research">Research</option>
+            <option value="Design">Design</option>
+            <option value="Other" selected>Other</option>
+          </select>
+          <input type="text" id="wbQProj" class="wb-cap-proj" placeholder="Project" list="wbProjectList">
+          <button class="wb-cap-add" id="wbSendBtn" onclick="wbQuickAdd()">+ Log</button>
         </div>
-        <select id="wbQCat" class="wb-q-cat">
-          <option value="Other">Category</option>
-          <option value="Development">Development</option>
-          <option value="Meeting">Meeting</option>
-          <option value="Code Review">Code Review</option>
-          <option value="Testing">Testing</option>
-          <option value="Documentation">Docs</option>
-          <option value="DevOps">DevOps</option>
-          <option value="Research">Research</option>
-          <option value="Design">Design</option>
-          <option value="Other">Other</option>
-        </select>
-        <input type="text" id="wbQProj" class="wb-q-proj" placeholder="Project" list="wbProjectList">
       </div>
-      <div class="wb-q-right">
-        <button class="wb-q-ico" id="wbMicBtn" onclick="wbToggleVoice()" title="Voice input">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v6a2 2 0 0 0 4 0V5a2 2 0 0 0-2-2zm7 7a1 1 0 0 1 1 1 8 8 0 0 1-16 0 1 1 0 0 1 2 0 6 6 0 0 0 12 0 1 1 0 0 1 1-1zm-7 11v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 2 0z"/></svg>
-        </button>
-        <button class="wb-q-ai" onclick="wbAiParse()" title="AI Parse (Ctrl+Enter)">✦ AI</button>
-        <button class="wb-q-add" id="wbSendBtn" onclick="wbQuickAdd()">+ Log</button>
-      </div>
+      <input type="date" id="wbDatePick" class="wb-date-inp" onchange="wbDatePicked(this.value)">
     </div>
-    <!-- Shortcut chips -->
-    <div class="wb-chips">
-      <button class="wb-chip" onclick="wbStandupChip()">📋 Standup</button>
-      <button class="wb-chip" onclick="handleToday()">📅 Today</button>
-      <button class="wb-chip" onclick="handleWeek()">📊 Week</button>
-      <button class="wb-chip" onclick="wbOpenDatePicker()">🗓 Date</button>
-      <button class="wb-chip" onclick="openShareModal()">✨ Share</button>
-    </div>
+
   </div>
 </div>
 
@@ -529,21 +495,9 @@ function setStatus(msg, isErr = false) {
 }
 
 // ── New log bottom sheet ──────────────────────────────────────────────────
-function wbOpenNewLog() {
-  document.getElementById('wbNewLog').classList.add('open');
-  document.getElementById('wbFab').classList.add('active');
-  setTimeout(() => { if (inp) inp.focus(); }, 240);
-}
-function wbCloseNewLog() {
-  document.getElementById('wbNewLog').classList.remove('open');
-  document.getElementById('wbFab').classList.remove('active');
-}
+// Keyboard: Escape blurs the capture bar
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { wbCloseNewLog(); return; }
-  const tag = document.activeElement.tagName;
-  if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !e.altKey && tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
-    e.preventDefault(); wbOpenNewLog();
-  }
+  if (e.key === 'Escape' && document.activeElement === inp) inp.blur();
 });
 
 // ── Response modal ────────────────────────────────────────────────────────
@@ -986,7 +940,6 @@ async function wbDrop(e, newDate) {
 
 // ── Input helpers ─────────────────────────────────────────────────────────
 function wbQKeydown(e) {
-  if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); wbAiParse(); return; }
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wbQuickAdd(); }
 }
 function wbAutosize(el) {
@@ -1047,7 +1000,9 @@ async function wbQuickAdd() {
     setStatus(`✅ Logged — ${WB.todayHours.toFixed(1)}h today`);
     showToast(`✓ ${text.slice(0, 50)}${text.length > 50 ? '…' : ''}`);
     histSave('user', text);
-    wbCloseNewLog();
+    // update topbar hours counter
+    const topH = document.getElementById('wbTopbarHours');
+    if (topH) topH.textContent = WB.todayHours.toFixed(1) + ' h';
     // add new project to picker if not already there
     if (proj && !WB.recentProjects.includes(proj)) {
       WB.recentProjects.unshift(proj);
@@ -1056,7 +1011,7 @@ async function wbQuickAdd() {
       wbInitProjectPicker();
     }
   } catch { showErr('Network error. Check your connection.'); }
-  finally { sendBtn.disabled = false; }
+  finally { sendBtn.disabled = false; inp.focus(); }
 }
 
 // ── AI Parse — Ollama parses a paragraph into multiple cards ──────────────
@@ -1420,7 +1375,7 @@ function startVoice() {
     recognition.interimResults  = true;
     recognition.lang            = 'en-US';
     recognition.maxAlternatives = 1;
-    recognition.onstart  = () => { recogActive = true; micBtn.classList.add('wbmic-on'); setStatus('🎤 Listening… speak now'); };
+    recognition.onstart  = () => { recogActive = true; micBtn?.classList.add('wbmic-on'); setStatus('🎤 Listening… speak now'); };
     recognition.onend    = () => stopVoice();
     recognition.onerror  = (e) => {
       stopVoice();
@@ -1445,7 +1400,7 @@ function startVoice() {
 }
 function stopVoice() {
   if (recogActive) setStatus('');
-  recogActive = false; micBtn.classList.remove('wbmic-on');
+  recogActive = false; micBtn?.classList.remove('wbmic-on');
   try { recognition?.stop(); } catch {}
 }
 

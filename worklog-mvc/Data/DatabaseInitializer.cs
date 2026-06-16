@@ -11,7 +11,7 @@ public static class DatabaseInitializer
         try
         {
             bool created = ctx.Database.EnsureCreated();
-            if (created) logger.LogInformation("Keep: database created.");
+            if (created) logger.LogInformation("WorkLog: database created.");
 
             if (isSqlite) { AppDbContext.Seed(ctx); return; }
 
@@ -21,12 +21,12 @@ public static class DatabaseInitializer
         }
         catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == -1 || ex.Number == 2)
         {
-            logger.LogError("Keep: cannot reach SQL Server.\n{Message}", ex.Message);
+            logger.LogError("WorkLog: cannot reach SQL Server.\n{Message}", ex.Message);
             throw;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Keep: database initialization failed.");
+            logger.LogError(ex, "WorkLog: database initialization failed.");
             throw;
         }
     }
@@ -75,6 +75,36 @@ public static class DatabaseInitializer
                 CONSTRAINT FK_ChecklistItems_Notes FOREIGN KEY (NoteId) REFERENCES Notes(Id) ON DELETE CASCADE
             )
             """, "ChecklistItems", logger);
+
+        Exec(ctx, """
+            IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'WorkEntries')
+            CREATE TABLE WorkEntries (
+                Id         INT            NOT NULL IDENTITY(1,1) CONSTRAINT PK_WorkEntries PRIMARY KEY,
+                UserId     INT            NOT NULL,
+                RawText    NVARCHAR(MAX)  NOT NULL DEFAULT N'',
+                LogDate    DATETIME2      NOT NULL,
+                CreatedAt  DATETIME2      NOT NULL DEFAULT GETUTCDATE(),
+                TotalHours REAL           NOT NULL DEFAULT 0,
+                IsAiParsed BIT            NOT NULL DEFAULT 0,
+                CONSTRAINT FK_WorkEntries_Users FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+            );
+            IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_WorkEntries_UserId')
+                CREATE INDEX IX_WorkEntries_UserId ON WorkEntries (UserId);
+            """, "WorkEntries", logger);
+
+        Exec(ctx, """
+            IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'WorkTasks')
+            CREATE TABLE WorkTasks (
+                Id           INT            NOT NULL IDENTITY(1,1) CONSTRAINT PK_WorkTasks PRIMARY KEY,
+                WorkEntryId  INT            NOT NULL,
+                Description  NVARCHAR(MAX)  NOT NULL DEFAULT N'',
+                Hours        REAL           NOT NULL DEFAULT 0,
+                Project      NVARCHAR(200)  NULL,
+                Category     NVARCHAR(50)   NOT NULL DEFAULT N'general',
+                SortOrder    INT            NOT NULL DEFAULT 0,
+                CONSTRAINT FK_WorkTasks_WorkEntries FOREIGN KEY (WorkEntryId) REFERENCES WorkEntries(Id) ON DELETE CASCADE
+            )
+            """, "WorkTasks", logger);
     }
 
     static void EnsureAllColumns(AppDbContext ctx, ILogger logger)
@@ -85,7 +115,7 @@ public static class DatabaseInitializer
     static void Exec(AppDbContext ctx, string sql, string name, ILogger logger)
     {
         try   { ctx.Database.ExecuteSqlRaw(sql); }
-        catch (Exception ex) { logger.LogError(ex, "Keep: failed ensuring table {Name}.", name); throw; }
+        catch (Exception ex) { logger.LogError(ex, "WorkLog: failed ensuring table {Name}.", name); throw; }
     }
 
     static void Col(AppDbContext ctx, string table, string column, string definition, ILogger logger)
@@ -98,6 +128,6 @@ public static class DatabaseInitializer
                 ALTER TABLE {table} ADD {column} {definition}
             """;
         try   { ctx.Database.ExecuteSqlRaw(sql); }
-        catch (Exception ex) { logger.LogError(ex, "Keep: failed ensuring column {Table}.{Column}.", table, column); throw; }
+        catch (Exception ex) { logger.LogError(ex, "WorkLog: failed ensuring column {Table}.{Column}.", table, column); throw; }
     }
 }

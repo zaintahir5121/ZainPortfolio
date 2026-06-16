@@ -13,7 +13,7 @@ public class AccountController(AppDbContext db) : Controller
     public IActionResult Login(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Notes");
+            return RedirectToAction("Index", "WorkLog");
 
         ViewBag.ReturnUrl = returnUrl;
         return View();
@@ -48,14 +48,14 @@ public class AccountController(AppDbContext db) : Controller
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);
 
-        return RedirectToAction("Index", "Notes");
+        return RedirectToAction("Index", "WorkLog");
     }
 
     [HttpGet]
     public IActionResult Register()
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Notes");
+            return RedirectToAction("Index", "WorkLog");
         return View();
     }
 
@@ -94,7 +94,7 @@ public class AccountController(AppDbContext db) : Controller
             new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies")),
             new AuthenticationProperties { IsPersistent = true });
 
-        return RedirectToAction("Index", "Notes");
+        return RedirectToAction("Index", "WorkLog");
     }
 
     [HttpPost, ValidateAntiForgeryToken]

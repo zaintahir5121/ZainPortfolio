@@ -29,7 +29,7 @@ public class AssistantController(AppDbContext db, OllamaService ai) : Controller
             var notesBlock = string.Join("\n", noteLines);
 
             var system = $"""
-                You are Keep AI, a smart assistant built into Keep, a personal notes app.
+                You are WorkLog AI, a smart assistant built into WorkLog, a work journal and timesheet app.
                 The user's notes (most recent first):
                 {notesBlock}
 
@@ -97,6 +97,30 @@ public class AssistantController(AppDbContext db, OllamaService ai) : Controller
         catch (Exception ex)
         {
             return Json(new { improved = (string?)null, error = ex.Message.Split('\n')[0] });
+        }
+    }
+
+    // POST /Assistant/Standup
+    [HttpPost]
+    public async Task<IActionResult> Standup(CancellationToken ct)
+    {
+        try
+        {
+            var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+            var tasks = await db.WorkTasks.Include(t => t.WorkEntry)
+                .Where(t => t.WorkEntry.UserId == Uid && t.WorkEntry.LogDate == yesterday)
+                .ToListAsync(ct);
+            if (!tasks.Any())
+                return Json(new { standup = "No work logged for yesterday. Start logging with the Work Log!" });
+            var content = string.Join("\n", tasks.Select(t =>
+                $"- {t.Description} ({t.Hours}h){(t.Project != null ? " [" + t.Project + "]" : "")}"));
+            var sys = "You are a daily standup assistant. Write a concise, professional standup update (3 bullet points max) from the work done. Format: **Yesterday:** bullet points. Be brief and professional.";
+            var standup = await ai.ChatAsync(sys, [], $"Work done yesterday:\n{content}", ct);
+            return Json(new { standup });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { standup = $"⚠️ AI unavailable: {ex.Message.Split('\n')[0]}" });
         }
     }
 }

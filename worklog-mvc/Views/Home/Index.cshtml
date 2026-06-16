@@ -1,15 +1,15 @@
 @{
     Layout = null;
-    ViewData["Title"] = "Keep. — Your personal notes, everywhere";
+    ViewData["Title"] = "worklog. — AI work log & notes";
 }
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keep. — Your personal notes, everywhere</title>
-  <meta name="description" content="Keep. is a beautiful personal notes app. Create, pin, color-code and search your notes from anywhere.">
-  <meta name="theme-color" content="#fbbc04">
+  <title>worklog. — AI work log & notes</title>
+  <meta name="description" content="worklog. is an AI-powered work journal and notes app. Log daily work, auto-generate timesheets, export to Jira/Slack.">
+  <meta name="theme-color" content="#6366f1">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -147,10 +147,10 @@
 <nav class="lp-nav">
   <a href="/" class="lp-logo">
     <svg width="28" height="28" viewBox="0 0 500 500">
-      <rect width="500" height="500" rx="100" fill="#fbbc04"/>
-      <path d="M310 90H190c-25 0-45 20-45 45v235l105-76 105 76V135c0-25-20-45-45-45z" fill="#fff"/>
+      <rect width="500" height="500" rx="10" fill="#6366f1"/>
+      <path d="M120 140h260v40H120zm0 90h260v40H120zm0 90h180v40H120zm220 10l80-20v80z" fill="#fff"/>
     </svg>
-    <span class="lp-logo-text">Keep<em>.</em></span>
+    <span class="lp-logo-text">worklog<em>.</em></span>
   </a>
   <div class="lp-nav-links">
     <a asp-controller="Account" asp-action="Login" class="lp-nav-link">Sign in</a>
@@ -161,32 +161,33 @@
 <section>
   <div class="lp-hero">
     <div>
-      <div class="lp-hero-badge">✨ Now with AI Assistant</div>
-      <h1>Notes that think<br>as fast as <span class="hl">you do.</span></h1>
-      <p>Keep. is a Google Keep-style personal notes app with an AI assistant. Create, pin, color-code, and search your notes — with smart AI help to write, summarise, and organise.</p>
+      <div class="lp-hero-badge">⏱ AI-powered work journal</div>
+      <h1>Log work. Generate timesheets.<br><span class="hl">Ship faster.</span></h1>
+      <p>worklog. is a two-in-one AI work journal and notes app. Describe your day in plain English — the AI parses it into tasks, hours, and projects. Export to Jira, Slack, and CSV in one click.</p>
       <div class="lp-cta-row">
-        <a asp-controller="Account" asp-action="Register" class="lp-btn lp-btn-primary">Start for free →</a>
+        <a asp-controller="Account" asp-action="Register" class="lp-btn lp-btn-primary">Start logging free →</a>
         <a asp-controller="Account" asp-action="Login" class="lp-btn lp-btn-secondary">Sign in</a>
       </div>
     </div>
     <div class="lp-hero-demo">
       <div class="demo-board">
-        <div class="demo-card dc-yellow">
-          <span class="dc-pin">📌</span>
-          <div class="demo-card-title">AI Integration ✨</div>
-          <div class="demo-card-body">Ollama chat, daily digest, note polish feature...</div>
-        </div>
-        <div class="demo-card dc-teal">
-          <div class="demo-card-title">Shopping</div>
-          <div class="demo-card-body">Milk · Eggs · Coffee<br>Bread · Yogurt</div>
-        </div>
         <div class="demo-card dc-blue">
-          <div class="demo-card-title">Meeting Notes</div>
-          <div class="demo-card-body">Q3 roadmap: performance, UX improvements, AI features.</div>
+          <span class="dc-pin">⏱</span>
+          <div class="demo-card-title">Today's Log ✨</div>
+          <div class="demo-card-body">Standup 15m · Bug fix 2h · Code review 1h · Deploy 30m</div>
         </div>
         <div class="demo-card dc-purple">
-          <div class="demo-card-title">Books 📚</div>
-          <div class="demo-card-body">Pragmatic Programmer · Clean Code · DDIA</div>
+          <div class="demo-card-title">Weekly Total</div>
+          <div class="demo-card-body">Mon 7h · Tue 8h · Wed 6.5h<br>🔥 12 day streak</div>
+        </div>
+        <div class="demo-card dc-yellow">
+          <span class="dc-pin">📌</span>
+          <div class="demo-card-title">Sprint Notes</div>
+          <div class="demo-card-body">Auth refactor due Friday — remember to update docs</div>
+        </div>
+        <div class="demo-card dc-teal">
+          <div class="demo-card-title">Meeting Notes</div>
+          <div class="demo-card-body">Q3 roadmap: perf, UX improvements, AI features</div>
         </div>
       </div>
     </div>
@@ -196,51 +197,51 @@
 <section class="lp-features">
   <div class="lp-features-inner">
     <div class="lp-section-label">Features</div>
-    <h2 class="lp-section-title">Everything you need to stay organised</h2>
-    <p class="lp-section-sub">Beautiful, fast, and smart — built for the way you think.</p>
+    <h2 class="lp-section-title">More powerful than a timesheet. Simpler than a PM tool.</h2>
+    <p class="lp-section-sub">Log work naturally, get structured timesheets, and keep notes — all in one place.</p>
     <div class="lp-feat-grid">
       <div class="lp-feat-card">
-        <div class="lp-feat-ico lp-feat-ico-ai">✨</div>
-        <div class="lp-feat-title">AI Assistant</div>
-        <div class="lp-feat-desc">Chat with an AI that knows your notes. Ask questions, get a daily digest, or polish any note with one click.</div>
+        <div class="lp-feat-ico lp-feat-ico-ai">⏱</div>
+        <div class="lp-feat-title">AI Work Log</div>
+        <div class="lp-feat-desc">Type "Fixed login bug 1h, code review 30min" and the AI automatically parses it into tasks, hours, and categories.</div>
       </div>
       <div class="lp-feat-card">
-        <div class="lp-feat-ico lp-feat-ico-color">🎨</div>
-        <div class="lp-feat-title">12 Colour Labels</div>
-        <div class="lp-feat-desc">Colour-code your notes with 12 beautiful palette options. Visually organise without a complicated tagging system.</div>
+        <div class="lp-feat-ico lp-feat-ico-color">📅</div>
+        <div class="lp-feat-title">Auto Timesheets</div>
+        <div class="lp-feat-desc">Weekly timesheet grid builds automatically. Export to CSV, copy Jira-format entries, or post your standup to Slack in one click.</div>
       </div>
       <div class="lp-feat-card">
-        <div class="lp-feat-ico lp-feat-ico-pin">📌</div>
-        <div class="lp-feat-title">Pin &amp; Archive</div>
-        <div class="lp-feat-desc">Pin important notes to the top. Archive the rest. Move to Trash with undo for anything accidentally deleted.</div>
+        <div class="lp-feat-ico lp-feat-ico-pin">☀️</div>
+        <div class="lp-feat-title">AI Standup Generator</div>
+        <div class="lp-feat-desc">Hit "Today's Standup" and get a ready-to-paste standup from yesterday's logged work entries — powered by Ollama AI.</div>
       </div>
       <div class="lp-feat-card">
-        <div class="lp-feat-ico lp-feat-ico-search">🔍</div>
-        <div class="lp-feat-title">Instant Search</div>
-        <div class="lp-feat-desc">Client-side search filters your notes in real time as you type — no loading, no waiting.</div>
+        <div class="lp-feat-ico lp-feat-ico-search">💡</div>
+        <div class="lp-feat-title">Notes + Checklists</div>
+        <div class="lp-feat-desc">Colour-coded notes and checklists sit alongside your work log. Pin, archive, search, and polish with AI in one workspace.</div>
       </div>
       <div class="lp-feat-card">
-        <div class="lp-feat-ico lp-feat-ico-dark">🌙</div>
-        <div class="lp-feat-title">Dark Mode</div>
-        <div class="lp-feat-desc">Beautiful light and dark themes with full keyboard shortcut support and your preference remembered across sessions.</div>
+        <div class="lp-feat-ico lp-feat-ico-dark">🔥</div>
+        <div class="lp-feat-title">Streak Tracking</div>
+        <div class="lp-feat-desc">See your logging streak and daily/weekly hour totals. Stay consistent and never lose track of what you shipped.</div>
       </div>
       <div class="lp-feat-card">
         <div class="lp-feat-ico lp-feat-ico-pwa">📱</div>
         <div class="lp-feat-title">Works Everywhere</div>
-        <div class="lp-feat-desc">Install as a PWA on mobile or desktop. Full masonry grid layout adapts beautifully from phone to ultrawide.</div>
+        <div class="lp-feat-desc">Install as a PWA on any device. Dark mode, keyboard shortcuts, and an offline-ready layout that adapts from mobile to ultrawide.</div>
       </div>
     </div>
   </div>
 </section>
 
 <div class="lp-cta-strip">
-  <h2>Ready to start capturing your ideas?</h2>
-  <p>Free forever. No credit card. Your notes stay private.</p>
+  <h2>Stop filling timesheets manually.</h2>
+  <p>Free forever. No credit card. Your data stays private.</p>
   <a asp-controller="Account" asp-action="Register" class="lp-btn lp-btn-primary">Create a free account →</a>
 </div>
 
 <footer class="lp-footer">
-  <span>© 2026 Keep. · Made with ❤️ by <a href="https://buymeacoffee.com/zaintahir512" target="_blank">Zain Tahir</a></span>
+  <span>© 2026 worklog. · Made with ❤️ by <a href="https://buymeacoffee.com/zaintahir512" target="_blank">Zain Tahir</a></span>
   <div style="display:flex;gap:16px">
     <a asp-controller="Account" asp-action="Login">Sign in</a>
     <a asp-controller="Account" asp-action="Register">Register</a>

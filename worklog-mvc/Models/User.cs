@@ -10,5 +10,6 @@ public class User
 
     public string? ApiKey { get; set; }
 
-    public ICollection<Note> Notes { get; set; } = [];
+    public ICollection<Note>      Notes       { get; set; } = [];
+    public ICollection<WorkEntry> WorkEntries { get; set; } = [];
 }

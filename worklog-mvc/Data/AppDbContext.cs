@@ -8,6 +8,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User>          Users          { get; set; }
     public DbSet<Note>          Notes          { get; set; }
     public DbSet<ChecklistItem> ChecklistItems { get; set; }
+    public DbSet<WorkEntry>     WorkEntries    { get; set; }
+    public DbSet<WorkTask>      WorkTasks      { get; set; }
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -15,6 +17,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
          .HasMany(n => n.ChecklistItems)
          .WithOne(c => c.Note)
          .HasForeignKey(c => c.NoteId)
+         .OnDelete(DeleteBehavior.Cascade);
+
+        b.Entity<WorkEntry>()
+         .HasMany(e => e.Tasks)
+         .WithOne(t => t.WorkEntry)
+         .HasForeignKey(t => t.WorkEntryId)
          .OnDelete(DeleteBehavior.Cascade);
     }
 

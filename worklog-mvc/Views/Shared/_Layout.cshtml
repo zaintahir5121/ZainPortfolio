@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>@(ViewData["Title"] is string t ? t + " — Keep" : "Keep")</title>
-  <meta name="description" content="@(ViewData["Description"] as string ?? "Keep — your personal notes, everywhere.")">
-  <meta name="theme-color" content="#ffffff">
+  <title>@(ViewData["Title"] is string t ? t + " — worklog." : "worklog.")</title>
+  <meta name="description" content="@(ViewData["Description"] as string ?? "worklog. — AI-powered work log, timesheets and notes.")">
+  <meta name="theme-color" content="#111827">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Keep">
+  <meta name="apple-mobile-web-app-title" content="worklog.">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,12 +25,12 @@
     <button class="gk-icon-btn" id="gkMenuBtn" onclick="gkToggleSidebar()" title="Main menu" aria-label="Main menu">
       <svg width="20" height="20" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor"/></svg>
     </button>
-    <a href="/Notes" class="gk-logo" title="Keep">
+    <a href="/WorkLog" class="gk-logo" title="worklog.">
       <svg width="28" height="28" viewBox="0 0 500 500">
-        <rect width="500" height="500" rx="100" fill="#fbbc04"/>
-        <path d="M310 90H190c-25 0-45 20-45 45v235l105-76 105 76V135c0-25-20-45-45-45z" fill="#fff"/>
+        <rect width="500" height="500" rx="10" fill="#6366f1"/>
+        <path d="M120 140h260v40H120zm0 90h260v40H120zm0 90h180v40H120zm220 10l80-20v80z" fill="#fff"/>
       </svg>
-      <span class="gk-logo-text">Keep.</span>
+      <span class="gk-logo-text">worklog<em>.</em></span>
     </a>
 
     <div class="gk-search" id="gkSearchBox">
@@ -85,11 +85,26 @@
     <!-- Sidebar -->
     <aside class="gk-sidebar" id="gkSidebar">
       <nav>
+        <div class="gk-nav-section-label">Work Log</div>
+        <a asp-controller="WorkLog" asp-action="Index" class="gk-nav-item @(section == "worklog" ? "active" : "")">
+          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
+            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z" fill="currentColor"/>
+          </svg>
+          <span class="gk-nav-label">Daily Log</span>
+        </a>
+        <a asp-controller="WorkLog" asp-action="Timesheet" class="gk-nav-item @(section == "timesheet" ? "active" : "")">
+          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
+            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+          </svg>
+          <span class="gk-nav-label">Timesheet</span>
+        </a>
+        <div class="gk-nav-sep"></div>
+        <div class="gk-nav-section-label">Notes</div>
         <a asp-controller="Notes" asp-action="Index" class="gk-nav-item @(section == "notes" ? "active" : "")">
           <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
             <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z" fill="currentColor"/>
           </svg>
-          <span class="gk-nav-label">Notes</span>
+          <span class="gk-nav-label">All Notes</span>
         </a>
         <a asp-controller="Notes" asp-action="Archive" class="gk-nav-item @(section == "archive" ? "active" : "")">
           <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
@@ -106,7 +121,6 @@
         <div class="gk-nav-sep"></div>
         <button type="button" class="gk-nav-item gk-nav-ai-btn" onclick="gkAiOpen()">
           <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="none"/>
             <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 13.5l-4-2.5 4-2.5v5z" fill="currentColor"/>
           </svg>
           <span class="gk-nav-label">AI Assistant ✨</span>
@@ -116,6 +130,12 @@
             <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8zm0-4h8v2H8z" fill="currentColor"/>
           </svg>
           <span class="gk-nav-label">Daily Digest</span>
+        </button>
+        <button type="button" class="gk-nav-item" onclick="gkAiStandup()">
+          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
+            <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z" fill="currentColor"/>
+          </svg>
+          <span class="gk-nav-label">Today's Standup</span>
         </button>
       </nav>
     </aside>
@@ -202,7 +222,7 @@ else
     <div class="gk-ai-header">
       <div class="gk-ai-title">
         <svg width="18" height="18" viewBox="0 0 24 24" style="vertical-align:-2px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" fill="currentColor"/></svg>
-        Keep AI
+        worklog. AI ✨
       </div>
       <div style="display:flex;gap:2px;align-items:center">
         <button class="gk-icon-btn" onclick="gkAiDailySummary()" title="Daily Digest">
@@ -218,7 +238,7 @@ else
     </div>
     <div class="gk-ai-msgs" id="gkAiMsgs">
       <div class="gk-ai-msg gk-ai-msg-bot">
-        <div class="gk-ai-bubble">Hey! I'm Keep AI ✨ I can see your notes and help you think, write, and summarise. Ask me anything!</div>
+        <div class="gk-ai-bubble">Hey! I'm worklog. AI ✨ I know your notes and work log entries. Ask me to summarise your day, help write a standup, or anything else!</div>
       </div>
     </div>
     <form class="gk-ai-foot" onsubmit="gkAiSend(event)">
@@ -501,6 +521,22 @@ async function gkAiDailySummary() {
 function gkAiDigestClose() {
   var ov = document.getElementById('gkAiDigestOv');
   if (ov) ov.style.display = 'none';
+}
+
+async function gkAiStandup() {
+  var ov = document.getElementById('gkAiDigestOv');
+  var body = document.getElementById('gkAiDigestBody');
+  var head = ov ? ov.querySelector('.gk-ai-digest-head span') : null;
+  if (!ov || !body) return;
+  if (head) head.textContent = '☀️ Today\'s Standup';
+  body.innerHTML = '<div class="gk-ai-typing"><span></span><span></span><span></span></div>';
+  ov.style.display = 'flex';
+  try {
+    var data = await gkPost('/Assistant/Standup', {});
+    body.innerHTML = _aiMd(data && data.standup ? data.standup : 'No work logged yet today.');
+  } catch(err) {
+    body.innerHTML = '<p style="color:var(--text2)">⚠️ AI unavailable. Make sure Ollama is running.</p>';
+  }
 }
 
 async function gkModalPolish() {

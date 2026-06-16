@@ -1,13 +1,13 @@
 {
-  "name": "Keep — Personal Notes",
-  "short_name": "Keep",
-  "description": "Google Keep-style personal notes. Create, pin, color-code and search your notes anywhere.",
-  "start_url": "/Notes",
+  "name": "worklog. — AI Work Log & Notes",
+  "short_name": "worklog.",
+  "description": "AI-powered work journal and notes. Log daily work, auto-generate timesheets, and export to Jira/Slack.",
+  "start_url": "/WorkLog",
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
-  "background_color": "#ffffff",
-  "theme_color": "#fbbc04",
+  "background_color": "#111827",
+  "theme_color": "#6366f1",
   "orientation": "any",
   "categories": ["productivity", "utilities"],
   "icons": [
@@ -19,17 +19,24 @@
   ],
   "shortcuts": [
     {
+      "name": "Daily Log",
+      "short_name": "Log",
+      "description": "Log your work",
+      "url": "/WorkLog",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Timesheet",
+      "short_name": "Timesheet",
+      "description": "Weekly timesheet",
+      "url": "/WorkLog/Timesheet",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
       "name": "Notes",
       "short_name": "Notes",
       "description": "Your notes board",
       "url": "/Notes",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
-    },
-    {
-      "name": "Archive",
-      "short_name": "Archive",
-      "description": "Archived notes",
-      "url": "/Notes/Archive",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ],

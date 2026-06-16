@@ -1,220 +1,263 @@
 @model List<WorkLogApp.Models.LogEntry>
+@using WorkLogApp.Models
 @{
-    Layout = null;
-    decimal todayHours = ViewBag.TodayHours is decimal h ? h : 0m;
-    string firstName = ViewBag.FirstName as string ?? "there";
-    var recentProjects = ViewBag.RecentProjects as List<string> ?? new List<string>();
-    string dateLabel = ViewBag.Date as string ?? DateTime.Today.ToString("ddd, MMM d");
+    ViewData["Title"] = "Notes";
+    decimal todayHours    = ViewBag.TodayHours     is decimal h  ? h  : 0m;
+    var yesterdayLogs     = ViewBag.YesterdayLogs  as List<LogEntry> ?? new();
+    decimal yesterdayHours = ViewBag.YesterdayHours is decimal yh ? yh : 0m;
+    var recentProjects    = ViewBag.RecentProjects as List<string> ?? new();
+    string dateLabel      = ViewBag.Date           as string ?? DateTime.Today.ToString("ddd, MMM d");
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>WorkLog Notes</title>
-  <meta name="theme-color" content="#6366f1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
-    body{
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      background:#fefce8;
-      display:flex;flex-direction:column;
-      height:100dvh;
-    }
 
-    /* ── Header ── */
-    .sk-hdr{
-      background:#6366f1;
-      color:#fff;
-      padding:10px 14px;
-      display:flex;align-items:center;gap:8px;
-      flex-shrink:0;
-      -webkit-app-region:drag;
-    }
-    .sk-logo{font-size:16px;font-weight:800;letter-spacing:-.3px;-webkit-app-region:no-drag}
-    .sk-pill{
-      font-size:11px;font-weight:700;
-      background:rgba(255,255,255,.22);
-      padding:2px 9px;border-radius:99px;
-      white-space:nowrap;
-    }
-    .sk-date{font-size:11px;opacity:.7;flex:1;text-align:right;white-space:nowrap}
-    .sk-hdr-btn{
-      -webkit-app-region:no-drag;
-      width:26px;height:26px;border-radius:6px;border:none;
-      background:rgba(255,255,255,.18);color:#fff;
-      font-size:14px;line-height:1;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      transition:background .12s;text-decoration:none;
-    }
-    .sk-hdr-btn:hover{background:rgba(255,255,255,.34)}
+@section Styles {
+<style>
+  /* ── Standalone / WCO: hide shell chrome, fill viewport ── */
+  @@media (display-mode: standalone), (display-mode: window-controls-overlay) {
+    .topnav, .app-footer { display: none !important; }
+    .main-wrap { padding: 0 !important; margin: 0 !important; max-width: none !important;
+                 height: 100dvh !important; overflow: hidden !important; }
+    .sk-root { height: 100dvh !important; }
+  }
 
-    /* ── Add form ── */
-    .sk-form{
-      display:none;flex-direction:column;gap:8px;
-      padding:10px 12px;
-      background:#fff;
-      border-bottom:2px solid #6366f1;
-      flex-shrink:0;
-    }
-    .sk-form.open{display:flex}
-    .sk-form-ta{
-      border:1.5px solid #e2e8f0;border-radius:10px;
-      padding:9px 12px;font-size:14px;font-family:inherit;
-      resize:none;outline:none;min-height:62px;
-      color:#0f172a;line-height:1.55;
-    }
-    .sk-form-ta:focus{border-color:#6366f1}
-    .sk-form-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-    .sk-form-cat{
-      flex:1;min-width:100px;
-      border:1.5px solid #e2e8f0;border-radius:8px;
-      padding:6px 8px;font-size:12.5px;font-family:inherit;
-      background:#fff;outline:none;color:#334155;
-    }
-    .sk-form-hrs{
-      width:48px;border:1.5px solid #e2e8f0;border-radius:8px;
-      padding:6px 8px;font-size:13px;font-family:inherit;
-      text-align:center;outline:none;
-      -moz-appearance:textfield;
-    }
-    .sk-form-hrs::-webkit-outer-spin-button,
-    .sk-form-hrs::-webkit-inner-spin-button{-webkit-appearance:none}
-    .sk-form-hlbl{font-size:12px;color:#64748b;margin-left:-3px}
-    .sk-form-proj{
-      flex:1;min-width:90px;
-      border:1.5px solid #e2e8f0;border-radius:8px;
-      padding:6px 8px;font-size:12.5px;font-family:inherit;
-      background:#fff;outline:none;color:#334155;
-    }
-    .sk-form-submit{
-      padding:7px 16px;background:#6366f1;color:#fff;
-      border:none;border-radius:9px;font-size:13px;font-weight:700;
-      cursor:pointer;font-family:inherit;white-space:nowrap;
-      transition:background .12s;
-    }
-    .sk-form-submit:hover{background:#4f46e5}
-    .sk-form-submit:disabled{opacity:.4;cursor:default}
+  /* ── Root ── */
+  .sk-root {
+    display: flex; flex-direction: column;
+    height: calc(100vh - 54px);
+    overflow: hidden; background: #fefce8;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    /* ── Notes list ── */
-    .sk-notes{
-      flex:1;overflow-y:auto;
-      padding:10px 10px 16px;
-      display:flex;flex-direction:column;gap:8px;
+  /* ── Compact page header (drag region when standalone) ── */
+  .sk-page-hdr {
+    background: #6366f1; color: #fff;
+    padding: 8px 14px; display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0; min-height: 40px; box-sizing: border-box;
+  }
+  @@media (display-mode: standalone) {
+    .sk-page-hdr { -webkit-app-region: drag; app-region: drag; }
+    .sk-page-hdr > * { -webkit-app-region: no-drag; app-region: no-drag; }
+  }
+  @@media (display-mode: window-controls-overlay) {
+    .sk-page-hdr {
+      position: fixed; z-index: 50;
+      top: env(titlebar-area-y, 0px); left: env(titlebar-area-x, 0px);
+      width: env(titlebar-area-width, 100%); height: env(titlebar-area-height, 40px);
+      padding: 0 10px; -webkit-app-region: drag; app-region: drag;
     }
-    .sk-notes::-webkit-scrollbar{width:4px}
-    .sk-notes::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:99px}
+    .sk-page-hdr > * { -webkit-app-region: no-drag; app-region: no-drag; }
+    .sk-wco-spacer { display: block !important; height: env(titlebar-area-height, 40px); }
+  }
+  .sk-wco-spacer { display: none; flex-shrink: 0; }
 
-    /* ── Single note card ── */
-    .sk-note{
-      background:#fff;
-      border-radius:10px;
-      border-left:4px solid #94a3b8;
-      padding:10px 12px;
-      box-shadow:0 1px 4px rgba(0,0,0,.06);
-      position:relative;
-      transition:box-shadow .15s;
-    }
-    .sk-note:hover{box-shadow:0 3px 12px rgba(0,0,0,.1)}
-    .sk-note-cat{
-      font-size:10px;font-weight:800;text-transform:uppercase;
-      letter-spacing:.5px;margin-bottom:5px;
-    }
-    .sk-note-desc{
-      font-size:13.5px;line-height:1.5;color:#1e293b;
-      margin-bottom:6px;word-break:break-word;
-    }
-    .sk-note-foot{
-      display:flex;align-items:center;gap:6px;
-      font-size:11px;color:#94a3b8;
-    }
-    .sk-note-proj{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .sk-note-hrs{font-weight:800;flex-shrink:0}
-    .sk-note-del{
-      position:absolute;top:8px;right:8px;
-      width:22px;height:22px;border-radius:50%;
-      background:none;border:none;cursor:pointer;
-      color:#cbd5e1;font-size:14px;line-height:1;
-      display:flex;align-items:center;justify-content:center;
-      opacity:0;transition:opacity .15s,color .1s,background .1s;
-    }
-    .sk-note:hover .sk-note-del{opacity:1}
-    .sk-note-del:hover{color:#ef4444;background:#fee2e2}
+  .sk-hdr-logo { font-size: 14px; font-weight: 800; letter-spacing: -.3px; color: #fff; text-decoration: none; }
+  .sk-hdr-pill { font-size: 11px; font-weight: 700; background: rgba(255,255,255,.22); padding: 2px 9px; border-radius: 99px; white-space: nowrap; }
+  .sk-hdr-date { font-size: 11px; opacity: .7; flex: 1; text-align: right; white-space: nowrap; }
+  .sk-hdr-btn {
+    width: 26px; height: 26px; border-radius: 6px; border: none;
+    background: rgba(255,255,255,.18); color: #fff; cursor: pointer;
+    font-size: 15px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; transition: background .12s;
+  }
+  .sk-hdr-btn:hover { background: rgba(255,255,255,.34); }
 
-    /* Category colours */
-    .sk-note[data-cat="Development"]   {border-color:#3b82f6;background:#eff6ff}
-    .sk-note[data-cat="Meeting"]       {border-color:#f59e0b;background:#fffbeb}
-    .sk-note[data-cat="Code Review"]   {border-color:#10b981;background:#f0fdf4}
-    .sk-note[data-cat="Testing"]       {border-color:#8b5cf6;background:#faf5ff}
-    .sk-note[data-cat="Documentation"] {border-color:#06b6d4;background:#ecfeff}
-    .sk-note[data-cat="DevOps"]        {border-color:#ef4444;background:#fff1f2}
-    .sk-note[data-cat="Research"]      {border-color:#6366f1;background:#eef2ff}
-    .sk-note[data-cat="Design"]        {border-color:#ec4899;background:#fdf2f8}
-    .sk-note[data-cat="Notes"]         {border-color:#d97706;background:#fefce8}
-    .sk-note[data-cat="Other"]         {border-color:#94a3b8;background:#f8fafc}
+  /* ── Add form ── */
+  .sk-form {
+    display: none; flex-direction: column; gap: 8px;
+    padding: 10px 12px; background: #fff;
+    border-bottom: 2px solid #6366f1; flex-shrink: 0;
+  }
+  .sk-form.open { display: flex; }
+  .sk-form-ta {
+    border: 1.5px solid #e2e8f0; border-radius: 10px;
+    padding: 9px 12px; font-size: 14px; font-family: inherit;
+    resize: none; outline: none; min-height: 58px;
+    color: #0f172a; line-height: 1.55;
+  }
+  .sk-form-ta:focus { border-color: #6366f1; }
+  .sk-form-row { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+  .sk-form-cat {
+    flex: 1; min-width: 100px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+    padding: 6px 8px; font-size: 12.5px; font-family: inherit;
+    background: #fff; outline: none; color: #334155;
+  }
+  .sk-form-hrs {
+    width: 48px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+    padding: 6px 8px; font-size: 13px; text-align: center;
+    outline: none; -moz-appearance: textfield; font-family: inherit;
+  }
+  .sk-form-hrs::-webkit-inner-spin-button,
+  .sk-form-hrs::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .sk-form-hlbl { font-size: 12px; color: #64748b; margin-left: -3px; }
+  .sk-form-proj {
+    flex: 1; min-width: 90px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+    padding: 6px 8px; font-size: 12.5px; font-family: inherit;
+    background: #fff; outline: none; color: #334155;
+  }
+  .sk-form-submit {
+    padding: 7px 16px; background: #6366f1; color: #fff; border: none;
+    border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: background .12s;
+  }
+  .sk-form-submit:hover { background: #4f46e5; }
+  .sk-form-submit:disabled { opacity: .4; cursor: default; }
 
-    .sk-note[data-cat="Development"]   .sk-note-cat{color:#3b82f6}
-    .sk-note[data-cat="Meeting"]       .sk-note-cat{color:#d97706}
-    .sk-note[data-cat="Code Review"]   .sk-note-cat{color:#10b981}
-    .sk-note[data-cat="Testing"]       .sk-note-cat{color:#8b5cf6}
-    .sk-note[data-cat="Documentation"] .sk-note-cat{color:#06b6d4}
-    .sk-note[data-cat="DevOps"]        .sk-note-cat{color:#ef4444}
-    .sk-note[data-cat="Research"]      .sk-note-cat{color:#6366f1}
-    .sk-note[data-cat="Design"]        .sk-note-cat{color:#ec4899}
-    .sk-note[data-cat="Notes"]         .sk-note-cat{color:#d97706}
-    .sk-note[data-cat="Other"]         .sk-note-cat{color:#94a3b8}
-    .sk-note-hrs{color:var(--accent,#6366f1)}
+  /* ── Board (scrollable) ── */
+  .sk-board {
+    flex: 1; overflow-y: auto; padding: 10px 10px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .sk-board::-webkit-scrollbar { width: 4px; }
+  .sk-board::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 99px; }
 
-    /* ── Empty state ── */
-    .sk-empty{
-      flex:1;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;
-      gap:10px;text-align:center;padding:32px;color:#94a3b8;
-    }
-    .sk-empty-ico{font-size:38px;opacity:.5}
-    .sk-empty-txt{font-size:13.5px;line-height:1.6}
+  /* ── Section divider (Yesterday) ── */
+  .sk-sec-hdr {
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .6px; color: #94a3b8;
+    padding: 6px 2px 4px; border-bottom: 1px solid #f1f5f9;
+    user-select: none;
+  }
+  .sk-sec-hdr .sk-chev { font-size: 9px; margin-left: auto; }
 
-    /* ── Footer ── */
-    .sk-footer{
-      padding:6px 12px;
-      font-size:11px;color:#94a3b8;text-align:center;
-      border-top:1px solid rgba(0,0,0,.06);
-      flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;
-    }
-    .sk-footer a{color:#6366f1;text-decoration:none;font-weight:600}
-    .sk-footer a:hover{text-decoration:underline}
-    .sk-tip{
-      font-size:10px;color:#cbd5e1;
-      display:flex;align-items:center;gap:4px;cursor:help;
-    }
+  /* ── Note card ── */
+  .sk-note {
+    background: #fff; border-radius: 10px; border-left: 4px solid #94a3b8;
+    padding: 10px 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    position: relative; cursor: pointer; transition: box-shadow .15s;
+  }
+  .sk-note:hover { box-shadow: 0 3px 12px rgba(0,0,0,.1); }
+  .sk-note.sk-pinned { border-left-color: #6366f1 !important; }
+  .sk-note-cat { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+  .sk-note-desc { font-size: 13.5px; line-height: 1.5; color: #1e293b; margin-bottom: 6px; word-break: break-word; }
+  .sk-note-foot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #94a3b8; }
+  .sk-note-proj { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sk-note-hrs { font-weight: 800; flex-shrink: 0; color: #6366f1; }
+  .sk-note-acts {
+    position: absolute; top: 7px; right: 7px; display: flex; gap: 3px;
+    opacity: 0; transition: opacity .15s;
+  }
+  .sk-note:hover .sk-note-acts { opacity: 1; }
+  .sk-act-btn {
+    width: 22px; height: 22px; border-radius: 5px; border: none;
+    background: none; cursor: pointer; font-size: 13px; color: #cbd5e1;
+    display: flex; align-items: center; justify-content: center;
+    transition: color .1s, background .1s;
+  }
+  .sk-act-btn.pin:hover, .sk-note.sk-pinned .sk-act-btn.pin { color: #6366f1; background: #eef2ff; }
+  .sk-act-btn.del:hover { color: #ef4444; background: #fee2e2; }
 
-    /* ── Toast ── */
-    .sk-toast{
-      position:fixed;bottom:44px;left:50%;transform:translateX(-50%);
-      background:#1e293b;color:#fff;font-size:12px;font-weight:600;
-      padding:7px 16px;border-radius:99px;
-      opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;
-      z-index:100;
-    }
-    .sk-toast.show{opacity:1}
+  /* ── Category colours ── */
+  .sk-note[data-cat="Development"]   { border-color:#3b82f6;background:#eff6ff; }
+  .sk-note[data-cat="Meeting"]       { border-color:#f59e0b;background:#fffbeb; }
+  .sk-note[data-cat="Code Review"]   { border-color:#10b981;background:#f0fdf4; }
+  .sk-note[data-cat="Testing"]       { border-color:#8b5cf6;background:#faf5ff; }
+  .sk-note[data-cat="Documentation"] { border-color:#06b6d4;background:#ecfeff; }
+  .sk-note[data-cat="DevOps"]        { border-color:#ef4444;background:#fff1f2; }
+  .sk-note[data-cat="Research"]      { border-color:#6366f1;background:#eef2ff; }
+  .sk-note[data-cat="Design"]        { border-color:#ec4899;background:#fdf2f8; }
+  .sk-note[data-cat="Notes"]         { border-color:#d97706;background:#fefce8; }
+  .sk-note[data-cat="Other"]         { border-color:#94a3b8;background:#f8fafc; }
+  .sk-note[data-cat="Development"]   .sk-note-cat { color:#3b82f6; }
+  .sk-note[data-cat="Meeting"]       .sk-note-cat { color:#d97706; }
+  .sk-note[data-cat="Code Review"]   .sk-note-cat { color:#10b981; }
+  .sk-note[data-cat="Testing"]       .sk-note-cat { color:#8b5cf6; }
+  .sk-note[data-cat="Documentation"] .sk-note-cat { color:#06b6d4; }
+  .sk-note[data-cat="DevOps"]        .sk-note-cat { color:#ef4444; }
+  .sk-note[data-cat="Research"]      .sk-note-cat { color:#6366f1; }
+  .sk-note[data-cat="Design"]        .sk-note-cat { color:#ec4899; }
+  .sk-note[data-cat="Notes"]         .sk-note-cat { color:#d97706; }
+  .sk-note[data-cat="Other"]         .sk-note-cat { color:#94a3b8; }
 
-    /* ── New note animation ── */
-    @@keyframes skPop{from{opacity:0;transform:translateY(-6px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-    .sk-note-new{animation:skPop .2s cubic-bezier(.22,1,.36,1)}
-  </style>
-</head>
-<body>
+  /* ── Empty state ── */
+  .sk-empty {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; text-align: center; padding: 32px; color: #94a3b8;
+  }
+  .sk-empty-ico { font-size: 38px; opacity: .5; }
+  .sk-empty-txt { font-size: 13.5px; line-height: 1.6; }
 
-  <!-- Header -->
-  <div class="sk-hdr">
-    <span class="sk-logo">✦ WorkLog</span>
-    <span class="sk-pill" id="skPill">@todayHours h today</span>
-    <span class="sk-date">@dateLabel</span>
-    <a href="/Logs" class="sk-hdr-btn" title="Open full app" style="-webkit-app-region:no-drag">⤢</a>
+  /* ── Standalone-only footer ── */
+  .sk-sfoot { display: none; padding: 6px 12px; font-size: 11px; color: #94a3b8;
+    border-top: 1px solid rgba(0,0,0,.06); flex-shrink: 0;
+    align-items: center; justify-content: center; gap: 8px;
+    background: #fff;
+  }
+  .sk-sfoot a { color: #6366f1; text-decoration: none; font-weight: 600; }
+  .sk-sfoot a:hover { text-decoration: underline; }
+  @@media (display-mode: standalone), (display-mode: window-controls-overlay) {
+    .sk-sfoot { display: flex; }
+  }
+
+  /* ── Edit modal ── */
+  .sk-modal-ov {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(3px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 300; padding: 20px;
+  }
+  .sk-modal-panel {
+    background: #fff; border-radius: 14px; width: 100%; max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
+    animation: skUp .2s cubic-bezier(.22,1,.36,1);
+  }
+  @@keyframes skUp { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .sk-modal-panel.note { background: #fefce8; border: 1px solid #fde68a; }
+  .sk-modal-hdr { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; }
+  .sk-modal-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .sk-modal-catl { font-size: 11px; font-weight: 700; color: #64748b; flex: 1; }
+  .sk-modal-x {
+    width: 26px; height: 26px; border-radius: 8px; border: 1px solid #e2e8f0;
+    background: #f8fafc; cursor: pointer; font-size: 13px; color: #64748b;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sk-modal-body { padding: 4px 16px 14px; }
+  .sk-modal-text {
+    font-size: 15px; line-height: 1.6; color: #1e293b; min-height: 54px;
+    word-break: break-word; outline: none; border-radius: 7px;
+    padding: 8px 10px; background: #f8fafc; cursor: text;
+    border: 1px solid transparent; transition: border-color .15s;
+    margin-bottom: 10px;
+  }
+  .sk-modal-text:focus { border-color: #6366f1; background: #fff; }
+  .sk-modal-panel.note .sk-modal-text { background: rgba(217,119,6,.06); }
+  .sk-modal-panel.note .sk-modal-text:focus { border-color: #d97706; }
+  .sk-modal-proj { font-size: 11.5px; color: #94a3b8; margin-bottom: 10px; padding: 0 2px; }
+  .sk-modal-foot { display: flex; gap: 8px; padding: 10px 16px 14px; border-top: 1px solid #f1f5f9; }
+  .sk-modal-panel.note .sk-modal-foot { border-top-color: #fde68a; }
+  .sk-modal-pin { padding: 7px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .12s; }
+  .sk-modal-pin.on { background: #eef2ff; color: #6366f1; border-color: #6366f1; }
+  .sk-modal-del { padding: 7px 12px; border-radius: 8px; border: 1px solid #fecaca; background: #fff1f2; color: #ef4444; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .sk-modal-save { flex: 1; padding: 7px; border-radius: 8px; border: none; background: #6366f1; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .12s; }
+  .sk-modal-save:hover { background: #4f46e5; }
+  .sk-modal-save:disabled { opacity: .4; cursor: default; }
+  .sk-modal-panel.note .sk-modal-save { background: linear-gradient(135deg,#f59e0b,#d97706); }
+
+  /* ── Toast ── */
+  .sk-toast {
+    position: fixed; bottom: 44px; left: 50%; transform: translateX(-50%);
+    background: #1e293b; color: #fff; font-size: 12px; font-weight: 600;
+    padding: 7px 16px; border-radius: 99px; opacity: 0; transition: opacity .2s;
+    white-space: nowrap; pointer-events: none; z-index: 400;
+  }
+  .sk-toast.show { opacity: 1; }
+
+  /* ── Animations ── */
+  @@keyframes skPop { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: none; } }
+  .sk-note-new { animation: skPop .2s cubic-bezier(.22,1,.36,1); }
+</style>
+}
+
+<div class="sk-root">
+
+  <!-- Compact header: informational in browser, drag region in standalone/WCO -->
+  <div class="sk-page-hdr">
+    <span class="sk-hdr-logo">✦ Notes</span>
+    <span class="sk-hdr-pill" id="skPill">@todayHours h today</span>
+    <span class="sk-hdr-date">@dateLabel</span>
     <button class="sk-hdr-btn" id="skAddToggle" onclick="skToggleForm()" title="Add note (N)">+</button>
   </div>
+  <div class="sk-wco-spacer"></div>
 
   <!-- Quick-add form -->
   <div class="sk-form" id="skForm">
@@ -235,163 +278,344 @@
       </select>
       <input type="number" id="skHrsInp" class="sk-form-hrs" value="0.5" min="0.25" max="24" step="0.25">
       <span class="sk-form-hlbl">h</span>
-      @if (recentProjects.Any())
-      {
-        <input type="text" id="skProj" class="sk-form-proj" placeholder="Project" list="skProjList">
-        <datalist id="skProjList">
-          @foreach (var p in recentProjects) { <option value="@p"></option> }
-        </datalist>
-      }
-      else
-      {
-        <input type="text" id="skProj" class="sk-form-proj" placeholder="Project">
-      }
+      <input type="text" id="skProj" class="sk-form-proj" placeholder="Project" list="skProjList">
+      <datalist id="skProjList">
+        @foreach (var p in recentProjects) { <option value="@p"></option> }
+      </datalist>
       <button class="sk-form-submit" id="skSaveBtn" onclick="skSave()">Add →</button>
     </div>
   </div>
 
   <!-- Notes board -->
-  @if (Model.Any())
-  {
-    <div class="sk-notes" id="skBoard">
-      @foreach (var log in Model)
+  <div class="sk-board" id="skBoard">
+    @if (Model.Any())
+    {
+      foreach (var log in Model)
       {
         var cat = string.IsNullOrWhiteSpace(log.Tags) ? "Other" : log.Tags;
-        <div class="sk-note" id="skn-@log.Id" data-cat="@cat">
+        <div class="sk-note" id="skn-@log.Id" data-cat="@cat"
+             onclick="skOpenModal(@log.Id,'@System.Web.HttpUtility.JavaScriptStringEncode(log.Description)','@cat','@log.Hours','@System.Web.HttpUtility.JavaScriptStringEncode(log.Project ?? "")')">
           <div class="sk-note-cat">@cat</div>
-          <div class="sk-note-desc">@log.Description</div>
+          <div class="sk-note-desc" id="skt-@log.Id">@log.Description</div>
           <div class="sk-note-foot">
             <span class="sk-note-proj">@(string.IsNullOrWhiteSpace(log.Project) ? "" : "📁 " + log.Project)</span>
             <span class="sk-note-hrs">@log.Hours h</span>
           </div>
-          <button class="sk-note-del" onclick="skDelete(@log.Id)" title="Delete">×</button>
+          <div class="sk-note-acts" onclick="event.stopPropagation()">
+            <button class="sk-act-btn pin" onclick="skPinNote(@log.Id)" title="Pin">📌</button>
+            <button class="sk-act-btn del" onclick="skQuickDelete(@log.Id)" title="Delete">×</button>
+          </div>
         </div>
       }
-    </div>
-  }
-  else
-  {
-    <div class="sk-empty" id="skBoard">
-      <div class="sk-empty-ico">📝</div>
-      <div class="sk-empty-txt">No notes today yet.<br>Press <strong>N</strong> or tap <strong>+</strong> to add one.</div>
-    </div>
-  }
+    }
+    else
+    {
+      <div class="sk-empty" id="skEmpty">
+        <div class="sk-empty-ico">📝</div>
+        <div class="sk-empty-txt">No entries today yet.<br>Press <strong>N</strong> or tap <strong>+</strong> to add one.</div>
+      </div>
+    }
 
-  <!-- Footer -->
-  <div class="sk-footer">
-    <a href="/Logs">Full dashboard →</a>
-    <span>·</span>
-    <span class="sk-tip" title="Install as app: click the install icon in your browser address bar. Then pin it to Windows Startup via Task Manager → Startup Apps.">💡 How to auto-start</span>
+    @if (yesterdayLogs.Any())
+    {
+      <div class="sk-sec-hdr" onclick="skToggleYday()">
+        <span>Yesterday · @yesterdayHours.ToString("F1") h</span>
+        <span class="sk-chev" id="skYdayChev">▾</span>
+      </div>
+      <div id="skYdayList">
+        @foreach (var log in yesterdayLogs)
+        {
+          var cat = string.IsNullOrWhiteSpace(log.Tags) ? "Other" : log.Tags;
+          <div class="sk-note" id="skn-@log.Id" data-cat="@cat"
+               onclick="skOpenModal(@log.Id,'@System.Web.HttpUtility.JavaScriptStringEncode(log.Description)','@cat','@log.Hours','@System.Web.HttpUtility.JavaScriptStringEncode(log.Project ?? "")')">
+            <div class="sk-note-cat">@cat</div>
+            <div class="sk-note-desc" id="skt-@log.Id">@log.Description</div>
+            <div class="sk-note-foot">
+              <span class="sk-note-proj">@(string.IsNullOrWhiteSpace(log.Project) ? "" : "📁 " + log.Project)</span>
+              <span class="sk-note-hrs">@log.Hours h</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
   </div>
 
-  <div class="sk-toast" id="skToast"></div>
+  <!-- Footer (only visible when installed as standalone PWA) -->
+  <div class="sk-sfoot">
+    <a href="/Logs">Full dashboard →</a>
+    <span>·</span>
+    <span>Click a card to edit · 📌 to pin</span>
+  </div>
+</div>
 
-  <script>
-  const CAT_COLORS = {
-    'Development':'#3b82f6','Meeting':'#f59e0b','Code Review':'#10b981',
-    'Testing':'#8b5cf6','Documentation':'#06b6d4','DevOps':'#ef4444',
-    'Research':'#6366f1','Design':'#ec4899','Notes':'#d97706','Other':'#94a3b8',
-  };
+<!-- Edit / view modal -->
+<div class="sk-modal-ov" id="skModal" style="display:none" onclick="if(event.target===this)skCloseModal()">
+  <div class="sk-modal-panel" id="skModalPanel">
+    <div class="sk-modal-hdr">
+      <div class="sk-modal-dot" id="skModalDot"></div>
+      <span class="sk-modal-catl" id="skModalCat"></span>
+      <button class="sk-modal-x" onclick="skCloseModal()">✕</button>
+    </div>
+    <div class="sk-modal-body">
+      <div class="sk-modal-text" id="skModalText" contenteditable="true"></div>
+      <div class="sk-modal-proj" id="skModalProj"></div>
+    </div>
+    <div class="sk-modal-foot">
+      <button class="sk-modal-pin" id="skModalPin" onclick="skModalPinToggle()">📌 Pin</button>
+      <button class="sk-modal-del" onclick="skModalDelete()">🗑</button>
+      <button class="sk-modal-save" id="skModalSaveBtn" onclick="skModalSave()">Save</button>
+    </div>
+  </div>
+</div>
 
-  let skFormOpen = false;
-  let skTotal = @todayHours;
+<div class="sk-toast" id="skToast"></div>
 
-  function skToggleForm() {
-    skFormOpen = !skFormOpen;
-    document.getElementById('skForm').classList.toggle('open', skFormOpen);
-    document.getElementById('skAddToggle').textContent = skFormOpen ? '×' : '+';
-    if (skFormOpen) setTimeout(() => document.getElementById('skTa').focus(), 30);
-  }
+@section Scripts {
+<script>
+const CAT_COLORS = {
+  Development:'#3b82f6',Meeting:'#f59e0b','Code Review':'#10b981',
+  Testing:'#8b5cf6',Documentation:'#06b6d4',DevOps:'#ef4444',
+  Research:'#6366f1',Design:'#ec4899',Notes:'#d97706',Other:'#94a3b8',
+};
 
-  function skKeydown(e) {
-    if (e.key === 'Escape') { e.preventDefault(); skToggleForm(); return; }
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); skSave(); }
-  }
+let skTotal = @todayHours;
+let skFormOpen = false;
+let _skModalId = null;
 
-  function skAutosize(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  }
-
-  function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  async function skSave() {
-    const ta   = document.getElementById('skTa');
-    const text = ta.value.trim();
-    if (!text) { ta.focus(); return; }
-    const cat  = document.getElementById('skCat').value;
-    const hrs  = parseFloat(document.getElementById('skHrsInp').value) || 0.5;
-    const proj = document.getElementById('skProj')?.value?.trim() || '';
-    const btn  = document.getElementById('skSaveBtn');
-    btn.disabled = true; btn.textContent = '…';
-    try {
-      const res = await fetch('/Logs/QuickAdd', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ description: text, hours: hrs, category: cat, project: proj }),
-      });
-      if (!res.ok) { skToast('Could not save'); return; }
-      const entry = await res.json();
-      ta.value = ''; skAutosize(ta);
-      skTotal = Math.round((skTotal + hrs) * 100) / 100;
-      document.getElementById('skPill').textContent = skTotal + ' h today';
-      skAddCard(entry);
-      skToggleForm();
-      skToast('✓ Note added!');
-    } catch { skToast('Network error'); }
-    finally { btn.disabled = false; btn.textContent = 'Add →'; }
-  }
-
-  function skAddCard(entry) {
-    const cat = entry.category || 'Other';
-    const proj = entry.project ? '📁 ' + escHtml(entry.project) : '';
-    const html = `<div class="sk-note sk-note-new" id="skn-${entry.id}" data-cat="${escHtml(cat)}">
-      <div class="sk-note-cat">${escHtml(cat)}</div>
-      <div class="sk-note-desc">${escHtml(entry.description)}</div>
-      <div class="sk-note-foot">
-        <span class="sk-note-proj">${proj}</span>
-        <span class="sk-note-hrs">${entry.hours} h</span>
-      </div>
-      <button class="sk-note-del" onclick="skDelete(${entry.id})" title="Delete">×</button>
-    </div>`;
-    const board = document.getElementById('skBoard');
-    if (board.classList.contains('sk-empty')) {
-      board.className = 'sk-notes';
-      board.innerHTML = '';
-    }
-    board.insertAdjacentHTML('afterbegin', html);
-  }
-
-  async function skDelete(id) {
-    const el = document.getElementById(`skn-${id}`);
-    if (!el) return;
-    const hrs = parseFloat(el.querySelector('.sk-note-hrs')?.textContent) || 0;
-    el.style.cssText += ';transition:all .18s;transform:scale(.92);opacity:0';
-    setTimeout(() => { el.remove(); }, 200);
-    skTotal = Math.max(0, Math.round((skTotal - hrs) * 100) / 100);
-    document.getElementById('skPill').textContent = skTotal + ' h today';
-    try {
-      await fetch('/Logs/DeleteEntry', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ id }),
-      });
-    } catch {}
-  }
-
-  let _toastTimer;
-  function skToast(msg) {
-    const t = document.getElementById('skToast');
-    t.textContent = msg; t.classList.add('show');
-    clearTimeout(_toastTimer);
-    _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-  }
-
-  // Keyboard shortcut: N opens the add form
-  document.addEventListener('keydown', e => {
-    if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !e.altKey &&
-        !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) {
-      e.preventDefault(); if (!skFormOpen) skToggleForm();
-    }
+// ── Pin state ──────────────────────────────────────────────────────────────
+const _skPins = new Set(JSON.parse(localStorage.getItem('sk_pins') || '[]'));
+(function _initPins() {
+  _skPins.forEach(id => {
+    document.getElementById(`skn-${id}`)?.classList.add('sk-pinned');
   });
-  </script>
-</body>
-</html>
+  _skSortPins();
+})();
+function _skSortPins() {
+  const board = document.getElementById('skBoard');
+  if (!board) return;
+  const cards = [...board.querySelectorAll(':scope > .sk-note')];
+  const pinned = cards.filter(c => _skPins.has(parseInt(c.id.replace('skn-',''))));
+  const rest   = cards.filter(c => !_skPins.has(parseInt(c.id.replace('skn-',''))));
+  pinned.forEach(c => board.insertBefore(c, board.firstChild));
+}
+function skPinNote(id) {
+  id = parseInt(id);
+  const card = document.getElementById(`skn-${id}`);
+  if (_skPins.has(id)) {
+    _skPins.delete(id); card?.classList.remove('sk-pinned');
+  } else {
+    _skPins.add(id); card?.classList.add('sk-pinned');
+  }
+  localStorage.setItem('sk_pins', JSON.stringify([..._skPins]));
+  _skSortPins();
+}
+
+// ── Window size (desktop standalone) ──────────────────────────────────────
+if (window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: window-controls-overlay)').matches) {
+  try {
+    const savedW = parseInt(localStorage.getItem('sk_w') || '0');
+    const savedH = parseInt(localStorage.getItem('sk_h') || '0');
+    window.resizeTo(savedW > 260 ? savedW : 380, savedH > 200 ? savedH : 580);
+  } catch {}
+  let _rsT;
+  window.addEventListener('resize', () => {
+    clearTimeout(_rsT);
+    _rsT = setTimeout(() => {
+      try { localStorage.setItem('sk_w', window.outerWidth); localStorage.setItem('sk_h', window.outerHeight); } catch {}
+    }, 400);
+  });
+}
+
+// ── Add form ───────────────────────────────────────────────────────────────
+function skToggleForm() {
+  skFormOpen = !skFormOpen;
+  document.getElementById('skForm').classList.toggle('open', skFormOpen);
+  document.getElementById('skAddToggle').textContent = skFormOpen ? '×' : '+';
+  if (skFormOpen) setTimeout(() => document.getElementById('skTa').focus(), 30);
+}
+function skKeydown(e) {
+  if (e.key === 'Escape') { e.preventDefault(); skToggleForm(); return; }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); skSave(); }
+}
+function skAutosize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+async function skSave() {
+  const ta   = document.getElementById('skTa');
+  const text = ta.value.trim();
+  if (!text) { ta.focus(); return; }
+  const cat  = document.getElementById('skCat').value;
+  const hrs  = parseFloat(document.getElementById('skHrsInp').value) || 0.5;
+  const proj = document.getElementById('skProj')?.value?.trim() || '';
+  const btn  = document.getElementById('skSaveBtn');
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const res = await fetch('/Logs/QuickAdd', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: text, hours: hrs, category: cat, project: proj }),
+    });
+    if (!res.ok) { skToast('Could not save'); return; }
+    const entry = await res.json();
+    ta.value = ''; skAutosize(ta);
+    skTotal = Math.round((skTotal + hrs) * 100) / 100;
+    document.getElementById('skPill').textContent = skTotal + ' h today';
+    skAddCard(entry);
+    skToggleForm();
+    skToast('✓ Added!');
+  } catch { skToast('Network error'); }
+  finally { btn.disabled = false; btn.textContent = 'Add →'; }
+}
+function skAddCard(entry) {
+  const cat  = entry.category || 'Other';
+  const proj = entry.project ? '📁 ' + _skEsc(entry.project) : '';
+  const card = document.createElement('div');
+  card.className = 'sk-note sk-note-new';
+  card.id = `skn-${entry.id}`;
+  card.dataset.cat = cat;
+  card.setAttribute('onclick', `skOpenModal(${entry.id},'${_skJs(entry.description)}','${_skJs(cat)}','${entry.hours}','${_skJs(entry.project||'')}')`);
+  card.innerHTML = `
+    <div class="sk-note-cat">${_skEsc(cat)}</div>
+    <div class="sk-note-desc" id="skt-${entry.id}">${_skEsc(entry.description)}</div>
+    <div class="sk-note-foot">
+      <span class="sk-note-proj">${proj}</span>
+      <span class="sk-note-hrs">${entry.hours} h</span>
+    </div>
+    <div class="sk-note-acts" onclick="event.stopPropagation()">
+      <button class="sk-act-btn pin" onclick="skPinNote(${entry.id})" title="Pin">📌</button>
+      <button class="sk-act-btn del" onclick="skQuickDelete(${entry.id})" title="Delete">×</button>
+    </div>`;
+  const board = document.getElementById('skBoard');
+  const empty = document.getElementById('skEmpty');
+  if (empty) { empty.remove(); }
+  board.insertAdjacentElement('afterbegin', card);
+}
+
+// ── Delete from list (hover ×) ─────────────────────────────────────────────
+async function skQuickDelete(id) {
+  const el  = document.getElementById(`skn-${id}`);
+  if (!el) return;
+  const hrs = parseFloat(el.querySelector('.sk-note-hrs')?.textContent) || 0;
+  el.style.cssText += ';transition:all .18s;transform:scale(.92);opacity:0';
+  setTimeout(() => { el.remove(); }, 200);
+  skTotal = Math.max(0, Math.round((skTotal - hrs) * 100) / 100);
+  document.getElementById('skPill').textContent = skTotal + ' h today';
+  _skPins.delete(id);
+  localStorage.setItem('sk_pins', JSON.stringify([..._skPins]));
+  try {
+    await fetch('/Logs/DeleteEntry', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+  } catch {}
+  skToast('✓ Deleted');
+}
+
+// ── Yesterday toggle ────────────────────────────────────────────────────────
+function skToggleYday() {
+  const list = document.getElementById('skYdayList');
+  const chev = document.getElementById('skYdayChev');
+  if (!list) return;
+  const hidden = list.style.display === 'none';
+  list.style.display = hidden ? '' : 'none';
+  if (chev) chev.textContent = hidden ? '▾' : '▸';
+}
+
+// ── Modal ────────────────────────────────────────────────────────────────────
+function skOpenModal(id, text, cat, hrs, proj) {
+  _skModalId = parseInt(id);
+  const isNote = cat === 'Notes';
+  const panel  = document.getElementById('skModalPanel');
+  panel.className = 'sk-modal-panel' + (isNote ? ' note' : '');
+  const color = CAT_COLORS[cat] || '#94a3b8';
+  document.getElementById('skModalDot').style.background  = color;
+  document.getElementById('skModalCat').textContent       = cat + ' · ' + hrs + ' h';
+  document.getElementById('skModalProj').textContent      = proj ? '📁 ' + proj : '';
+  const textEl = document.getElementById('skModalText');
+  textEl.textContent = text;
+  // Pin button state
+  const pinBtn = document.getElementById('skModalPin');
+  const pinned = _skPins.has(_skModalId);
+  pinBtn.className = 'sk-modal-pin' + (pinned ? ' on' : '');
+  pinBtn.textContent = pinned ? '📌 Unpin' : '📌 Pin';
+  document.getElementById('skModal').style.display = 'flex';
+  // Focus + cursor at end
+  setTimeout(() => {
+    textEl.focus();
+    const r = document.createRange(); r.selectNodeContents(textEl); r.collapse(false);
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  }, 80);
+}
+function skCloseModal() {
+  document.getElementById('skModal').style.display = 'none';
+  _skModalId = null;
+}
+function skModalPinToggle() {
+  if (_skModalId == null) return;
+  skPinNote(_skModalId);
+  const pinned = _skPins.has(_skModalId);
+  const btn = document.getElementById('skModalPin');
+  btn.className = 'sk-modal-pin' + (pinned ? ' on' : '');
+  btn.textContent = pinned ? '📌 Unpin' : '📌 Pin';
+}
+async function skModalDelete() {
+  if (_skModalId == null) return;
+  await skQuickDelete(_skModalId);
+  skCloseModal();
+}
+async function skModalSave() {
+  if (_skModalId == null) return;
+  const id     = _skModalId;
+  const textEl = document.getElementById('skModalText');
+  const newText = textEl.textContent.trim();
+  if (!newText) return;
+  const btn = document.getElementById('skModalSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const res = await fetch('/Logs/UpdateEntry', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, description: newText }),
+    });
+    if (!res.ok) { btn.disabled = false; btn.textContent = 'Save'; skToast('Could not save'); return; }
+    // Update card text
+    const descEl = document.getElementById(`skt-${id}`);
+    if (descEl) descEl.textContent = newText;
+    // Update onclick
+    const card = document.getElementById(`skn-${id}`);
+    if (card) {
+      const cat = card.dataset.cat || 'Other';
+      const hrsEl = card.querySelector('.sk-note-hrs');
+      const hrs = hrsEl ? hrsEl.textContent.replace(/[^\d.]/g,'') : '0';
+      const projEl = card.querySelector('.sk-note-proj');
+      const proj = projEl?.textContent.replace('📁 ','') || '';
+      card.setAttribute('onclick', `skOpenModal(${id},'${_skJs(newText)}','${_skJs(cat)}','${hrs}','${_skJs(proj)}')`);
+    }
+    skCloseModal();
+    skToast('✓ Saved');
+  } catch { btn.disabled = false; btn.textContent = 'Save'; skToast('Network error'); }
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+let _toastT;
+function skToast(msg) {
+  const t = document.getElementById('skToast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Keyboard shortcuts ─────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { skCloseModal(); if (skFormOpen) skToggleForm(); return; }
+  if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !e.altKey &&
+      !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) {
+    e.preventDefault(); if (!skFormOpen) skToggleForm();
+  }
+});
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function _skEsc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _skJs(s)  { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n').replace(/\r/g,''); }
+</script>
+}

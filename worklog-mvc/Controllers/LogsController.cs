@@ -511,10 +511,15 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
     [HttpGet]
     public async Task<IActionResult> Sticky()
     {
-        var today = DateOnly.FromDateTime(DateTime.Today);
-        var allMine = db.LogEntries.Where(l => l.UserId == CurrentUserId);
+        var today     = DateOnly.FromDateTime(DateTime.Today);
+        var yesterday = today.AddDays(-1);
+        var allMine   = db.LogEntries.Where(l => l.UserId == CurrentUserId);
         var todayLogs = await allMine
             .Where(l => l.Date == today)
+            .OrderByDescending(l => l.CreatedAt)
+            .ToListAsync();
+        var yesterdayLogs = await allMine
+            .Where(l => l.Date == yesterday)
             .OrderByDescending(l => l.CreatedAt)
             .ToListAsync();
         var recentProjects = await allMine
@@ -525,6 +530,8 @@ public class LogsController(AppDbContext db, IOllamaService ollama) : Controller
             .Take(10)
             .ToListAsync();
         ViewBag.TodayHours     = todayLogs.Sum(l => l.Hours);
+        ViewBag.YesterdayLogs  = yesterdayLogs;
+        ViewBag.YesterdayHours = yesterdayLogs.Sum(l => l.Hours);
         ViewBag.FirstName      = (User.FindFirstValue(ClaimTypes.Name) ?? "there").Split(' ')[0];
         ViewBag.RecentProjects = recentProjects;
         ViewBag.Date           = DateTime.Today.ToString("ddd, MMM d");

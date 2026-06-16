@@ -2,12 +2,13 @@
   "name": "WorkLog — Daily Work Journal",
   "short_name": "WorkLog",
   "description": "Free daily work journal and time tracker. Log tasks, export timesheets, track your streak.",
-  "start_url": "/Logs",
+  "start_url": "/Logs/Sticky",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#080818",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "background_color": "#fefce8",
   "theme_color": "#6366f1",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "categories": ["productivity", "utilities"],
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
@@ -18,13 +19,6 @@
   ],
   "shortcuts": [
     {
-      "name": "Today Widget",
-      "short_name": "Widget",
-      "description": "Day-preview widget — today's work, progress bar, yesterday summary",
-      "url": "/Logs/Widget",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
-    },
-    {
       "name": "Dashboard",
       "short_name": "Dashboard",
       "description": "Full WorkLog dashboard",
@@ -32,10 +26,10 @@
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "name": "Sticky Notes",
-      "short_name": "Notes",
-      "description": "Quick sticky notes panel",
-      "url": "/Logs/Sticky",
+      "name": "Day Widget",
+      "short_name": "Widget",
+      "description": "Compact day-preview widget with log and notes tabs",
+      "url": "/Logs/Widget",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ],

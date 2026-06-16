@@ -19,7 +19,6 @@
     .sk-root { height: 100dvh !important; }
   }
 
-  /* ── Root ── */
   .sk-root {
     display: flex; flex-direction: column;
     height: calc(100vh - 54px);
@@ -27,7 +26,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── Top bar (drag region in standalone) ── */
+  /* ── Top bar ── */
   .sk-topbar {
     background: #fff; border-bottom: 1px solid #e8e5f5;
     padding: 0 14px; display: flex; align-items: center; gap: 10px;
@@ -49,97 +48,79 @@
     .sk-wco-spacer { display: block !important; height: env(titlebar-area-height, 46px); }
   }
   .sk-wco-spacer { display: none; flex-shrink: 0; }
-
-  .sk-topbar-logo {
-    font-size: 15px; font-weight: 800; color: #6366f1;
-    letter-spacing: -.3px; text-decoration: none;
-  }
-  .sk-topbar-pill {
-    font-size: 11px; font-weight: 700; background: #eef2ff; color: #6366f1;
-    padding: 3px 10px; border-radius: 99px; white-space: nowrap;
-  }
+  .sk-topbar-logo { font-size: 15px; font-weight: 800; color: #6366f1; letter-spacing: -.3px; text-decoration: none; }
   .sk-topbar-date { font-size: 11.5px; color: #94a3b8; flex: 1; text-align: right; white-space: nowrap; }
-  .sk-topbar-add {
-    padding: 6px 14px; background: #6366f1; color: #fff; border: none;
-    border-radius: 20px; font-size: 12.5px; font-weight: 700; cursor: pointer;
-    font-family: inherit; transition: background .12s; white-space: nowrap;
+  .sk-bmc-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 11px; border-radius: 20px; text-decoration: none;
+    background: #ffdd00; color: #1a1a1a; font-size: 11.5px; font-weight: 700;
+    border: none; cursor: pointer; white-space: nowrap;
+    transition: background .14s, transform .1s;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
   }
-  .sk-topbar-add:hover { background: #4f46e5; }
+  .sk-bmc-btn:hover { background: #f5d000; transform: scale(1.03); }
 
   /* ── Scrollable canvas ── */
-  .sk-canvas {
-    flex: 1; overflow-y: auto; padding: 14px 14px 20px;
-  }
+  .sk-canvas { flex: 1; overflow-y: auto; padding: 14px 14px 20px; }
   .sk-canvas::-webkit-scrollbar { width: 5px; }
   .sk-canvas::-webkit-scrollbar-thumb { background: #d4d0f0; border-radius: 99px; }
 
-  /* ── Google Keep-style creator ── */
+  /* ── Creator ── */
   .sk-creator {
-    max-width: 500px; margin: 0 auto 18px;
-    background: #fff; border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(99,102,241,.12);
-    overflow: hidden; border: 1px solid #e8e5f5;
-    transition: box-shadow .15s;
+    max-width: 520px; margin: 0 auto 18px;
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(99,102,241,.1);
+    border: 1.5px solid #e8e5f5;
+    transition: box-shadow .15s, border-color .15s;
+    overflow: hidden;
   }
-  .sk-creator:focus-within { box-shadow: 0 4px 22px rgba(99,102,241,.2); }
+  .sk-creator:focus-within {
+    box-shadow: 0 6px 24px rgba(99,102,241,.18);
+    border-color: #c7d2fe;
+  }
+  /* idle placeholder row */
   .sk-creator-idle {
-    padding: 12px 16px; cursor: text; display: flex; align-items: center;
-    font-size: 14px; color: #94a3b8; gap: 10px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 16px; cursor: text;
+    font-size: 14px; color: #94a3b8;
   }
-  .sk-creator-idle-ico { font-size: 18px; }
-  .sk-creator-open { display: none; flex-direction: column; }
-  .sk-creator.expanded .sk-creator-idle { display: none; }
-  .sk-creator.expanded .sk-creator-open { display: flex; }
+  .sk-creator-idle-ico { font-size: 17px; }
+  /* expanded form */
+  .sk-creator-form { display: none; flex-direction: column; }
+  .sk-creator.active .sk-creator-idle { display: none; }
+  .sk-creator.active .sk-creator-form { display: flex; }
   .sk-creator-ta {
     border: none; outline: none; resize: none;
-    padding: 13px 16px 6px; font-size: 14px; font-family: inherit;
-    color: #1e293b; line-height: 1.55; min-height: 72px;
-    background: transparent;
+    padding: 14px 16px 8px; font-size: 14px; font-family: inherit;
+    color: #1e293b; line-height: 1.55; min-height: 68px; max-height: 130px;
+    background: transparent; overflow-y: auto;
   }
-  .sk-creator-row {
-    display: flex; gap: 6px; padding: 8px 12px 10px;
-    align-items: center; flex-wrap: wrap;
+  /* Category toggle */
+  .sk-cat-row {
+    display: flex; gap: 7px; padding: 8px 14px 12px;
     border-top: 1px solid #f1f0f9;
   }
-  .sk-creator-sel {
-    flex: 1; min-width: 100px; border: 1.5px solid #e8e5f5; border-radius: 8px;
-    padding: 5px 8px; font-size: 12.5px; font-family: inherit;
-    background: #f8f7ff; outline: none; color: #334155;
+  .sk-cat-btn {
+    flex: 1; padding: 7px 10px; border-radius: 20px;
+    border: 1.5px solid #e8e5f5; background: #f8f7ff;
+    font-size: 12.5px; font-weight: 600; color: #94a3b8;
+    cursor: pointer; font-family: inherit; transition: all .14s;
+    text-align: center;
   }
-  .sk-creator-hrs {
-    width: 46px; border: 1.5px solid #e8e5f5; border-radius: 8px;
-    padding: 5px 8px; font-size: 13px; text-align: center;
-    outline: none; -moz-appearance: textfield; font-family: inherit;
-    background: #f8f7ff;
+  .sk-cat-btn.active { border-color: #6366f1; background: #eef2ff; color: #6366f1; }
+  .sk-cat-btn[data-cat="Work Log"].active { border-color: #10b981; background: #d1fae5; color: #065f46; }
+  /* hint */
+  .sk-creator-hint {
+    font-size: 10.5px; color: #c4bfe8; text-align: center;
+    padding: 0 14px 10px; display: none;
   }
-  .sk-creator-hrs::-webkit-inner-spin-button,
-  .sk-creator-hrs::-webkit-outer-spin-button { -webkit-appearance: none; }
-  .sk-creator-hlbl { font-size: 12px; color: #64748b; }
-  .sk-creator-proj {
-    flex: 1.2; min-width: 90px; border: 1.5px solid #e8e5f5; border-radius: 8px;
-    padding: 5px 8px; font-size: 12.5px; font-family: inherit;
-    background: #f8f7ff; outline: none; color: #334155;
-  }
-  .sk-creator-save {
-    padding: 6px 14px; background: #6366f1; color: #fff; border: none;
-    border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer;
-    font-family: inherit; transition: background .12s;
-  }
-  .sk-creator-save:hover { background: #4f46e5; }
-  .sk-creator-save:disabled { opacity: .4; cursor: default; }
-  .sk-creator-close {
-    padding: 6px 10px; background: none; color: #94a3b8; border: 1px solid #e2e8f0;
-    border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
-    font-family: inherit;
-  }
-  .sk-creator-close:hover { color: #64748b; border-color: #cbd5e1; }
+  .sk-creator.active .sk-creator-hint { display: block; }
 
-  /* ── Grid board ── */
+  /* ── Grid ── */
   .sk-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
-    gap: 11px;
-    align-items: start;
+    gap: 11px; align-items: start;
   }
 
   /* ── Section divider ── */
@@ -153,96 +134,34 @@
   .sk-sec-hdr .sk-chev { font-size: 9px; margin-left: auto; }
   .sk-yday-items { display: contents; }
 
-  /* ── Sticky note card ── */
+  /* ── Note card ── */
   .sk-note {
-    background: #fefce8; border-radius: 8px;
-    padding: 11px 13px 12px; min-height: 130px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
-    position: relative; cursor: pointer;
+    border-radius: 10px; padding: 12px 13px 13px; min-height: 120px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04);
+    cursor: pointer; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; gap: 6px;
     transition: box-shadow .15s, transform .12s;
     word-break: break-word;
-    display: flex; flex-direction: column; gap: 6px;
-    overflow: hidden;
+    background: #fefce8;
   }
-  .sk-note:hover { box-shadow: 0 6px 20px rgba(0,0,0,.13), 0 0 0 1px rgba(0,0,0,.06); transform: translateY(-2px); }
+  .sk-note:hover { box-shadow: 0 6px 20px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.05); transform: translateY(-2px); }
   /* fold corner */
   .sk-note::after {
     content: ''; position: absolute; bottom: 0; right: 0;
-    width: 18px; height: 18px;
-    background: linear-gradient(225deg, rgba(0,0,0,.08) 50%, transparent 50%);
-    border-top-left-radius: 4px;
+    width: 16px; height: 16px;
+    background: linear-gradient(225deg, rgba(0,0,0,.1) 50%, transparent 50%);
   }
-  /* pin marker */
-  .sk-note.sk-pinned::before {
-    content: '📌';
-    position: absolute; top: 6px; right: 8px;
-    font-size: 11px; line-height: 1;
-  }
-  .sk-note.sk-pinned { box-shadow: 0 4px 14px rgba(99,102,241,.18), 0 0 0 1.5px #6366f1; }
+  .sk-note-cat  { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; opacity: .7; }
+  .sk-note-desc { font-size: 13px; line-height: 1.5; color: #1e293b; flex: 1;
+                  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; }
+  .sk-note-proj { font-size: 10.5px; color: #94a3b8; margin-top: auto;
+                  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  .sk-note-cat {
-    font-size: 9.5px; font-weight: 800; text-transform: uppercase;
-    letter-spacing: .5px; opacity: .75;
-  }
-  .sk-note-desc {
-    font-size: 13px; line-height: 1.5; color: #1e293b;
-    flex: 1; overflow: hidden;
-    display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical;
-  }
-  .sk-note-foot {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 10.5px; color: #94a3b8; margin-top: auto;
-  }
-  .sk-note-proj { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .sk-note-hrs  { font-weight: 800; flex-shrink: 0; }
-  .sk-note-acts {
-    position: absolute; bottom: 8px; right: 8px;
-    display: flex; gap: 3px; opacity: 0; transition: opacity .15s;
-  }
-  .sk-note:hover .sk-note-acts { opacity: 1; }
-  .sk-act-btn {
-    width: 22px; height: 22px; border-radius: 5px; border: none;
-    background: rgba(255,255,255,.7); backdrop-filter: blur(4px);
-    cursor: pointer; font-size: 12px; color: #64748b;
-    display: flex; align-items: center; justify-content: center;
-    transition: color .1s, background .1s;
-  }
-  .sk-act-btn.pin:hover, .sk-note.sk-pinned .sk-act-btn.pin { color: #6366f1; background: rgba(238,242,255,.9); }
-  .sk-act-btn.del:hover { color: #ef4444; background: rgba(254,226,226,.9); }
-
-  /* ── Category colours ── */
-  .sk-note[data-cat="Development"]   { background:#dbeafe; }
-  .sk-note[data-cat="Meeting"]       { background:#fef9c3; }
-  .sk-note[data-cat="Code Review"]   { background:#d1fae5; }
-  .sk-note[data-cat="Testing"]       { background:#ede9fe; }
-  .sk-note[data-cat="Documentation"] { background:#cffafe; }
-  .sk-note[data-cat="DevOps"]        { background:#fee2e2; }
-  .sk-note[data-cat="Research"]      { background:#e0e7ff; }
-  .sk-note[data-cat="Design"]        { background:#fce7f3; }
-  .sk-note[data-cat="Notes"]         { background:#fefce8; }
-  .sk-note[data-cat="Other"]         { background:#f1f5f9; }
-
-  .sk-note[data-cat="Development"]   .sk-note-cat { color:#1d4ed8; }
-  .sk-note[data-cat="Meeting"]       .sk-note-cat { color:#b45309; }
-  .sk-note[data-cat="Code Review"]   .sk-note-cat { color:#065f46; }
-  .sk-note[data-cat="Testing"]       .sk-note-cat { color:#5b21b6; }
-  .sk-note[data-cat="Documentation"] .sk-note-cat { color:#0e7490; }
-  .sk-note[data-cat="DevOps"]        .sk-note-cat { color:#b91c1c; }
-  .sk-note[data-cat="Research"]      .sk-note-cat { color:#3730a3; }
-  .sk-note[data-cat="Design"]        .sk-note-cat { color:#9d174d; }
-  .sk-note[data-cat="Notes"]         .sk-note-cat { color:#92400e; }
-  .sk-note[data-cat="Other"]         .sk-note-cat { color:#475569; }
-
-  .sk-note[data-cat="Development"]   .sk-note-hrs { color:#1d4ed8; }
-  .sk-note[data-cat="Meeting"]       .sk-note-hrs { color:#b45309; }
-  .sk-note[data-cat="Code Review"]   .sk-note-hrs { color:#065f46; }
-  .sk-note[data-cat="Testing"]       .sk-note-hrs { color:#5b21b6; }
-  .sk-note[data-cat="Documentation"] .sk-note-hrs { color:#0e7490; }
-  .sk-note[data-cat="DevOps"]        .sk-note-hrs { color:#b91c1c; }
-  .sk-note[data-cat="Research"]      .sk-note-hrs { color:#3730a3; }
-  .sk-note[data-cat="Design"]        .sk-note-hrs { color:#9d174d; }
-  .sk-note[data-cat="Notes"]         .sk-note-hrs { color:#92400e; }
-  .sk-note[data-cat="Other"]         .sk-note-hrs { color:#64748b; }
+  /* category colours */
+  .sk-note[data-cat="Notes"]    { background: #fefce8; }
+  .sk-note[data-cat="Work Log"] { background: #d1fae5; }
+  .sk-note[data-cat="Notes"]    .sk-note-cat { color: #92400e; }
+  .sk-note[data-cat="Work Log"] .sk-note-cat { color: #065f46; }
 
   /* ── Empty state ── */
   .sk-empty {
@@ -250,7 +169,7 @@
     align-items: center; justify-content: center;
     gap: 10px; text-align: center; padding: 48px 24px; color: #a89fc4;
   }
-  .sk-empty-ico { font-size: 42px; opacity: .5; }
+  .sk-empty-ico { font-size: 42px; opacity: .45; }
   .sk-empty-txt { font-size: 13.5px; line-height: 1.7; }
 
   /* ── Standalone footer ── */
@@ -273,41 +192,36 @@
     z-index: 300; padding: 20px;
   }
   .sk-modal-panel {
-    background: #fff; border-radius: 14px; width: 100%; max-width: 420px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
+    background: #fff; border-radius: 14px; width: 100%; max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.22); overflow: hidden;
     animation: skUp .2s cubic-bezier(.22,1,.36,1);
   }
   @@keyframes skUp { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .sk-modal-panel.note { background: #fefce8; border: 1px solid #fde68a; }
-  .sk-modal-hdr { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; }
-  .sk-modal-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .sk-modal-catl { font-size: 11px; font-weight: 700; color: #64748b; flex: 1; }
+  .sk-modal-panel[data-cat="Notes"]    { background: #fefce8; border: 1px solid #fde68a; }
+  .sk-modal-panel[data-cat="Work Log"] { background: #d1fae5; border: 1px solid #6ee7b7; }
+  .sk-modal-hdr { display: flex; align-items: center; gap: 10px; padding: 14px 16px 8px; }
+  .sk-modal-catl { font-size: 11.5px; font-weight: 800; flex: 1; color: #475569; }
   .sk-modal-x {
-    width: 26px; height: 26px; border-radius: 8px; border: 1px solid #e2e8f0;
-    background: #f8fafc; cursor: pointer; font-size: 13px; color: #64748b;
+    width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(0,0,0,.08);
+    background: rgba(255,255,255,.7); cursor: pointer; font-size: 13px; color: #64748b;
     display: flex; align-items: center; justify-content: center;
   }
   .sk-modal-body { padding: 4px 16px 14px; }
   .sk-modal-text {
-    font-size: 15px; line-height: 1.6; color: #1e293b; min-height: 54px;
-    word-break: break-word; outline: none; border-radius: 7px;
-    padding: 8px 10px; background: #f8fafc; cursor: text;
+    font-size: 15px; line-height: 1.6; color: #1e293b; min-height: 60px;
+    word-break: break-word; outline: none; border-radius: 8px;
+    padding: 9px 11px; background: rgba(255,255,255,.6); cursor: text;
     border: 1px solid transparent; transition: border-color .15s;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   .sk-modal-text:focus { border-color: #6366f1; background: #fff; }
-  .sk-modal-panel.note .sk-modal-text { background: rgba(217,119,6,.06); }
-  .sk-modal-panel.note .sk-modal-text:focus { border-color: #d97706; }
-  .sk-modal-proj { font-size: 11.5px; color: #94a3b8; margin-bottom: 10px; padding: 0 2px; }
-  .sk-modal-foot { display: flex; gap: 8px; padding: 10px 16px 14px; border-top: 1px solid #f1f5f9; }
-  .sk-modal-panel.note .sk-modal-foot { border-top-color: #fde68a; }
-  .sk-modal-pin { padding: 7px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .12s; }
-  .sk-modal-pin.on { background: #eef2ff; color: #6366f1; border-color: #6366f1; }
-  .sk-modal-del { padding: 7px 12px; border-radius: 8px; border: 1px solid #fecaca; background: #fff1f2; color: #ef4444; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .sk-modal-panel[data-cat="Work Log"] .sk-modal-text:focus { border-color: #10b981; }
+  .sk-modal-foot { display: flex; gap: 8px; padding: 10px 16px 14px; border-top: 1px solid rgba(0,0,0,.06); }
+  .sk-modal-del  { padding: 7px 14px; border-radius: 8px; border: 1px solid #fecaca; background: #fff1f2; color: #ef4444; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
   .sk-modal-save { flex: 1; padding: 7px; border-radius: 8px; border: none; background: #6366f1; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .12s; }
   .sk-modal-save:hover { background: #4f46e5; }
   .sk-modal-save:disabled { opacity: .4; cursor: default; }
-  .sk-modal-panel.note .sk-modal-save { background: linear-gradient(135deg,#f59e0b,#d97706); }
+  .sk-modal-panel[data-cat="Work Log"] .sk-modal-save { background: #10b981; }
 
   /* ── Toast ── */
   .sk-toast {
@@ -318,78 +232,58 @@
   }
   .sk-toast.show { opacity: 1; }
 
-  @@keyframes skPop { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: none; } }
-  .sk-note-new { animation: skPop .22s cubic-bezier(.22,1,.36,1); }
+  /* ── Card pop-in animation ── */
+  @@keyframes skPop {
+    from { opacity: 0; transform: scale(.88) translateY(-8px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .sk-note-new { animation: skPop .25s cubic-bezier(.22,1,.36,1); }
 </style>
 }
 
 <div class="sk-root">
 
-  <!-- Top bar -->
   <div class="sk-topbar">
     <span class="sk-topbar-logo">📝 Notes.</span>
-    <span class="sk-topbar-pill" id="skPill">@todayHours h today</span>
     <span class="sk-topbar-date">@dateLabel</span>
-    <button class="sk-topbar-add" id="skAddBtn" onclick="skExpandCreator()" title="Add note (N)">+ Add note</button>
+    <a class="sk-bmc-btn" href="https://buymeacoffee.com/zaintahir512" target="_blank" rel="noopener">☕ Buy me a coffee</a>
   </div>
   <div class="sk-wco-spacer"></div>
 
-  <!-- Scrollable canvas -->
   <div class="sk-canvas" id="skCanvas">
 
-    <!-- Google Keep-style creator -->
+    <!-- Creator -->
     <div class="sk-creator" id="skCreator">
-      <div class="sk-creator-idle" onclick="skExpandCreator()">
-        <span class="sk-creator-idle-ico">📝</span>
-        <span>Take a note…</span>
+      <div class="sk-creator-idle" onclick="skActivate()">
+        <span class="sk-creator-idle-ico">✏️</span>
+        <span>Take a note… (or press N)</span>
       </div>
-      <div class="sk-creator-open" id="skCreatorOpen">
-        <textarea id="skTa" class="sk-creator-ta" placeholder="What did you work on?"
-                  rows="3" onkeydown="skKeydown(event)" oninput="skAutosize(this)"></textarea>
-        <div class="sk-creator-row">
-          <select id="skCat" class="sk-creator-sel">
-            <option value="Notes" selected>📝 Notes</option>
-            <option value="Development">💻 Development</option>
-            <option value="Meeting">👥 Meeting</option>
-            <option value="Code Review">🔍 Code Review</option>
-            <option value="Testing">🧪 Testing</option>
-            <option value="Documentation">📄 Docs</option>
-            <option value="DevOps">⚙️ DevOps</option>
-            <option value="Research">🔬 Research</option>
-            <option value="Design">🎨 Design</option>
-            <option value="Other">Other</option>
-          </select>
-          <input type="number" id="skHrsInp" class="sk-creator-hrs" value="0.5" min="0.25" max="24" step="0.25">
-          <span class="sk-creator-hlbl">h</span>
-          <input type="text" id="skProj" class="sk-creator-proj" placeholder="Project" list="skProjList">
-          <datalist id="skProjList">
-            @foreach (var p in recentProjects) { <option value="@p"></option> }
-          </datalist>
-          <button class="sk-creator-close" onclick="skCollapseCreator()">Close</button>
-          <button class="sk-creator-save" id="skSaveBtn" onclick="skSave()">Add →</button>
+      <div class="sk-creator-form" id="skForm">
+        <textarea id="skTa" class="sk-creator-ta" placeholder="What's on your mind?"
+                  oninput="skAutosize(this)" onkeydown="skKeydown(event)"></textarea>
+        <div class="sk-cat-row">
+          <button class="sk-cat-btn active" data-cat="Notes"    id="skCatNotes"   onclick="skSetCat('Notes')">📝 Notes</button>
+          <button class="sk-cat-btn"        data-cat="Work Log" id="skCatWork"    onclick="skSetCat('Work Log')">⚙️ Work Log</button>
         </div>
       </div>
+      <div class="sk-creator-hint">Press Enter to save · Esc to cancel</div>
     </div>
 
-    <!-- Notes grid -->
+    <!-- Grid -->
     <div class="sk-grid" id="skGrid">
       @if (Model.Any())
       {
         foreach (var log in Model)
         {
-          var cat = string.IsNullOrWhiteSpace(log.Tags) ? "Other" : log.Tags;
+          var cat = (log.Tags == "Work Log") ? "Work Log" : "Notes";
           <div class="sk-note" id="skn-@log.Id" data-cat="@cat"
-               onclick="skOpenModal(@log.Id,'@System.Web.HttpUtility.JavaScriptStringEncode(log.Description)','@cat','@log.Hours','@System.Web.HttpUtility.JavaScriptStringEncode(log.Project ?? "")')">
+               onclick="skOpenModal(@log.Id,'@System.Web.HttpUtility.JavaScriptStringEncode(log.Description)','@cat')">
             <div class="sk-note-cat">@cat</div>
             <div class="sk-note-desc" id="skt-@log.Id">@log.Description</div>
-            <div class="sk-note-foot">
-              <span class="sk-note-proj">@(string.IsNullOrWhiteSpace(log.Project) ? "" : "📁 " + log.Project)</span>
-              <span class="sk-note-hrs">@log.Hours h</span>
-            </div>
-            <div class="sk-note-acts" onclick="event.stopPropagation()">
-              <button class="sk-act-btn pin" onclick="skPinNote(@log.Id)" title="Pin">📌</button>
-              <button class="sk-act-btn del" onclick="skQuickDelete(@log.Id)" title="Delete">×</button>
-            </div>
+            @if (!string.IsNullOrWhiteSpace(log.Project))
+            {
+              <div class="sk-note-proj">📁 @log.Project</div>
+            }
           </div>
         }
       }
@@ -397,28 +291,27 @@
       {
         <div class="sk-empty" id="skEmpty">
           <div class="sk-empty-ico">📝</div>
-          <div class="sk-empty-txt">No entries today yet.<br>Press <strong>N</strong> or tap <strong>+ Add note</strong> to get started.</div>
+          <div class="sk-empty-txt">Nothing here yet.<br>Click above or press <strong>N</strong> to add your first note.</div>
         </div>
       }
 
       @if (yesterdayLogs.Any())
       {
         <div class="sk-sec-hdr" onclick="skToggleYday()">
-          <span>Yesterday · @yesterdayHours.ToString("F1") h</span>
+          <span>Yesterday</span>
           <span class="sk-chev" id="skYdayChev">▾</span>
         </div>
         <div class="sk-yday-items" id="skYdayList">
           @foreach (var log in yesterdayLogs)
           {
-            var cat = string.IsNullOrWhiteSpace(log.Tags) ? "Other" : log.Tags;
-            <div class="sk-note" id="skny-@log.Id" data-cat="@cat"
-                 onclick="skOpenModal(@log.Id,'@System.Web.HttpUtility.JavaScriptStringEncode(log.Description)','@cat','@log.Hours','@System.Web.HttpUtility.JavaScriptStringEncode(log.Project ?? "")')">
+            var cat = (log.Tags == "Work Log") ? "Work Log" : "Notes";
+            <div class="sk-note" data-cat="@cat">
               <div class="sk-note-cat">@cat</div>
               <div class="sk-note-desc">@log.Description</div>
-              <div class="sk-note-foot">
-                <span class="sk-note-proj">@(string.IsNullOrWhiteSpace(log.Project) ? "" : "📁 " + log.Project)</span>
-                <span class="sk-note-hrs">@log.Hours h</span>
-              </div>
+              @if (!string.IsNullOrWhiteSpace(log.Project))
+              {
+                <div class="sk-note-proj">📁 @log.Project</div>
+              }
             </div>
           }
         </div>
@@ -426,11 +319,10 @@
     </div>
   </div>
 
-  <!-- Standalone-only footer -->
   <div class="sk-sfoot">
     <a href="/Logs">Full dashboard →</a>
     <span>·</span>
-    <span>Click a card to edit · 📌 to pin</span>
+    <a class="sk-bmc-btn" href="https://buymeacoffee.com/zaintahir512" target="_blank" rel="noopener">☕ Buy me a coffee</a>
   </div>
 </div>
 
@@ -438,17 +330,14 @@
 <div class="sk-modal-ov" id="skModal" style="display:none" onclick="if(event.target===this)skCloseModal()">
   <div class="sk-modal-panel" id="skModalPanel">
     <div class="sk-modal-hdr">
-      <div class="sk-modal-dot" id="skModalDot"></div>
       <span class="sk-modal-catl" id="skModalCat"></span>
       <button class="sk-modal-x" onclick="skCloseModal()">✕</button>
     </div>
     <div class="sk-modal-body">
       <div class="sk-modal-text" id="skModalText" contenteditable="true"></div>
-      <div class="sk-modal-proj" id="skModalProj"></div>
     </div>
     <div class="sk-modal-foot">
-      <button class="sk-modal-pin" id="skModalPin" onclick="skModalPinToggle()">📌 Pin</button>
-      <button class="sk-modal-del" onclick="skModalDelete()">🗑</button>
+      <button class="sk-modal-del" onclick="skModalDelete()">🗑 Delete</button>
       <button class="sk-modal-save" id="skModalSaveBtn" onclick="skModalSave()">Save</button>
     </div>
   </div>
@@ -458,148 +347,79 @@
 
 @section Scripts {
 <script>
-const CAT_COLORS = {
-  Development:'#3b82f6',Meeting:'#f59e0b','Code Review':'#10b981',
-  Testing:'#8b5cf6',Documentation:'#06b6d4',DevOps:'#ef4444',
-  Research:'#6366f1',Design:'#ec4899',Notes:'#d97706',Other:'#94a3b8',
-};
-
-let skTotal = @todayHours;
-let skCreatorExpanded = false;
+let _skActive = false;
+let _skCat    = 'Notes';
 let _skModalId = null;
 
-// ── Pin state ──────────────────────────────────────────────────────────────
-const _skPins = new Set(JSON.parse(localStorage.getItem('sk_pins') || '[]'));
-(function _initPins() {
-  _skPins.forEach(id => {
-    document.getElementById(`skn-${id}`)?.classList.add('sk-pinned');
-  });
-  _skSortPins();
-})();
-function _skSortPins() {
-  const grid = document.getElementById('skGrid');
-  if (!grid) return;
-  const cards = [...grid.querySelectorAll(':scope > .sk-note')];
-  const pinned = cards.filter(c => _skPins.has(parseInt(c.id.replace('skn-',''))));
-  const rest   = cards.filter(c => !_skPins.has(parseInt(c.id.replace('skn-',''))));
-  pinned.forEach(c => grid.insertBefore(c, grid.firstChild));
-}
-function skPinNote(id) {
-  id = parseInt(id);
-  const card = document.getElementById(`skn-${id}`);
-  if (_skPins.has(id)) {
-    _skPins.delete(id); card?.classList.remove('sk-pinned');
-  } else {
-    _skPins.add(id); card?.classList.add('sk-pinned');
-  }
-  localStorage.setItem('sk_pins', JSON.stringify([..._skPins]));
-  _skSortPins();
-}
-
-// ── Window size persistence ─────────────────────────────────────────────────
-if (window.matchMedia('(display-mode: standalone)').matches ||
-    window.matchMedia('(display-mode: window-controls-overlay)').matches) {
-  try {
-    const savedW = parseInt(localStorage.getItem('sk_w') || '0');
-    const savedH = parseInt(localStorage.getItem('sk_h') || '0');
-    window.resizeTo(savedW > 260 ? savedW : 400, savedH > 200 ? savedH : 600);
-  } catch {}
-  let _rsT;
-  window.addEventListener('resize', () => {
-    clearTimeout(_rsT);
-    _rsT = setTimeout(() => {
-      try { localStorage.setItem('sk_w', window.outerWidth); localStorage.setItem('sk_h', window.outerHeight); } catch {}
-    }, 400);
-  });
-}
-
-// ── Creator (Google Keep style) ─────────────────────────────────────────────
-function skExpandCreator() {
-  if (skCreatorExpanded) return;
-  skCreatorExpanded = true;
-  document.getElementById('skCreator').classList.add('expanded');
+// ── Creator ────────────────────────────────────────────────────────────────
+function skActivate() {
+  if (_skActive) return;
+  _skActive = true;
+  document.getElementById('skCreator').classList.add('active');
   setTimeout(() => document.getElementById('skTa').focus(), 30);
 }
-function skCollapseCreator() {
-  skCreatorExpanded = false;
-  document.getElementById('skCreator').classList.remove('expanded');
-  document.getElementById('skTa').value = '';
+function skDeactivate() {
+  _skActive = false;
+  const creator = document.getElementById('skCreator');
+  creator.classList.remove('active');
+  const ta = document.getElementById('skTa');
+  ta.value = ''; ta.style.height = '';
 }
-function skKeydown(e) {
-  if (e.key === 'Escape') { e.preventDefault(); skCollapseCreator(); return; }
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); skSave(); }
+function skSetCat(cat) {
+  _skCat = cat;
+  document.getElementById('skCatNotes').classList.toggle('active', cat === 'Notes');
+  document.getElementById('skCatWork').classList.toggle('active', cat === 'Work Log');
 }
 function skAutosize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 130) + 'px';
 }
+function skKeydown(e) {
+  if (e.key === 'Escape') { e.preventDefault(); skDeactivate(); return; }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); skSave(); }
+}
+
+// ── Save ───────────────────────────────────────────────────────────────────
 async function skSave() {
   const ta   = document.getElementById('skTa');
   const text = ta.value.trim();
-  if (!text) { ta.focus(); return; }
-  const cat  = document.getElementById('skCat').value;
-  const hrs  = parseFloat(document.getElementById('skHrsInp').value) || 0.5;
-  const proj = document.getElementById('skProj')?.value?.trim() || '';
-  const btn  = document.getElementById('skSaveBtn');
-  btn.disabled = true; btn.textContent = '…';
+  if (!text) return;
+  // Optimistic: add card immediately, then persist
+  const tempId = 'tmp-' + Date.now();
+  skAddCard({ id: tempId, description: text, category: _skCat, project: '' }, true);
+  skDeactivate();
   try {
     const res = await fetch('/Logs/QuickAdd', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ description: text, hours: hrs, category: cat, project: proj }),
+      body: JSON.stringify({ description: text, hours: 0, category: _skCat, project: '' }),
     });
-    if (!res.ok) { skToast('Could not save'); return; }
+    if (!res.ok) { document.getElementById(`skn-${tempId}`)?.remove(); skToast('Could not save'); return; }
     const entry = await res.json();
-    skTotal = Math.round((skTotal + hrs) * 100) / 100;
-    document.getElementById('skPill').textContent = skTotal + ' h today';
-    skAddCard(entry);
-    skCollapseCreator();
-    skToast('✓ Added!');
-  } catch { skToast('Network error'); }
-  finally { btn.disabled = false; btn.textContent = 'Add →'; }
+    // Replace temp card with real id
+    const tempEl = document.getElementById(`skn-${tempId}`);
+    if (tempEl) {
+      tempEl.id = `skn-${entry.id}`;
+      tempEl.setAttribute('onclick', `skOpenModal(${entry.id},'${_skJs(entry.description)}','${_skJs(_skCat)}')`);
+      const descEl = tempEl.querySelector('.sk-note-desc');
+      if (descEl) descEl.id = `skt-${entry.id}`;
+    }
+  } catch {
+    document.getElementById(`skn-${tempId}`)?.remove();
+    skToast('Network error');
+  }
 }
-function skAddCard(entry) {
-  const cat  = entry.category || 'Other';
-  const proj = entry.project ? '📁 ' + _skEsc(entry.project) : '';
+function skAddCard(entry, animate) {
   const card = document.createElement('div');
-  card.className = 'sk-note sk-note-new';
+  card.className = 'sk-note' + (animate ? ' sk-note-new' : '');
   card.id = `skn-${entry.id}`;
-  card.dataset.cat = cat;
-  card.setAttribute('onclick', `skOpenModal(${entry.id},'${_skJs(entry.description)}','${_skJs(cat)}','${entry.hours}','${_skJs(entry.project||'')}')`);
-  card.innerHTML = `
-    <div class="sk-note-cat">${_skEsc(cat)}</div>
-    <div class="sk-note-desc" id="skt-${entry.id}">${_skEsc(entry.description)}</div>
-    <div class="sk-note-foot">
-      <span class="sk-note-proj">${proj}</span>
-      <span class="sk-note-hrs">${entry.hours} h</span>
-    </div>
-    <div class="sk-note-acts" onclick="event.stopPropagation()">
-      <button class="sk-act-btn pin" onclick="skPinNote(${entry.id})" title="Pin">📌</button>
-      <button class="sk-act-btn del" onclick="skQuickDelete(${entry.id})" title="Delete">×</button>
-    </div>`;
+  card.dataset.cat = entry.category;
+  card.setAttribute('onclick', `skOpenModal('${entry.id}','${_skJs(entry.description)}','${_skJs(entry.category)}')`);
+  card.innerHTML = `<div class="sk-note-cat">${_skEsc(entry.category)}</div>
+    <div class="sk-note-desc" id="skt-${entry.id}">${_skEsc(entry.description)}</div>`;
   const grid  = document.getElementById('skGrid');
   const empty = document.getElementById('skEmpty');
   if (empty) empty.remove();
   grid.insertAdjacentElement('afterbegin', card);
-}
-
-// ── Quick delete ────────────────────────────────────────────────────────────
-async function skQuickDelete(id) {
-  const el  = document.getElementById(`skn-${id}`);
-  if (!el) return;
-  const hrs = parseFloat(el.querySelector('.sk-note-hrs')?.textContent) || 0;
-  el.style.cssText += ';transition:all .18s;transform:scale(.88);opacity:0';
-  setTimeout(() => el.remove(), 200);
-  skTotal = Math.max(0, Math.round((skTotal - hrs) * 100) / 100);
-  document.getElementById('skPill').textContent = skTotal + ' h today';
-  _skPins.delete(id);
-  localStorage.setItem('sk_pins', JSON.stringify([..._skPins]));
-  try {
-    await fetch('/Logs/DeleteEntry', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-  } catch {}
-  skToast('✓ Deleted');
 }
 
 // ── Yesterday toggle ─────────────────────────────────────────────────────────
@@ -613,21 +433,13 @@ function skToggleYday() {
 }
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
-function skOpenModal(id, text, cat, hrs, proj) {
-  _skModalId = parseInt(id);
-  const isNote = cat === 'Notes';
-  const panel  = document.getElementById('skModalPanel');
-  panel.className = 'sk-modal-panel' + (isNote ? ' note' : '');
-  const color = CAT_COLORS[cat] || '#94a3b8';
-  document.getElementById('skModalDot').style.background  = color;
-  document.getElementById('skModalCat').textContent       = cat + ' · ' + hrs + ' h';
-  document.getElementById('skModalProj').textContent      = proj ? '📁 ' + proj : '';
+function skOpenModal(id, text, cat) {
+  _skModalId = id;
+  const panel = document.getElementById('skModalPanel');
+  panel.dataset.cat = cat;
+  document.getElementById('skModalCat').textContent = cat;
   const textEl = document.getElementById('skModalText');
   textEl.textContent = text;
-  const pinBtn = document.getElementById('skModalPin');
-  const pinned = _skPins.has(_skModalId);
-  pinBtn.className = 'sk-modal-pin' + (pinned ? ' on' : '');
-  pinBtn.textContent = pinned ? '📌 Unpin' : '📌 Pin';
   document.getElementById('skModal').style.display = 'flex';
   setTimeout(() => {
     textEl.focus();
@@ -639,18 +451,14 @@ function skCloseModal() {
   document.getElementById('skModal').style.display = 'none';
   _skModalId = null;
 }
-function skModalPinToggle() {
-  if (_skModalId == null) return;
-  skPinNote(_skModalId);
-  const pinned = _skPins.has(_skModalId);
-  const btn = document.getElementById('skModalPin');
-  btn.className = 'sk-modal-pin' + (pinned ? ' on' : '');
-  btn.textContent = pinned ? '📌 Unpin' : '📌 Pin';
-}
 async function skModalDelete() {
   if (_skModalId == null) return;
-  await skQuickDelete(_skModalId);
+  const id = _skModalId;
   skCloseModal();
+  const el = document.getElementById(`skn-${id}`);
+  if (el) { el.style.cssText += ';transition:all .18s;transform:scale(.88);opacity:0'; setTimeout(() => el.remove(), 200); }
+  try { await fetch('/Logs/DeleteEntry', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id }) }); } catch {}
+  skToast('✓ Deleted');
 }
 async function skModalSave() {
   if (_skModalId == null) return;
@@ -669,16 +477,8 @@ async function skModalSave() {
     const descEl = document.getElementById(`skt-${id}`);
     if (descEl) descEl.textContent = newText;
     const card = document.getElementById(`skn-${id}`);
-    if (card) {
-      const cat = card.dataset.cat || 'Other';
-      const hrsEl = card.querySelector('.sk-note-hrs');
-      const hrs = hrsEl ? hrsEl.textContent.replace(/[^\d.]/g,'') : '0';
-      const projEl = card.querySelector('.sk-note-proj');
-      const proj = projEl?.textContent.replace('📁 ','') || '';
-      card.setAttribute('onclick', `skOpenModal(${id},'${_skJs(newText)}','${_skJs(cat)}','${hrs}','${_skJs(proj)}')`);
-    }
-    skCloseModal();
-    skToast('✓ Saved');
+    if (card) card.setAttribute('onclick', `skOpenModal(${id},'${_skJs(newText)}','${_skJs(card.dataset.cat)}')`);
+    skCloseModal(); skToast('✓ Saved');
   } catch { btn.disabled = false; btn.textContent = 'Save'; skToast('Network error'); }
 }
 
@@ -693,12 +493,29 @@ function skToast(msg) {
 
 // ── Keyboard shortcuts ─────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { skCloseModal(); if (skCreatorExpanded) skCollapseCreator(); return; }
+  if (e.key === 'Escape') { skCloseModal(); skDeactivate(); return; }
   if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !e.altKey &&
       !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) {
-    e.preventDefault(); if (!skCreatorExpanded) skExpandCreator();
+    e.preventDefault(); skActivate();
   }
 });
+
+// ── Window size persistence ─────────────────────────────────────────────────
+if (window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: window-controls-overlay)').matches) {
+  try {
+    const savedW = parseInt(localStorage.getItem('sk_w') || '0');
+    const savedH = parseInt(localStorage.getItem('sk_h') || '0');
+    window.resizeTo(savedW > 260 ? savedW : 400, savedH > 200 ? savedH : 600);
+  } catch {}
+  let _rsT;
+  window.addEventListener('resize', () => {
+    clearTimeout(_rsT);
+    _rsT = setTimeout(() => {
+      try { localStorage.setItem('sk_w', window.outerWidth); localStorage.setItem('sk_h', window.outerHeight); } catch {}
+    }, 400);
+  });
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function _skEsc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }

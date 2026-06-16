@@ -13,7 +13,7 @@ public class AccountController(AppDbContext db) : Controller
     public IActionResult Login(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Logs");
+            return RedirectToAction("Index", "Notes");
 
         ViewBag.ReturnUrl = returnUrl;
         return View();
@@ -34,7 +34,7 @@ public class AccountController(AppDbContext db) : Controller
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new("UserId", user.Id.ToString()),
             new(ClaimTypes.Name,           user.Name),
             new("username",                user.Username),
             new(ClaimTypes.Role,           user.Role),
@@ -48,14 +48,14 @@ public class AccountController(AppDbContext db) : Controller
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);
 
-        return RedirectToAction("Index", "Logs");
+        return RedirectToAction("Index", "Notes");
     }
 
     [HttpGet]
     public IActionResult Register()
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Logs");
+            return RedirectToAction("Index", "Notes");
         return View();
     }
 
@@ -83,7 +83,7 @@ public class AccountController(AppDbContext db) : Controller
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new("UserId", user.Id.ToString()),
             new(ClaimTypes.Name,           user.Name),
             new("username",                user.Username),
             new(ClaimTypes.Role,           user.Role),
@@ -94,7 +94,7 @@ public class AccountController(AppDbContext db) : Controller
             new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies")),
             new AuthenticationProperties { IsPersistent = true });
 
-        return RedirectToAction("Index", "Logs");
+        return RedirectToAction("Index", "Notes");
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -109,7 +109,7 @@ public class AccountController(AppDbContext db) : Controller
     [Microsoft.AspNetCore.Authorization.Authorize]
     public async Task<IActionResult> ApiKey()
     {
-        var uid  = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var uid  = int.Parse(User.FindFirstValue("UserId")!);
         var user = await db.Users.FindAsync(uid);
         if (user is null) return NotFound();
 
@@ -125,7 +125,7 @@ public class AccountController(AppDbContext db) : Controller
     [Microsoft.AspNetCore.Authorization.Authorize]
     public async Task<IActionResult> RegenerateKey()
     {
-        var uid  = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var uid  = int.Parse(User.FindFirstValue("UserId")!);
         var user = await db.Users.FindAsync(uid);
         if (user is null) return NotFound();
         user.ApiKey = Guid.NewGuid().ToString("N")[..24];

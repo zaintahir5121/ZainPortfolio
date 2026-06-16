@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using WorkLogApp.Data;
+using WorkLogApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient<OllamaService>();
 
 var connStr = builder.Configuration.GetConnectionString("Default") ?? "";
 builder.Services.AddDbContext<AppDbContext>(opt =>

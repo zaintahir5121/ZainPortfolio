@@ -56,6 +56,9 @@
     <button class="gk-icon-btn" onclick="gkShowKbd()" title="Keyboard shortcuts (Ctrl+/)">
       <svg width="18" height="18" viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 5H5v-2h2v2zm9 0H8v-2h8v2zm0-3h-2v-2h2v2zm0-3h-2V8h2v2zm3 6h-2v-2h2v2zm0-3h-2v-2h2v2zm0-3h-2V8h2v2z" fill="currentColor"/></svg>
     </button>
+    <button class="gk-icon-btn gk-ai-topbtn" onclick="gkAiOpen()" title="AI Assistant (Ctrl+K)">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm1 14h-2v-1h2v1zm0-3h-2c-.55 0-1-.45-1-1V9.41l-1.29-1.3 1.41-1.41 1.17 1.17c.18.08.38.13.59.13h.12c.21 0 .41-.05.59-.13l1.17-1.17 1.41 1.41L14 9.41V12c0 .55-.45 1-1 1z" fill="none"/><path d="M9 21h6v-1H9v1zm3-19C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm1 14h-2v-1h2v1zm0-3h-2c-.55 0-1-.45-1-1v-2.59l-1.29-1.3 1.41-1.41 1.17 1.17c.18.08.38.13.59.13h.12c.21 0 .41-.05.59-.13l1.17-1.17 1.41 1.41L14 11.41V13c0 .55-.45 1-1 1z" fill="currentColor"/></svg>
+    </button>
 
     <div class="gk-avatar" onclick="this.classList.toggle('open')">
       @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "?")
@@ -100,6 +103,20 @@
           </svg>
           <span class="gk-nav-label">Trash</span>
         </a>
+        <div class="gk-nav-sep"></div>
+        <button type="button" class="gk-nav-item gk-nav-ai-btn" onclick="gkAiOpen()">
+          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="none"/>
+            <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 13.5l-4-2.5 4-2.5v5z" fill="currentColor"/>
+          </svg>
+          <span class="gk-nav-label">AI Assistant ✨</span>
+        </button>
+        <button type="button" class="gk-nav-item" onclick="gkAiDailySummary()">
+          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
+            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8zm0-4h8v2H8z" fill="currentColor"/>
+          </svg>
+          <span class="gk-nav-label">Daily Digest</span>
+        </button>
       </nav>
     </aside>
 
@@ -130,6 +147,9 @@
           <button class="gk-icon-btn" id="gkModalColorBtn" onclick="gkShowColorPicker('modal')" title="Change color">
             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/></svg>
           </button>
+          <button class="gk-icon-btn gk-modal-polish-btn" id="gkModalPolishBtn" onclick="gkModalPolish()" title="Polish with AI ✨">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 16l-4-4 4-4 1.41 1.41L5.83 12l2.58 2.59L7 16zm10 0l-1.41-1.41L18.17 12l-2.58-2.59L17 8l4 4-4 4zm-5 2l-1.5-9h2l1.5 9h-2z" fill="currentColor"/></svg>
+          </button>
           <button class="gk-icon-btn" id="gkModalArchiveBtn" onclick="gkModalToggleArchive()" title="Archive">
             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z" fill="currentColor"/></svg>
           </button>
@@ -155,6 +175,7 @@
         <div class="gk-kbd-row"><span class="gk-kbd-desc">Save note</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>Enter</kbd></div></div>
         <div class="gk-kbd-row"><span class="gk-kbd-desc">Toggle dark mode</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>D</kbd></div></div>
         <div class="gk-kbd-row"><span class="gk-kbd-desc">Toggle view</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>G</kbd></div></div>
+        <div class="gk-kbd-row"><span class="gk-kbd-desc">AI Assistant</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>K</kbd></div></div>
         <div class="gk-kbd-row"><span class="gk-kbd-desc">Shortcuts</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>/</kbd></div></div>
       </div>
       <button class="gk-kbd-close" onclick="gkHideKbd()">Got it</button>
@@ -173,6 +194,59 @@ else
   <span id="gkToastMsg"></span>
   <button class="gk-toast-undo" id="gkToastUndo" style="display:none" onclick="gkUndoLast()">Undo</button>
 </div>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+  <!-- AI Chat Panel -->
+  <div class="gk-ai-pane" id="gkAiPane">
+    <div class="gk-ai-header">
+      <div class="gk-ai-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" style="vertical-align:-2px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" fill="currentColor"/></svg>
+        Keep AI
+      </div>
+      <div style="display:flex;gap:2px;align-items:center">
+        <button class="gk-icon-btn" onclick="gkAiDailySummary()" title="Daily Digest">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="currentColor"/></svg>
+        </button>
+        <button class="gk-icon-btn" onclick="gkAiClearChat()" title="Clear conversation">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/></svg>
+        </button>
+        <button class="gk-icon-btn" onclick="gkAiClose()" title="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="gk-ai-msgs" id="gkAiMsgs">
+      <div class="gk-ai-msg gk-ai-msg-bot">
+        <div class="gk-ai-bubble">Hey! I'm Keep AI ✨ I can see your notes and help you think, write, and summarise. Ask me anything!</div>
+      </div>
+    </div>
+    <form class="gk-ai-foot" onsubmit="gkAiSend(event)">
+      <input type="text" id="gkAiInput" class="gk-ai-inp" placeholder="Ask anything about your notes…" autocomplete="off">
+      <button type="submit" class="gk-ai-send" title="Send">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" fill="currentColor"/></svg>
+      </button>
+    </form>
+  </div>
+  <!-- AI FAB -->
+  <button class="gk-ai-fab" id="gkAiFab" onclick="gkAiOpen()" title="AI Assistant">
+    <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" fill="currentColor"/></svg>
+  </button>
+  <!-- Daily Digest overlay -->
+  <div class="gk-ai-digest-ov" id="gkAiDigestOv" style="display:none" onclick="if(event.target===this)gkAiDigestClose()">
+    <div class="gk-ai-digest-card">
+      <div class="gk-ai-digest-head">
+        <span>📋 Daily Digest</span>
+        <button class="gk-icon-btn" onclick="gkAiDigestClose()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
+        </button>
+      </div>
+      <div class="gk-ai-digest-body" id="gkAiDigestBody">
+        <div class="gk-ai-typing"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  </div>
+}
 
 @RenderSection("Scripts", required: false)
 
@@ -331,6 +405,7 @@ document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.key === 'd') { e.preventDefault(); gkToggleTheme(); return; }
   if (e.ctrlKey && e.key === 'g') { e.preventDefault(); gkToggleView(); return; }
   if (e.ctrlKey && e.key === 'f') { e.preventDefault(); document.getElementById('gkSearchInput')?.focus(); return; }
+  if (e.ctrlKey && e.key === 'k') { e.preventDefault(); gkAiOpen(); return; }
   if (!inInput) {
     if (e.key === 'n') { e.preventDefault(); if (typeof gkOpenCreator === 'function') gkOpenCreator('note'); return; }
     if (e.key === 'l') { e.preventDefault(); if (typeof gkOpenCreator === 'function') gkOpenCreator('list'); return; }
@@ -341,6 +416,126 @@ document.addEventListener('keydown', e => {
 function gkCloseModal() {}
 function _gkModalNote() { return null; }
 function _noteById(id) { return document.getElementById('gnc-' + id); }
+
+// ── AI Assistant ───────────────────────────────────────────────────────────────
+var _aiHistory = [];
+var _aiOpen = false;
+
+function gkAiOpen() {
+  _aiOpen = true;
+  document.getElementById('gkAiPane')?.classList.add('open');
+  document.getElementById('gkAiFab')?.classList.add('hidden');
+  setTimeout(() => document.getElementById('gkAiInput')?.focus(), 250);
+}
+function gkAiClose() {
+  _aiOpen = false;
+  document.getElementById('gkAiPane')?.classList.remove('open');
+  document.getElementById('gkAiFab')?.classList.remove('hidden');
+}
+function gkAiClearChat() {
+  _aiHistory = [];
+  var msgs = document.getElementById('gkAiMsgs');
+  if (!msgs) return;
+  msgs.innerHTML = '<div class="gk-ai-msg gk-ai-msg-bot"><div class="gk-ai-bubble">Chat cleared! Ask me anything ✨</div></div>';
+}
+
+function _aiAppend(role, text) {
+  var msgs = document.getElementById('gkAiMsgs');
+  if (!msgs) return;
+  var div = document.createElement('div');
+  div.className = 'gk-ai-msg ' + (role === 'user' ? 'gk-ai-msg-user' : 'gk-ai-msg-bot');
+  var bub = document.createElement('div');
+  bub.className = 'gk-ai-bubble';
+  bub.innerHTML = _aiMd(text);
+  div.appendChild(bub);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function _aiTyping() {
+  var msgs = document.getElementById('gkAiMsgs');
+  if (!msgs) return null;
+  var div = document.createElement('div');
+  div.className = 'gk-ai-msg gk-ai-msg-bot gk-ai-typing-row';
+  div.innerHTML = '<div class="gk-ai-bubble"><div class="gk-ai-typing"><span></span><span></span><span></span></div></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function gkAiSend(e) {
+  e.preventDefault();
+  var inp = document.getElementById('gkAiInput');
+  var msg = inp ? inp.value.trim() : '';
+  if (!msg) return;
+  inp.value = '';
+  _aiAppend('user', msg);
+  var typing = _aiTyping();
+  try {
+    var data = await gkPost('/Assistant/Chat', { message: msg, history: _aiHistory });
+    if (typing) typing.remove();
+    var reply = data && data.reply ? data.reply : '…';
+    _aiAppend('assistant', reply);
+    _aiHistory.push({ role: 'user', content: msg });
+    _aiHistory.push({ role: 'assistant', content: reply });
+    if (_aiHistory.length > 20) _aiHistory = _aiHistory.slice(-20);
+  } catch(err) {
+    if (typing) typing.remove();
+    _aiAppend('assistant', '⚠️ Could not reach AI. Make sure Ollama is running.');
+  }
+}
+
+async function gkAiDailySummary() {
+  var ov = document.getElementById('gkAiDigestOv');
+  var body = document.getElementById('gkAiDigestBody');
+  if (!ov || !body) return;
+  body.innerHTML = '<div class="gk-ai-typing"><span></span><span></span><span></span></div>';
+  ov.style.display = 'flex';
+  try {
+    var data = await gkPost('/Assistant/DailySummary', {});
+    body.innerHTML = _aiMd(data && data.summary ? data.summary : 'No summary available.');
+  } catch(err) {
+    body.innerHTML = '<p style="color:var(--text2)">⚠️ AI unavailable. Make sure Ollama is running.</p>';
+  }
+}
+function gkAiDigestClose() {
+  var ov = document.getElementById('gkAiDigestOv');
+  if (ov) ov.style.display = 'none';
+}
+
+async function gkModalPolish() {
+  var btn = document.getElementById('gkModalPolishBtn');
+  var title = document.getElementById('gkModalTitle')?.value || '';
+  var body = document.getElementById('gkModalBody')?.innerText || '';
+  if (!title && !body) { gkToast('Add some content first!'); return; }
+  if (btn) { btn.disabled = true; btn.style.opacity = '.4'; }
+  try {
+    var data = await gkPost('/Assistant/Polish', { title, content: body });
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+    if (data && data.improved) {
+      var bodyEl = document.getElementById('gkModalBody');
+      if (bodyEl) bodyEl.innerText = data.improved;
+      gkToast('Note polished ✨');
+    } else {
+      gkToast('⚠️ AI unavailable');
+    }
+  } catch(err) {
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+    gkToast('⚠️ AI unavailable');
+  }
+}
+
+// Simple markdown → HTML (bold, italic, bullets, headers, line breaks)
+function _aiMd(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^#{1,3} (.+)$/gm, '<strong>$1</strong>')
+    .replace(/^- (.+)$/gm, '• $1')
+    .replace(/\n/g, '<br>');
+}
 </script>
 </body>
 </html>

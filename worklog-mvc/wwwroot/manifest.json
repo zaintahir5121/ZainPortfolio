@@ -1,13 +1,13 @@
 {
-  "name": "WorkLog — Daily Work Journal",
-  "short_name": "WorkLog",
-  "description": "Free daily work journal and time tracker. Log tasks, export timesheets, track your streak.",
-  "start_url": "/Logs/Sticky",
+  "name": "Keep — Personal Notes",
+  "short_name": "Keep",
+  "description": "Google Keep-style personal notes. Create, pin, color-code and search your notes anywhere.",
+  "start_url": "/Notes",
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
-  "background_color": "#fefce8",
-  "theme_color": "#6366f1",
+  "background_color": "#ffffff",
+  "theme_color": "#fbbc04",
   "orientation": "any",
   "categories": ["productivity", "utilities"],
   "icons": [
@@ -19,17 +19,17 @@
   ],
   "shortcuts": [
     {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "description": "Full WorkLog dashboard",
-      "url": "/Logs",
+      "name": "Notes",
+      "short_name": "Notes",
+      "description": "Your notes board",
+      "url": "/Notes",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "name": "Day Widget",
-      "short_name": "Widget",
-      "description": "Compact day-preview widget with log and notes tabs",
-      "url": "/Logs/Widget",
+      "name": "Archive",
+      "short_name": "Archive",
+      "description": "Archived notes",
+      "url": "/Notes/Archive",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ],

@@ -1,204 +1,346 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>@(ViewData["Title"] ?? "WorkLog")</title>
-  <meta name="description" content="@(ViewData["Description"] ?? "WorkLog — simple, AI-powered work logging for teams and individuals.")">
-  <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#6366f1">
+  <title>@(ViewData["Title"] is string t ? t + " — Keep" : "Keep")</title>
+  <meta name="description" content="@(ViewData["Description"] as string ?? "Keep — your personal notes, everywhere.")">
+  <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="WorkLog">
+  <meta name="apple-mobile-web-app-title" content="Keep">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
   @RenderSection("Styles", required: false)
 </head>
 <body>
 
-<nav class="topnav">
-  <a href="/" class="t-logo">worklog<span>.</span></a>
-  <div class="t-links">
-    <a asp-controller="Logs" asp-action="Index"
-       class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Logs" && ViewContext.RouteData.Values["action"]?.ToString() != "Sticky" ? "t-link-on" : "")">WorkLog</a>
-    <a asp-controller="Logs" asp-action="Sticky"
-       class="t-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Sticky" ? "t-link-on" : "")">📝 Notes</a>
-    <a asp-controller="Assistant" asp-action="Index"
-       class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Assistant" ? "t-link-on" : "")">✦ AI</a>
-    <a asp-controller="Timesheet" asp-action="Index"
-       class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Timesheet" ? "t-link-on" : "")">Timesheet</a>
-    <a asp-controller="Recurring" asp-action="Index"
-       class="t-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Recurring" ? "t-link-on" : "")">↺ Recurring</a>
-    @* Growth hidden — re-enable by uncommenting:
-    @{
-      var growthActive = new[]{"Growth","Achievements","Experience","Learning"}
-        .Contains(ViewContext.RouteData.Values["controller"]?.ToString() ?? "");
-    }
-    <a asp-controller="Growth" asp-action="Index"
-       class="t-link @(growthActive ? "t-link-on" : "")">🌱 Growth</a>
-    *@
-  </div>
-  <div class="t-right">
-    @if (ViewBag.TodayHours is decimal th && th > 0)
-    {
-      <span class="t-stat">@th h today</span>
-    }
-    <div class="t-avatar">@(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "?")</div>
-    <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0" id="logoutForm">
-      @Html.AntiForgeryToken()
-      <button type="submit" class="t-signout">Sign out</button>
-    </form>
-  </div>
-  <button class="t-menu-btn" id="tMenuBtn" aria-label="Open menu">&#9776;</button>
-</nav>
-
-<div class="t-mobile-drawer" id="tMobileDrawer">
-  <a asp-controller="Logs" asp-action="Index"
-     class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Logs" && ViewContext.RouteData.Values["action"]?.ToString() != "Sticky" ? "t-link-on" : "")">WorkLog</a>
-  <a asp-controller="Logs" asp-action="Sticky"
-     class="t-drawer-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Sticky" ? "t-link-on" : "")">📝 Notes</a>
-  <a asp-controller="Assistant" asp-action="Index"
-     class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Assistant" ? "t-link-on" : "")">✦ AI Assistant</a>
-  <a asp-controller="Timesheet" asp-action="Index"
-     class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Timesheet" ? "t-link-on" : "")">Timesheet</a>
-  <a asp-controller="Recurring" asp-action="Index"
-     class="t-drawer-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Recurring" ? "t-link-on" : "")">↺ Recurring</a>
-  <div class="t-drawer-divider"></div>
-  @* Growth hidden — uncomment to restore:
-  <a asp-controller="Growth" asp-action="Index" class="t-drawer-link">🌱 Growth</a>
-  <div class="t-drawer-divider"></div>
-  *@
-  <button class="t-drawer-signout" onclick="document.getElementById('logoutForm').submit()">Sign out</button>
-</div>
-
-<main class="main-wrap">
-  @RenderBody()
-</main>
-
-<footer class="app-footer">
-  <div class="af-inner">
-    <span class="af-copy">&copy; 2026 WorkLog</span>
-    <nav class="af-links">
-      <a asp-controller="Home" asp-action="About">About</a>
-      <a asp-controller="Home" asp-action="Privacy">Privacy</a>
-      <a asp-controller="Home" asp-action="Terms">Terms</a>
-      <a asp-controller="Home" asp-action="Contact">Contact</a>
-      <button class="af-feedback" onclick="openFeedback()">💬 Feedback</button>
-    </nav>
-  </div>
-</footer>
-
-@if (TempData["Toast"] is string toast)
+@if (User.Identity?.IsAuthenticated == true)
 {
-  <div class="toast-wrap" id="tw"><div class="toast">@toast</div></div>
-  <script>setTimeout(()=>document.getElementById('tw')?.remove(), 3000)</script>
-}
-@if (TempData["Error"] is string err)
-{
-  <div class="toast-wrap toast-err" id="twe"><div class="toast">@err</div></div>
-  <script>setTimeout(()=>document.getElementById('twe')?.remove(), 4000)</script>
-}
+  var section = ViewBag.Section as string ?? "notes";
+  <!-- ── Top bar ── -->
+  <header class="gk-topbar">
+    <button class="gk-icon-btn" id="gkMenuBtn" onclick="gkToggleSidebar()" title="Main menu" aria-label="Main menu">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor"/></svg>
+    </button>
+    <a href="/Notes" class="gk-logo" title="Keep">
+      <svg width="28" height="28" viewBox="0 0 500 500">
+        <rect width="500" height="500" rx="100" fill="#fbbc04"/>
+        <path d="M310 90H190c-25 0-45 20-45 45v235l105-76 105 76V135c0-25-20-45-45-45z" fill="#fff"/>
+      </svg>
+      <span class="gk-logo-text">Keep.</span>
+    </a>
 
-<script>
-  // Hamburger
-  const btn = document.getElementById('tMenuBtn');
-  const drawer = document.getElementById('tMobileDrawer');
-  if (btn && drawer) {
-    btn.addEventListener('click', () => {
-      drawer.classList.toggle('open');
-      btn.textContent = drawer.classList.contains('open') ? '✕' : '☰';
-    });
-    document.addEventListener('click', e => {
-      if (!btn.contains(e.target) && !drawer.contains(e.target)) {
-        drawer.classList.remove('open');
-        btn.textContent = '☰';
-      }
-    });
-  }
-</script>
-
-<!-- ── Feedback modal ─────────────────────────────────────────────────────── -->
-<div class="fb-overlay" id="fbOverlay" onclick="if(event.target===this)closeFeedback()" style="display:none">
-  <div class="fb-panel">
-    <div class="fb-hdr">
-      <div>
-        <div class="fb-title">💬 Share your feedback</div>
-        <div class="fb-sub">Help us make WorkLog better for you</div>
-      </div>
-      <button class="fb-close" onclick="closeFeedback()">✕</button>
+    <div class="gk-search" id="gkSearchBox">
+      <button class="gk-icon-btn" style="color:var(--text2)" aria-label="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+      </button>
+      <input type="text" id="gkSearchInput" class="gk-search-input" placeholder="Search your notes"
+             autocomplete="off" oninput="gkFilter(this.value)"
+             onkeydown="if(event.key==='Escape'){gkClearSearch();this.blur();}">
+      <button class="gk-icon-btn gk-search-clear" id="gkSearchClear" style="display:none" onclick="gkClearSearch()" aria-label="Clear search">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
+      </button>
     </div>
-    <div class="fb-body">
-      <div class="fb-q">How would you rate WorkLog?</div>
-      <div class="fb-stars" id="fbStars">
-        <button type="button" class="fb-star" onclick="fbRate(1)">★</button>
-        <button type="button" class="fb-star" onclick="fbRate(2)">★</button>
-        <button type="button" class="fb-star" onclick="fbRate(3)">★</button>
-        <button type="button" class="fb-star" onclick="fbRate(4)">★</button>
-        <button type="button" class="fb-star" onclick="fbRate(5)">★</button>
+
+    <div class="gk-topbar-spacer"></div>
+
+    <button class="gk-icon-btn" id="gkViewBtn" onclick="gkToggleView()" title="Toggle list view">
+      <svg width="20" height="20" viewBox="0 0 24 24" id="gkViewIcon"><path d="M4 5h3v3H4zm0 5h3v3H4zm0 5h3v3H4zm5-10h11v3H9zm0 5h11v3H9zm0 5h11v3H9z" fill="currentColor"/></svg>
+    </button>
+    <button class="gk-icon-btn" id="gkThemeBtn" onclick="gkToggleTheme()" title="Toggle dark mode">
+      <svg width="20" height="20" viewBox="0 0 24 24" id="gkThemeIcon"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z" fill="currentColor"/></svg>
+    </button>
+    <button class="gk-icon-btn" onclick="gkShowKbd()" title="Keyboard shortcuts (Ctrl+/)">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 5H5v-2h2v2zm9 0H8v-2h8v2zm0-3h-2v-2h2v2zm0-3h-2V8h2v2zm3 6h-2v-2h2v2zm0-3h-2v-2h2v2zm0-3h-2V8h2v2z" fill="currentColor"/></svg>
+    </button>
+
+    <div class="gk-avatar" onclick="this.classList.toggle('open')">
+      @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "?")
+      <div class="gk-avatar-menu" onclick="event.stopPropagation()">
+        <div style="padding:12px 16px 8px; font-size:14px; font-weight:600;">@User.Identity?.Name</div>
+        <div class="gk-avatar-menu-sep"></div>
+        <a href="https://buymeacoffee.com/zaintahir512" target="_blank" rel="noopener" class="gk-avatar-menu-item">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z" fill="currentColor"/></svg>
+          Buy me a coffee ☕
+        </a>
+        <div class="gk-avatar-menu-sep"></div>
+        <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
+          @Html.AntiForgeryToken()
+          <button type="submit" class="gk-avatar-menu-item" style="border:none;cursor:pointer;width:100%">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/></svg>
+            Sign out
+          </button>
+        </form>
       </div>
-      <div class="fb-field">
-        <label class="fb-lbl">Category</label>
-        <select class="fb-sel" id="fbCat">
-          <option value="General Feedback">General Feedback</option>
-          <option value="Feature Request">Feature Request</option>
-          <option value="Bug Report">Bug Report</option>
-          <option value="UI Improvement">UI Improvement</option>
-          <option value="Performance">Performance</option>
-        </select>
+    </div>
+  </header>
+
+  <div class="gk-layout">
+    <!-- Sidebar -->
+    <aside class="gk-sidebar" id="gkSidebar">
+      <nav>
+        <a asp-controller="Notes" asp-action="Index" class="gk-nav-item @(section == "notes" ? "active" : "")">
+          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
+            <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z" fill="currentColor"/>
+          </svg>
+          <span class="gk-nav-label">Notes</span>
+        </a>
+        <a asp-controller="Notes" asp-action="Archive" class="gk-nav-item @(section == "archive" ? "active" : "")">
+          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
+            <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z" fill="currentColor"/>
+          </svg>
+          <span class="gk-nav-label">Archive</span>
+        </a>
+        <a asp-controller="Notes" asp-action="Trash" class="gk-nav-item @(section == "trash" ? "active" : "")">
+          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
+            <path d="M15 4V3H9v1H4v2h1l1 13c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2l1-13h1V4h-5zm2 15H7l-1-13h10l-1 13z" fill="currentColor"/>
+          </svg>
+          <span class="gk-nav-label">Trash</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="gk-content" id="gkContent">
+      @RenderBody()
+    </main>
+  </div>
+
+  <!-- Color picker (shared, moved around by JS) -->
+  <div class="gk-colors" id="gkColorPicker" style="display:none">
+    @foreach (var c in new[]{"default","red","orange","yellow","green","teal","blue","dark-blue","purple","pink","brown","gray"}) {
+      <div class="gk-color-swatch cs-@c" data-color="@c" onclick="gkApplyColor('@c')" title="@(c == "default" ? "Default" : char.ToUpper(c[0]) + c[1..])"></div>
+    }
+  </div>
+
+  <!-- Edit modal -->
+  <div class="gk-modal-ov" id="gkModalOv" style="display:none" onclick="if(event.target===this)gkCloseModal()">
+    <div class="gk-modal" id="gkModal">
+      <input type="text" class="gk-modal-title" id="gkModalTitle" placeholder="Title">
+      <div class="gk-modal-body" id="gkModalBody" contenteditable="true" data-placeholder="Take a note…"></div>
+      <div class="gk-modal-list" id="gkModalList" style="display:none"></div>
+      <div class="gk-modal-foot">
+        <div class="gk-modal-tools" id="gkModalTools">
+          <button class="gk-icon-btn" id="gkModalPinBtn" onclick="gkModalTogglePin()" title="Pin note">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M14 4v5l2 1v4h-5v6l-1 1-1-1v-6H4v-4l2-1V4h8z" fill="currentColor"/></svg>
+          </button>
+          <button class="gk-icon-btn" id="gkModalColorBtn" onclick="gkShowColorPicker('modal')" title="Change color">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/></svg>
+          </button>
+          <button class="gk-icon-btn" id="gkModalArchiveBtn" onclick="gkModalToggleArchive()" title="Archive">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z" fill="currentColor"/></svg>
+          </button>
+          <button class="gk-icon-btn" id="gkModalDeleteBtn" onclick="gkModalDelete()" title="Delete note">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 4V3H9v1H4v2h1l1 13c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2l1-13h1V4h-5zm2 15H7l-1-13h10l-1 13z" fill="currentColor"/></svg>
+          </button>
+        </div>
+        <div class="gk-modal-meta" id="gkModalMeta"></div>
+        <button class="gk-modal-close" onclick="gkCloseModal()">Close</button>
       </div>
-      <div class="fb-field">
-        <label class="fb-lbl">Tell us more <span style="font-weight:400;opacity:.45">(optional)</span></label>
-        <textarea class="fb-ta" id="fbMsg" placeholder="What's on your mind?" rows="3" maxlength="1000"></textarea>
-      </div>
-      <button class="fb-submit" id="fbSubmitBtn" onclick="submitFeedback()">Send Feedback →</button>
-      <div class="fb-success hidden" id="fbSuccess">✓ Thank you! Your feedback helps us improve WorkLog.</div>
     </div>
   </div>
-</div>
 
-<script>
-let _fbRating = 0;
-function openFeedback() {
-  _fbRating = 0;
-  document.querySelectorAll('.fb-star').forEach(s => s.classList.remove('on'));
-  document.getElementById('fbMsg').value = '';
-  document.getElementById('fbSuccess').classList.add('hidden');
-  const btn = document.getElementById('fbSubmitBtn');
-  btn.style.display = ''; btn.disabled = false; btn.textContent = 'Send Feedback →';
-  document.getElementById('fbOverlay').style.display = 'flex';
+  <!-- Keyboard shortcuts overlay -->
+  <div class="gk-kbd-ov" id="gkKbdOv" style="display:none" onclick="if(event.target===this)gkHideKbd()">
+    <div class="gk-kbd-panel">
+      <div class="gk-kbd-title">Keyboard shortcuts</div>
+      <div class="gk-kbd-grid">
+        <div class="gk-kbd-row"><span class="gk-kbd-desc">New note</span><div class="gk-kbd-keys"><kbd>N</kbd></div></div>
+        <div class="gk-kbd-row"><span class="gk-kbd-desc">New checklist</span><div class="gk-kbd-keys"><kbd>L</kbd></div></div>
+        <div class="gk-kbd-row"><span class="gk-kbd-desc">Search</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>F</kbd></div></div>
+        <div class="gk-kbd-row"><span class="gk-kbd-desc">Close / cancel</span><div class="gk-kbd-keys"><kbd>Esc</kbd></div></div>
+        <div class="gk-kbd-row"><span class="gk-kbd-desc">Save note</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>Enter</kbd></div></div>
+        <div class="gk-kbd-row"><span class="gk-kbd-desc">Toggle dark mode</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>D</kbd></div></div>
+        <div class="gk-kbd-row"><span class="gk-kbd-desc">Toggle view</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>G</kbd></div></div>
+        <div class="gk-kbd-row"><span class="gk-kbd-desc">Shortcuts</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>/</kbd></div></div>
+      </div>
+      <button class="gk-kbd-close" onclick="gkHideKbd()">Got it</button>
+    </div>
+  </div>
 }
-function closeFeedback() { document.getElementById('fbOverlay').style.display = 'none'; }
-function fbRate(n) {
-  _fbRating = n;
-  document.querySelectorAll('.fb-star').forEach((s, i) => s.classList.toggle('on', i < n));
+else
+{
+  <main class="auth-wrap">
+    @RenderBody()
+  </main>
 }
-async function submitFeedback() {
-  if (!_fbRating) { alert('Please select a rating first.'); return; }
-  const btn = document.getElementById('fbSubmitBtn');
-  btn.disabled = true; btn.textContent = 'Sending…';
-  try {
-    const res = await fetch('/Feedback/Submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rating: _fbRating, category: document.getElementById('fbCat').value, message: document.getElementById('fbMsg').value.trim() }),
-    });
-    if (res.ok) {
-      btn.style.display = 'none';
-      document.getElementById('fbSuccess').classList.remove('hidden');
-      setTimeout(closeFeedback, 2800);
-    } else { btn.disabled = false; btn.textContent = 'Send Feedback →'; }
-  } catch { btn.disabled = false; btn.textContent = 'Send Feedback →'; }
-}
-</script>
+
+<!-- Toast -->
+<div class="gk-toast" id="gkToast">
+  <span id="gkToastMsg"></span>
+  <button class="gk-toast-undo" id="gkToastUndo" style="display:none" onclick="gkUndoLast()">Undo</button>
+</div>
 
 @RenderSection("Scripts", required: false)
-<a href="https://buymeacoffee.com/zaintahir512" target="_blank" rel="noopener" class="bmc-float" title="Support WorkLog — Buy me a coffee">☕</a>
+
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+// ── Theme ──────────────────────────────────────────────────────────────────────
+(function() {
+  const t = localStorage.getItem('gk_theme') || 'light';
+  document.documentElement.dataset.theme = t;
+})();
+function gkToggleTheme() {
+  const html = document.documentElement;
+  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  html.dataset.theme = next;
+  localStorage.setItem('gk_theme', next);
+}
+
+// ── Sidebar ────────────────────────────────────────────────────────────────────
+let _sbOpen = localStorage.getItem('gk_sb') !== 'closed';
+function gkToggleSidebar() {
+  _sbOpen = !_sbOpen;
+  localStorage.setItem('gk_sb', _sbOpen ? 'open' : 'closed');
+  document.getElementById('gkSidebar')?.classList.toggle('open', _sbOpen);
+  if (window.innerWidth <= 600) {
+    document.getElementById('gkSidebar')?.classList.toggle('mobile-open', _sbOpen);
   }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  if (_sbOpen && window.innerWidth > 600) {
+    document.getElementById('gkSidebar')?.classList.add('open');
+  }
+});
+
+// ── View toggle ────────────────────────────────────────────────────────────────
+let _listView = localStorage.getItem('gk_view') === 'list';
+function gkToggleView() {
+  _listView = !_listView;
+  localStorage.setItem('gk_view', _listView ? 'list' : 'grid');
+  _applyView();
+}
+function _applyView() {
+  document.querySelectorAll('.gk-grid').forEach(g => g.classList.toggle('list-view', _listView));
+  const icon = document.getElementById('gkViewIcon');
+  if (icon) icon.innerHTML = _listView
+    ? '<path d="M3 5h8v2H3zm0 4h8v2H3zm0 4h8v2H3zm10-8h8v2h-8zm0 4h8v2h-8zm0 4h8v2h-8z" fill="currentColor"/>'
+    : '<path d="M4 5h3v3H4zm0 5h3v3H4zm0 5h3v3H4zm5-10h11v3H9zm0 5h11v3H9zm0 5h11v3H9z" fill="currentColor"/>';
+}
+document.addEventListener('DOMContentLoaded', _applyView);
+
+// ── Search ─────────────────────────────────────────────────────────────────────
+function gkFilter(q) {
+  q = q.trim().toLowerCase();
+  const clear = document.getElementById('gkSearchClear');
+  if (clear) clear.style.display = q ? '' : 'none';
+  document.querySelectorAll('.gk-card').forEach(card => {
+    const text = (card.dataset.title + ' ' + card.dataset.content + ' ' + (card.dataset.type || '')).toLowerCase();
+    card.style.display = (!q || text.includes(q)) ? '' : 'none';
+  });
+  document.querySelectorAll('.gk-section-label').forEach(s => s.style.display = q ? 'none' : '');
+}
+function gkClearSearch() {
+  const inp = document.getElementById('gkSearchInput');
+  if (inp) { inp.value = ''; gkFilter(''); }
+}
+
+// ── Keyboard shortcuts overlay ─────────────────────────────────────────────────
+function gkShowKbd() { document.getElementById('gkKbdOv').style.display = 'flex'; }
+function gkHideKbd() { document.getElementById('gkKbdOv').style.display = 'none'; }
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+let _toastT;
+let _undoFn = null;
+function gkToast(msg, undoFn) {
+  const el  = document.getElementById('gkToast');
+  const msg_el = document.getElementById('gkToastMsg');
+  const undo_el = document.getElementById('gkToastUndo');
+  if (!el) return;
+  msg_el.textContent = msg;
+  _undoFn = undoFn || null;
+  if (undo_el) undo_el.style.display = undoFn ? '' : 'none';
+  el.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => { el.classList.remove('show'); _undoFn = null; }, 3500);
+}
+function gkUndoLast() {
+  if (_undoFn) { _undoFn(); _undoFn = null; document.getElementById('gkToast')?.classList.remove('show'); }
+}
+
+// ── Global API helper ──────────────────────────────────────────────────────────
+async function gkPost(url, data) {
+  const r = await fetch(url, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) throw new Error(r.status);
+  return r.text().then(t => t ? JSON.parse(t) : null).catch(() => null);
+}
+
+// ── Color picker state ─────────────────────────────────────────────────────────
+let _cpContext  = null; // 'modal' or note id
+let _cpCallback = null;
+function gkShowColorPicker(context, anchorEl) {
+  _cpContext = context;
+  const cp = document.getElementById('gkColorPicker');
+  if (!cp) return;
+  // highlight active color
+  const note = context === 'modal' ? _gkModalNote() : _noteById(context);
+  const color = note?.dataset?.color || 'default';
+  cp.querySelectorAll('.gk-color-swatch').forEach(s =>
+    s.classList.toggle('active', s.dataset.color === color));
+  if (anchorEl) {
+    const r = anchorEl.getBoundingClientRect();
+    cp.style.top  = (r.bottom + 6 + window.scrollY) + 'px';
+    cp.style.left = r.left + 'px';
+    cp.style.position = 'fixed';
+    cp.style.top  = (r.bottom + 6) + 'px';
+  }
+  cp.style.display = 'flex';
+  setTimeout(() => document.addEventListener('click', _cpOutside, { once: true }), 10);
+}
+function _cpOutside(e) {
+  const cp = document.getElementById('gkColorPicker');
+  if (cp && !cp.contains(e.target)) cp.style.display = 'none';
+}
+function gkApplyColor(color) {
+  document.getElementById('gkColorPicker').style.display = 'none';
+  if (_cpContext === 'modal') {
+    gkModalSetColor(color);
+  } else if (_cpContext) {
+    _updateCardColor(_cpContext, color);
+  }
+}
+function _updateCardColor(noteId, color) {
+  const card = document.getElementById('gnc-' + noteId);
+  if (card) {
+    const oldColor = card.dataset.color || 'default';
+    card.className = card.className.replace(/\bnc-\S+/g, '').trim() + ' nc-' + color;
+    card.dataset.color = color;
+    const modal = document.getElementById('gkModal');
+    if (modal && modal.dataset.noteId == noteId) {
+      modal.className = modal.className.replace(/\bnc-\S+/g, '').trim() + ' nc-' + color;
+    }
+  }
+  gkPost('/Notes/Update', { id: parseInt(noteId), color });
+}
+
+// ── Global keyboard shortcuts ──────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement?.tagName;
+  const inInput = ['INPUT','TEXTAREA'].includes(tag) || document.activeElement?.isContentEditable;
+  if (e.key === 'Escape') {
+    gkCloseModal(); gkHideKbd();
+    if (typeof gkCreatorClose === 'function') gkCreatorClose();
+    return;
+  }
+  if (e.ctrlKey && e.key === '/') { e.preventDefault(); gkShowKbd(); return; }
+  if (e.ctrlKey && e.key === 'd') { e.preventDefault(); gkToggleTheme(); return; }
+  if (e.ctrlKey && e.key === 'g') { e.preventDefault(); gkToggleView(); return; }
+  if (e.ctrlKey && e.key === 'f') { e.preventDefault(); document.getElementById('gkSearchInput')?.focus(); return; }
+  if (!inInput) {
+    if (e.key === 'n') { e.preventDefault(); if (typeof gkOpenCreator === 'function') gkOpenCreator('note'); return; }
+    if (e.key === 'l') { e.preventDefault(); if (typeof gkOpenCreator === 'function') gkOpenCreator('list'); return; }
+  }
+});
+
+// ── Stubs (overridden per-page) ────────────────────────────────────────────────
+function gkCloseModal() {}
+function _gkModalNote() { return null; }
+function _noteById(id) { return document.getElementById('gnc-' + id); }
 </script>
 </body>
 </html>

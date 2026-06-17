@@ -34,12 +34,6 @@ public class WorkLogController(AppDbContext db, OllamaService ai) : Controller
                                 .Distinct().OrderBy(p => p).Take(20).ToListAsync();
         ViewBag.Section    = "worklog";
 
-        var notes = await db.Notes.Include(n => n.ChecklistItems)
-            .Where(n => n.UserId == uid && !n.IsArchived && !n.IsDeleted)
-            .OrderByDescending(n => n.IsPinned).ThenByDescending(n => n.UpdatedAt)
-            .Take(50).ToListAsync();
-        ViewBag.Notes = notes;
-
         return View(entries);
     }
 

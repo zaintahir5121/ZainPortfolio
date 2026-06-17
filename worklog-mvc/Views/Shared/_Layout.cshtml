@@ -19,12 +19,8 @@
 
 @if (User.Identity?.IsAuthenticated == true)
 {
-  var section = ViewBag.Section as string ?? "notes";
   <!-- ── Top bar ── -->
-  <header class="gk-topbar">
-    <button class="gk-icon-btn" id="gkMenuBtn" onclick="gkToggleSidebar()" title="Main menu" aria-label="Main menu">
-      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor"/></svg>
-    </button>
+  <header class="sp-bar">
     <a href="/WorkLog" class="gk-logo" title="worklog.">
       <svg width="28" height="28" viewBox="0 0 500 500">
         <rect width="500" height="500" rx="10" fill="#6366f1"/>
@@ -33,31 +29,16 @@
       <span class="gk-logo-text">worklog<em>.</em></span>
     </a>
 
-    <div class="gk-search" id="gkSearchBox">
-      <button class="gk-icon-btn" style="color:var(--text2)" aria-label="Search">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
-      </button>
-      <input type="text" id="gkSearchInput" class="gk-search-input" placeholder="Search your notes"
-             autocomplete="off" oninput="gkFilter(this.value)"
-             onkeydown="if(event.key==='Escape'){gkClearSearch();this.blur();}">
-      <button class="gk-icon-btn gk-search-clear" id="gkSearchClear" style="display:none" onclick="gkClearSearch()" aria-label="Clear search">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
-      </button>
-    </div>
+    <div class="sp-bar-spacer"></div>
 
-    <div class="gk-topbar-spacer"></div>
-
-    <button class="gk-icon-btn" id="gkViewBtn" onclick="gkToggleView()" title="Toggle list view">
-      <svg width="20" height="20" viewBox="0 0 24 24" id="gkViewIcon"><path d="M4 5h3v3H4zm0 5h3v3H4zm0 5h3v3H4zm5-10h11v3H9zm0 5h11v3H9zm0 5h11v3H9z" fill="currentColor"/></svg>
+    <button class="gk-icon-btn sp-ai-btn" onclick="gkAiOpen()" title="AI Assistant (Ctrl+K)">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M9 21h6v-1H9v1zm3-19C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm1 14h-2v-1h2v1zm0-3h-2c-.55 0-1-.45-1-1v-2.59l-1.29-1.3 1.41-1.41 1.17 1.17c.18.08.38.13.59.13h.12c.21 0 .41-.05.59-.13l1.17-1.17 1.41 1.41L14 11.41V13c0 .55-.45 1-1 1z" fill="currentColor"/></svg>
     </button>
-    <button class="gk-icon-btn" id="gkThemeBtn" onclick="gkToggleTheme()" title="Toggle dark mode">
+    <button class="gk-icon-btn" onclick="gkToggleTheme()" title="Toggle dark mode">
       <svg width="20" height="20" viewBox="0 0 24 24" id="gkThemeIcon"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z" fill="currentColor"/></svg>
     </button>
     <button class="gk-icon-btn" onclick="gkShowKbd()" title="Keyboard shortcuts (Ctrl+/)">
       <svg width="18" height="18" viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 5H5v-2h2v2zm9 0H8v-2h8v2zm0-3h-2v-2h2v2zm0-3h-2V8h2v2zm3 6h-2v-2h2v2zm0-3h-2v-2h2v2zm0-3h-2V8h2v2z" fill="currentColor"/></svg>
-    </button>
-    <button class="gk-icon-btn gk-ai-topbtn" onclick="gkAiOpen()" title="AI Assistant (Ctrl+K)">
-      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm1 14h-2v-1h2v1zm0-3h-2c-.55 0-1-.45-1-1V9.41l-1.29-1.3 1.41-1.41 1.17 1.17c.18.08.38.13.59.13h.12c.21 0 .41-.05.59-.13l1.17-1.17 1.41 1.41L14 9.41V12c0 .55-.45 1-1 1z" fill="none"/><path d="M9 21h6v-1H9v1zm3-19C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm1 14h-2v-1h2v1zm0-3h-2c-.55 0-1-.45-1-1v-2.59l-1.29-1.3 1.41-1.41 1.17 1.17c.18.08.38.13.59.13h.12c.21 0 .41-.05.59-.13l1.17-1.17 1.41 1.41L14 11.41V13c0 .55-.45 1-1 1z" fill="currentColor"/></svg>
     </button>
 
     <div class="gk-avatar" onclick="this.classList.toggle('open')">
@@ -81,70 +62,9 @@
     </div>
   </header>
 
-  <div class="gk-layout">
-    <!-- Sidebar -->
-    <aside class="gk-sidebar" id="gkSidebar">
-      <nav>
-        <div class="gk-nav-section-label">Work Log</div>
-        <a asp-controller="WorkLog" asp-action="Index" class="gk-nav-item @(section == "worklog" ? "active" : "")">
-          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z" fill="currentColor"/>
-          </svg>
-          <span class="gk-nav-label">Daily Log</span>
-        </a>
-        <a asp-controller="WorkLog" asp-action="Timesheet" class="gk-nav-item @(section == "timesheet" ? "active" : "")">
-          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
-          </svg>
-          <span class="gk-nav-label">Timesheet</span>
-        </a>
-        <div class="gk-nav-sep"></div>
-        <div class="gk-nav-section-label">Notes</div>
-        <a asp-controller="Notes" asp-action="Index" class="gk-nav-item @(section == "notes" ? "active" : "")">
-          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z" fill="currentColor"/>
-          </svg>
-          <span class="gk-nav-label">All Notes</span>
-        </a>
-        <a asp-controller="Notes" asp-action="Archive" class="gk-nav-item @(section == "archive" ? "active" : "")">
-          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z" fill="currentColor"/>
-          </svg>
-          <span class="gk-nav-label">Archive</span>
-        </a>
-        <a asp-controller="Notes" asp-action="Trash" class="gk-nav-item @(section == "trash" ? "active" : "")">
-          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M15 4V3H9v1H4v2h1l1 13c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2l1-13h1V4h-5zm2 15H7l-1-13h10l-1 13z" fill="currentColor"/>
-          </svg>
-          <span class="gk-nav-label">Trash</span>
-        </a>
-        <div class="gk-nav-sep"></div>
-        <button type="button" class="gk-nav-item gk-nav-ai-btn" onclick="gkAiOpen()">
-          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 13.5l-4-2.5 4-2.5v5z" fill="currentColor"/>
-          </svg>
-          <span class="gk-nav-label">AI Assistant ✨</span>
-        </button>
-        <button type="button" class="gk-nav-item" onclick="gkAiDailySummary()">
-          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8zm0-4h8v2H8z" fill="currentColor"/>
-          </svg>
-          <span class="gk-nav-label">Daily Digest</span>
-        </button>
-        <button type="button" class="gk-nav-item" onclick="gkAiStandup()">
-          <svg class="gk-nav-ico" width="20" height="20" viewBox="0 0 24 24">
-            <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z" fill="currentColor"/>
-          </svg>
-          <span class="gk-nav-label">Today's Standup</span>
-        </button>
-      </nav>
-    </aside>
-
-    <!-- Main -->
-    <main class="gk-content" id="gkContent">
-      @RenderBody()
-    </main>
-  </div>
+  <main class="sp-main" id="spMain">
+    @RenderBody()
+  </main>
 
   <!-- Color picker (shared, moved around by JS) -->
   <div class="gk-colors" id="gkColorPicker" style="display:none">
@@ -190,11 +110,9 @@
       <div class="gk-kbd-grid">
         <div class="gk-kbd-row"><span class="gk-kbd-desc">New note</span><div class="gk-kbd-keys"><kbd>N</kbd></div></div>
         <div class="gk-kbd-row"><span class="gk-kbd-desc">New checklist</span><div class="gk-kbd-keys"><kbd>L</kbd></div></div>
-        <div class="gk-kbd-row"><span class="gk-kbd-desc">Search</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>F</kbd></div></div>
         <div class="gk-kbd-row"><span class="gk-kbd-desc">Close / cancel</span><div class="gk-kbd-keys"><kbd>Esc</kbd></div></div>
         <div class="gk-kbd-row"><span class="gk-kbd-desc">Save note</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>Enter</kbd></div></div>
         <div class="gk-kbd-row"><span class="gk-kbd-desc">Toggle dark mode</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>D</kbd></div></div>
-        <div class="gk-kbd-row"><span class="gk-kbd-desc">Toggle view</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>G</kbd></div></div>
         <div class="gk-kbd-row"><span class="gk-kbd-desc">AI Assistant</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>K</kbd></div></div>
         <div class="gk-kbd-row"><span class="gk-kbd-desc">Shortcuts</span><div class="gk-kbd-keys"><kbd>Ctrl</kbd><kbd>/</kbd></div></div>
       </div>
@@ -283,51 +201,19 @@ function gkToggleTheme() {
   localStorage.setItem('gk_theme', next);
 }
 
-// ── Sidebar ────────────────────────────────────────────────────────────────────
-let _sbOpen = localStorage.getItem('gk_sb') !== 'closed';
-function gkToggleSidebar() {
-  _sbOpen = !_sbOpen;
-  localStorage.setItem('gk_sb', _sbOpen ? 'open' : 'closed');
-  document.getElementById('gkSidebar')?.classList.toggle('open', _sbOpen);
-  if (window.innerWidth <= 600) {
-    document.getElementById('gkSidebar')?.classList.toggle('mobile-open', _sbOpen);
-  }
-}
-document.addEventListener('DOMContentLoaded', () => {
-  if (_sbOpen && window.innerWidth > 600) {
-    document.getElementById('gkSidebar')?.classList.add('open');
-  }
-});
-
-// ── View toggle ────────────────────────────────────────────────────────────────
-let _listView = localStorage.getItem('gk_view') === 'list';
-function gkToggleView() {
-  _listView = !_listView;
-  localStorage.setItem('gk_view', _listView ? 'list' : 'grid');
-  _applyView();
-}
-function _applyView() {
-  document.querySelectorAll('.gk-grid').forEach(g => g.classList.toggle('list-view', _listView));
-  const icon = document.getElementById('gkViewIcon');
-  if (icon) icon.innerHTML = _listView
-    ? '<path d="M3 5h8v2H3zm0 4h8v2H3zm0 4h8v2H3zm10-8h8v2h-8zm0 4h8v2h-8zm0 4h8v2h-8z" fill="currentColor"/>'
-    : '<path d="M4 5h3v3H4zm0 5h3v3H4zm0 5h3v3H4zm5-10h11v3H9zm0 5h11v3H9zm0 5h11v3H9z" fill="currentColor"/>';
-}
-document.addEventListener('DOMContentLoaded', _applyView);
-
-// ── Search ─────────────────────────────────────────────────────────────────────
+// ── Search filter (for notes tab) ─────────────────────────────────────────────
 function gkFilter(q) {
   q = q.trim().toLowerCase();
-  const clear = document.getElementById('gkSearchClear');
+  var clear = document.getElementById('gkSearchClear');
   if (clear) clear.style.display = q ? '' : 'none';
-  document.querySelectorAll('.gk-card').forEach(card => {
-    const text = (card.dataset.title + ' ' + card.dataset.content + ' ' + (card.dataset.type || '')).toLowerCase();
+  document.querySelectorAll('.gk-card').forEach(function(card) {
+    var text = (card.dataset.title + ' ' + card.dataset.content + ' ' + (card.dataset.type || '')).toLowerCase();
     card.style.display = (!q || text.includes(q)) ? '' : 'none';
   });
-  document.querySelectorAll('.gk-section-label').forEach(s => s.style.display = q ? 'none' : '');
+  document.querySelectorAll('.gk-section-label').forEach(function(s) { s.style.display = q ? 'none' : ''; });
 }
 function gkClearSearch() {
-  const inp = document.getElementById('gkSearchInput');
+  var inp = document.getElementById('gkSearchInput');
   if (inp) { inp.value = ''; gkFilter(''); }
 }
 
@@ -336,19 +222,19 @@ function gkShowKbd() { document.getElementById('gkKbdOv').style.display = 'flex'
 function gkHideKbd() { document.getElementById('gkKbdOv').style.display = 'none'; }
 
 // ── Toast ──────────────────────────────────────────────────────────────────────
-let _toastT;
-let _undoFn = null;
+var _toastT;
+var _undoFn = null;
 function gkToast(msg, undoFn) {
-  const el  = document.getElementById('gkToast');
-  const msg_el = document.getElementById('gkToastMsg');
-  const undo_el = document.getElementById('gkToastUndo');
+  var el  = document.getElementById('gkToast');
+  var msg_el = document.getElementById('gkToastMsg');
+  var undo_el = document.getElementById('gkToastUndo');
   if (!el) return;
   msg_el.textContent = msg;
   _undoFn = undoFn || null;
   if (undo_el) undo_el.style.display = undoFn ? '' : 'none';
   el.classList.add('show');
   clearTimeout(_toastT);
-  _toastT = setTimeout(() => { el.classList.remove('show'); _undoFn = null; }, 3500);
+  _toastT = setTimeout(function() { el.classList.remove('show'); _undoFn = null; }, 3500);
 }
 function gkUndoLast() {
   if (_undoFn) { _undoFn(); _undoFn = null; document.getElementById('gkToast')?.classList.remove('show'); }
@@ -365,29 +251,28 @@ async function gkPost(url, data) {
 }
 
 // ── Color picker state ─────────────────────────────────────────────────────────
-let _cpContext  = null; // 'modal' or note id
-let _cpCallback = null;
+var _cpContext  = null;
+var _cpCallback = null;
 function gkShowColorPicker(context, anchorEl) {
   _cpContext = context;
-  const cp = document.getElementById('gkColorPicker');
+  var cp = document.getElementById('gkColorPicker');
   if (!cp) return;
-  // highlight active color
-  const note = context === 'modal' ? _gkModalNote() : _noteById(context);
-  const color = note?.dataset?.color || 'default';
-  cp.querySelectorAll('.gk-color-swatch').forEach(s =>
-    s.classList.toggle('active', s.dataset.color === color));
+  var note = context === 'modal' ? _gkModalNote() : _noteById(context);
+  var color = note?.dataset?.color || 'default';
+  cp.querySelectorAll('.gk-color-swatch').forEach(function(s) {
+    s.classList.toggle('active', s.dataset.color === color);
+  });
   if (anchorEl) {
-    const r = anchorEl.getBoundingClientRect();
-    cp.style.top  = (r.bottom + 6 + window.scrollY) + 'px';
-    cp.style.left = r.left + 'px';
+    var r = anchorEl.getBoundingClientRect();
     cp.style.position = 'fixed';
     cp.style.top  = (r.bottom + 6) + 'px';
+    cp.style.left = r.left + 'px';
   }
   cp.style.display = 'flex';
-  setTimeout(() => document.addEventListener('click', _cpOutside, { once: true }), 10);
+  setTimeout(function() { document.addEventListener('click', _cpOutside, { once: true }); }, 10);
 }
 function _cpOutside(e) {
-  const cp = document.getElementById('gkColorPicker');
+  var cp = document.getElementById('gkColorPicker');
   if (cp && !cp.contains(e.target)) cp.style.display = 'none';
 }
 function gkApplyColor(color) {
@@ -399,12 +284,11 @@ function gkApplyColor(color) {
   }
 }
 function _updateCardColor(noteId, color) {
-  const card = document.getElementById('gnc-' + noteId);
+  var card = document.getElementById('gnc-' + noteId);
   if (card) {
-    const oldColor = card.dataset.color || 'default';
     card.className = card.className.replace(/\bnc-\S+/g, '').trim() + ' nc-' + color;
     card.dataset.color = color;
-    const modal = document.getElementById('gkModal');
+    var modal = document.getElementById('gkModal');
     if (modal && modal.dataset.noteId == noteId) {
       modal.className = modal.className.replace(/\bnc-\S+/g, '').trim() + ' nc-' + color;
     }
@@ -413,9 +297,9 @@ function _updateCardColor(noteId, color) {
 }
 
 // ── Global keyboard shortcuts ──────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  const tag = document.activeElement?.tagName;
-  const inInput = ['INPUT','TEXTAREA'].includes(tag) || document.activeElement?.isContentEditable;
+document.addEventListener('keydown', function(e) {
+  var tag = document.activeElement?.tagName;
+  var inInput = ['INPUT','TEXTAREA'].includes(tag) || document.activeElement?.isContentEditable;
   if (e.key === 'Escape') {
     gkCloseModal(); gkHideKbd();
     if (typeof gkCreatorClose === 'function') gkCreatorClose();
@@ -423,8 +307,6 @@ document.addEventListener('keydown', e => {
   }
   if (e.ctrlKey && e.key === '/') { e.preventDefault(); gkShowKbd(); return; }
   if (e.ctrlKey && e.key === 'd') { e.preventDefault(); gkToggleTheme(); return; }
-  if (e.ctrlKey && e.key === 'g') { e.preventDefault(); gkToggleView(); return; }
-  if (e.ctrlKey && e.key === 'f') { e.preventDefault(); document.getElementById('gkSearchInput')?.focus(); return; }
   if (e.ctrlKey && e.key === 'k') { e.preventDefault(); gkAiOpen(); return; }
   if (!inInput) {
     if (e.key === 'n') { e.preventDefault(); if (typeof gkOpenCreator === 'function') gkOpenCreator('note'); return; }
@@ -445,7 +327,7 @@ function gkAiOpen() {
   _aiOpen = true;
   document.getElementById('gkAiPane')?.classList.add('open');
   document.getElementById('gkAiFab')?.classList.add('hidden');
-  setTimeout(() => document.getElementById('gkAiInput')?.focus(), 250);
+  setTimeout(function() { document.getElementById('gkAiInput')?.focus(); }, 250);
 }
 function gkAiClose() {
   _aiOpen = false;
@@ -561,7 +443,7 @@ async function gkModalPolish() {
   }
 }
 
-// Simple markdown → HTML (bold, italic, bullets, headers, line breaks)
+// Simple markdown → HTML
 function _aiMd(text) {
   if (!text) return '';
   return text

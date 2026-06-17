@@ -33,6 +33,13 @@ public class WorkLogController(AppDbContext db, OllamaService ai) : Controller
                                 .Select(t => t.Project!)
                                 .Distinct().OrderBy(p => p).Take(20).ToListAsync();
         ViewBag.Section    = "worklog";
+
+        var notes = await db.Notes.Include(n => n.ChecklistItems)
+            .Where(n => n.UserId == uid && !n.IsArchived && !n.IsDeleted)
+            .OrderByDescending(n => n.IsPinned).ThenByDescending(n => n.UpdatedAt)
+            .Take(50).ToListAsync();
+        ViewBag.Notes = notes;
+
         return View(entries);
     }
 
@@ -55,6 +62,62 @@ public class WorkLogController(AppDbContext db, OllamaService ai) : Controller
         ViewBag.WeekOffset = weekOffset;
         ViewBag.Section    = "timesheet";
         return View(tasks);
+    }
+
+    public async Task<IActionResult> TimesheetJson(int weekOffset = 0)
+    {
+        var uid = Uid;
+        var today = DateTime.UtcNow.Date;
+        int dow = (int)today.DayOfWeek;
+        var weekStart = today.AddDays(dow == 0 ? -6 : -(dow - 1)).AddDays(weekOffset * 7);
+        var weekEnd   = weekStart.AddDays(6);
+
+        var tasks = await db.WorkTasks.Include(t => t.WorkEntry)
+            .Where(t => t.WorkEntry.UserId == uid
+                     && t.WorkEntry.LogDate >= weekStart
+                     && t.WorkEntry.LogDate <= weekEnd)
+            .ToListAsync();
+
+        var days = Enumerable.Range(0, 7).Select(i => weekStart.AddDays(i)).ToList();
+
+        var byProject = tasks
+            .GroupBy(t => t.Project ?? "(no project)")
+            .OrderBy(g => g.Key)
+            .Select(g => new {
+                name  = g.Key,
+                total = (double)g.Sum(t => t.Hours),
+                hours = days.ToDictionary(
+                    d => d.ToString("yyyy-MM-dd"),
+                    d => (double)g.Where(t => t.WorkEntry.LogDate.Date == d.Date).Sum(t => t.Hours))
+            })
+            .ToList();
+
+        var dayTotals = days.ToDictionary(
+            d => d.ToString("yyyy-MM-dd"),
+            d => (double)tasks.Where(t => t.WorkEntry.LogDate.Date == d.Date).Sum(t => t.Hours));
+
+        var grandTotal = tasks.Sum(t => (double)t.Hours);
+
+        // Build export text
+        var ordered = tasks.OrderBy(t => t.WorkEntry.LogDate).ThenBy(t => t.SortOrder).ToList();
+        var jiraLines  = ordered.Select(t => (t.Project != null ? "[" + t.Project + "] " : "") + t.Description + " - " + t.Hours + "h");
+        var slackLines = ordered.Select(t => "• " + t.Description + " (" + t.Hours + "h)" + (t.Project != null ? " [" + t.Project + "]" : ""));
+
+        return Json(new {
+            weekStart  = weekStart.ToString("MMM d"),
+            weekEnd    = weekEnd.ToString("MMM d, yyyy"),
+            weekOffset = weekOffset,
+            days       = days.Select(d => new {
+                date  = d.ToString("yyyy-MM-dd"),
+                label = d.ToString("ddd"),
+                @short = d.ToString("M/d")
+            }),
+            byProject  = byProject,
+            dayTotals  = dayTotals,
+            grandTotal = grandTotal,
+            jiraText   = string.Join("\n", jiraLines),
+            slackText  = "*This week:*\n" + string.Join("\n", slackLines)
+        });
     }
 
     [HttpPost]

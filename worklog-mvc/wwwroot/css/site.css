@@ -417,6 +417,25 @@ body {
 @keyframes cardOut { to { opacity: 0; transform: scale(.9); } }
 .gk-card-removing { animation: cardOut .18s forwards; }
 
+/* === DATE PICKER === */
+.wl-date-inp { border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 12.5px; font-weight: 500; color: var(--text2); background: var(--bg); font-family: inherit; outline: none; cursor: pointer; transition: border-color .15s, color .15s; flex-shrink: 0; }
+.wl-date-inp:hover, .wl-date-inp:focus { border-color: var(--accent); color: var(--text); }
+.wl-date-inp::-webkit-calendar-picker-indicator { opacity: .5; cursor: pointer; }
+[data-theme="dark"] .wl-date-inp { color-scheme: dark; }
+
+/* === PROJECT FILTER === */
+.wl-filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+.wl-filter-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text2); flex-shrink: 0; }
+.wl-filter-pill { padding: 4px 14px; border-radius: 99px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text2); font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
+.wl-filter-pill:hover { border-color: var(--accent); color: var(--accent); background: rgba(99,102,241,.06); }
+.wl-filter-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.25); }
+
+/* === INLINE TASK EDIT === */
+.wl-entry:hover .wl-task-desc { cursor: pointer; text-decoration: underline; text-decoration-style: dashed; text-underline-offset: 3px; text-decoration-color: rgba(100,116,139,.5); }
+.wl-entry:hover .wl-task-hours { cursor: pointer; }
+.wl-task-inp { border: 1.5px solid var(--accent); border-radius: 6px; padding: 2px 8px; font-size: 13px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; box-shadow: 0 0 0 3px var(--accent-glow); }
+.wl-task-inp-hours { width: 64px; text-align: center; }
+
 /* === RESPONSIVE === */
 @media (max-width: 900px) { .gk-grid { columns: 3 160px; } }
 @media (min-width: 640px) { .sp-standup-label { display: inline; } }

@@ -276,6 +276,9 @@ document.addEventListener('keydown', function(e) {
   if (e.ctrlKey && e.key === 'd') { e.preventDefault(); gkToggleTheme(); }
   if (e.key === 'Escape') { standupClose(); }
   if (e.ctrlKey && e.key === 'k') { e.preventDefault(); document.getElementById('gkSearchInput')?.focus(); }
+  if (e.ctrlKey && e.key === '1') { e.preventDefault(); document.querySelector('[data-tab="worklog"]')?.click(); }
+  if (e.ctrlKey && e.key === '2') { e.preventDefault(); document.querySelector('[data-tab="notes"]')?.click(); }
+  if (e.ctrlKey && e.key === '3') { e.preventDefault(); document.querySelector('[data-tab="timesheet"]')?.click(); }
 });
 </script>
 </body>

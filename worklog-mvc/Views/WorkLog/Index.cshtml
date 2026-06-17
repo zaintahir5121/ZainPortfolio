@@ -101,8 +101,24 @@
     <div class="wl-creator-sep"></div>
     <div class="wl-creator-foot">
       <span class="wl-hint">Press <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0 5px;font-size:11px">Enter</kbd> to log &nbsp;·&nbsp; <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0 5px;font-size:11px">Shift+Enter</kbd> for new line</span>
+      <input type="date" id="wlDate" class="wl-date-inp"
+             value="@DateTime.UtcNow.Date.ToString("yyyy-MM-dd")"
+             max="@DateTime.UtcNow.Date.ToString("yyyy-MM-dd")"
+             title="Log for date">
     </div>
   </div>
+
+  <!-- Project filter pills -->
+  @{ var wlProjects = ViewBag.Projects as List<string> ?? new List<string>(); }
+  @if (wlProjects.Any()) {
+  <div class="wl-filter-bar" id="wlFilterBar">
+    <span class="wl-filter-lbl">Filter:</span>
+    <button class="wl-filter-pill active" data-project="" onclick="wlFilter(this,'')">All</button>
+    @foreach (var p in wlProjects) {
+      <button class="wl-filter-pill" data-project="@p" onclick="wlFilter(this,'@p')">@p</button>
+    }
+  </div>
+  }
 
   <!-- Entries -->
   <div class="wl-entries" id="wlEntriesList">
@@ -137,8 +153,8 @@
                   @foreach (var task in entry.Tasks.OrderBy(t => t.SortOrder)) {
                     <div class="wl-task wl-cat-@task.Category">
                       <span class="wl-task-dot"></span>
-                      <span class="wl-task-desc">@task.Description</span>
-                      @if (task.Hours > 0) { <span class="wl-task-hours">@task.Hours.ToString("G3")h</span> }
+                      <span class="wl-task-desc" onclick="wlEditDesc(@task.Id,this)" title="Click to edit">@task.Description</span>
+                      @if (task.Hours > 0) { <span class="wl-task-hours" onclick="wlEditHours(@task.Id,this)" title="Click to edit hours">@task.Hours.ToString("G3")h</span> }
                       @if (!string.IsNullOrEmpty(task.Project)) { <span class="wl-task-proj">@task.Project</span> }
                     </div>
                   }
@@ -326,7 +342,7 @@ async function wlSubmit() {
   if (bar) bar.style.display = 'flex';
   inp.disabled = true;
   try {
-    var data = await gkPost('/WorkLog/Log', { text: text, date: null });
+    var data = await gkPost('/WorkLog/Log', { text: text, date: document.getElementById('wlDate')?.value || null });
     inp.value = '';
     inp.disabled = false;
     if (bar) bar.style.display = 'none';
@@ -349,10 +365,10 @@ function wlBuildEntryHtml(d) {
   if (d.isAiParsed && d.tasks && d.tasks.length > 0) {
     tasksHtml = '<div class="wl-entry-tasks">';
     d.tasks.forEach(function(t) {
-      var hrs = t.hours > 0 ? '<span class="wl-task-hours">' + t.hours + 'h</span>' : '';
+      var hrs = t.hours > 0 ? '<span class="wl-task-hours" onclick="wlEditHours(' + t.id + ',this)" title="Click to edit hours">' + t.hours + 'h</span>' : '';
       var prj = t.project ? '<span class="wl-task-proj">' + _esc(t.project) + '</span>' : '';
       tasksHtml += '<div class="wl-task wl-cat-' + (t.category || 'general') + '"><span class="wl-task-dot"></span>'
-        + '<span class="wl-task-desc">' + _esc(t.description) + '</span>' + hrs + prj + '</div>';
+        + '<span class="wl-task-desc" onclick="wlEditDesc(' + t.id + ',this)" title="Click to edit">' + _esc(t.description) + '</span>' + hrs + prj + '</div>';
     });
     tasksHtml += '</div>';
   }
@@ -423,6 +439,57 @@ async function wlDeleteEntry(id) {
     el.classList.remove('wl-entry-removing');
     gkToast('Failed to delete');
   }
+}
+
+function wlFilter(btn, proj) {
+  document.querySelectorAll('.wl-filter-pill').forEach(function(b) { b.classList.toggle('active', b.dataset.project === proj); });
+  document.querySelectorAll('.wl-entry').forEach(function(el) {
+    if (!proj) { el.style.display = ''; return; }
+    var projEl = el.querySelector('.wl-task-proj');
+    el.style.display = (projEl && projEl.textContent.trim() === proj) ? '' : 'none';
+  });
+  document.querySelectorAll('.wl-day-group').forEach(function(g) {
+    var hasVisible = Array.from(g.querySelectorAll('.wl-entry')).some(function(e) { return e.style.display !== 'none'; });
+    g.style.display = hasVisible ? '' : 'none';
+  });
+}
+
+function wlEditDesc(id, el) {
+  if (el.querySelector('input')) return;
+  var orig = el.textContent;
+  var inp = document.createElement('input');
+  inp.type = 'text'; inp.value = orig; inp.className = 'wl-task-inp';
+  el.innerHTML = ''; el.appendChild(inp); inp.focus(); inp.select();
+  function save() {
+    var val = inp.value.trim() || orig;
+    el.textContent = val;
+    if (val !== orig) gkPost('/WorkLog/UpdateTask', { id: id, description: val }).catch(function() { el.textContent = orig; gkToast('Failed'); });
+  }
+  inp.onblur = save;
+  inp.onkeydown = function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+    if (e.key === 'Escape') { el.textContent = orig; }
+  };
+}
+
+function wlEditHours(id, el) {
+  if (el.querySelector('input')) return;
+  var orig = parseFloat(el.textContent);
+  var inp = document.createElement('input');
+  inp.type = 'number'; inp.value = orig; inp.min = '0'; inp.max = '24'; inp.step = '0.25';
+  inp.className = 'wl-task-inp wl-task-inp-hours';
+  el.innerHTML = ''; el.appendChild(inp); inp.focus(); inp.select();
+  function save() {
+    var val = parseFloat(inp.value);
+    if (isNaN(val) || val < 0) val = orig;
+    el.textContent = val.toFixed(2).replace(/\.?0+$/, '') + 'h';
+    if (val !== orig) gkPost('/WorkLog/UpdateTask', { id: id, hours: val }).catch(function() { el.textContent = orig + 'h'; gkToast('Failed'); });
+  }
+  inp.onblur = save;
+  inp.onkeydown = function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+    if (e.key === 'Escape') { el.textContent = orig + 'h'; }
+  };
 }
 
 // ════════════════════════════════════════════════════════════════

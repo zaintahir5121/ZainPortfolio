@@ -40,6 +40,13 @@
       </div>
     </div>
 
+    <!-- Jump links -->
+    <nav class="hd-jumps">
+      <a class="hd-jump" href="#section-worklog" onclick="document.getElementById('section-worklog').scrollIntoView({behavior:'smooth'});return false;">Work Log</a>
+      <a class="hd-jump" href="#section-notes"   onclick="document.getElementById('section-notes').scrollIntoView({behavior:'smooth'});return false;">Notes</a>
+      <a class="hd-jump" href="#section-timesheet" onclick="document.getElementById('section-timesheet').scrollIntoView({behavior:'smooth'});return false;">Timesheet</a>
+    </nav>
+
     <div class="hd-spacer"></div>
 
     <button class="hd-standup-btn" onclick="standupOpen()" title="Generate AI standup">
@@ -77,22 +84,6 @@
       </div>
     </div>
   </header>
-
-  <!-- ── Section switcher ── -->
-  <div class="sec-switcher">
-    <button class="sec-tab" data-tab="worklog" onclick="spTab('worklog')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 20V10M18 20V4M6 20v-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-      Work Log
-    </button>
-    <button class="sec-tab" data-tab="notes" onclick="spTab('notes')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Notes
-    </button>
-    <button class="sec-tab" data-tab="timesheet" onclick="spTab('timesheet')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      Timesheet
-    </button>
-  </div>
 
   <!-- ── AI Standup Modal ── -->
   <div class="standup-ov" id="standupOv" style="display:none" onclick="if(event.target===this)standupClose()">
@@ -276,9 +267,9 @@ document.addEventListener('keydown', function(e) {
   if (e.ctrlKey && e.key === 'd') { e.preventDefault(); gkToggleTheme(); }
   if (e.key === 'Escape') { standupClose(); }
   if (e.ctrlKey && e.key === 'k') { e.preventDefault(); document.getElementById('gkSearchInput')?.focus(); }
-  if (e.ctrlKey && e.key === '1') { e.preventDefault(); spTab('worklog'); }
-  if (e.ctrlKey && e.key === '2') { e.preventDefault(); spTab('notes'); }
-  if (e.ctrlKey && e.key === '3') { e.preventDefault(); spTab('timesheet'); }
+  if (e.ctrlKey && e.key === '1') { e.preventDefault(); document.getElementById('section-worklog')?.scrollIntoView({ behavior: 'smooth' }); }
+  if (e.ctrlKey && e.key === '2') { e.preventDefault(); document.getElementById('section-notes')?.scrollIntoView({ behavior: 'smooth' }); }
+  if (e.ctrlKey && e.key === '3') { e.preventDefault(); document.getElementById('section-timesheet')?.scrollIntoView({ behavior: 'smooth' }); }
 });
 </script>
 </body>

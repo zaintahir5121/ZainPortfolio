@@ -133,6 +133,18 @@ body {
 
 .hd-spacer { flex: 1; }
 
+/* Jump nav — subtle anchor links in header */
+.hd-jumps { display: flex; align-items: center; gap: 2px; margin-left: 8px; }
+.hd-jump {
+  padding: 5px 11px; border-radius: 7px;
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,.35); text-decoration: none;
+  transition: background var(--trans), color var(--trans);
+  white-space: nowrap;
+}
+.hd-jump:hover { background: rgba(255,255,255,.07); color: rgba(255,255,255,.8); }
+@media (max-width: 680px) { .hd-jumps { display: none; } }
+
 /* Header icon button */
 .hd-btn {
   width: 36px; height: 36px; border-radius: 9px; border: none;
@@ -195,43 +207,6 @@ body {
 }
 .hd-avatar-item:hover { background: rgba(255,255,255,.07); color: rgba(255,255,255,.9); }
 
-/* ══════════════════════════════════════════════
-   SECTION SWITCHER — THE UNIQUE PART
-   ══════════════════════════════════════════════ */
-.sec-switcher {
-  display: flex; align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  background: rgba(10,10,18,.6);
-  gap: 2px;
-  overflow-x: auto;
-}
-.sec-tab {
-  display: flex; align-items: center; gap: 8px;
-  padding: 0 18px; height: 46px;
-  border: none; background: transparent;
-  color: var(--text2); font-size: 13.5px; font-weight: 500;
-  cursor: pointer; font-family: inherit;
-  position: relative; white-space: nowrap;
-  transition: color var(--trans);
-  flex-shrink: 0;
-}
-.sec-tab::after {
-  content: ''; position: absolute;
-  bottom: 0; left: 18px; right: 18px; height: 2px;
-  background: var(--accent); border-radius: 2px 2px 0 0;
-  transform: scaleX(0); transition: transform .2s cubic-bezier(.22,1,.36,1);
-}
-.sec-tab:hover { color: rgba(255,255,255,.8); }
-.sec-tab.active { color: #fff; font-weight: 600; }
-.sec-tab.active::after { transform: scaleX(1); }
-.sec-tab svg { opacity: .65; flex-shrink: 0; }
-.sec-tab.active svg { opacity: 1; color: var(--accent2); }
-.sec-tab-badge {
-  font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px;
-  background: var(--accent-bg); color: var(--accent2);
-  border: 1px solid rgba(139,92,246,.2);
-}
 
 /* ══════════════════════════════════════════════
    MAIN CONTENT
@@ -247,11 +222,21 @@ body {
 }
 
 /* ══════════════════════════════════════════════
-   PANELS
+   PAGE SECTIONS (no tabs — single scroll)
    ══════════════════════════════════════════════ */
-.sp-panel { display: none; }
-.sp-panel.active { display: block; animation: panelFade .18s ease; }
-@keyframes panelFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+.page-section {
+  margin-bottom: 56px;
+}
+.page-section-head {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .9px;
+  color: var(--text2);
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.page-section-head svg { opacity: .6; flex-shrink: 0; }
 
 /* ══════════════════════════════════════════════
    STATS ROW

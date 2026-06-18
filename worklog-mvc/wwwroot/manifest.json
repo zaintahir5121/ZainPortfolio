@@ -1,0 +1,46 @@
+{
+  "name": "worklog. — AI Work Log & Notes",
+  "short_name": "worklog.",
+  "description": "AI-powered work journal and notes. Log daily work, auto-generate timesheets, and export to Jira/Slack.",
+  "start_url": "/WorkLog",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "background_color": "#111827",
+  "theme_color": "#6366f1",
+  "orientation": "any",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    { "src": "/og-image.png", "sizes": "1200x630", "type": "image/png", "form_factor": "wide" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Daily Log",
+      "short_name": "Log",
+      "description": "Log your work",
+      "url": "/WorkLog",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Timesheet",
+      "short_name": "Timesheet",
+      "description": "Weekly timesheet",
+      "url": "/WorkLog/Timesheet",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Notes",
+      "short_name": "Notes",
+      "description": "Your notes board",
+      "url": "/Notes",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
+}

@@ -1,0 +1,25 @@
+# Build outputs
+bin/
+obj/
+
+# SQLite dev databases
+*.db
+*.db-shm
+*.db-wal
+
+# User secrets / local overrides
+**/appsettings.Local.json
+**/secrets.json
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code internal
+.claude/

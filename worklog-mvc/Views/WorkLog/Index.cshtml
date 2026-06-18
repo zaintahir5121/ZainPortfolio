@@ -1,0 +1,951 @@
+@model List<WorkLogApp.Models.WorkEntry>
+@using WorkLogApp.Models
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "worklog.";
+    var todayHours = (double)(ViewBag.TodayHours ?? 0);
+    var weekHours  = (double)(ViewBag.WeekHours  ?? 0);
+    var streak     = (int)(ViewBag.Streak ?? 0);
+    var today      = DateTime.UtcNow.Date;
+    var notes      = ViewBag.Notes as List<Note> ?? new List<Note>();
+
+    var grouped = Model.GroupBy(e => e.LogDate.Date)
+                       .OrderByDescending(g => g.Key)
+                       .ToList();
+
+    // Stats bar helpers
+    double todayBarPct = Math.Min(todayHours / 8.0 * 100, 100);
+    double weekBarPct  = Math.Min(weekHours  / 40.0 * 100, 100);
+    double streakBarPct = Math.Min(streak / 30.0 * 100, 100);
+
+    var pinnedNotes = notes.Where(n => n.IsPinned).ToList();
+    var otherNotes  = notes.Where(n => !n.IsPinned).ToList();
+}
+
+@section Styles {
+<style>
+  /* Inline icon-btn variant for light bg */
+  .gk-icon-btn-light {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: transparent; color: var(--text2); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--trans), color var(--trans);
+  }
+  .gk-icon-btn-light:hover { background: var(--surface2); color: var(--text); }
+  .gk-icon-btn-light svg { pointer-events: none; }
+
+  /* checklist input */
+  .gk-cl-checkbox { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
+  .gk-cl-text { flex: 1; border: none; outline: none; background: transparent; font-size: 14px; color: var(--text); font-family: inherit; }
+</style>
+}
+
+<!-- ── Stats bar ── -->
+<div class="wl-stats">
+  <div class="wl-stat">
+    <div class="wl-stat-icon today-icon">⏱️</div>
+    <div class="wl-stat-content">
+      <span class="wl-stat-val">@todayHours.ToString("F1")h</span>
+      <span class="wl-stat-lbl">Today</span>
+      <div class="wl-stat-bar"><div class="wl-stat-bar-fill" style="width:@todayBarPct.ToString("F1")%"></div></div>
+    </div>
+  </div>
+  <div class="wl-stat">
+    <div class="wl-stat-icon week-icon">📊</div>
+    <div class="wl-stat-content">
+      <span class="wl-stat-val">@weekHours.ToString("F1")h</span>
+      <span class="wl-stat-lbl">This Week</span>
+      <div class="wl-stat-bar"><div class="wl-stat-bar-fill" style="width:@weekBarPct.ToString("F1")%"></div></div>
+    </div>
+  </div>
+  <div class="wl-stat wl-streak">
+    <div class="wl-stat-icon streak-icon">🔥</div>
+    <div class="wl-stat-content">
+      <span class="wl-stat-val">@streak</span>
+      <span class="wl-stat-lbl">Day Streak</span>
+      <div class="wl-stat-bar"><div class="wl-stat-bar-fill" style="width:@streakBarPct.ToString("F1")%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION: WORK LOG
+     ══════════════════════════════════════ -->
+<div class="page-section" id="section-worklog">
+<div class="page-section-head">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20V10M18 20V4M6 20v-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+  Work Log
+</div>
+
+  <!-- Creator -->
+  <div class="wl-creator">
+    <div id="wlParsingBar" class="wl-parsing" style="display:none">
+      <div class="gk-ai-typing"><span></span><span></span><span></span></div>
+      AI is parsing your work log…
+    </div>
+    <textarea id="wlInput" class="wl-creator-inp"
+              placeholder="What did you work on today? e.g. Fixed auth bug 2h, reviewed PRs 1h, standup 30m"
+              rows="3" onkeydown="wlInputKey(event)"></textarea>
+    <div class="wl-creator-sep"></div>
+    <div class="wl-creator-foot">
+      <span class="wl-hint">Press <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0 5px;font-size:11px">Enter</kbd> to log &nbsp;·&nbsp; <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0 5px;font-size:11px">Shift+Enter</kbd> for new line</span>
+      <input type="date" id="wlDate" class="wl-date-inp"
+             value="@DateTime.UtcNow.Date.ToString("yyyy-MM-dd")"
+             max="@DateTime.UtcNow.Date.ToString("yyyy-MM-dd")"
+             title="Log for date">
+    </div>
+  </div>
+
+  <!-- Project filter pills -->
+  @{ var wlProjects = ViewBag.Projects as List<string> ?? new List<string>(); }
+  @if (wlProjects.Any()) {
+  <div class="wl-filter-bar" id="wlFilterBar">
+    <span class="wl-filter-lbl">Filter:</span>
+    <button class="wl-filter-pill active" data-project="" onclick="wlFilter(this,'')">All</button>
+    @foreach (var p in wlProjects) {
+      <button class="wl-filter-pill" data-project="@p" onclick="wlFilter(this,'@p')">@p</button>
+    }
+  </div>
+  }
+
+  <!-- Entries -->
+  <div class="wl-entries" id="wlEntriesList">
+    @if (!Model.Any()) {
+      <div class="wl-empty" id="wlEmpty">
+        <div class="wl-empty-ico">⏱️</div>
+        <div class="wl-empty-title">No work logged yet</div>
+        <div class="wl-empty-sub">Describe what you worked on today — AI parses it into tasks and estimates hours automatically.</div>
+      </div>
+    } else {
+      @foreach (var group in grouped) {
+        var groupHours = group.Sum(e => (double)e.TotalHours);
+        var dayLabel = group.Key == today ? "Today"
+                     : group.Key == today.AddDays(-1) ? "Yesterday"
+                     : group.Key >= today.AddDays(-6) ? group.Key.ToString("dddd")
+                     : group.Key.ToString("MMM d, yyyy");
+        <div class="wl-day-group" data-date="@group.Key.ToString("yyyy-MM-dd")">
+          <div class="wl-day-header">
+            <span>@dayLabel</span>
+            <span class="wl-day-hours">@groupHours.ToString("F1")h</span>
+          </div>
+          @foreach (var entry in group.OrderByDescending(e => e.CreatedAt)) {
+            var dominantCat = entry.Tasks.Count > 0
+                ? entry.Tasks.GroupBy(t => t.Category ?? "general")
+                    .OrderByDescending(g => g.Sum(t => (double)t.Hours) > 0 ? g.Sum(t => (double)t.Hours) : g.Count())
+                    .First().Key
+                : "general";
+            <div class="wl-entry wl-entry-cat-@dominantCat" id="wle-@entry.Id">
+              <div class="wl-entry-raw">@entry.RawText</div>
+              @if (entry.IsAiParsed && entry.Tasks.Any()) {
+                <div class="wl-entry-tasks">
+                  @foreach (var task in entry.Tasks.OrderBy(t => t.SortOrder)) {
+                    <div class="wl-task wl-cat-@task.Category">
+                      <span class="wl-task-dot"></span>
+                      <span class="wl-task-desc" onclick="wlEditDesc(@task.Id,this)" title="Click to edit">@task.Description</span>
+                      @if (task.Hours > 0) { <span class="wl-task-hours" onclick="wlEditHours(@task.Id,this)" title="Click to edit hours">@task.Hours.ToString("G3")h</span> }
+                      @if (!string.IsNullOrEmpty(task.Project)) { <span class="wl-task-proj">@task.Project</span> }
+                    </div>
+                  }
+                </div>
+              }
+              <div class="wl-entry-foot">
+                <span class="wl-entry-time">@entry.CreatedAt.ToString("h:mm tt")</span>
+                @if (!entry.IsAiParsed) { <span class="wl-badge-raw">not parsed</span> }
+                @if (entry.TotalHours > 0) { <span class="wl-task-hours">@entry.TotalHours.ToString("G3")h total</span> }
+                <button class="wl-entry-del" onclick="wlDeleteEntry(@entry.Id)" title="Delete entry">🗑</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION: NOTES
+     ══════════════════════════════════════ -->
+<div class="page-section" id="section-notes">
+<div class="page-section-head">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Notes
+</div>
+
+  <!-- Note creator -->
+  <div class="gk-creator" id="gkCreator">
+    <div class="gk-creator-idle" onclick="gkCreatorActivate(false)">
+      <span class="gk-creator-idle-text">Take a note…</span>
+      <div class="gk-creator-idle-btns">
+        <button class="gk-creator-idle-btn" onclick="event.stopPropagation();gkCreatorActivate(true)" title="New list note">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M3 5h2v2H3zm4 0h14v2H7zm-4 6h2v2H3zm4 0h14v2H7zm-4 6h2v2H3zm4 0h14v2H7z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="gk-creator-body" id="gkCreatorBody">
+      <input type="text" class="gk-creator-title" id="gkCreatorTitle" placeholder="Title">
+      <div id="gkCreatorNoteArea" style="display:block">
+        <textarea class="gk-creator-ta" id="gkCreatorTa" placeholder="Take a note…" rows="2"></textarea>
+      </div>
+      <div id="gkCreatorListArea" style="display:none">
+        <div class="gk-creator-list" id="gkCreatorList"></div>
+        <button class="gk-cl-add" onclick="gkClAddItem()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+          List item
+        </button>
+      </div>
+      <div class="gk-creator-foot">
+        <div class="gk-creator-tools">
+          <!-- Color picker trigger -->
+          <button class="gk-icon-btn-light" onclick="gkColorPickerOpen(event, null)" title="Change color">
+            <svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8.5 15c1 1.5 5.5 1.5 7 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+          </button>
+        </div>
+        <button class="gk-creator-close" onclick="gkCreatorClose()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes grid -->
+  <div id="notesContainer">
+    @if (pinnedNotes.Any()) {
+      <div class="gk-section-label">Pinned</div>
+      <div class="gk-grid" id="gkPinnedGrid">
+        @foreach (var note in pinnedNotes) {
+          @await Html.PartialAsync("_NoteCard", note)
+        }
+      </div>
+      <div class="gk-section-gap"></div>
+      <div class="gk-section-label">Others</div>
+    }
+    <div class="gk-grid" id="gkGrid">
+      @foreach (var note in otherNotes) {
+        @await Html.PartialAsync("_NoteCard", note)
+      }
+    </div>
+    @if (!notes.Any()) {
+      <div class="gk-empty" id="gkEmpty">
+        <div class="gk-empty-icon">💡</div>
+        <div class="gk-empty-title">Notes you add appear here</div>
+        <div class="gk-empty-sub">Capture ideas, to-dos, and anything you want to remember.</div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION: TIMESHEET
+     ══════════════════════════════════════ -->
+<div class="page-section" id="section-timesheet">
+<div class="page-section-head">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  Timesheet
+</div>
+  <div id="tsContent">
+    <div class="ts-loading">
+      <div class="gk-ai-typing" style="justify-content:center"><span></span><span></span><span></span></div>
+      <p style="margin-top:14px;color:var(--text2)">Loading timesheet…</p>
+    </div>
+  </div>
+</div>
+
+<!-- Note edit modal -->
+<div class="gk-modal-ov" id="gkModalOv" style="display:none" onclick="if(event.target===this)gkModalClose()">
+  <div class="gk-modal" id="gkModalCard">
+    <button class="gk-card-pin" id="gkModalPin" onclick="gkModalTogglePin()" style="position:absolute;top:10px;right:10px;opacity:1;z-index:2;background:var(--surface2)" title="Pin note">
+      <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 2l2.4 6.4L21 10l-6.4 2.4L12 19l-2.4-6.6L3 10l6.6-2.6L12 2z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+    </button>
+    <input type="text" class="gk-modal-title" id="gkModalTitle" placeholder="Title">
+    <div id="gkModalNoteArea">
+      <div class="gk-modal-body" id="gkModalBody" contenteditable="true" data-placeholder="Note…"></div>
+    </div>
+    <div id="gkModalListArea" style="display:none">
+      <div class="gk-modal-list" id="gkModalList"></div>
+      <button class="gk-modal-add-item" onclick="gkModalAddItem()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        Add item
+      </button>
+    </div>
+    <div class="gk-modal-foot">
+      <div class="gk-modal-tools">
+        <button class="gk-icon-btn-light" onclick="gkColorPickerOpen(event, _modalNoteId)" title="Change color">
+          <svg width="18" height="18" viewBox="0 0 24 24"><circle cx="13" cy="13" r="8" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 19L3 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="11" r="1.5" fill="currentColor"/><circle cx="16" cy="11" r="1.5" fill="currentColor"/><path d="M10 16s.5 2 3 2 3-2 3-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+        </button>
+        <button class="gk-icon-btn-light" onclick="gkModalArchive()" title="Archive">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 8H3v13h18V8zM3 8l2-4h14l2 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M10 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="gk-icon-btn-light gk-modal-polish-btn" onclick="gkModalPolish()" title="Polish with AI">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2L13.5 7.5L19 9L13.5 10.5L12 16L10.5 10.5L5 9L10.5 7.5L12 2Z" fill="currentColor"/><path d="M19 15L19.7 17.3L22 18L19.7 18.7L19 21L18.3 18.7L16 18L18.3 17.3L19 15Z" fill="currentColor" opacity=".5"/></svg>
+        </button>
+      </div>
+      <span class="gk-modal-meta" id="gkModalMeta"></span>
+      <button class="gk-modal-close" onclick="gkModalClose()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Color picker -->
+<div class="gk-colors" id="gkColors" style="display:none">
+  <button class="gk-color-swatch cs-default" onclick="gkColorApply('default')" title="Default"></button>
+  <button class="gk-color-swatch cs-red"       onclick="gkColorApply('red')" title="Red"></button>
+  <button class="gk-color-swatch cs-orange"    onclick="gkColorApply('orange')" title="Orange"></button>
+  <button class="gk-color-swatch cs-yellow"    onclick="gkColorApply('yellow')" title="Yellow"></button>
+  <button class="gk-color-swatch cs-green"     onclick="gkColorApply('green')" title="Green"></button>
+  <button class="gk-color-swatch cs-teal"      onclick="gkColorApply('teal')" title="Teal"></button>
+  <button class="gk-color-swatch cs-blue"      onclick="gkColorApply('blue')" title="Blue"></button>
+  <button class="gk-color-swatch cs-dark-blue" onclick="gkColorApply('dark-blue')" title="Dark Blue"></button>
+  <button class="gk-color-swatch cs-purple"    onclick="gkColorApply('purple')" title="Purple"></button>
+  <button class="gk-color-swatch cs-pink"      onclick="gkColorApply('pink')" title="Pink"></button>
+  <button class="gk-color-swatch cs-brown"     onclick="gkColorApply('brown')" title="Brown"></button>
+  <button class="gk-color-swatch cs-gray"      onclick="gkColorApply('gray')" title="Gray"></button>
+</div>
+
+@section Scripts {
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('wlInput')?.focus();
+  tsLoad(0);
+});
+
+// ════════════════════════════════════════════════════════════════
+// WORK LOG
+// ════════════════════════════════════════════════════════════════
+function wlInputKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); wlSubmit(); }
+}
+
+async function wlSubmit() {
+  var inp  = document.getElementById('wlInput');
+  var text = inp.value.trim();
+  if (!text) { inp.focus(); return; }
+  var bar = document.getElementById('wlParsingBar');
+  if (bar) bar.style.display = 'flex';
+  inp.disabled = true;
+  try {
+    var data = await gkPost('/WorkLog/Log', { text: text, date: document.getElementById('wlDate')?.value || null });
+    inp.value = '';
+    inp.disabled = false;
+    if (bar) bar.style.display = 'none';
+    if (data) {
+      document.getElementById('wlEmpty')?.remove();
+      wlPrependEntry(data);
+      gkToast('Work logged ✓');
+    }
+    inp.focus();
+  } catch(err) {
+    if (bar) bar.style.display = 'none';
+    inp.disabled = false;
+    gkToast('Failed to save — try again');
+    inp.focus();
+  }
+}
+
+function wlBuildEntryHtml(d) {
+  var tasksHtml = '';
+  if (d.isAiParsed && d.tasks && d.tasks.length > 0) {
+    tasksHtml = '<div class="wl-entry-tasks">';
+    d.tasks.forEach(function(t) {
+      var hrs = t.hours > 0 ? '<span class="wl-task-hours" onclick="wlEditHours(' + t.id + ',this)" title="Click to edit hours">' + t.hours + 'h</span>' : '';
+      var prj = t.project ? '<span class="wl-task-proj">' + _esc(t.project) + '</span>' : '';
+      tasksHtml += '<div class="wl-task wl-cat-' + (t.category || 'general') + '"><span class="wl-task-dot"></span>'
+        + '<span class="wl-task-desc" onclick="wlEditDesc(' + t.id + ',this)" title="Click to edit">' + _esc(t.description) + '</span>' + hrs + prj + '</div>';
+    });
+    tasksHtml += '</div>';
+  }
+  var notParsed = d.isAiParsed ? '' : '<span class="wl-badge-raw">not parsed</span>';
+  var totalHrs  = d.totalHours > 0 ? '<span class="wl-task-hours">' + d.totalHours + 'h total</span>' : '';
+  var _domCat = 'general';
+  if (d.tasks && d.tasks.length > 0) {
+    var _catH = {};
+    d.tasks.forEach(function(t) { var c = t.category||'general'; _catH[c] = (_catH[c]||0)+(t.hours||1); });
+    _domCat = Object.keys(_catH).reduce(function(a,b){return _catH[a]>=_catH[b]?a:b;});
+  }
+  return '<div class="wl-entry wl-entry-new wl-entry-cat-' + _domCat + '" id="wle-' + d.id + '">'
+    + '<div class="wl-entry-raw">' + _esc(d.rawText) + '</div>'
+    + tasksHtml
+    + '<div class="wl-entry-foot"><span class="wl-entry-time">' + d.createdAt + '</span>'
+    + notParsed + totalHrs
+    + '<button class="wl-entry-del" onclick="wlDeleteEntry(' + d.id + ')" title="Delete">🗑</button></div></div>';
+}
+
+function wlPrependEntry(d) {
+  var list    = document.getElementById('wlEntriesList');
+  var dateKey = d.logDate;
+  var group   = list.querySelector('[data-date="' + dateKey + '"]');
+  if (!group) {
+    var dayDiv = document.createElement('div');
+    dayDiv.className  = 'wl-day-group';
+    dayDiv.dataset.date = dateKey;
+    dayDiv.innerHTML  = '<div class="wl-day-header"><span>' + _esc(d.relDate) + '</span>'
+      + '<span class="wl-day-hours" id="wl-dhours-' + dateKey + '">0.0h</span></div>';
+    list.insertBefore(dayDiv, list.firstChild);
+    group = dayDiv;
+  }
+  group.querySelector('.wl-day-header').insertAdjacentHTML('afterend', wlBuildEntryHtml(d));
+  updateDayTotal(dateKey);
+}
+
+function updateDayTotal(dateKey) {
+  var group   = document.querySelector('[data-date="' + dateKey + '"]');
+  var hoursEl = group?.querySelector('.wl-day-hours');
+  if (!hoursEl) return;
+  var total = 0;
+  group.querySelectorAll('.wl-entry').forEach(function(el) {
+    var hEl = el.querySelector('.wl-task-hours');
+    if (hEl) { var v = parseFloat(hEl.textContent); if (!isNaN(v)) total += v; }
+  });
+  hoursEl.textContent = total.toFixed(1) + 'h';
+}
+
+async function wlDeleteEntry(id) {
+  var el = document.getElementById('wle-' + id);
+  if (!el) return;
+  el.classList.add('wl-entry-removing');
+  try {
+    await gkPost('/WorkLog/DeleteEntry', { id: id });
+    setTimeout(function() {
+      var group = el.closest('.wl-day-group');
+      el.remove();
+      if (group && !group.querySelectorAll('.wl-entry').length) group.remove();
+      if (!document.querySelector('.wl-entry')) {
+        document.getElementById('wlEntriesList').innerHTML =
+          '<div class="wl-empty" id="wlEmpty"><div class="wl-empty-ico">⏱️</div>'
+          + '<div class="wl-empty-title">No work logged yet</div>'
+          + '<div class="wl-empty-sub">Start by describing what you worked on today.</div></div>';
+      }
+    }, 200);
+    gkToast('Entry deleted');
+  } catch(err) {
+    el.classList.remove('wl-entry-removing');
+    gkToast('Failed to delete');
+  }
+}
+
+function wlFilter(btn, proj) {
+  document.querySelectorAll('.wl-filter-pill').forEach(function(b) { b.classList.toggle('active', b.dataset.project === proj); });
+  document.querySelectorAll('.wl-entry').forEach(function(el) {
+    if (!proj) { el.style.display = ''; return; }
+    var projEl = el.querySelector('.wl-task-proj');
+    el.style.display = (projEl && projEl.textContent.trim() === proj) ? '' : 'none';
+  });
+  document.querySelectorAll('.wl-day-group').forEach(function(g) {
+    var hasVisible = Array.from(g.querySelectorAll('.wl-entry')).some(function(e) { return e.style.display !== 'none'; });
+    g.style.display = hasVisible ? '' : 'none';
+  });
+}
+
+function wlEditDesc(id, el) {
+  if (el.querySelector('input')) return;
+  var orig = el.textContent;
+  var inp = document.createElement('input');
+  inp.type = 'text'; inp.value = orig; inp.className = 'wl-task-inp';
+  el.innerHTML = ''; el.appendChild(inp); inp.focus(); inp.select();
+  function save() {
+    var val = inp.value.trim() || orig;
+    el.textContent = val;
+    if (val !== orig) gkPost('/WorkLog/UpdateTask', { id: id, description: val }).catch(function() { el.textContent = orig; gkToast('Failed'); });
+  }
+  inp.onblur = save;
+  inp.onkeydown = function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+    if (e.key === 'Escape') { el.textContent = orig; }
+  };
+}
+
+function wlEditHours(id, el) {
+  if (el.querySelector('input')) return;
+  var orig = parseFloat(el.textContent);
+  var inp = document.createElement('input');
+  inp.type = 'number'; inp.value = orig; inp.min = '0'; inp.max = '24'; inp.step = '0.25';
+  inp.className = 'wl-task-inp wl-task-inp-hours';
+  el.innerHTML = ''; el.appendChild(inp); inp.focus(); inp.select();
+  function save() {
+    var val = parseFloat(inp.value);
+    if (isNaN(val) || val < 0) val = orig;
+    el.textContent = val.toFixed(2).replace(/\.?0+$/, '') + 'h';
+    if (val !== orig) gkPost('/WorkLog/UpdateTask', { id: id, hours: val }).catch(function() { el.textContent = orig + 'h'; gkToast('Failed'); });
+  }
+  inp.onblur = save;
+  inp.onkeydown = function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+    if (e.key === 'Escape') { el.textContent = orig + 'h'; }
+  };
+}
+
+// ════════════════════════════════════════════════════════════════
+// TIMESHEET
+// ════════════════════════════════════════════════════════════════
+async function tsLoad(offset) {
+  var container = document.getElementById('tsContent');
+  if (!container) return;
+  container.innerHTML = '<div class="ts-loading"><div class="gk-ai-typing" style="justify-content:center"><span></span><span></span><span></span></div><p style="margin-top:14px;color:var(--text2)">Loading…</p></div>';
+  try {
+    var r = await fetch('/WorkLog/TimesheetJson?weekOffset=' + offset);
+    if (!r.ok) throw new Error(r.status);
+    var d = await r.json();
+    container.innerHTML = _buildTimesheetHtml(d);
+  } catch(err) {
+    container.innerHTML = '<div class="ts-empty"><div class="ts-empty-ico">⚠️</div><div class="ts-empty-title">Could not load timesheet</div></div>';
+  }
+}
+
+function _buildTimesheetHtml(d) {
+  var today = new Date().toISOString().slice(0,10);
+  var prevBtn = '<button class="ts-nav-btn" onclick="tsLoad(' + (d.weekOffset - 1) + ')">← Prev week</button>';
+  var nextBtn = d.weekOffset < 0
+    ? '<button class="ts-nav-btn" onclick="tsLoad(' + (d.weekOffset + 1) + ')">Next week →</button>'
+    : '<button class="ts-nav-btn" style="opacity:.35;pointer-events:none">Next week →</button>';
+  var nav = '<div class="ts-nav"><div style="display:flex;align-items:center;gap:12px">'
+    + prevBtn + '<span class="ts-week-label">Week of ' + d.weekStart + ' – ' + d.weekEnd + '</span>' + nextBtn
+    + '</div><div class="ts-actions">'
+    + '<a href="/WorkLog/ExportCsv" class="ts-export-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 15l-4-4h3V5h2v6h3l-4 4zM5 17h14v2H5z" fill="currentColor"/></svg> Export CSV</a>'
+    + '<button class="ts-export-btn" onclick="tsCopyJira()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="5" y="5" width="14" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M9 12h6M9 8h6M9 16h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Copy Jira</button>'
+    + '<button class="ts-export-btn" onclick="tsCopySlack()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Copy Slack</button>'
+    + '</div></div>';
+
+  if (!d.byProject || d.byProject.length === 0) {
+    return nav + '<div class="ts-empty"><div class="ts-empty-ico">📅</div><div class="ts-empty-title">No work logged this week</div></div>';
+  }
+
+  var days = d.days || [];
+  var head = '<thead><tr><th>Project</th>';
+  days.forEach(function(day) {
+    var cls = day.date === today ? ' class="ts-today-col"' : '';
+    head += '<th' + cls + '>' + day.label + '<br><span style="font-weight:400;color:var(--text2);font-size:11px">' + day.short + '</span></th>';
+  });
+  head += '<th>Total</th></tr></thead>';
+
+  var body = '<tbody>';
+  d.byProject.forEach(function(proj) {
+    body += '<tr><td>' + _esc(proj.name) + '</td>';
+    days.forEach(function(day) {
+      var h = proj.hours[day.date] || 0;
+      var cls = day.date === today ? ' class="ts-today-col"' : '';
+      body += '<td' + cls + '>' + (h > 0 ? '<span class="ts-hours-cell">' + h.toFixed(1) + 'h</span>' : '<span class="ts-zero">—</span>') + '</td>';
+    });
+    body += '<td class="ts-hours-cell">' + proj.total.toFixed(1) + 'h</td></tr>';
+  });
+  body += '</tbody>';
+
+  var foot = '<tfoot><tr class="ts-total-row"><td>Total</td>';
+  days.forEach(function(day) {
+    var h = d.dayTotals[day.date] || 0;
+    var cls = day.date === today ? ' class="ts-today-col"' : '';
+    foot += '<td' + cls + '>' + (h > 0 ? h.toFixed(1) + 'h' : '<span class="ts-zero">—</span>') + '</td>';
+  });
+  foot += '<td>' + d.grandTotal.toFixed(1) + 'h</td></tr></tfoot>';
+
+  _jiraText  = d.jiraText  || '';
+  _slackText = d.slackText || '';
+
+  return nav + '<div class="ts-table-wrap"><table class="ts-table">' + head + body + foot + '</table></div>';
+}
+
+var _jiraText = '', _slackText = '';
+function tsCopyJira() {
+  navigator.clipboard.writeText(_jiraText)
+    .then(function() { gkToast('Jira format copied ✓'); })
+    .catch(function() { prompt('Copy Jira format:', _jiraText); });
+}
+function tsCopySlack() {
+  navigator.clipboard.writeText(_slackText)
+    .then(function() { gkToast('Slack standup copied ✓'); })
+    .catch(function() { prompt('Copy Slack format:', _slackText); });
+}
+
+// ════════════════════════════════════════════════════════════════
+// NOTES — Google Keep UI
+// ════════════════════════════════════════════════════════════════
+var _gkIsList = false;
+var _gkCreatorColor = 'default';
+
+function gkCreatorActivate(isList) {
+  var c = document.getElementById('gkCreator');
+  var noteArea = document.getElementById('gkCreatorNoteArea');
+  var listArea = document.getElementById('gkCreatorListArea');
+  _gkIsList = isList;
+  c.classList.add('active');
+  if (isList) {
+    noteArea.style.display = 'none';
+    listArea.style.display = 'block';
+    var listEl = document.getElementById('gkCreatorList');
+    if (!listEl.children.length) gkClAddItem();
+  } else {
+    noteArea.style.display = 'block';
+    listArea.style.display = 'none';
+    setTimeout(function() { document.getElementById('gkCreatorTa')?.focus(); }, 50);
+  }
+}
+
+function gkClAddItem() {
+  var listEl = document.getElementById('gkCreatorList');
+  var row = document.createElement('div');
+  row.className = 'gk-cl-input-row';
+  row.innerHTML = '<input type="checkbox" class="gk-cl-checkbox">'
+    + '<input type="text" class="gk-cl-text" placeholder="List item…" onkeydown="gkClKey(event,this)">';
+  listEl.appendChild(row);
+  row.querySelector('input[type="text"]')?.focus();
+}
+
+function gkClKey(e, inp) {
+  if (e.key === 'Enter') { e.preventDefault(); gkClAddItem(); }
+  if (e.key === 'Backspace' && inp.value === '') {
+    var row = inp.closest('.gk-cl-input-row');
+    var prev = row.previousElementSibling;
+    row.remove();
+    if (prev) prev.querySelector('input[type="text"]')?.focus();
+  }
+}
+
+async function gkCreatorClose() {
+  var title = document.getElementById('gkCreatorTitle').value.trim();
+  var ta    = document.getElementById('gkCreatorTa').value.trim();
+  var items = [];
+  if (_gkIsList) {
+    document.querySelectorAll('#gkCreatorList .gk-cl-input-row').forEach(function(row) {
+      var txt = row.querySelector('input[type="text"]')?.value.trim();
+      var chk = row.querySelector('input[type="checkbox"]')?.checked || false;
+      if (txt) items.push({ text: txt, checked: chk });
+    });
+  }
+  var hasContent = title || ta || items.length > 0;
+  if (hasContent) {
+    try {
+      var data = await gkPost('/Notes/Create', {
+        title: title, content: _gkIsList ? '' : ta,
+        color: _gkCreatorColor, pinned: false,
+        items: _gkIsList ? items : null
+      });
+      if (data) {
+        document.getElementById('gkEmpty')?.remove();
+        var card = _buildNoteCard(data);
+        var grid = document.getElementById('gkGrid');
+        var tmp = document.createElement('div');
+        tmp.innerHTML = card;
+        var cardEl = tmp.firstElementChild;
+        cardEl.classList.add('gk-card-new');
+        grid.insertBefore(cardEl, grid.firstChild);
+        gkToast('Note saved ✓');
+      }
+    } catch(err) {
+      gkToast('Failed to save note');
+    }
+  }
+  // Reset
+  document.getElementById('gkCreatorTitle').value = '';
+  document.getElementById('gkCreatorTa').value = '';
+  document.getElementById('gkCreatorList').innerHTML = '';
+  _gkCreatorColor = 'default';
+  document.getElementById('gkCreator').classList.remove('active');
+  _gkIsList = false;
+}
+
+// Close creator when clicking outside
+document.addEventListener('click', function(e) {
+  var creator = document.getElementById('gkCreator');
+  if (creator && creator.classList.contains('active') && !creator.contains(e.target) && !document.getElementById('gkColors')?.contains(e.target)) {
+    gkCreatorClose();
+  }
+});
+
+// ── Note card HTML builder ──
+function _buildNoteCard(n) {
+  var bodyHtml = '';
+  if (n.noteType === 'list' && n.items && n.items.length > 0) {
+    bodyHtml = '<div class="gk-card-list">';
+    n.items.slice(0, 6).forEach(function(item) {
+      bodyHtml += '<div class="gk-card-list-item' + (item.isChecked ? ' checked' : '') + '">'
+        + '<input type="checkbox"' + (item.isChecked ? ' checked' : '') + ' onclick="gkCardCheckItem(event,' + n.id + ',' + item.id + ',this)">'
+        + '<span>' + _esc(item.text) + '</span></div>';
+    });
+    if (n.items.length > 6) bodyHtml += '<div style="font-size:12px;color:var(--text2);padding:2px 0">+' + (n.items.length - 6) + ' more</div>';
+    bodyHtml += '</div>';
+  } else {
+    if (n.content) bodyHtml = '<div class="gk-card-text">' + _esc(n.content) + '</div>';
+  }
+  return '<div class="gk-card nc-' + (n.color || 'default') + (n.isPinned ? ' pinned' : '') + '" id="gkcard-' + n.id + '" onclick="gkCardOpen(' + n.id + ')">'
+    + '<button class="gk-card-pin" onclick="gkCardPin(event,' + n.id + ')" title="' + (n.isPinned ? 'Unpin' : 'Pin') + '">'
+    + '<svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 2l2.4 6.4L21 10l-6.4 2.4L12 19l-2.4-6.6L3 10l6.6-2.6L12 2z" stroke="currentColor" stroke-width="1.5" ' + (n.isPinned ? 'fill="currentColor"' : 'fill="none"') + '/></svg>'
+    + '</button>'
+    + '<div class="gk-card-body">'
+    + (n.title ? '<div class="gk-card-title">' + _esc(n.title) + '</div>' : '')
+    + bodyHtml
+    + '</div>'
+    + '<div class="gk-card-actions">'
+    + '<button class="gk-card-act" onclick="gkColorPickerOpen(event,' + n.id + ')" title="Color"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8.5 15c1 1.5 5.5 1.5 7 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></button>'
+    + '<button class="gk-card-act" onclick="gkCardArchive(event,' + n.id + ')" title="Archive"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M21 8H3v13h18V8zM3 8l2-4h14l2 4" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M10 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>'
+    + '<div class="gk-card-act-spacer"></div>'
+    + '<button class="gk-card-act del" onclick="gkCardDelete(event,' + n.id + ')" title="Delete"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>'
+    + '</div></div>';
+}
+
+// ── Card actions ──
+async function gkCardPin(e, id) {
+  e.stopPropagation();
+  var card = document.getElementById('gkcard-' + id);
+  if (!card) return;
+  var isPinned = card.classList.contains('pinned');
+  try {
+    await gkPost('/Notes/Update', { id: id, pinned: !isPinned });
+    // Move card between grids
+    card.classList.add('gk-card-removing');
+    setTimeout(function() {
+      card.remove();
+      var newCard = document.createElement('div');
+      newCard.innerHTML = _buildNoteCard({ id: id, isPinned: !isPinned, color: _getCardColor(card), title: card.querySelector('.gk-card-title')?.textContent || '', content: card.querySelector('.gk-card-text')?.textContent || '', noteType: card.querySelector('.gk-card-list') ? 'list' : 'note', items: [] });
+      // rebuild from server would be ideal; simplest is reload
+      window.location.reload();
+    }, 180);
+  } catch(err) { gkToast('Failed'); }
+}
+
+async function gkCardArchive(e, id) {
+  e.stopPropagation();
+  var card = document.getElementById('gkcard-' + id);
+  if (!card) return;
+  card.classList.add('gk-card-removing');
+  try {
+    await gkPost('/Notes/Update', { id: id, archived: true });
+    setTimeout(function() {
+      card.remove();
+      gkToast('Note archived', function() {
+        gkPost('/Notes/Update', { id: id, archived: false }).then(function() { window.location.reload(); });
+      });
+    }, 180);
+  } catch(err) { card.classList.remove('gk-card-removing'); gkToast('Failed'); }
+}
+
+async function gkCardDelete(e, id) {
+  e.stopPropagation();
+  var card = document.getElementById('gkcard-' + id);
+  if (!card) return;
+  card.classList.add('gk-card-removing');
+  try {
+    await gkPost('/Notes/Delete', { id: id });
+    setTimeout(function() {
+      card.remove();
+      gkToast('Note deleted');
+    }, 180);
+  } catch(err) { card.classList.remove('gk-card-removing'); gkToast('Failed'); }
+}
+
+async function gkCardCheckItem(e, noteId, itemId, cb) {
+  e.stopPropagation();
+  try {
+    await gkPost('/Notes/UpdateItem', { id: itemId, checked: cb.checked });
+    var li = cb.closest('.gk-card-list-item');
+    if (li) li.classList.toggle('checked', cb.checked);
+  } catch(err) { cb.checked = !cb.checked; }
+}
+
+function _getCardColor(card) {
+  var cls = card.className.match(/nc-([a-z-]+)/);
+  return cls ? cls[1] : 'default';
+}
+
+// ── Color picker ──
+var _colorTargetId = null;
+function gkColorPickerOpen(e, noteId) {
+  e.stopPropagation();
+  _colorTargetId = noteId;
+  var picker = document.getElementById('gkColors');
+  picker.style.display = 'flex';
+  picker.style.top  = (e.clientY + 8) + 'px';
+  picker.style.left = Math.min(e.clientX, window.innerWidth - 420) + 'px';
+  // mark current
+  var card = noteId ? document.getElementById('gkcard-' + noteId) : null;
+  var cur = card ? (_getCardColor(card)) : _gkCreatorColor;
+  picker.querySelectorAll('.gk-color-swatch').forEach(function(s) {
+    s.classList.toggle('active', s.classList.contains('cs-' + cur));
+  });
+}
+async function gkColorApply(color) {
+  document.getElementById('gkColors').style.display = 'none';
+  var id = _colorTargetId;
+  if (id === null) {
+    // creator
+    _gkCreatorColor = color;
+    return;
+  }
+  var card = document.getElementById('gkcard-' + id);
+  if (card) {
+    card.className = card.className.replace(/nc-[a-z-]+/, 'nc-' + color);
+  }
+  var modal = document.getElementById('gkModalCard');
+  if (modal && _modalNoteId === id) {
+    modal.className = modal.className.replace(/nc-[a-z-]+/, 'nc-' + color);
+  }
+  try {
+    await gkPost('/Notes/Update', { id: id, color: color });
+  } catch(err) { gkToast('Failed to update color'); }
+}
+document.addEventListener('click', function(e) {
+  var picker = document.getElementById('gkColors');
+  if (picker && picker.style.display !== 'none' && !picker.contains(e.target)) {
+    picker.style.display = 'none';
+  }
+});
+
+// ── Note modal ──
+var _modalNoteId = null;
+var _modalSaveTimer = null;
+
+function gkCardOpen(id) {
+  var card = document.getElementById('gkcard-' + id);
+  if (!card) return;
+  var color = _getCardColor(card);
+  var titleEl = card.querySelector('.gk-card-title');
+  var textEl  = card.querySelector('.gk-card-text');
+  var listEl  = card.querySelector('.gk-card-list');
+  var isPinned = card.classList.contains('pinned');
+
+  _modalNoteId = id;
+  var modal    = document.getElementById('gkModalCard');
+  var ov       = document.getElementById('gkModalOv');
+  var noteArea = document.getElementById('gkModalNoteArea');
+  var listArea = document.getElementById('gkModalListArea');
+
+  modal.className = 'gk-modal nc-' + color;
+  document.getElementById('gkModalTitle').value = titleEl ? titleEl.textContent : '';
+  document.getElementById('gkModalMeta').textContent = '';
+  document.getElementById('gkModalPin').querySelector('path').setAttribute('fill', isPinned ? 'currentColor' : 'none');
+
+  if (listEl) {
+    noteArea.style.display = 'none';
+    listArea.style.display = 'block';
+    var mList = document.getElementById('gkModalList');
+    mList.innerHTML = '';
+    card.querySelectorAll('.gk-card-list-item').forEach(function(li) {
+      var chk = li.querySelector('input[type="checkbox"]')?.checked || false;
+      var txt = li.querySelector('span')?.textContent || '';
+      gkModalAddItemRow(mList, { text: txt, isChecked: chk, id: null });
+    });
+  } else {
+    noteArea.style.display = 'block';
+    listArea.style.display = 'none';
+    document.getElementById('gkModalBody').textContent = textEl ? textEl.textContent : '';
+  }
+
+  ov.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  setTimeout(function() { document.getElementById('gkModalTitle').focus(); }, 50);
+
+  // Auto-save on input
+  var autoSave = function() {
+    clearTimeout(_modalSaveTimer);
+    _modalSaveTimer = setTimeout(function() { gkModalSave(false); }, 800);
+  };
+  document.getElementById('gkModalTitle').oninput = autoSave;
+  document.getElementById('gkModalBody').oninput  = autoSave;
+}
+
+function gkModalAddItemRow(container, item) {
+  var row = document.createElement('div');
+  row.className = 'gk-modal-item' + (item.isChecked ? ' done' : '');
+  var iid = item.id || ('new-' + Date.now() + Math.random());
+  row.dataset.itemId = iid;
+  row.innerHTML = '<input type="checkbox" ' + (item.isChecked ? 'checked' : '') + ' onchange="gkModalItemCheck(this)">'
+    + '<input type="text" class="gk-modal-item-text" value="' + _esc(item.text) + '" onkeydown="gkModalItemKey(event,this)">'
+    + '<button class="gk-modal-item-del" onclick="this.closest(\'.gk-modal-item\').remove()" title="Remove">✕</button>';
+  container.appendChild(row);
+  return row;
+}
+
+function gkModalItemCheck(cb) {
+  cb.closest('.gk-modal-item').classList.toggle('done', cb.checked);
+  clearTimeout(_modalSaveTimer);
+  _modalSaveTimer = setTimeout(function() { gkModalSave(false); }, 600);
+}
+
+function gkModalItemKey(e, inp) {
+  if (e.key === 'Enter') { e.preventDefault(); gkModalAddItem(); }
+  if (e.key === 'Backspace' && inp.value === '') {
+    var row = inp.closest('.gk-modal-item');
+    var prev = row.previousElementSibling;
+    row.remove();
+    if (prev) prev.querySelector('input[type="text"]')?.focus();
+  }
+}
+
+function gkModalAddItem() {
+  var list = document.getElementById('gkModalList');
+  var row = gkModalAddItemRow(list, { text: '', isChecked: false, id: null });
+  row.querySelector('input[type="text"]')?.focus();
+}
+
+function gkModalTogglePin() {
+  var card = document.getElementById('gkcard-' + _modalNoteId);
+  var isPinned = card ? card.classList.contains('pinned') : false;
+  gkPost('/Notes/Update', { id: _modalNoteId, pinned: !isPinned }).then(function() {
+    document.getElementById('gkModalPin').querySelector('path').setAttribute('fill', !isPinned ? 'currentColor' : 'none');
+    gkToast(!isPinned ? 'Note pinned' : 'Note unpinned');
+    if (card) { card.classList.toggle('pinned', !isPinned); }
+  });
+}
+
+async function gkModalArchive() {
+  await gkPost('/Notes/Update', { id: _modalNoteId, archived: true });
+  gkModalClose();
+  var card = document.getElementById('gkcard-' + _modalNoteId);
+  if (card) { card.classList.add('gk-card-removing'); setTimeout(function() { card.remove(); }, 180); }
+  gkToast('Note archived');
+}
+
+async function gkModalPolish() {
+  var titleEl = document.getElementById('gkModalTitle');
+  var bodyEl  = document.getElementById('gkModalBody');
+  gkToast('Polishing with AI…');
+  try {
+    var d = await gkPost('/Assistant/Polish', { title: titleEl.value, content: bodyEl.textContent });
+    if (d?.improved) { bodyEl.textContent = d.improved; gkToast('Polished ✓'); }
+  } catch(err) { gkToast('AI unavailable'); }
+}
+
+async function gkModalSave(andClose) {
+  if (!_modalNoteId) return;
+  var title = document.getElementById('gkModalTitle').value.trim();
+  var body  = document.getElementById('gkModalBody').textContent.trim();
+  var listArea = document.getElementById('gkModalListArea');
+  var isListVisible = listArea.style.display !== 'none';
+  var items = [];
+  if (isListVisible) {
+    document.querySelectorAll('#gkModalList .gk-modal-item').forEach(function(row) {
+      var txt = row.querySelector('input[type="text"]')?.value.trim() || '';
+      var chk = row.querySelector('input[type="checkbox"]')?.checked || false;
+      if (txt) items.push({ text: txt, checked: chk });
+    });
+  }
+  try {
+    await gkPost('/Notes/Update', { id: _modalNoteId, title: title, content: isListVisible ? null : body });
+    // Update card
+    var card = document.getElementById('gkcard-' + _modalNoteId);
+    if (card) {
+      var cardTitle = card.querySelector('.gk-card-title');
+      if (title) {
+        if (!cardTitle) { cardTitle = document.createElement('div'); cardTitle.className = 'gk-card-title'; card.querySelector('.gk-card-body')?.prepend(cardTitle); }
+        cardTitle.textContent = title;
+      } else if (cardTitle) { cardTitle.remove(); }
+      var cardText = card.querySelector('.gk-card-text');
+      if (cardText && !isListVisible) cardText.textContent = body;
+    }
+    if (andClose) {
+      document.getElementById('gkModalOv').style.display = 'none';
+      document.body.style.overflow = '';
+      _modalNoteId = null;
+    }
+  } catch(err) { /* silent */ }
+}
+
+function gkModalClose() {
+  clearTimeout(_modalSaveTimer);
+  gkModalSave(true);
+}
+
+// ════════════════════════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════════════════════════
+function _esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+}

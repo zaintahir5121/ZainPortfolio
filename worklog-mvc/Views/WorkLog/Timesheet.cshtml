@@ -1,0 +1,156 @@
+@model List<WorkLogApp.Models.WorkTask>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Timesheet";
+    var section = ViewBag.Section as string ?? "timesheet";
+    var weekStart  = (DateTime)(ViewBag.WeekStart);
+    var weekEnd    = (DateTime)(ViewBag.WeekEnd);
+    var weekOffset = (int)(ViewBag.WeekOffset ?? 0);
+
+    // Build day columns Mon–Sun
+    var days = Enumerable.Range(0, 7).Select(i => weekStart.AddDays(i)).ToList();
+
+    // Group tasks by project + day
+    var byProject = Model
+        .GroupBy(t => t.Project ?? "(no project)")
+        .OrderBy(g => g.Key)
+        .ToList();
+
+    // Day totals
+    var dayTotals = days.ToDictionary(d => d, d => Model.Where(t => t.WorkEntry.LogDate.Date == d.Date).Sum(t => (double)t.Hours));
+    double grandTotal = Model.Sum(t => (double)t.Hours);
+
+    // For Jira/Slack export
+    var jiraLines = Model.OrderBy(t => t.WorkEntry.LogDate).ThenBy(t => t.SortOrder)
+        .Select(t => (t.Project != null ? "[" + t.Project + "] " : "") + t.Description + " - " + t.Hours + "h");
+    var slackLines = Model.OrderBy(t => t.WorkEntry.LogDate).ThenBy(t => t.SortOrder)
+        .Select(t => "• " + t.Description + " (" + t.Hours + "h)" + (t.Project != null ? " [" + t.Project + "]" : ""));
+    var jiraText  = string.Join("\n", jiraLines);
+    var slackText = "*This week:*\n" + string.Join("\n", slackLines);
+}
+
+@section Styles {
+<style>
+  .ts-wrap { max-width: 960px; margin: 0 auto; padding: 24px 24px 80px; }
+  .ts-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .ts-nav-btn { padding: 8px 16px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; cursor: pointer; font-size: 14px; transition: background .15s; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+  .ts-nav-btn:hover { background: var(--bg); }
+  .ts-week-label { font-size: 16px; font-weight: 600; color: var(--text); }
+  .ts-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ts-export-btn { padding: 7px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px; cursor: pointer; transition: all .15s; }
+  .ts-export-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .ts-table-wrap { overflow-x: auto; }
+  .ts-table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); min-width: 640px; }
+  .ts-table th { background: var(--bg); padding: 10px 12px; font-size: 12.5px; font-weight: 600; color: var(--text2); text-align: center; border-bottom: 1px solid var(--border); }
+  .ts-table th:first-child { text-align: left; }
+  .ts-table td { padding: 10px 12px; font-size: 13.5px; border-bottom: 1px solid var(--border); text-align: center; color: var(--text2); }
+  .ts-table td:first-child { text-align: left; color: var(--text); font-weight: 500; }
+  .ts-table tr:last-child td { border-bottom: none; }
+  .ts-table .ts-total-row td { font-weight: 700; background: var(--bg); color: var(--text); }
+  .ts-hours-cell { color: var(--text); font-weight: 600; }
+  .ts-zero { color: var(--border); }
+  .ts-empty { text-align: center; padding: 60px 20px; color: var(--text2); }
+  .ts-empty-ico { font-size: 48px; margin-bottom: 16px; }
+  .ts-empty-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .ts-today-col { background: rgba(99,102,241,.04); }
+</style>
+}
+
+<div class="ts-wrap">
+  <div class="ts-nav">
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="/WorkLog/Timesheet?weekOffset=@(weekOffset-1)" class="ts-nav-btn">← Prev</a>
+      <span class="ts-week-label">Week of @weekStart.ToString("MMM d") – @weekEnd.ToString("MMM d, yyyy")</span>
+      @if (weekOffset < 0) {
+        <a href="/WorkLog/Timesheet?weekOffset=@(weekOffset+1)" class="ts-nav-btn">Next →</a>
+      } else {
+        <a href="/WorkLog/Timesheet?weekOffset=@(weekOffset+1)" class="ts-nav-btn" style="opacity:.4;pointer-events:none">Next →</a>
+      }
+    </div>
+    <div class="ts-actions">
+      <a href="/WorkLog/ExportCsv" class="ts-export-btn">⬇ Export CSV</a>
+      <button class="ts-export-btn" onclick="tsCopyJira()">📋 Copy Jira</button>
+      <button class="ts-export-btn" onclick="tsCopySlack()">💬 Copy Slack</button>
+    </div>
+  </div>
+
+  @if (!Model.Any()) {
+    <div class="ts-empty">
+      <div class="ts-empty-ico">📅</div>
+      <div class="ts-empty-title">No work logged this week</div>
+      <p style="font-size:14px;color:var(--text2)">Log your work on the <a href="/WorkLog" style="color:var(--accent)">Daily Log</a> page and it will appear here.</p>
+    </div>
+  } else {
+    var today = DateTime.UtcNow.Date;
+    <div class="ts-table-wrap">
+    <table class="ts-table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          @foreach (var d in days) {
+            <th class="@(d.Date == today ? "ts-today-col" : "")">@d.ToString("ddd")<br><span style="font-weight:400;color:var(--text2)">@d.ToString("M/d")</span></th>
+          }
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var proj in byProject) {
+          var projTotal = proj.Sum(t => (double)t.Hours);
+          <tr>
+            <td>@proj.Key</td>
+            @foreach (var d in days) {
+              var cellHours = proj.Where(t => t.WorkEntry.LogDate.Date == d.Date).Sum(t => (double)t.Hours);
+              <td class="@(d.Date == today ? "ts-today-col" : "")">
+                @if (cellHours > 0) {
+                  <span class="ts-hours-cell">@cellHours.ToString("F1")h</span>
+                } else {
+                  <span class="ts-zero">—</span>
+                }
+              </td>
+            }
+            <td class="ts-hours-cell">@projTotal.ToString("F1")h</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr class="ts-total-row">
+          <td>Total</td>
+          @foreach (var d in days) {
+            <td class="@(d.Date == today ? "ts-today-col" : "")">
+              @if (dayTotals[d] > 0) {
+                @dayTotals[d].ToString("F1")<text>h</text>
+              } else {
+                <span class="ts-zero">—</span>
+              }
+            </td>
+          }
+          <td>@grandTotal.ToString("F1")h</td>
+        </tr>
+      </tfoot>
+    </table>
+    </div>
+  }
+</div>
+
+@section Scripts {
+<script>
+var _jiraText  = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(jiraText));
+var _slackText = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(slackText));
+
+function tsCopyJira() {
+  navigator.clipboard.writeText(_jiraText).then(function() {
+    gkToast('Jira format copied to clipboard');
+  }).catch(function() {
+    prompt('Copy Jira format:', _jiraText);
+  });
+}
+
+function tsCopySlack() {
+  navigator.clipboard.writeText(_slackText).then(function() {
+    gkToast('Slack standup copied to clipboard');
+  }).catch(function() {
+    prompt('Copy Slack standup:', _slackText);
+  });
+}
+</script>
+}

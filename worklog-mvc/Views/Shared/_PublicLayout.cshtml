@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@(ViewData["Title"] ?? "WorkLog") — worklog.today</title>
+  <meta name="description" content="@(ViewData["Description"] ?? "WorkLog — simple, distraction-free work logging for teams and individuals. Track time, projects, and get AI-powered daily summaries.")">
+  <meta name="robots" content="@(ViewData["Robots"] ?? "index, follow")">
+  <meta name="author" content="WorkLog">
+  <link rel="canonical" href="https://worklog.today@(Context.Request.Path.ToString().TrimEnd('/') == "" ? "/" : Context.Request.Path.ToString())">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  @if (ViewData["OgTitle"] != null) {
+    <meta property="og:type"        content="website">
+    <meta property="og:site_name"   content="WorkLog">
+    <meta property="og:url"         content="https://worklog.today@(Context.Request.Path)">
+    <meta property="og:title"       content="@ViewData["OgTitle"]">
+    <meta property="og:description" content="@(ViewData["OgDescription"] ?? ViewData["Description"] ?? "")">
+    <meta property="og:image"       content="https://worklog.today/og-image.png">
+    <meta name="twitter:card"       content="summary_large_image">
+    <meta name="twitter:title"      content="@ViewData["OgTitle"]">
+    <meta name="twitter:description" content="@(ViewData["OgDescription"] ?? ViewData["Description"] ?? "")">
+    <meta name="twitter:image"      content="https://worklog.today/og-image.png">
+  }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+</head>
+<body>
+<div class="pub-page">
+
+  <nav class="l-nav">
+    <a href="/" class="l-logo">worklog<span>.</span></a>
+    <div class="pub-nav-links">
+      <a asp-controller="Home" asp-action="About" class="pub-nav-link">About</a>
+      <a asp-controller="Home" asp-action="Contact" class="pub-nav-link">Contact</a>
+    </div>
+    <a asp-controller="Account" asp-action="Login" class="l-signin">Sign in →</a>
+  </nav>
+
+  <main class="pub-main">
+    @RenderBody()
+  </main>
+
+  <footer class="pub-footer">
+    <div class="pf-inner">
+      <div class="pf-brand">worklog<span>.</span></div>
+      <nav class="pf-links">
+        <a asp-controller="Home" asp-action="About">About</a>
+        <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+        <a asp-controller="Home" asp-action="Terms">Terms of Service</a>
+        <a asp-controller="Home" asp-action="Contact">Contact</a>
+      </nav>
+      <div class="pf-copy">&copy; 2026 WorkLog &mdash; simple by design</div>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

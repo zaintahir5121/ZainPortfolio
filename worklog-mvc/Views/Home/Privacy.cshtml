@@ -1,0 +1,79 @@
+@{
+    Layout = "_PublicLayout";
+    ViewData["Title"]       = "Privacy Policy";
+    ViewData["Description"] = "WorkLog privacy policy — your data stays private. No third-party analytics, no ads, no data sharing. Read how WorkLog protects your work journal data.";
+    ViewData["Robots"]      = "noindex, follow";
+}
+
+<div class="policy-head">
+  <div class="ph-label">Legal</div>
+  <h1>Privacy Policy</h1>
+  <p class="ph-meta">Last updated: June 2025</p>
+</div>
+
+<div class="policy-body">
+
+  <div class="pb-callout">
+    <strong>Short version:</strong> WorkLog stores only the data you enter. Your work logs stay in your own database. The AI runs locally on your machine — nothing is sent to third-party AI servers. We do not sell your data.
+  </div>
+
+  <h2>1. Information We Collect</h2>
+  <p>WorkLog collects only the information you provide directly:</p>
+  <ul>
+    <li><strong>Account information</strong> — your name and password (stored as a one-way hash using bcrypt; we cannot recover your password)</li>
+    <li><strong>Work log entries</strong> — the project names, descriptions, hours, tags, and dates you enter</li>
+    <li><strong>Recurring entry templates</strong> — any recurring work templates you configure</li>
+  </ul>
+  <p>We do not collect email addresses, payment information, location data, device identifiers, or any other personal information beyond what is listed above.</p>
+
+  <h2>2. How We Use Your Information</h2>
+  <p>Your data is used solely to provide the WorkLog service:</p>
+  <ul>
+    <li>Displaying your work logs and timesheet reports</li>
+    <li>Computing statistics (streak, weekly hours, project breakdowns)</li>
+    <li>Generating AI-powered summaries</li>
+    <li>Auto-firing recurring entries on your first daily visit</li>
+  </ul>
+  <p>We never use your data for advertising, profiling, or any purpose other than providing the WorkLog service to you.</p>
+
+  <h2>3. AI and Local Processing</h2>
+  <p>WorkLog's AI features (description improvement, natural language parsing, daily summaries) are processed on the same server where WorkLog is deployed. Your work log content is not sent to third-party cloud AI services.</p>
+
+  <h2>4. Data Storage</h2>
+  <p>All data is stored in a SQL Server database on the server or machine where WorkLog is deployed. If you are self-hosting WorkLog, you have full control over your database and can delete all data at any time.</p>
+
+  <h2>5. Cookies</h2>
+  <p>WorkLog uses a single session cookie to keep you logged in. This cookie:</p>
+  <ul>
+    <li>Contains only an encrypted session identifier</li>
+    <li>Is valid for 7 days (with sliding expiration)</li>
+    <li>Is deleted when you sign out</li>
+    <li>Is not used for tracking, analytics, or advertising</li>
+  </ul>
+
+  <h2>6. Third-Party Services</h2>
+  <p>WorkLog loads the <strong>Inter</strong> typeface from Google Fonts. This means your browser makes a request to Google's servers to download the font. Google may log this request according to their own privacy policy. No other third-party services are used by default.</p>
+  <p>If you enable Google AdSense on your deployment, Google may set additional cookies for advertising purposes. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a> for details.</p>
+
+  <h2>7. Data Retention</h2>
+  <p>Your data is retained for as long as your account exists. You can delete individual log entries at any time. To delete your account and all associated data, contact the administrator of your WorkLog instance.</p>
+
+  <h2>8. Security</h2>
+  <p>We take reasonable technical precautions to protect your data including:</p>
+  <ul>
+    <li>Passwords hashed with bcrypt (never stored in plain text)</li>
+    <li>HTTPS encryption in transit</li>
+    <li>Anti-forgery tokens on all state-changing requests</li>
+    <li>Authenticated access — all log data requires sign-in</li>
+  </ul>
+
+  <h2>9. Your Rights</h2>
+  <p>You have the right to access, correct, export, or delete any personal data WorkLog holds about you. To exercise these rights, contact the WorkLog administrator or use the <a asp-controller="Home" asp-action="Contact">Contact</a> page.</p>
+
+  <h2>10. Changes to This Policy</h2>
+  <p>If we make material changes to this policy, we will update the "Last updated" date at the top of this page. Continued use of WorkLog after changes constitutes acceptance of the updated policy.</p>
+
+  <h2>11. Contact</h2>
+  <p>Questions about this privacy policy? <a asp-controller="Home" asp-action="Contact">Get in touch.</a></p>
+
+</div>

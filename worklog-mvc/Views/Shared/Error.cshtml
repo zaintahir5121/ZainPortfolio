@@ -1,0 +1,36 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Error — WorkLog";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Something went wrong — WorkLog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+  <style>
+    .err-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; }
+    .err-card { background:#fff; border-radius:20px; padding:3rem 2.5rem; max-width:480px; width:100%; text-align:center; box-shadow:0 4px 40px rgba(99,102,241,.12); }
+    .err-code  { font-size:4rem; font-weight:800; color:#6366f1; line-height:1; margin-bottom:.5rem; }
+    .err-title { font-size:1.35rem; font-weight:700; color:#0f0e2a; margin-bottom:.75rem; }
+    .err-sub   { font-size:.9rem; color:#8888aa; margin-bottom:2rem; line-height:1.6; }
+    .err-btn   { display:inline-block; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:.7rem 1.75rem; border-radius:10px; font-weight:700; font-size:.9rem; text-decoration:none; }
+  </style>
+</head>
+<body>
+<div class="err-page">
+  <div class="err-card">
+    <div class="err-code">500</div>
+    <div class="err-title">Something went wrong</div>
+    <p class="err-sub">
+      An unexpected error occurred. This is usually a temporary issue.<br>
+      If it keeps happening, check that SQL Server is running and your connection string is correct.
+    </p>
+    <a href="/" class="err-btn">← Back to home</a>
+  </div>
+</div>
+</body>
+</html>

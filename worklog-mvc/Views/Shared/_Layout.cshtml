@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@(ViewData["Title"] is string t ? t + " — worklog." : "worklog.")</title>
+  <meta name="description" content="@(ViewData["Description"] as string ?? "worklog. — AI-powered work log and timesheets.")">
+  <meta name="theme-color" content="#08080f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+  @RenderSection("Styles", required: false)
+</head>
+<body>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+  <!-- ── Header ── -->
+  <header class="app-header">
+    <a href="/WorkLog" class="hd-logo" title="worklog.">
+      <div class="hd-logo-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="8" height="5" rx="1.5" fill="rgba(255,255,255,.9)"/>
+          <rect x="3" y="10" width="18" height="3" rx="1.5" fill="rgba(255,255,255,.7)"/>
+          <rect x="3" y="15" width="12" height="3" rx="1.5" fill="rgba(255,255,255,.7)"/>
+          <rect x="3" y="20" width="7" height="1.5" rx=".75" fill="rgba(255,255,255,.5)"/>
+        </svg>
+      </div>
+      <span class="hd-logo-text">worklog<em>.</em></span>
+    </a>
+
+    <div class="hd-search-wrap">
+      <div class="hd-search">
+        <svg class="hd-search-icon" width="15" height="15" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        <input type="text" class="hd-search-input" id="gkSearchInput" placeholder="Search…" autocomplete="off">
+        <button class="hd-search-clear" id="gkSearchClear" title="Clear" onclick="gkSearchClearFn()">
+          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Jump links -->
+    <nav class="hd-jumps">
+      <a class="hd-jump" href="#section-worklog" onclick="document.getElementById('section-worklog').scrollIntoView({behavior:'smooth'});return false;">Work Log</a>
+      <a class="hd-jump" href="#section-notes"   onclick="document.getElementById('section-notes').scrollIntoView({behavior:'smooth'});return false;">Notes</a>
+      <a class="hd-jump" href="#section-timesheet" onclick="document.getElementById('section-timesheet').scrollIntoView({behavior:'smooth'});return false;">Timesheet</a>
+    </nav>
+
+    <div class="hd-spacer"></div>
+
+    <button class="hd-standup-btn" onclick="standupOpen()" title="Generate AI standup">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z" fill="currentColor"/>
+        <path d="M19 15L19.8 17.2L22 18L19.8 18.8L19 21L18.2 18.8L16 18L18.2 17.2L19 15Z" fill="currentColor" opacity=".6"/>
+      </svg>
+      <span class="hd-standup-label">AI Standup</span>
+    </button>
+
+    <button class="hd-btn" onclick="gkToggleTheme()" title="Toggle theme">
+      <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z" fill="currentColor"/></svg>
+    </button>
+
+    <div class="hd-avatar" onclick="this.classList.toggle('open')">
+      @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "?")
+      <div class="hd-avatar-menu" onclick="event.stopPropagation()">
+        <div class="hd-avatar-name">
+          @User.Identity?.Name
+          <span class="hd-avatar-email">Free account</span>
+        </div>
+        <div class="hd-avatar-sep"></div>
+        <a href="https://buymeacoffee.com/zaintahir512" target="_blank" rel="noopener" class="hd-avatar-item">
+          <svg width="15" height="15" viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z" fill="currentColor"/></svg>
+          Buy me a coffee ☕
+        </a>
+        <div class="hd-avatar-sep"></div>
+        <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
+          @Html.AntiForgeryToken()
+          <button type="submit" class="hd-avatar-item" style="border:none;cursor:pointer;width:100%">
+            <svg width="15" height="15" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/></svg>
+            Sign out
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── AI Standup Modal ── -->
+  <div class="standup-ov" id="standupOv" style="display:none" onclick="if(event.target===this)standupClose()">
+    <div class="standup-card">
+      <div class="standup-head">
+        <div class="standup-head-left">
+          <div class="standup-head-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z" fill="white"/>
+              <path d="M19 15L19.8 17.2L22 18L19.8 18.8L19 21L18.2 18.8L16 18L18.2 17.2L19 15Z" fill="rgba(255,255,255,.7)"/>
+            </svg>
+          </div>
+          <div>
+            <div class="standup-title">AI Standup</div>
+            <div class="standup-sub">Generated from yesterday's work log</div>
+          </div>
+        </div>
+        <button class="standup-head-close" onclick="standupClose()">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        </button>
+      </div>
+      <div class="standup-body" id="standupBody">
+        <div class="standup-loading" id="standupLoading">
+          <div class="gk-ai-typing"><span></span><span></span><span></span></div>
+          <p>Generating your standup…</p>
+        </div>
+        <div class="standup-text" id="standupText" style="display:none"></div>
+      </div>
+      <div class="standup-foot">
+        <button class="standup-close-btn" onclick="standupClose()">Close</button>
+        <button class="standup-copy-btn" id="standupCopyBtn" onclick="standupCopy()" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"/></svg>
+          Copy to clipboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-wrap">
+    <div class="app-content">
+      @RenderBody()
+    </div>
+  </div>
+}
+else
+{
+  <main class="auth-wrap">
+    @RenderBody()
+  </main>
+}
+
+<div class="gk-toast" id="gkToast">
+  <span id="gkToastMsg"></span>
+  <button class="gk-toast-undo" id="gkToastUndo" style="display:none" onclick="gkUndoLast()">Undo</button>
+</div>
+
+@RenderSection("Scripts", required: false)
+
+<script>
+(function() {
+  const t = localStorage.getItem('gk_theme') || 'dark';
+  document.documentElement.dataset.theme = t;
+})();
+function gkToggleTheme() {
+  const html = document.documentElement;
+  const next = html.dataset.theme === 'light' ? 'dark' : 'light';
+  html.dataset.theme = next;
+  localStorage.setItem('gk_theme', next);
+}
+
+var _toastT, _undoFn = null;
+function gkToast(msg, undoFn) {
+  var el = document.getElementById('gkToast');
+  var msgEl = document.getElementById('gkToastMsg');
+  var undoEl = document.getElementById('gkToastUndo');
+  if (!el) return;
+  msgEl.textContent = msg;
+  _undoFn = undoFn || null;
+  if (undoEl) undoEl.style.display = undoFn ? '' : 'none';
+  el.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(function() { el.classList.remove('show'); _undoFn = null; }, 3500);
+}
+function gkUndoLast() {
+  if (_undoFn) { _undoFn(); _undoFn = null; document.getElementById('gkToast')?.classList.remove('show'); }
+}
+
+async function gkPost(url, data) {
+  const r = await fetch(url, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) throw new Error(r.status);
+  return r.text().then(t => t ? JSON.parse(t) : null).catch(() => null);
+}
+
+var _searchDebounce;
+document.addEventListener('DOMContentLoaded', function() {
+  var inp = document.getElementById('gkSearchInput');
+  var clr = document.getElementById('gkSearchClear');
+  if (!inp) return;
+  inp.addEventListener('input', function() {
+    clr.classList.toggle('visible', inp.value.length > 0);
+    clearTimeout(_searchDebounce);
+    _searchDebounce = setTimeout(function() { gkApplySearch(inp.value.trim().toLowerCase()); }, 200);
+  });
+  inp.addEventListener('keydown', function(e) { if (e.key === 'Escape') { gkSearchClearFn(); inp.blur(); } });
+});
+function gkSearchClearFn() {
+  var inp = document.getElementById('gkSearchInput');
+  var clr = document.getElementById('gkSearchClear');
+  if (inp) inp.value = '';
+  if (clr) clr.classList.remove('visible');
+  gkApplySearch('');
+}
+function gkApplySearch(q) {
+  document.querySelectorAll('.wl-entry').forEach(function(el) {
+    var txt = el.textContent.toLowerCase();
+    el.style.display = (!q || txt.includes(q)) ? '' : 'none';
+  });
+  document.querySelectorAll('.gk-card').forEach(function(el) {
+    var txt = el.textContent.toLowerCase();
+    el.style.display = (!q || txt.includes(q)) ? '' : 'none';
+  });
+  document.querySelectorAll('.wl-day-group').forEach(function(g) {
+    var hasVisible = Array.from(g.querySelectorAll('.wl-entry')).some(function(e) { return e.style.display !== 'none'; });
+    g.style.display = hasVisible ? '' : 'none';
+  });
+}
+
+var _standupText = '';
+function standupOpen() {
+  var ov = document.getElementById('standupOv');
+  var loading = document.getElementById('standupLoading');
+  var textEl = document.getElementById('standupText');
+  var copyBtn = document.getElementById('standupCopyBtn');
+  if (!ov) return;
+  _standupText = '';
+  loading.style.display = 'flex';
+  textEl.style.display = 'none';
+  textEl.innerHTML = '';
+  copyBtn.disabled = true;
+  ov.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  fetch('/Assistant/Standup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      _standupText = d.standup || '';
+      loading.style.display = 'none';
+      textEl.style.display = 'block';
+      textEl.innerHTML = _formatStandup(_standupText);
+      copyBtn.disabled = false;
+    })
+    .catch(function() {
+      loading.style.display = 'none';
+      textEl.style.display = 'block';
+      textEl.textContent = 'Could not generate standup. Please try again.';
+    });
+}
+function standupClose() {
+  var ov = document.getElementById('standupOv');
+  if (ov) ov.style.display = 'none';
+  document.body.style.overflow = '';
+}
+function standupCopy() {
+  if (!_standupText) return;
+  navigator.clipboard.writeText(_standupText)
+    .then(function() { gkToast('Standup copied to clipboard ✓'); })
+    .catch(function() { prompt('Copy your standup:', _standupText); });
+}
+function _formatStandup(txt) {
+  if (!txt) return '';
+  return txt
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^•\s/gm, '<span style="color:var(--accent2)">•</span> ')
+    .replace(/\n/g, '<br>');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key === 'd') { e.preventDefault(); gkToggleTheme(); }
+  if (e.key === 'Escape') { standupClose(); }
+  if (e.ctrlKey && e.key === 'k') { e.preventDefault(); document.getElementById('gkSearchInput')?.focus(); }
+  if (e.ctrlKey && e.key === '1') { e.preventDefault(); document.getElementById('section-worklog')?.scrollIntoView({ behavior: 'smooth' }); }
+  if (e.ctrlKey && e.key === '2') { e.preventDefault(); document.getElementById('section-notes')?.scrollIntoView({ behavior: 'smooth' }); }
+  if (e.ctrlKey && e.key === '3') { e.preventDefault(); document.getElementById('section-timesheet')?.scrollIntoView({ behavior: 'smooth' }); }
+});
+</script>
+</body>
+</html>

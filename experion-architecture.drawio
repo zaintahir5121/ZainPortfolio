@@ -1,0 +1,249 @@
+<mxfile host="app.diagrams.net" modified="2026-06-18" agent="Claude" version="21.0.0">
+  <diagram id="experion-arch" name="AG ONE — Experion Architecture">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SWIMLANE: PRODUCT LAYER                            -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="sw1" value="AG ONE Product Series — Each Team Works Independently" style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="40" width="1520" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="p1" value="Product 1&#xa;Learn" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="sw1">
+          <mxGeometry x="20" y="50" width="160" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2" value="Product 2&#xa;Work" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="sw1">
+          <mxGeometry x="200" y="50" width="160" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3" value="Product 3&#xa;[Your Product]" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="sw1">
+          <mxGeometry x="380" y="50" width="160" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="p4" value="Product 4&#xa;[Your Product]" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="sw1">
+          <mxGeometry x="560" y="50" width="160" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="p5" value="Product 5&#xa;[Your Product]" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="sw1">
+          <mxGeometry x="740" y="50" width="160" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="p6" value="Product 6&#xa;[Your Product]" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="sw1">
+          <mxGeometry x="920" y="50" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Experion JS SDK Reference -->
+        <mxCell id="sdk-ref" value="&lt;script src=&quot;experion.js&quot;&gt;&#xa;(drop-in, one line)" style="shape=mxgraph.flowchart.document;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontStyle=2;" vertex="1" parent="sw1">
+          <mxGeometry x="1310" y="40" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- AG ONE ROUTER                                      -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="agone" value="AG ONE&#xa;Central Router &amp; Orchestrator&#xa;(Decides: Generation or Action?)" style="rounded=1;fillColor=#1e40af;strokeColor=#1d4ed8;fontColor=#ffffff;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="570" y="240" width="500" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow: Each product → AG ONE -->
+        <mxCell id="e-p1-ag" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" edge="1" source="p1" target="agone" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-p2-ag" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" edge="1" source="p2" target="agone" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-p3-ag" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" edge="1" source="p3" target="agone" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-p4-ag" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" edge="1" source="p4" target="agone" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-p5-ag" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" edge="1" source="p5" target="agone" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-p6-ag" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" edge="1" source="p6" target="agone" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- TWO PATHS                                          -->
+        <!-- ═══════════════════════════════════════════════════ -->
+
+        <!-- GENERATION PATH BOX -->
+        <mxCell id="gen-path" value="Generation Path" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="400" width="580" height="290" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="gen1" value="Step 1: Embed Query&#xa;(text → vector)" style="rounded=1;fillColor=#fff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="gen-path">
+          <mxGeometry x="20" y="50" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="gen2" value="Step 2: Semantic Cache Check&#xa;(HIT = &lt;15ms, skip LLM)" style="rounded=1;fillColor=#fff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="gen-path">
+          <mxGeometry x="20" y="120" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="gen3" value="Step 3: Load Conversation History&#xa;(from Blob JSONL)" style="rounded=1;fillColor=#fff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="gen-path">
+          <mxGeometry x="20" y="190" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="gen4" value="Step 4: KB Retrieval&#xa;(Azure AI Search / RAG)" style="rounded=1;fillColor=#fff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="gen-path">
+          <mxGeometry x="340" y="120" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="gen5" value="Step 5: Azure OpenAI GPT-4.1&#xa;+ suggestion chips" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=10;" vertex="1" parent="gen-path">
+          <mxGeometry x="340" y="190" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="gen6" value="Step 6: Persist to Blob + SemanticCache" style="rounded=1;fillColor=#fff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="gen-path">
+          <mxGeometry x="180" y="260" width="220" height="18" as="geometry"/>
+        </mxCell>
+
+        <!-- gen internal arrows -->
+        <mxCell id="eg1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="gen1" target="gen2" parent="gen-path"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="eg2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="gen2" target="gen3" parent="gen-path"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="eg3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="gen3" target="gen4" parent="gen-path"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="eg4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="gen4" target="gen5" parent="gen-path"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ACTION PATH BOX -->
+        <mxCell id="act-path" value="Action Path" style="swimlane;startSize=30;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="710" y="400" width="580" height="290" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="act1" value="Step 1: NLP Intent Router&#xa;(embedding cosine + Jaccard)" style="rounded=1;fillColor=#fff;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="act-path">
+          <mxGeometry x="20" y="50" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act2" value="Step 2: ActionMappings Lookup&#xa;(SQL — no LLM needed)" style="rounded=1;fillColor=#fff;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="act-path">
+          <mxGeometry x="20" y="130" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act3" value="Step 3: Dispatch ActionJob&#xa;(Service Bus Queue)" style="rounded=1;fillColor=#fff;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="act-path">
+          <mxGeometry x="20" y="210" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act4" value="ActionWorker (Background)&#xa;Executes → targetEndpoint" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=10;" vertex="1" parent="act-path">
+          <mxGeometry x="330" y="130" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act5" value="SignalR — echo result back to SDK" style="rounded=1;fillColor=#fff;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="act-path">
+          <mxGeometry x="330" y="210" width="220" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- act internal arrows -->
+        <mxCell id="ea1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act1" target="act2" parent="act-path"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="ea2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act2" target="act3" parent="act-path"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="ea3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act3" target="act4" parent="act-path"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="ea4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act4" target="act5" parent="act-path"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- AG ONE → Paths -->
+        <mxCell id="e-ag-gen" value="GENERATION" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#82b366;fontStyle=1;fontSize=11;strokeWidth=2;" edge="1" source="agone" target="gen-path" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-ag-act" value="ACTION" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#d79b00;fontStyle=1;fontSize=11;strokeWidth=2;" edge="1" source="agone" target="act-path" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- EXPERION FRONTEND JS SDK                           -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="sdk-box" value="Experion JS SDK&#xa;(Hosted on Azure Blob Storage — CDN)" style="swimlane;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="740" width="580" height="220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sdk1" value="Identity Resolver&#xa;UserID / anon-id / IP cohort" style="rounded=1;fillColor=#fff;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="sdk-box">
+          <mxGeometry x="20" y="50" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="sdk2" value="Activity Tracker&#xa;pageview, click, scroll, idle..." style="rounded=1;fillColor=#fff;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="sdk-box">
+          <mxGeometry x="220" y="50" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="sdk3" value="Circle Gesture (Alt+drag)&#xa;Captures DOM text region" style="rounded=1;fillColor=#fff;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="sdk-box">
+          <mxGeometry x="20" y="130" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="sdk4" value="Chat Sidebar + Sphere Avatar&#xa;Suggestion chips" style="rounded=1;fillColor=#fff;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="sdk-box">
+          <mxGeometry x="220" y="130" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="sdk5" value="Proactive Nudge Toast&#xa;(SignalR push)" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=10;" vertex="1" parent="sdk-box">
+          <mxGeometry x="420" y="90" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- EXPERION BACKEND API                               -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="api-box" value="Experion API (.NET 8)&#xa;— Experion Team Owns This —" style="swimlane;startSize=30;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="710" y="740" width="580" height="220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="api1" value="POST /track&#xa;Ingest activity events" style="rounded=1;fillColor=#fff;strokeColor=#b85450;fontSize=10;" vertex="1" parent="api-box">
+          <mxGeometry x="20" y="50" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="api2" value="POST /process&#xa;Chat / Action / Generation" style="rounded=1;fillColor=#fff;strokeColor=#b85450;fontSize=10;" vertex="1" parent="api-box">
+          <mxGeometry x="220" y="50" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="api3" value="RecommendationEngine&#xa;Trigger rules + LLM nudge" style="rounded=1;fillColor=#fff;strokeColor=#b85450;fontSize=10;" vertex="1" parent="api-box">
+          <mxGeometry x="20" y="130" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="api4" value="SignalR Hub&#xa;Push nudges + action ACKs" style="rounded=1;fillColor=#fff;strokeColor=#b85450;fontSize=10;" vertex="1" parent="api-box">
+          <mxGeometry x="220" y="130" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="api5" value="ExperionService&#xa;NLP Router + Pipeline" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=10;" vertex="1" parent="api-box">
+          <mxGeometry x="420" y="90" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- SDK ↔ API -->
+        <mxCell id="e-sdk-api1" value="POST /track (batched)" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#9673a6;fontSize=10;" edge="1" source="sdk-box" target="api1" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-sdk-api2" value="POST /process (chat/action)" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#b85450;fontSize=10;" edge="1" source="sdk-box" target="api2" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-api-sdk" value="SignalR push (nudge / ACK)" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#b85450;fontSize=10;dashed=1;" edge="1" source="api4" target="sdk5" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Gen Path → API -->
+        <mxCell id="e-gen-api" value="routes through Experion API" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#82b366;fontSize=9;dashed=1;" edge="1" source="gen-path" target="api-box" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-act-api" value="routes through Experion API" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#d79b00;fontSize=9;dashed=1;" edge="1" source="act-path" target="api-box" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- STORAGE LAYER                                      -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="store-box" value="Storage &amp; Infrastructure Layer" style="swimlane;startSize=30;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1010" width="1230" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="st1" value="Azure Blob Storage&#xa;conversations/ &amp; activity/ JSONL" style="shape=mxgraph.azure2.blob_storage;fillColor=#0078d4;strokeColor=#005a9e;fontColor=#fff;fontSize=10;" vertex="1" parent="store-box">
+          <mxGeometry x="20" y="35" width="200" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="st2" value="SQL Server&#xa;ActionMappings, SemanticCache,&#xa;UserProfile, AuditLog, TenantConfig" style="shape=mxgraph.azure2.sql;fillColor=#0078d4;strokeColor=#005a9e;fontColor=#fff;fontSize=10;" vertex="1" parent="store-box">
+          <mxGeometry x="240" y="35" width="220" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="st3" value="Azure AI Search&#xa;KB Index + Semantic Cache&#xa;(Vector / Hybrid)" style="shape=mxgraph.azure2.search;fillColor=#0078d4;strokeColor=#005a9e;fontColor=#fff;fontSize=10;" vertex="1" parent="store-box">
+          <mxGeometry x="480" y="35" width="200" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="st4" value="Azure OpenAI&#xa;GPT-4.1 + Embeddings" style="shape=mxgraph.azure2.cognitive_services;fillColor=#0078d4;strokeColor=#005a9e;fontColor=#fff;fontSize=10;" vertex="1" parent="store-box">
+          <mxGeometry x="700" y="35" width="200" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="st5" value="Azure Service Bus&#xa;Action Queue" style="shape=mxgraph.azure2.service_bus;fillColor=#0078d4;strokeColor=#005a9e;fontColor=#fff;fontSize=10;" vertex="1" parent="store-box">
+          <mxGeometry x="920" y="35" width="200" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="st6" value="Azure SignalR Service&#xa;Real-time push" style="shape=mxgraph.azure2.signalr;fillColor=#0078d4;strokeColor=#005a9e;fontColor=#fff;fontSize=10;" vertex="1" parent="store-box">
+          <mxGeometry x="1040" y="35" width="160" height="65" as="geometry"/>
+        </mxCell>
+
+        <!-- API → Storage -->
+        <mxCell id="e-api-st" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#666;" edge="1" source="api-box" target="store-box" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- INTEGRATION BOUNDARY NOTE                          -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <mxCell id="note1" value="⚠ Experion Team Integration Boundary&#xa;Each product team calls Experion via API only.&#xa;No direct DB / SDK code access by product teams." style="text;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=2;rounded=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="400" width="290" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="note2" value="JS SDK hosted on Azure Blob (CDN).&#xa;Any .NET product adds 1 &lt;script&gt; tag.&#xa;data-tenant / data-api / data-user-id" style="text;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontStyle=2;rounded=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="510" width="290" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="note3" value="Per-product weights (different per team):&#xa;• Action response weight&#xa;• Generation response weight&#xa;• Chat response weight" style="text;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontStyle=2;rounded=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="610" width="290" height="90" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Experion — Technical Implementation Document</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Calibri', 'Segoe UI', sans-serif;
+  background: #d1d5db;
+  color: #111827;
+  font-size: 11pt;
+  line-height: 1.6;
+}
+
+/* ── TOOLBAR ── */
+.toolbar {
+  position: sticky; top: 0; z-index: 200;
+  background: #1e3a8a;
+  padding: 8px 24px;
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+.btn { padding: 6px 16px; border-radius: 5px; border: none; cursor: pointer; font-size: 11px; font-weight: 700; }
+.btn-white { background: #fff; color: #1e3a8a; }
+.btn-ghost { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+
+/* ── PAGE (Word simulation) ── */
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 20px auto;
+  background: #fff;
+  padding: 20mm 22mm 20mm 28mm;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+}
+
+/* ── COVER PAGE ── */
+.cover {
+  min-height: 260mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 3px solid #1e3a8a;
+  margin-bottom: 0;
+  page-break-after: always;
+}
+.cover-tag {
+  font-size: 10pt; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; color: #6b7280; margin-bottom: 16px;
+}
+.cover h1 { font-size: 28pt; font-weight: 800; color: #1e3a8a; line-height: 1.2; margin-bottom: 8px; }
+.cover h2 { font-size: 16pt; font-weight: 400; color: #374151; margin-bottom: 32px; }
+.cover-line { width: 60px; height: 4px; background: #1e3a8a; margin-bottom: 32px; }
+.cover-meta { font-size: 10pt; color: #6b7280; line-height: 2.2; }
+.cover-meta strong { color: #374151; font-weight: 700; }
+
+/* ── TOC ── */
+.toc-page { page-break-after: always; padding-top: 10mm; }
+.toc-title { font-size: 16pt; font-weight: 800; color: #1e3a8a; margin-bottom: 20px; border-bottom: 2px solid #dbeafe; padding-bottom: 8px; }
+.toc-item {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 10.5pt; padding: 5px 0;
+  border-bottom: 1px dotted #d1d5db;
+  color: #374151;
+}
+.toc-item .toc-num { color: #1e3a8a; font-weight: 700; margin-right: 10px; min-width: 28px; }
+.toc-item .toc-page-num { color: #9ca3af; font-size: 9pt; }
+.toc-sub { padding-left: 28px; font-size: 10pt; color: #6b7280; }
+
+/* ── SECTION HEADINGS ── */
+.section-break { page-break-before: always; padding-top: 8mm; }
+
+h1.doc-h1 {
+  font-size: 18pt; font-weight: 800; color: #1e3a8a;
+  margin: 0 0 6px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid #1e3a8a;
+}
+.section-num { color: #93c5fd; margin-right: 10px; }
+
+h2.doc-h2 {
+  font-size: 13pt; font-weight: 700; color: #1e40af;
+  margin: 20px 0 8px;
+  padding-left: 12px;
+  border-left: 4px solid #3b82f6;
+}
+h3.doc-h3 {
+  font-size: 11pt; font-weight: 700; color: #374151;
+  margin: 16px 0 6px;
+}
+
+p { margin-bottom: 10px; color: #374151; font-size: 10.5pt; }
+p.note { font-style: italic; color: #6b7280; font-size: 10pt; }
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: 4px; padding: 10px 14px;
+  margin: 12px 0; font-size: 10pt;
+  border-left: 4px solid;
+}
+.callout.blue  { background: #eff6ff; border-color: #3b82f6; }
+.callout.green { background: #f0fdf4; border-color: #22c55e; }
+.callout.amber { background: #fffbeb; border-color: #f59e0b; }
+.callout.red   { background: #fef2f2; border-color: #ef4444; }
+.callout strong { font-weight: 700; }
+
+/* ── TABLES ── */
+table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 9.5pt; }
+thead tr { background: #1e3a8a; color: #fff; }
+thead th { padding: 8px 10px; text-align: left; font-weight: 700; font-size: 9pt; letter-spacing: 0.3px; }
+tbody tr:nth-child(even) { background: #f8fafc; }
+tbody td { padding: 7px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; color: #374151; }
+tbody tr:hover { background: #eff6ff; }
+
+.tag { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 8.5pt; font-weight: 700; }
+.tag-blue   { background: #dbeafe; color: #1e40af; }
+.tag-green  { background: #dcfce7; color: #166534; }
+.tag-amber  { background: #fef3c7; color: #92400e; }
+.tag-red    { background: #fee2e2; color: #991b1b; }
+.tag-purple { background: #f3e8ff; color: #6b21a8; }
+.tag-gray   { background: #f3f4f6; color: #374151; }
+
+/* ── CODE ── */
+code {
+  background: #f3f4f6; padding: 1px 5px;
+  border-radius: 3px; font-family: 'Consolas','Courier New',monospace;
+  font-size: 9pt; color: #dc2626;
+}
+.code-block {
+  background: #0f172a; color: #e2e8f0;
+  padding: 14px 16px; border-radius: 6px;
+  font-family: 'Consolas','Courier New',monospace;
+  font-size: 8.5pt; line-height: 1.8;
+  margin: 10px 0 16px; overflow-x: auto;
+  white-space: pre;
+}
+.code-block .cm  { color: #6b7280; } /* comment */
+.code-block .kw  { color: #93c5fd; } /* keyword */
+.code-block .st  { color: #86efac; } /* string */
+.code-block .tp  { color: #fde047; } /* type */
+.code-block .fn  { color: #c4b5fd; } /* function */
+.code-block .nm  { color: #fb923c; } /* number */
+
+/* ── STEPS ── */
+.steps { margin: 10px 0 16px; }
+.step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+.step-num {
+  flex-shrink: 0; width: 26px; height: 26px;
+  background: #1e3a8a; color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 10pt; font-weight: 800; margin-top: 1px;
+}
+.step-body strong { display: block; font-size: 10.5pt; color: #111827; }
+.step-body span   { font-size: 9.5pt; color: #6b7280; }
+
+/* ── ARCH DIAGRAM (CSS-drawn) ── */
+.arch-wrap { margin: 16px 0; overflow-x: auto; }
+.arch {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0; font-size: 9pt; min-width: 560px;
+}
+.arch-row { display: flex; width: 100%; justify-content: center; align-items: center; gap: 6px; margin: 2px 0; }
+.arch-box {
+  border-radius: 6px; padding: 8px 12px; text-align: center;
+  font-weight: 700; font-size: 9pt; line-height: 1.4;
+  border: 2px solid; flex: 1;
+}
+.ab-blue   { background: #dbeafe; border-color: #3b82f6; color: #1e3a8a; }
+.ab-navy   { background: #1e3a8a; border-color: #1e40af; color: #fff; }
+.ab-green  { background: #dcfce7; border-color: #16a34a; color: #166534; }
+.ab-amber  { background: #fff7ed; border-color: #ea580c; color: #9a3412; }
+.ab-purple { background: #f3e8ff; border-color: #7c3aed; color: #5b21b6; }
+.ab-gray   { background: #f9fafb; border-color: #9ca3af; color: #374151; }
+.ab-yellow { background: #fefce8; border-color: #ca8a04; color: #713f12; }
+.ab-teal   { background: #f0fdfa; border-color: #0d9488; color: #134e4a; }
+
+.arch-arrow { text-align: center; font-size: 16pt; color: #6b7280; line-height: 1; margin: 0; }
+.arch-arrow-row { display: flex; width: 100%; justify-content: center; gap: 6px; }
+.arch-arrow-item { flex: 1; text-align: center; font-size: 13pt; color: #6b7280; }
+.arch-label { font-size: 8pt; color: #6b7280; text-align: center; font-style: italic; }
+.arch-split { display: flex; width: 100%; gap: 6px; }
+.arch-split-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+/* ── FLOW TABLE (numbered pipeline) ── */
+.flow-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.flow-table td { padding: 8px 10px; border: 1px solid #e5e7eb; vertical-align: top; font-size: 9.5pt; }
+.flow-step-num {
+  background: #1e3a8a; color: #fff; font-weight: 800;
+  text-align: center; width: 36px; font-size: 10pt;
+}
+.flow-name { font-weight: 700; color: #1e40af; width: 160px; }
+.flow-detail { color: #374151; }
+.flow-perf { color: #6b7280; font-style: italic; font-size: 9pt; width: 120px; }
+
+/* ── FOOTER ── */
+.doc-footer {
+  margin-top: 40px; padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 8.5pt; color: #9ca3af;
+  display: flex; justify-content: space-between;
+}
+
+@media print {
+  .toolbar { display: none !important; }
+  body { background: #fff; }
+  .page { margin: 0; box-shadow: none; padding: 15mm 18mm 15mm 22mm; }
+  .section-break { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="btn btn-ghost" onclick="window.location.href='experion-document.html'">← Overview Doc</button>
+  <button class="btn btn-white" onclick="window.print()">🖨 Print / Save as Word PDF</button>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- COVER PAGE                                       -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="page">
+<div class="cover">
+  <div class="cover-tag">Technical Implementation Document — Developer Reference</div>
+  <h1>AG ONE — Experion</h1>
+  <h2>Intent Resolver, Product Callback &amp; Team Integration Architecture</h2>
+  <div class="cover-line"></div>
+  <div class="cover-meta">
+    <div><strong>Document Type:</strong> Technical Developer Reference</div>
+    <div><strong>Product:</strong> Experion — AG ONE Series</div>
+    <div><strong>Version:</strong> 1.0 &nbsp;|&nbsp; <strong>Date:</strong> June 2026</div>
+    <div><strong>Audience:</strong> Backend Engineers · Frontend Engineers · Product Integration Teams</div>
+    <div><strong>Status:</strong> Active</div>
+  </div>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- TABLE OF CONTENTS                                -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="toc-page">
+  <div class="toc-title">Table of Contents</div>
+  <div class="toc-item"><div><span class="toc-num">1</span> System Overview &amp; Architecture</div><div class="toc-page-num">3</div></div>
+  <div class="toc-item toc-sub"><div>1.1 High-Level Architecture Diagram</div></div>
+  <div class="toc-item toc-sub"><div>1.2 Components at a Glance</div></div>
+  <div class="toc-item"><div><span class="toc-num">2</span> Intent Resolver — Deep Dive</div><div class="toc-page-num">5</div></div>
+  <div class="toc-item toc-sub"><div>2.1 How Classification Works</div></div>
+  <div class="toc-item toc-sub"><div>2.2 Scoring Algorithm</div></div>
+  <div class="toc-item toc-sub"><div>2.3 Per-Product Weights</div></div>
+  <div class="toc-item toc-sub"><div>2.4 Code Reference</div></div>
+  <div class="toc-item"><div><span class="toc-num">3</span> /process Pipeline — Full Flow</div><div class="toc-page-num">7</div></div>
+  <div class="toc-item toc-sub"><div>3.1 Action Path</div></div>
+  <div class="toc-item toc-sub"><div>3.2 Generation Path (RAG)</div></div>
+  <div class="toc-item toc-sub"><div>3.3 Chat Path</div></div>
+  <div class="toc-item toc-sub"><div>3.4 Product Callback — How Experion Calls Back</div></div>
+  <div class="toc-item"><div><span class="toc-num">4</span> /track Pipeline</div><div class="toc-page-num">10</div></div>
+  <div class="toc-item"><div><span class="toc-num">5</span> Team Independence Contract</div><div class="toc-page-num">11</div></div>
+  <div class="toc-item toc-sub"><div>5.1 What the Product Team Provides</div></div>
+  <div class="toc-item toc-sub"><div>5.2 What the Experion Team Sets Up</div></div>
+  <div class="toc-item toc-sub"><div>5.3 Endpoints the Product Team Must Expose</div></div>
+  <div class="toc-item"><div><span class="toc-num">6</span> Database Schema</div><div class="toc-page-num">13</div></div>
+  <div class="toc-item"><div><span class="toc-num">7</span> API Reference</div><div class="toc-page-num">14</div></div>
+  <div class="toc-item"><div><span class="toc-num">8</span> JS SDK — Integration Reference</div><div class="toc-page-num">15</div></div>
+  <div class="toc-item"><div><span class="toc-num">9</span> Configuration &amp; Environment Setup</div><div class="toc-page-num">16</div></div>
+  <div class="toc-item"><div><span class="toc-num">10</span> Performance &amp; Cost Design Decisions</div><div class="toc-page-num">17</div></div>
+  <div class="toc-item"><div><span class="toc-num">11</span> Production Deployment Checklist</div><div class="toc-page-num">18</div></div>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 1 — SYSTEM OVERVIEW                      -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">1</span> System Overview &amp; Architecture</h1>
+
+<p>Experion is a drop-in AI agent for the AG ONE product series. It is delivered as a single JavaScript SDK (hosted on Azure Blob CDN) backed by a .NET 8 API. The core design principle is <strong>full product team independence</strong> — each product integrates via a one-time config registration and a single script tag. No product team ever touches Experion's internals.</p>
+
+<h2 class="doc-h2">1.1 High-Level Architecture Diagram</h2>
+
+<div class="arch-wrap">
+<div class="arch">
+  <!-- Products row -->
+  <div class="arch-row">
+    <div class="arch-box ab-yellow" style="font-size:8pt">Product 1<br>Learn</div>
+    <div class="arch-box ab-yellow" style="font-size:8pt">Product 2<br>Work</div>
+    <div class="arch-box ab-yellow" style="font-size:8pt">Product 3<br>Safe</div>
+    <div class="arch-box ab-yellow" style="font-size:8pt">Product 4</div>
+    <div class="arch-box ab-yellow" style="font-size:8pt">Product 5</div>
+    <div class="arch-box ab-yellow" style="font-size:8pt">Product 6</div>
+  </div>
+  <div class="arch-label">↓ each product drops one &lt;script&gt; tag — Experion JS SDK loads ↓</div>
+  <!-- SDK -->
+  <div class="arch-row" style="margin-top:4px">
+    <div class="arch-box ab-purple" style="max-width:100%">Experion JS SDK &nbsp;·&nbsp; Hosted on Azure Blob CDN &nbsp;·&nbsp; Activity Tracker · Chat Sidebar · Circle Gesture · Nudge Toast</div>
+  </div>
+  <div class="arch-arrow">↕</div>
+  <div class="arch-label">POST /track &nbsp;&nbsp;|&nbsp;&nbsp; POST /process &nbsp;&nbsp;|&nbsp;&nbsp; SignalR push</div>
+  <!-- API -->
+  <div class="arch-row" style="margin-top:4px">
+    <div class="arch-box ab-navy" style="max-width:100%">Experion API (.NET 8) &nbsp;·&nbsp; ExperionController · ExperionService · RecommendationEngine · ActionWorker · SignalR Hub</div>
+  </div>
+  <div class="arch-label">↓ Intent Resolver classifies each /process request ↓</div>
+  <!-- Three paths -->
+  <div class="arch-row" style="margin-top:4px">
+    <div class="arch-box ab-amber">ACTION Path<br><span style="font-size:8pt;font-weight:400">NLP Router → SQL → Queue → Worker → Product /action endpoint</span></div>
+    <div class="arch-box ab-green">GENERATION Path<br><span style="font-size:8pt;font-weight:400">Embed → Cache → KB Retrieval → OpenAI → Answer</span></div>
+    <div class="arch-box ab-purple">CHAT Path<br><span style="font-size:8pt;font-weight:400">History → Product /context → OpenAI → Reply</span></div>
+  </div>
+  <div class="arch-label">↓ all paths read/write to storage ↓</div>
+  <!-- Storage -->
+  <div class="arch-row" style="margin-top:4px">
+    <div class="arch-box ab-gray" style="font-size:8pt">Azure Blob<br>conversations/ activity/</div>
+    <div class="arch-box ab-gray" style="font-size:8pt">SQL Server<br>ActionMappings TenantConfig SemanticCache</div>
+    <div class="arch-box ab-gray" style="font-size:8pt">Azure AI Search<br>KB + Vector Index</div>
+    <div class="arch-box ab-gray" style="font-size:8pt">Azure OpenAI<br>GPT-4.1 + Embeddings</div>
+    <div class="arch-box ab-gray" style="font-size:8pt">Service Bus<br>Action Queue</div>
+  </div>
+  <!-- Callback arrow -->
+  <div class="arch-label" style="margin-top:6px">↑ Experion calls back to product's registered endpoints (targetEndpoint / /context) ↑</div>
+</div>
+</div>
+
+<h2 class="doc-h2">1.2 Components at a Glance</h2>
+<table>
+  <thead><tr><th>Component</th><th>Technology</th><th>Owned By</th><th>Responsibility</th></tr></thead>
+  <tbody>
+    <tr><td>JS SDK</td><td>Vanilla JS, SignalR client</td><td>Experion Team</td><td>Activity tracking, chat UI, nudge display</td></tr>
+    <tr><td>Experion API</td><td>.NET 8, ASP.NET Core</td><td>Experion Team</td><td>All AI processing, routing, persistence</td></tr>
+    <tr><td>Intent Resolver</td><td>C# — hybrid NLP scoring</td><td>Experion Team</td><td>Classifies every /process request</td></tr>
+    <tr><td>ActionWorker</td><td>.NET Background Service</td><td>Experion Team</td><td>Executes actions, calls product endpoints</td></tr>
+    <tr><td>Product App</td><td>Any .NET stack</td><td>Product Team</td><td>Business logic, exposes /action + /context</td></tr>
+    <tr><td>TenantConfig</td><td>SQL row</td><td>Experion Team</td><td>Per-product KB, weights, thresholds</td></tr>
+    <tr><td>ActionMappings</td><td>SQL rows</td><td>Experion Team</td><td>Data-driven action routing (no code change)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 2 — INTENT RESOLVER                      -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">2</span> Intent Resolver — Deep Dive</h1>
+
+<p>The Intent Resolver is the brain of the <code>/process</code> pipeline. It receives the embedded query vector and decides whether the request is an <strong>ACTION</strong>, a <strong>GENERATION</strong>, or a <strong>CHAT</strong>. The decision happens before any LLM call — ensuring actions never waste tokens.</p>
+
+<h2 class="doc-h2">2.1 How Classification Works</h2>
+
+<div class="arch-wrap">
+<div class="arch">
+  <div class="arch-row">
+    <div class="arch-box ab-navy">Query Vector (from Step 1 Embed)</div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-row">
+    <div class="arch-box ab-blue">Score vs ALL ActionMappings for this tenant<br><span style="font-size:8pt;font-weight:400">Cosine(queryVec, actionEmbedding) + Jaccard(queryWords, actionPhrases)</span></div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-row">
+    <div class="arch-box ab-blue">Apply Per-Product Weights<br><span style="font-size:8pt;font-weight:400">finalScore = hybridScore × actionWeight[tenantId]</span></div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-row">
+    <div class="arch-box ab-blue">Compare to Thresholds<br><span style="font-size:8pt;font-weight:400">ACTION_THRESHOLD = 0.72 · Has conversation history? → CHAT bias</span></div>
+  </div>
+  <div class="arch-arrow-row" style="margin:4px 0">
+    <div class="arch-arrow-item" style="color:#ea580c">↙ &gt; threshold</div>
+    <div class="arch-arrow-item" style="color:#16a34a">↓ below threshold</div>
+    <div class="arch-arrow-item" style="color:#7c3aed">↘ has history</div>
+  </div>
+  <div class="arch-row">
+    <div class="arch-box ab-amber">ACTION</div>
+    <div class="arch-box ab-green">GENERATION</div>
+    <div class="arch-box ab-purple">CHAT</div>
+  </div>
+</div>
+</div>
+
+<h2 class="doc-h2">2.2 Scoring Algorithm</h2>
+
+<div class="callout blue">
+  <strong>Hybrid Score Formula:</strong> <code>finalScore = (cosineWeight × cosineSimilarity) + (jaccardWeight × jaccardScore)</code><br>
+  Default: cosineWeight = 0.7, jaccardWeight = 0.3. Per-product weights multiply the final score.
+</div>
+
+<table>
+  <thead><tr><th>Score Component</th><th>What It Measures</th><th>Range</th><th>Default Weight</th></tr></thead>
+  <tbody>
+    <tr><td>Cosine Similarity</td><td>Semantic closeness between query vector and action embedding</td><td>0.0 – 1.0</td><td>70%</td></tr>
+    <tr><td>Phrase Jaccard</td><td>Word overlap between query and action's example phrases</td><td>0.0 – 1.0</td><td>30%</td></tr>
+    <tr><td>Per-Product Action Weight</td><td>Tenant-level multiplier — biases toward or away from action classification</td><td>0.0 – 2.0</td><td>1.0 (neutral)</td></tr>
+  </tbody>
+</table>
+
+<h2 class="doc-h2">2.3 Per-Product Weights</h2>
+<p>Stored in <code>TenantConfig</code>. The Experion team sets these during onboarding based on what each product primarily does:</p>
+
+<table>
+  <thead><tr><th>Product</th><th>Action Weight</th><th>Generation Weight</th><th>Chat Weight</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>Learn</td><td>0.6</td><td>1.4</td><td>1.2</td><td>Knowledge-heavy; users ask questions, rarely take direct actions</td></tr>
+    <tr><td>Work</td><td>1.6</td><td>0.8</td><td>0.7</td><td>Task-driven; users execute operations frequently</td></tr>
+    <tr><td>Safe</td><td>1.0</td><td>1.2</td><td>1.0</td><td>Balanced; compliance questions + some actions</td></tr>
+    <tr><td>Default</td><td>1.0</td><td>1.0</td><td>1.0</td><td>Neutral baseline for new products</td></tr>
+  </tbody>
+</table>
+
+<h2 class="doc-h2">2.4 Code Reference — IntentResolver.cs</h2>
+<div class="code-block"><span class="kw">public class</span> <span class="tp">IntentResolver</span>
+{
+    <span class="kw">private const double</span> ACTION_THRESHOLD = <span class="nm">0.72</span>;
+    <span class="kw">private const double</span> COSINE_WEIGHT    = <span class="nm">0.70</span>;
+    <span class="kw">private const double</span> JACCARD_WEIGHT   = <span class="nm">0.30</span>;
+
+    <span class="kw">public</span> <span class="tp">IntentResult</span> <span class="fn">Resolve</span>(
+        <span class="tp">float[]</span> queryVector,
+        <span class="tp">string</span>  queryText,
+        <span class="tp">List</span>&lt;<span class="tp">ActionMapping</span>&gt; mappings,
+        <span class="tp">TenantConfig</span> tenant,
+        <span class="kw">bool</span> hasConversationHistory)
+    {
+        <span class="cm">// CHAT bias — if user is in an active conversation, lean toward CHAT</span>
+        <span class="kw">if</span> (hasConversationHistory &amp;&amp; IsFollowUp(queryText))
+            <span class="kw">return new</span> <span class="tp">IntentResult</span> { Type = <span class="tp">IntentType</span>.Chat };
+
+        <span class="tp">ActionMapping</span> bestMatch = <span class="kw">null</span>;
+        <span class="kw">double</span> bestScore = <span class="nm">0</span>;
+
+        <span class="kw">foreach</span> (<span class="kw">var</span> mapping <span class="kw">in</span> mappings.Where(m => m.Enabled))
+        {
+            <span class="kw">double</span> cosine  = <span class="fn">CosineSimilarity</span>(queryVector, mapping.Embedding);
+            <span class="kw">double</span> jaccard = <span class="fn">JaccardScore</span>(queryText, mapping.Phrases);
+            <span class="kw">double</span> hybrid  = (COSINE_WEIGHT * cosine) + (JACCARD_WEIGHT * jaccard);
+            <span class="kw">double</span> final   = hybrid * tenant.ActionWeight; <span class="cm">// per-product bias</span>
+
+            <span class="kw">if</span> (final > bestScore) { bestScore = final; bestMatch = mapping; }
+        }
+
+        <span class="kw">if</span> (bestScore >= ACTION_THRESHOLD &amp;&amp; bestMatch != <span class="kw">null</span>)
+            <span class="kw">return new</span> <span class="tp">IntentResult</span> { Type = <span class="tp">IntentType</span>.Action, Mapping = bestMatch };
+
+        <span class="kw">return new</span> <span class="tp">IntentResult</span> { Type = <span class="tp">IntentType</span>.Generation };
+    }
+}</div>
+
+<div class="callout amber"><strong>Note for developers:</strong> <code>ActionMapping.Embedding</code> is pre-computed when the row is inserted. Never re-embed at runtime — it would defeat the purpose of the fast action path.</div>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 3 — /process PIPELINE                    -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">3</span> /process Pipeline — Full Flow</h1>
+
+<table class="flow-table">
+  <thead><tr><th style="width:36px">#</th><th style="width:160px">Step</th><th>What Happens</th><th style="width:130px">Performance</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="flow-step-num">1</td>
+      <td class="flow-name">Embed Query</td>
+      <td class="flow-detail">User text → 1536-dim vector via Azure OpenAI Embeddings. Stored in memory for this request cycle.</td>
+      <td class="flow-perf">~30–80 ms</td>
+    </tr>
+    <tr>
+      <td class="flow-step-num">2</td>
+      <td class="flow-name">Semantic Cache</td>
+      <td class="flow-detail">Cosine search over <code>SemanticCache</code> SQL table. Threshold = 0.95. <strong>HIT returns immediately</strong> — skips steps 3–5.</td>
+      <td class="flow-perf">HIT &lt;15 ms<br>MISS ~5 ms</td>
+    </tr>
+    <tr>
+      <td class="flow-step-num">3</td>
+      <td class="flow-name">Intent Resolver</td>
+      <td class="flow-detail">Hybrid cosine + Jaccard scoring against <code>ActionMappings</code>. Applies per-product weights. Outputs: ACTION / GENERATION / CHAT.</td>
+      <td class="flow-perf">~2–5 ms</td>
+    </tr>
+    <tr>
+      <td class="flow-step-num">4a</td>
+      <td class="flow-name">Action Path</td>
+      <td class="flow-detail">Dispatch <code>ActionJob</code> to queue. <code>ActionWorker</code> calls the product's <code>targetEndpoint</code>. Result echoed via SignalR.</td>
+      <td class="flow-perf">~10–50 ms<br>No LLM</td>
+    </tr>
+    <tr>
+      <td class="flow-step-num">4b</td>
+      <td class="flow-name">Generation / RAG</td>
+      <td class="flow-detail">Load conversation history (Blob) → retrieve KB chunks (AI Search) → build prompt → call GPT-4.1 → return answer + chips.</td>
+      <td class="flow-perf">~800–2000 ms</td>
+    </tr>
+    <tr>
+      <td class="flow-step-num">4c</td>
+      <td class="flow-name">Chat Path</td>
+      <td class="flow-detail">Load full session history → optionally call product <code>GET /context</code> → build prompt with history + context → GPT-4.1 reply.</td>
+      <td class="flow-perf">~800–2000 ms</td>
+    </tr>
+    <tr>
+      <td class="flow-step-num">5</td>
+      <td class="flow-name">Persist</td>
+      <td class="flow-detail">Append user + assistant turns to Blob JSONL. On cache miss: write to <code>SemanticCache</code>. Always write <code>AuditLog</code> row.</td>
+      <td class="flow-perf">~5–15 ms async</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="doc-h2">3.1 Action Path — Detail</h2>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Match ActionMapping</strong><span>Intent Resolver identifies the best matching <code>ActionMapping</code> row (actionKey + targetEndpoint).</span></div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Dispatch ActionJob</strong><span>An <code>ActionJob</code> message is pushed to the Service Bus queue: <code>{ tenantId, userId, actionKey, targetEndpoint, sessionId }</code></span></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body"><strong>ActionWorker Executes</strong><span>Background worker dequeues the job and calls <code>POST {targetEndpoint}</code> on the product's own API with the user context.</span></div></div>
+  <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Product Executes Internally</strong><span>The product handles the action in its own codebase (e.g. adds to cart, applies coupon). Experion does not know the internal logic.</span></div></div>
+  <div class="step"><div class="step-num">5</div><div class="step-body"><strong>SignalR ACK</strong><span>ActionWorker pushes a confirmation message to the SDK via SignalR hub. SDK shows a toast or updates the UI.</span></div></div>
+</div>
+
+<div class="code-block"><span class="cm">// ActionJob model</span>
+<span class="kw">public record</span> <span class="tp">ActionJob</span>(
+    <span class="tp">string</span> TenantId,
+    <span class="tp">string</span> UserId,
+    <span class="tp">string</span> SessionId,
+    <span class="tp">string</span> ActionKey,
+    <span class="tp">string</span> TargetEndpoint   <span class="cm">// e.g. "https://learn.agone.com/api/experion/action/add_to_cart"</span>
+);
+
+<span class="cm">// ActionWorker — executes the action by calling the product's endpoint</span>
+<span class="kw">public class</span> <span class="tp">ActionWorker</span> : <span class="tp">BackgroundService</span>
+{
+    <span class="kw">protected override async</span> <span class="tp">Task</span> <span class="fn">ExecuteAsync</span>(<span class="tp">CancellationToken</span> ct)
+    {
+        <span class="kw">await foreach</span> (<span class="kw">var</span> job <span class="kw">in</span> _queue.ReadAllAsync(ct))
+        {
+            <span class="kw">var</span> payload = <span class="kw">new</span> { job.UserId, job.SessionId, job.ActionKey };
+            <span class="kw">var</span> response = <span class="kw">await</span> _http.<span class="fn">PostAsJsonAsync</span>(job.TargetEndpoint, payload, ct);
+            <span class="kw">await</span> _signalR.<span class="fn">SendToUserAsync</span>(job.UserId, <span class="st">"ActionResult"</span>, <span class="kw">new</span> {
+                job.ActionKey,
+                Success = response.<span class="fn">IsSuccessStatusCode</span>()
+            });
+        }
+    }
+}</div>
+
+<h2 class="doc-h2">3.2 Generation Path (RAG) — Detail</h2>
+<div class="code-block"><span class="cm">// ExperionService.cs — Generation pipeline</span>
+<span class="kw">public async</span> <span class="tp">Task</span>&lt;<span class="tp">ProcessResult</span>&gt; <span class="fn">RunGenerationAsync</span>(<span class="tp">ProcessRequest</span> req, <span class="tp">float[]</span> queryVec)
+{
+    <span class="cm">// 1. Load conversation history from Blob</span>
+    <span class="kw">var</span> history = <span class="kw">await</span> _blob.<span class="fn">LoadConversationAsync</span>(req.TenantId, req.UserId);
+
+    <span class="cm">// 2. Retrieve relevant KB chunks from Azure AI Search</span>
+    <span class="kw">var</span> chunks   = <span class="kw">await</span> _search.<span class="fn">RetrieveAsync</span>(req.TenantId, queryVec, topK: <span class="nm">5</span>);
+
+    <span class="cm">// 3. Build prompt (system = KB chunks, history = prior turns)</span>
+    <span class="kw">var</span> messages = <span class="fn">BuildMessages</span>(history, chunks, req.Text, req.CapturedText);
+
+    <span class="cm">// 4. Call Azure OpenAI</span>
+    <span class="kw">var</span> answer   = <span class="kw">await</span> _openai.<span class="fn">ChatAsync</span>(messages);
+
+    <span class="cm">// 5. Persist turns + update SemanticCache</span>
+    <span class="kw">await</span> _blob.<span class="fn">AppendTurnsAsync</span>(req.TenantId, req.UserId, req.Text, answer.Text);
+    <span class="kw">await</span> _cache.<span class="fn">WriteAsync</span>(queryVec, answer.Text);
+
+    <span class="kw">return new</span> <span class="tp">ProcessResult</span> { Answer = answer.Text, Chips = answer.Chips };
+}</div>
+
+<h2 class="doc-h2">3.3 Chat Path — Detail</h2>
+<p>The Chat path is identical to Generation but loads the <strong>full session history</strong> and optionally fetches a live product context snapshot via <code>GET /context</code> on the product's API. This allows Experion to give answers that are aware of what the user is currently doing in the product (e.g. current cart contents, active form, current page).</p>
+
+<div class="code-block"><span class="cm">// Optional context call to the product's /context endpoint</span>
+<span class="tp">ProductContext</span>? ctx = <span class="kw">null</span>;
+<span class="kw">if</span> (tenant.ContextEndpoint != <span class="kw">null</span>)
+    ctx = <span class="kw">await</span> _http.<span class="fn">GetFromJsonAsync</span>&lt;<span class="tp">ProductContext</span>&gt;(
+        <span class="st">$"{tenant.ContextEndpoint}?userId={req.UserId}&amp;sessionId={req.SessionId}"</span>
+    );</div>
+
+<h2 class="doc-h2">3.4 Product Callback — How Experion Calls Back to Products</h2>
+
+<div class="callout blue"><strong>Key architectural point:</strong> Experion is not a closed black box. For actions, Experion calls out to the product's registered <code>targetEndpoint</code>. For chat context enrichment, it calls the product's <code>/context</code> endpoint. Products register these endpoints once — Experion handles the rest.</div>
+
+<table>
+  <thead><tr><th>Call Type</th><th>Direction</th><th>When</th><th>Endpoint (product registers)</th><th>Auth</th></tr></thead>
+  <tbody>
+    <tr><td>Action Execution</td><td>Experion → Product</td><td>After ACTION classification</td><td><code>POST /experion/action/{actionKey}</code></td><td>Shared secret header</td></tr>
+    <tr><td>Context Fetch</td><td>Experion → Product</td><td>CHAT path (optional)</td><td><code>GET /experion/context</code></td><td>Shared secret header</td></tr>
+    <tr><td>SDK Events</td><td>SDK → Experion</td><td>Every ~5 seconds (batch)</td><td><code>POST /track</code></td><td>TenantId + UserId</td></tr>
+    <tr><td>Process Request</td><td>SDK → Experion</td><td>User sends message</td><td><code>POST /process</code></td><td>TenantId + SessionId</td></tr>
+    <tr><td>SignalR Push</td><td>Experion → SDK</td><td>After action / nudge ready</td><td>SignalR hub (long-lived)</td><td>SessionId</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 4 — /track PIPELINE                      -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">4</span> /track Pipeline</h1>
+<p>The tracking pipeline is entirely async and never blocks the chat or action path.</p>
+
+<table class="flow-table">
+  <thead><tr><th style="width:36px">#</th><th style="width:160px">Step</th><th>What Happens</th><th style="width:130px">Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="flow-step-num">1</td><td class="flow-name">SDK Batches Events</td><td>Activity events are queued client-side and posted every ~5 s, or via <code>sendBeacon</code> on page unload.</td><td>Fire-and-forget</td></tr>
+    <tr><td class="flow-step-num">2</td><td class="flow-name">Append to Blob</td><td>Each event written as one JSONL line to <code>activity/{tenant}/{userId}/{yyyy-MM-dd}.jsonl</code>.</td><td>Azure Append Blob</td></tr>
+    <tr><td class="flow-step-num">3</td><td class="flow-name">Update UserProfile</td><td>SQL counters incremented (pageviews, clicks, session count). Used for recommendation trigger rules.</td><td>SQL upsert</td></tr>
+    <tr><td class="flow-step-num">4</td><td class="flow-name">RecommendationEngine</td><td>Reads recent activity blob → applies trigger rules → if triggered: LLM drafts nudge text → SignalR push to SDK.</td><td>Per-user cooldown</td></tr>
+  </tbody>
+</table>
+
+<h3 class="doc-h3">Trigger Rules</h3>
+<table>
+  <thead><tr><th>Rule</th><th>Condition</th><th>Nudge Example</th></tr></thead>
+  <tbody>
+    <tr><td>High frequency</td><td>≥ 5 events in 30 seconds</td><td>"Looks like you're stuck — want some help?"</td></tr>
+    <tr><td>Category browse</td><td>≥ 3 products in same category viewed</td><td>"You've viewed 3 products — want to compare?"</td></tr>
+    <tr><td>Cart abandonment</td><td>Items in cart, no checkout event in session</td><td>"Ready to check out?"</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 5 — TEAM INDEPENDENCE CONTRACT           -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">5</span> Team Independence Contract</h1>
+
+<h2 class="doc-h2">5.1 What the Product Team Provides (One-Time)</h2>
+<table>
+  <thead><tr><th>Item</th><th>Format</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Tenant name</td><td>string</td><td><code>"learn"</code></td></tr>
+    <tr><td>KB content</td><td>Markdown / plain text</td><td>Product FAQs, policies, pricing pages</td></tr>
+    <tr><td>Action definitions</td><td>List of action objects</td><td>See table below</td></tr>
+    <tr><td>Response weights</td><td>3 decimals (action / gen / chat)</td><td><code>0.6 / 1.4 / 1.2</code></td></tr>
+    <tr><td>Action base URL</td><td>HTTPS URL</td><td><code>https://learn.agone.com/api/experion</code></td></tr>
+    <tr><td>Context endpoint</td><td>HTTPS URL (optional)</td><td><code>https://learn.agone.com/api/experion/context</code></td></tr>
+    <tr><td>Shared secret</td><td>Secret string</td><td>For validating Experion callbacks</td></tr>
+  </tbody>
+</table>
+
+<h3 class="doc-h3">Action Definition Format</h3>
+<div class="code-block">[
+  {
+    <span class="st">"actionKey"</span>:     <span class="st">"add_to_cart"</span>,
+    <span class="st">"description"</span>:   <span class="st">"Add the currently viewed product to the user's cart"</span>,
+    <span class="st">"phrases"</span>:       <span class="st">"add to cart|put this in my cart|buy this|I want this"</span>,
+    <span class="st">"targetEndpoint"</span>: <span class="st">"https://learn.agone.com/api/experion/action/add_to_cart"</span>,
+    <span class="st">"enabled"</span>:       <span class="kw">true</span>
+  }
+]</div>
+
+<h2 class="doc-h2">5.2 What the Experion Team Sets Up</h2>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Insert TenantConfig row</strong><span>Name, KB content, idle threshold, cooldown, action/gen/chat weights, context endpoint, shared secret.</span></div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Insert ActionMappings rows</strong><span>One row per action. Compute and store the embedding for description+phrases at insert time.</span></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Index KB into Azure AI Search</strong><span>Chunk KB content → embed each chunk → upload to the tenant's AI Search index.</span></div></div>
+  <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Confirm with product team</strong><span>Share the tenant ID. Product team drops the script tag. Done.</span></div></div>
+</div>
+
+<h2 class="doc-h2">5.3 Endpoints the Product Team Must Expose</h2>
+
+<h3 class="doc-h3">POST /experion/action/{actionKey}</h3>
+<div class="code-block"><span class="cm">// Request body sent by Experion ActionWorker</span>
+{
+  <span class="st">"userId"</span>:    <span class="st">"user-123"</span>,
+  <span class="st">"sessionId"</span>: <span class="st">"user-123__abc"</span>,
+  <span class="st">"actionKey"</span>: <span class="st">"add_to_cart"</span>
+}
+
+<span class="cm">// Expected response (200 OK)</span>
+{ <span class="st">"success"</span>: <span class="kw">true</span>, <span class="st">"message"</span>: <span class="st">"Item added to cart"</span> }
+
+<span class="cm">// Validate the shared secret before processing</span>
+<span class="kw">if</span> (!Request.Headers[<span class="st">"X-Experion-Secret"</span>].Equals(_config[<span class="st">"ExperionSecret"</span>]))
+    <span class="kw">return</span> <span class="fn">Unauthorized</span>();</div>
+
+<h3 class="doc-h3">GET /experion/context (Optional)</h3>
+<div class="code-block"><span class="cm">// Query params: ?userId=user-123&amp;sessionId=user-123__abc</span>
+<span class="cm">// Return whatever live context helps Experion give better chat replies</span>
+{
+  <span class="st">"currentPage"</span>:    <span class="st">"product/widget-pro"</span>,
+  <span class="st">"cartItemCount"</span>:  <span class="nm">2</span>,
+  <span class="st">"activeModule"</span>:   <span class="st">"checkout"</span>,
+  <span class="st">"userPlan"</span>:       <span class="st">"premium"</span>
+}</div>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 6 — DATABASE SCHEMA                      -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">6</span> Database Schema</h1>
+
+<h2 class="doc-h2">TenantConfig</h2>
+<table>
+  <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>TenantId</code></td><td>varchar(50) PK</td><td>Slug — e.g. "learn", "work"</td></tr>
+    <tr><td><code>Name</code></td><td>nvarchar(100)</td><td>Display name</td></tr>
+    <tr><td><code>KbContent</code></td><td>nvarchar(max)</td><td>Raw KB text (demo); AI Search index name (prod)</td></tr>
+    <tr><td><code>ActionWeight</code></td><td>float</td><td>Intent resolver multiplier for action scoring</td></tr>
+    <tr><td><code>GenerationWeight</code></td><td>float</td><td>Intent resolver multiplier for generation</td></tr>
+    <tr><td><code>ChatWeight</code></td><td>float</td><td>Intent resolver multiplier for chat</td></tr>
+    <tr><td><code>IdleThresholdSeconds</code></td><td>int</td><td>Seconds of idle before recommendation engine fires</td></tr>
+    <tr><td><code>NudgeCooldownSeconds</code></td><td>int</td><td>Minimum seconds between nudges per user</td></tr>
+    <tr><td><code>ContextEndpoint</code></td><td>nvarchar(500) null</td><td>Optional GET /context URL on the product's API</td></tr>
+    <tr><td><code>SharedSecret</code></td><td>nvarchar(200)</td><td>HMAC secret for validating callbacks</td></tr>
+  </tbody>
+</table>
+
+<h2 class="doc-h2">ActionMappings</h2>
+<table>
+  <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>Id</code></td><td>int PK</td><td>Auto-increment</td></tr>
+    <tr><td><code>TenantId</code></td><td>varchar(50) FK</td><td>→ TenantConfig</td></tr>
+    <tr><td><code>ActionKey</code></td><td>varchar(100)</td><td>e.g. "add_to_cart"</td></tr>
+    <tr><td><code>Description</code></td><td>nvarchar(500)</td><td>Human-readable description</td></tr>
+    <tr><td><code>Phrases</code></td><td>nvarchar(1000)</td><td>Pipe-separated example utterances</td></tr>
+    <tr><td><code>Embedding</code></td><td>varbinary(max)</td><td>Pre-computed float[] of description+phrases</td></tr>
+    <tr><td><code>TargetEndpoint</code></td><td>nvarchar(500)</td><td>Full URL Experion calls for this action</td></tr>
+    <tr><td><code>Enabled</code></td><td>bit</td><td>Feature flag per tenant — toggle without code change</td></tr>
+  </tbody>
+</table>
+
+<h2 class="doc-h2">SemanticCache</h2>
+<table>
+  <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>Id</code></td><td>int PK</td><td></td></tr>
+    <tr><td><code>TenantId</code></td><td>varchar(50)</td><td></td></tr>
+    <tr><td><code>QueryEmbedding</code></td><td>varbinary(max)</td><td>Vector of the original question</td></tr>
+    <tr><td><code>Answer</code></td><td>nvarchar(max)</td><td>Cached LLM answer</td></tr>
+    <tr><td><code>CreatedAt</code></td><td>datetime2</td><td>For TTL expiry jobs</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 7 — API REFERENCE                        -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">7</span> API Reference</h1>
+
+<h2 class="doc-h2">POST /process</h2>
+<div class="code-block"><span class="cm">// Request</span>
+{
+  <span class="st">"tenantId"</span>:     <span class="st">"learn"</span>,
+  <span class="st">"userId"</span>:       <span class="st">"user-123"</span>,
+  <span class="st">"sessionId"</span>:    <span class="st">"user-123__abc"</span>,
+  <span class="st">"text"</span>:         <span class="st">"add this to my cart"</span>,
+  <span class="st">"capturedText"</span>: <span class="kw">null</span>   <span class="cm">// populated when user uses Circle Gesture</span>
+}
+
+<span class="cm">// Response</span>
+{
+  <span class="st">"intentType"</span>:   <span class="st">"Action"</span>,   <span class="cm">// "Action" | "Generation" | "Chat"</span>
+  <span class="st">"answer"</span>:       <span class="kw">null</span>,       <span class="cm">// populated for Generation/Chat</span>
+  <span class="st">"actionKey"</span>:    <span class="st">"add_to_cart"</span>,
+  <span class="st">"chips"</span>:        [],
+  <span class="st">"cached"</span>:       <span class="kw">false</span>
+}</div>
+
+<h2 class="doc-h2">POST /track</h2>
+<div class="code-block"><span class="cm">// Request — array of batched events</span>
+{
+  <span class="st">"tenantId"</span>:  <span class="st">"learn"</span>,
+  <span class="st">"userId"</span>:    <span class="st">"user-123"</span>,
+  <span class="st">"sessionId"</span>: <span class="st">"user-123__abc"</span>,
+  <span class="st">"events"</span>: [
+    { <span class="st">"type"</span>: <span class="st">"pageview"</span>, <span class="st">"url"</span>: <span class="st">"/products/widget"</span>, <span class="st">"ts"</span>: <span class="nm">1718700000</span> },
+    { <span class="st">"type"</span>: <span class="st">"click"</span>,    <span class="st">"target"</span>: <span class="st">"#buy-btn"</span>,       <span class="st">"ts"</span>: <span class="nm">1718700005</span> }
+  ]
+}
+
+<span class="cm">// Response: 202 Accepted (fire-and-forget)</span></div>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 8 — JS SDK REFERENCE                     -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">8</span> JS SDK — Integration Reference</h1>
+
+<h2 class="doc-h2">Installation (one line)</h2>
+<div class="code-block"><span class="cm">&lt;!-- Drop anywhere in &lt;head&gt; or before &lt;/body&gt; --&gt;</span>
+&lt;script
+  src=<span class="st">"https://cdn.agone.io/experion/v1/experion.min.js"</span>
+  data-tenant=<span class="st">"learn"</span>
+  data-api=<span class="st">"https://api.experion.agone.io"</span>
+  data-user-id=<span class="st">"{{ currentUser.id }}"</span>   <span class="cm">&lt;!-- server-rendered --&gt;</span>
+&gt;&lt;/script&gt;</div>
+
+<h2 class="doc-h2">SDK Configuration Attributes</h2>
+<table>
+  <thead><tr><th>Attribute</th><th>Required</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>data-tenant</code></td><td><span class="tag tag-red">Required</span></td><td>Tenant slug registered with Experion team</td></tr>
+    <tr><td><code>data-api</code></td><td><span class="tag tag-red">Required</span></td><td>Base URL of the Experion API</td></tr>
+    <tr><td><code>data-user-id</code></td><td><span class="tag tag-amber">Recommended</span></td><td>Logged-in user ID. Omit for anonymous (falls back to localStorage anon-id)</td></tr>
+    <tr><td><code>data-flush-interval</code></td><td><span class="tag tag-gray">Optional</span></td><td>Event batch interval in ms. Default: 5000</td></tr>
+    <tr><td><code>data-theme</code></td><td><span class="tag tag-gray">Optional</span></td><td><code>light</code> | <code>dark</code>. Default: auto-detect</td></tr>
+  </tbody>
+</table>
+
+<h2 class="doc-h2">SDK Modules Summary</h2>
+<table>
+  <thead><tr><th>Module</th><th>Auto-starts</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>Identity Resolver</td><td>Yes</td><td>Resolves UserID or mints anon-id. Calls <code>/identify</code> to get SessionId.</td></tr>
+    <tr><td>Activity Tracker</td><td>Yes</td><td>Hooks onto DOM events. Batches and sends to <code>/track</code>.</td></tr>
+    <tr><td>Circle Gesture</td><td>Yes</td><td>Alt+drag to circle a region. Extracts DOM text, sends with next <code>/process</code> call.</td></tr>
+    <tr><td>Chat Sidebar</td><td>Yes</td><td>Sphere avatar + sliding panel. Sends messages to <code>/process</code>.</td></tr>
+    <tr><td>Nudge Toast</td><td>Yes</td><td>Listens on SignalR connection for <code>ProactiveNudge</code> events. Displays dismissible toast.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 9 — CONFIGURATION                        -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">9</span> Configuration &amp; Environment Setup</h1>
+
+<h2 class="doc-h2">appsettings.json — Key Settings</h2>
+<div class="code-block">{
+  <span class="st">"Experion"</span>: {
+    <span class="st">"UseAzureOpenAI"</span>:   <span class="kw">true</span>,         <span class="cm">// false = mock LLM (demo mode)</span>
+    <span class="st">"UseAzureBlob"</span>:     <span class="kw">true</span>,         <span class="cm">// false = local JSONL files</span>
+    <span class="st">"UseAzureSearch"</span>:   <span class="kw">true</span>,         <span class="cm">// false = naive text search</span>
+    <span class="st">"UseServiceBus"</span>:    <span class="kw">true</span>,         <span class="cm">// false = in-process queue</span>
+    <span class="st">"UseAzureSignalR"</span>:  <span class="kw">true</span>,         <span class="cm">// false = in-process SignalR</span>
+    <span class="st">"ActionThreshold"</span>:  <span class="nm">0.72</span>,
+    <span class="st">"CacheThreshold"</span>:   <span class="nm">0.95</span>,
+    <span class="st">"CosineWeight"</span>:     <span class="nm">0.70</span>,
+    <span class="st">"JaccardWeight"</span>:    <span class="nm">0.30</span>
+  },
+  <span class="st">"AzureOpenAI"</span>: {
+    <span class="st">"Endpoint"</span>:         <span class="st">"https://YOUR.openai.azure.com"</span>,
+    <span class="st">"ApiKey"</span>:           <span class="st">"YOUR_KEY"</span>,
+    <span class="st">"ChatDeployment"</span>:   <span class="st">"gpt-4.1"</span>,
+    <span class="st">"EmbedDeployment"</span>:  <span class="st">"text-embedding-3-large"</span>
+  }
+}</div>
+
+<h2 class="doc-h2">Demo → Production Swap</h2>
+<table>
+  <thead><tr><th>Setting</th><th>Demo Value</th><th>Production Value</th><th>How to Switch</th></tr></thead>
+  <tbody>
+    <tr><td><code>UseAzureOpenAI</code></td><td>false (mock)</td><td>true</td><td>Config flag + add Azure keys</td></tr>
+    <tr><td><code>UseAzureBlob</code></td><td>false (local JSONL)</td><td>true</td><td>Config flag + connection string</td></tr>
+    <tr><td><code>UseAzureSearch</code></td><td>false (text search)</td><td>true</td><td>Config flag + endpoint + key</td></tr>
+    <tr><td><code>UseServiceBus</code></td><td>false (in-process)</td><td>true</td><td>Config flag + connection string</td></tr>
+    <tr><td><code>UseAzureSignalR</code></td><td>false (in-process)</td><td>true</td><td>Config flag + connection string</td></tr>
+    <tr><td>Database</td><td>SQLite</td><td>SQL Server</td><td>Connection string only</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 10 — PERFORMANCE                         -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">10</span> Performance &amp; Cost Design Decisions</h1>
+
+<table>
+  <thead><tr><th>Decision</th><th>Why</th><th>Impact</th></tr></thead>
+  <tbody>
+    <tr><td>Semantic Cache checked first</td><td>Same/similar questions asked repeatedly by different users — no reason to call LLM each time</td><td>Cache HIT: &lt;15 ms. Typical LLM call: 800–2000 ms. 30–60% of questions expected to be cache hits at scale</td></tr>
+    <tr><td>Action path calls no LLM</td><td>An action like "add to cart" needs routing logic, not text generation</td><td>Action latency: 10–50 ms vs 800+ ms. Zero token cost.</td></tr>
+    <tr><td>Activity ingest is async</td><td>Tracking should never make the user wait</td><td>Zero impact on chat/action response time regardless of event volume</td></tr>
+    <tr><td>Conversation history in Blob</td><td>SQL is expensive at scale for append-heavy long text</td><td>SQL stays small and fast. Blob costs ≈ $0.002/GB. History scales without SQL growth.</td></tr>
+    <tr><td>ActionMappings embeddings pre-computed</td><td>If we re-embed at query time, we waste 30–80 ms on every request just to compare</td><td>Intent scoring is a pure in-memory cosine comparison — effectively 0 ms</td></tr>
+    <tr><td>Per-product weights in config not code</td><td>Tuning product bias should not require a deployment</td><td>Adjust weights via SQL update, live within minutes</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ████████████████████████████████████████████████ -->
+<!-- SECTION 11 — PRODUCTION CHECKLIST                -->
+<!-- ████████████████████████████████████████████████ -->
+<div class="section-break">
+<h1 class="doc-h1"><span class="section-num">11</span> Production Deployment Checklist</h1>
+
+<h2 class="doc-h2">Experion Team — Before Go-Live</h2>
+<table>
+  <thead><tr><th>Item</th><th>Done?</th></tr></thead>
+  <tbody>
+    <tr><td>All config flags set to <code>true</code> (Azure services active)</td><td>☐</td></tr>
+    <tr><td>TenantConfig rows inserted for all onboarded products</td><td>☐</td></tr>
+    <tr><td>ActionMappings rows inserted + embeddings pre-computed</td><td>☐</td></tr>
+    <tr><td>KB content chunked + indexed in Azure AI Search per tenant</td><td>☐</td></tr>
+    <tr><td>Shared secrets distributed to all product teams securely</td><td>☐</td></tr>
+    <tr><td>SignalR hub scaled to Azure SignalR Service</td><td>☐</td></tr>
+    <tr><td>Service Bus queue and ActionWorker verified end-to-end</td><td>☐</td></tr>
+    <tr><td>Semantic Cache TTL expiry job scheduled</td><td>☐</td></tr>
+    <tr><td>SDK JS bundle deployed to Azure Blob CDN with correct CORS headers</td><td>☐</td></tr>
+    <tr><td>AuditLog retention policy set (GDPR compliance)</td><td>☐</td></tr>
+  </tbody>
+</table>
+
+<h2 class="doc-h2">Product Team — Before Go-Live</h2>
+<table>
+  <thead><tr><th>Item</th><th>Done?</th></tr></thead>
+  <tbody>
+    <tr><td><code>POST /experion/action/{key}</code> endpoint live and validates shared secret</td><td>☐</td></tr>
+    <tr><td>(Optional) <code>GET /experion/context</code> endpoint live and returns JSON</td><td>☐</td></tr>
+    <tr><td><code>&lt;script&gt;</code> tag added to product HTML with correct <code>data-tenant</code> and <code>data-user-id</code></td><td>☐</td></tr>
+    <tr><td>Tested with a real user session (chat + action + nudge)</td><td>☐</td></tr>
+    <tr><td>Anonymous user fallback tested (no <code>data-user-id</code>)</td><td>☐</td></tr>
+  </tbody>
+</table>
+
+<div class="callout green">
+  <strong>Zero ongoing integration work:</strong> Once the script tag is live and endpoints are registered, the product team has no further Experion work. All AI, tracking, caching, and routing is managed by the Experion team independently.
+</div>
+
+<div class="doc-footer">
+  <span>AG ONE — Experion Technical Implementation Document &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; v1.0</span>
+  <span>June 2026</span>
+</div>
+</div>
+
+</div><!-- /page -->
+
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AG ONE — Experion Architecture Document</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Calibri, Georgia, serif;
+    background: #e2e8f0;
+    color: #1e293b;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* toolbar */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #1e40af;
+    padding: 10px 24px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .btn {
+    padding: 7px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .btn-white { background: #fff; color: #1e40af; }
+  .btn-ghost { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+
+  /* page */
+  .page {
+    max-width: 900px;
+    margin: 24px auto 60px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+    padding: 60px 72px;
+  }
+
+  /* COVER */
+  .cover {
+    text-align: center;
+    padding: 40px 0 50px;
+    border-bottom: 3px solid #1e40af;
+    margin-bottom: 50px;
+  }
+  .cover .tag {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .cover h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1e40af;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .cover h2 {
+    font-size: 18px;
+    font-weight: 400;
+    color: #475569;
+    margin-bottom: 24px;
+  }
+  .cover-meta {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 2;
+  }
+  .cover-meta strong { color: #64748b; }
+
+  /* HEADINGS */
+  h2.section {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e40af;
+    margin: 40px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #dbeafe;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2.section .num {
+    background: #1e40af;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 20px;
+  }
+
+  h3.sub {
+    font-size: 14px;
+    font-weight: 700;
+    color: #334155;
+    margin: 22px 0 8px;
+  }
+
+  p { margin-bottom: 10px; color: #374151; }
+
+  /* TABLES */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 12px;
+  }
+  thead tr { background: #1e40af; color: #fff; }
+  thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr:hover { background: #eff6ff; }
+  tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+    color: #374151;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .b-blue  { background: #dbeafe; color: #1e40af; }
+  .b-green { background: #dcfce7; color: #15803d; }
+  .b-amber { background: #fef3c7; color: #92400e; }
+  .b-red   { background: #fee2e2; color: #991b1b; }
+  .b-purple{ background: #f3e8ff; color: #6b21a8; }
+
+  /* STEPS */
+  .steps { margin: 16px 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: #1e40af;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 2px;
+  }
+  .step-content strong { color: #1e293b; display: block; margin-bottom: 2px; }
+  .step-content span { color: #64748b; font-size: 12px; }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 12px;
+    border-left: 4px solid;
+  }
+  .callout.info  { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+  .callout.warn  { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+  .callout.green { background: #f0fdf4; border-color: #22c55e; color: #166534; }
+  .callout strong { font-weight: 700; }
+
+  /* CODE */
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    color: #dc2626;
+  }
+
+  .code-block {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 16px 18px;
+    border-radius: 8px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    margin: 12px 0;
+    overflow-x: auto;
+  }
+
+  /* FOOTER */
+  .doc-footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 2px solid #e2e8f0;
+    text-align: center;
+    font-size: 11px;
+    color: #94a3b8;
+  }
+
+  ul { margin: 8px 0 12px 20px; }
+  ul li { margin-bottom: 5px; color: #374151; }
+
+  @media print {
+    .toolbar { display: none !important; }
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; padding: 40px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="btn btn-ghost" onclick="window.print()">Print / Save as PDF</button>
+  <button class="btn btn-white" onclick="window.location.href='evaluation-dashboard.html'">← Dashboard</button>
+</div>
+
+<div class="page">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="tag">Architecture Document — Confidential</div>
+    <h1>AG ONE — Experion</h1>
+    <h2>Architecture, Integration &amp; Component Reference</h2>
+    <div class="cover-meta">
+      <div><strong>Product:</strong> Experion (AG ONE Series)</div>
+      <div><strong>Version:</strong> 1.0 &nbsp;|&nbsp; <strong>Date:</strong> June 2026</div>
+      <div><strong>Scope:</strong> JS SDK · .NET 8 API · Multi-Product Integration · Storage</div>
+    </div>
+  </div>
+
+  <!-- 1. WHAT IS EXPERION -->
+  <h2 class="section"><span class="num">1</span> What Is Experion</h2>
+  <p>
+    Experion is a drop-in AI agent within the <strong>AG ONE product series</strong>. It is delivered as a single JavaScript file hosted on Azure Blob Storage (CDN) and backed by a .NET 8 API. Any product in the AG ONE series — or any external .NET application — can embed Experion with a single <code>&lt;script&gt;</code> tag.
+  </p>
+  <p>
+    Experion combines two roles: an <strong>Activity-Mining Agent</strong> (passively watches user behaviour) and a <strong>Recommendation / Chatbot Agent</strong> (responds to requests, takes actions, surfaces proactive suggestions).
+  </p>
+
+  <div class="callout info">
+    <strong>Integration Rule:</strong> Each product team works independently and integrates with Experion via its API only. No product team has direct access to Experion's database, JS SDK code, or internal services.
+  </div>
+
+  <!-- 2. HOW AG ONE ROUTES REQUESTS -->
+  <h2 class="section"><span class="num">2</span> AG ONE Routing — How It Works</h2>
+  <p>
+    AG ONE acts as the central orchestrator. Every request — regardless of which product it originates from — is received by AG ONE, which then decides the path:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Path</th>
+        <th>Triggered When</th>
+        <th>What Happens</th>
+        <th>LLM Used?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge b-green">Generation</span></td>
+        <td>User asks a question, wants an explanation, or circles a UI element</td>
+        <td>RAG pipeline — KB retrieval → Azure OpenAI → answer + chips</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-amber">Action</span></td>
+        <td>User requests an action (add to cart, checkout, apply coupon…)</td>
+        <td>NLP routing → ActionMappings SQL lookup → queue → worker</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-blue">Chat</span></td>
+        <td>Conversational follow-up tied to session history</td>
+        <td>History loaded from Blob → Generation pipeline with context</td>
+        <td>Yes</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="sub">Per-Product Response Weights</h3>
+  <p>Each product in the AG ONE series has its own configurable weights that control how Experion prioritises each response type for that product's context:</p>
+  <table>
+    <thead>
+      <tr><th>Product</th><th>Action Weight</th><th>Generation Weight</th><th>Chat Weight</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Product 1 — Learn</td><td>Low</td><td>High</td><td>High</td><td>Knowledge-heavy; users ask questions</td></tr>
+      <tr><td>Product 2 — Work</td><td>High</td><td>Medium</td><td>Low</td><td>Task-driven; users take actions</td></tr>
+      <tr><td>Product 3–6</td><td colspan="3"><em>Configurable per TenantConfig row</em></td><td>Set at onboarding</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3. COMPONENTS -->
+  <h2 class="section"><span class="num">3</span> Core Components</h2>
+
+  <h3 class="sub">3.1 Experion JS SDK (Frontend)</h3>
+  <p>Hosted on <strong>Azure Blob Storage</strong> and served via CDN. Added to any product with one line:</p>
+  <div class="code-block">&lt;script
+  src="https://cdn.experion.ai/sdk/experion.js"
+  data-tenant="your-tenant-id"
+  data-api="https://api.experion.ai"
+  data-user-id="{{ currentUser.id }}"
+&gt;&lt;/script&gt;</div>
+
+  <table>
+    <thead><tr><th>Module</th><th>What It Does</th></tr></thead>
+    <tbody>
+      <tr><td>Identity Resolver</td><td>Uses logged-in UserID; falls back to <code>anon-&lt;id&gt;</code> + IP/region cohort for anonymous users</td></tr>
+      <tr><td>Activity Tracker</td><td>Passively captures pageview, click, scroll, dwell, input, idle, gesture events</td></tr>
+      <tr><td>Circle Gesture</td><td>Alt + drag circles any page region; SDK extracts DOM text and sends as <code>capturedText</code></td></tr>
+      <tr><td>Chat Sidebar</td><td>Sphere avatar + sliding chat panel + suggestion chips returned by the API</td></tr>
+      <tr><td>Proactive Nudge Toast</td><td>Receives server-side recommendations pushed via SignalR in real time</td></tr>
+      <tr><td>Event Batcher</td><td>Batches events and flushes every ~5 seconds; uses <code>sendBeacon</code> on page unload</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="sub">3.2 Experion API (.NET 8 — Backend)</h3>
+  <p>Owned entirely by the Experion team. Exposes only two main endpoints to product teams:</p>
+
+  <table>
+    <thead><tr><th>Endpoint</th><th>Purpose</th><th>Called By</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST /track</code></td><td>Ingest batched activity events from the SDK</td><td>JS SDK (automatic)</td></tr>
+      <tr><td><code>POST /process</code></td><td>Handle a chat, action, or generation request</td><td>JS SDK (on user input)</td></tr>
+    </tbody>
+  </table>
+
+  <p>Internal services (not exposed to product teams):</p>
+  <table>
+    <thead><tr><th>Service</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td>ExperionService</td><td>Flat pipeline orchestrator — one method per step, no nested orchestrators</td></tr>
+      <tr><td>RecommendationEngine</td><td>Reads activity blob → applies trigger rules → asks LLM → pushes nudge via SignalR</td></tr>
+      <tr><td>ActionWorker</td><td>Background worker consuming the action queue (Service Bus in production)</td></tr>
+      <tr><td>SignalR Hub</td><td>Pushes nudges and action acknowledgements to the SDK in real time</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 4. PROCESS PIPELINE -->
+  <h2 class="section"><span class="num">4</span> /process Pipeline — Step by Step</h2>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Embed Query</strong>
+        <span>The user's text is converted into a vector using Azure OpenAI Embeddings.</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Semantic Cache Check</strong>
+        <span>Cosine search over the SemanticCache table. A HIT short-circuits the LLM and returns in &lt;15 ms (vs 60–2000 ms for a full LLM call).</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>NLP Intent Router</strong>
+        <span>Hybrid score (embedding cosine + phrase Jaccard) against ActionMappings. Classifies the request as <strong>ACTION</strong> or <strong>GENERATION</strong>.</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4a</div>
+      <div class="step-content">
+        <strong>Run Action (if ACTION)</strong>
+        <span>Dispatch an ActionJob to the queue. Background worker executes the action and calls the product's <code>targetEndpoint</code>. SignalR echoes result back to SDK.</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4b</div>
+      <div class="step-content">
+        <strong>Run Generation / RAG (if GENERATION)</strong>
+        <span>Load conversation history from Blob → retrieve KB chunks → call Azure OpenAI GPT-4.1 → return answer + suggestion chips.</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <strong>Persist</strong>
+        <span>Write two JSONL lines (user turn + assistant turn) to Blob. On cache miss, write answer back to SemanticCache. Always write an AuditLog row to SQL.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. /track pipeline -->
+  <h2 class="section"><span class="num">5</span> /track Pipeline — Activity Ingest</h2>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>SDK Batches Events</strong><span>Events are collected client-side and posted every ~5 seconds, or immediately on page unload via sendBeacon.</span></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Append to Blob</strong><span>Each event is appended as a JSONL line to <code>activity/{tenant}/{userId}/{yyyy-MM-dd}.jsonl</code>.</span></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Update UserProfile</strong><span>Counters in the SQL UserProfile table are updated.</span></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>RecommendationEngine</strong><span>Reads recent activity blob → applies trigger rules (e.g. ≥5 events in 30 s, cooldown not active) → LLM drafts a nudge → SignalR pushes it to the SDK.</span></div></div>
+  </div>
+
+  <div class="callout green">
+    <strong>Performance note:</strong> Activity ingest is fully async (fire-and-forget). It never blocks the chat or action path.
+  </div>
+
+  <!-- 6. STORAGE -->
+  <h2 class="section"><span class="num">6</span> Storage Layer</h2>
+  <table>
+    <thead><tr><th>Store</th><th>What It Holds</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge b-blue">Azure Blob</span></td>
+        <td><code>conversations/{tenant}/{userId}/{date}.jsonl</code><br><code>activity/{tenant}/{userId}/{date}.jsonl</code></td>
+        <td>Cheap append-only storage; keeps SQL small</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-green">SQL Server</span></td>
+        <td>ActionMappings, SemanticCache, UserProfile, AuditLog, TenantConfig</td>
+        <td>Fast indexed lookups, transactional safety</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-amber">Azure AI Search</span></td>
+        <td>KB index + semantic-cache vector index</td>
+        <td>Hybrid vector/keyword retrieval for RAG</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-red">Azure OpenAI</span></td>
+        <td>GPT-4.1 (chat completion) + Embeddings model</td>
+        <td>LLM inference + vectorisation</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-purple">Azure Service Bus</span></td>
+        <td>Action Job queue</td>
+        <td>Durable, decoupled action execution</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 7. ACTIONS -->
+  <h2 class="section"><span class="num">7</span> Supported Actions (ActionMappings)</h2>
+  <p>Actions are data-driven. Adding a new action requires only inserting a row — no code change.</p>
+  <table>
+    <thead><tr><th>Action Key</th><th>Description</th><th>Example Phrases</th></tr></thead>
+    <tbody>
+      <tr><td><code>add_to_cart</code></td><td>Add the currently viewed product to the user's cart</td><td>"add to cart", "put this in my cart", "buy this"</td></tr>
+      <tr><td><code>checkout</code></td><td>Take the user to the checkout / payment flow</td><td>"checkout", "pay now", "complete my order"</td></tr>
+      <tr><td><code>apply_coupon</code></td><td>Apply a discount or promo code</td><td>"apply coupon", "use promo code", "discount"</td></tr>
+      <tr><td><code>open_profile</code></td><td>Open the account / settings page</td><td>"my account", "open settings", "profile"</td></tr>
+      <tr><td><code>contact_support</code></td><td>Open a support ticket or email support</td><td>"contact support", "raise a ticket", "get help"</td></tr>
+      <tr><td><code>logout</code></td><td>Sign the user out</td><td>"log out", "sign out", "exit"</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 8. PROACTIVE NUDGES -->
+  <h2 class="section"><span class="num">8</span> Proactive Recommendations</h2>
+  <table>
+    <thead><tr><th>Trigger</th><th>Nudge Example</th></tr></thead>
+    <tbody>
+      <tr><td>≥ 3 products viewed in same category</td><td>"You've viewed 3 products in this category — would you like to compare them?"</td></tr>
+      <tr><td>≥ 5 events in 30 seconds + form idle</td><td>"Looks like you're stuck on this form — want me to walk you through it?"</td></tr>
+      <tr><td>Cart not checked out in session</td><td>"It's been a while since you checked your cart — ready to check out?"</td></tr>
+    </tbody>
+  </table>
+  <p>All nudges are throttled with per-user cooldowns to prevent noise.</p>
+
+  <!-- 9. IDENTITY MODEL -->
+  <h2 class="section"><span class="num">9</span> Identity Model</h2>
+  <table>
+    <thead><tr><th>User Type</th><th>Identity</th><th>Session ID</th></tr></thead>
+    <tbody>
+      <tr><td>Logged-in</td><td>Real <code>UserID</code> from the product</td><td><code>&lt;userId&gt;__&lt;random&gt;</code> minted on <code>/identify</code></td></tr>
+      <tr><td>Anonymous</td><td><code>anon-&lt;id&gt;</code> persisted in localStorage + IP-based region cohort</td><td>Same pattern — geo-aware recommendations still work</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 10. TEAM INTEGRATION GUIDE -->
+  <h2 class="section"><span class="num">10</span> Product Team Integration Guide</h2>
+  <p>This is everything a product team needs to know. No access to Experion internals is required.</p>
+
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Experion team creates a TenantConfig row</strong><span>Name, KB content, idle thresholds, cooldown settings.</span></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Experion team seeds ActionMappings rows</strong><span>One row per action you want to expose for your product. No code change needed.</span></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Product team drops one script tag</strong><span><code>&lt;script src="experion.js" data-tenant="your-id" data-api="..." data-user-id="..."&gt;</code></span></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Done</strong><span>Experion now tracks behaviour, serves the chat sidebar, fires proactive nudges, and can take actions — all scoped to your tenant.</span></div></div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Boundary rule:</strong> Product teams call <code>POST /track</code> and <code>POST /process</code> only. All other Experion infrastructure is owned and managed by the Experion team exclusively.
+  </div>
+
+  <!-- 11. PRODUCTION SWAP -->
+  <h2 class="section"><span class="num">11</span> Production Swap-In (Demo → Prod)</h2>
+  <table>
+    <thead><tr><th>Component</th><th>Demo (Local)</th><th>Production</th><th>Change Required</th></tr></thead>
+    <tbody>
+      <tr><td>LLM / Embeddings</td><td>Mock / stub</td><td>Azure OpenAI</td><td>One config switch</td></tr>
+      <tr><td>Blob Storage</td><td>Local JSONL files</td><td>Azure Blob Append Blobs</td><td>One config switch</td></tr>
+      <tr><td>Database</td><td>SQLite</td><td>SQL Server</td><td>Connection string only</td></tr>
+      <tr><td>Action Queue</td><td>In-process queue</td><td>Azure Service Bus</td><td>One config switch</td></tr>
+      <tr><td>SignalR</td><td>In-process</td><td>Azure SignalR Service</td><td>One config switch</td></tr>
+      <tr><td>KB Retrieval</td><td>Naive text search</td><td>Azure AI Search (hybrid)</td><td>One config switch</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 12. COST / LATENCY -->
+  <h2 class="section"><span class="num">12</span> Performance &amp; Cost Optimisations</h2>
+  <table>
+    <thead><tr><th>Optimisation</th><th>How It Works</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td>Semantic Cache</td><td>Repeated / paraphrased queries hit the cache, not the LLM</td><td>HIT &lt;15 ms vs 60–2000 ms LLM call</td></tr>
+      <tr><td>Action path — no LLM</td><td>Pure NLP routing → SQL → queue; LLM never called for actions</td><td>Near-zero latency and token cost for actions</td></tr>
+      <tr><td>Async activity ingest</td><td>Fire-and-forget; never blocks chat or action paths</td><td>Chat latency unaffected by tracking load</td></tr>
+      <tr><td>Blob for history</td><td>Conversation history in blob keeps SQL small and indexed</td><td>SQL stays fast; history scales cheaply</td></tr>
+    </tbody>
+  </table>
+
+  <div class="doc-footer">
+    <p>AG ONE — Experion Architecture Document &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; June 2026</p>
+    <p style="margin-top:4px">For questions contact the Experion team. Product teams integrate via API only.</p>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Presentation Evaluation Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
+      padding: 24px 32px;
+      border-bottom: 2px solid #3b82f6;
+    }
+
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    header p {
+      font-size: 13px;
+      color: #93c5fd;
+      margin-top: 4px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      padding: 16px 32px 0;
+      background: #0f172a;
+      border-bottom: 2px solid #1e293b;
+    }
+
+    .tab-btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      background: #1e293b;
+      color: #94a3b8;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #1d4ed8;
+      color: #fff;
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .container {
+      padding: 24px 32px;
+      max-width: 1400px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .legend span {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-right: 4px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .dot {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+
+    .dot-1 { background: #ef4444; }
+    .dot-2 { background: #f97316; }
+    .dot-3 { background: #eab308; }
+    .dot-4 { background: #22c55e; }
+    .dot-5 { background: #3b82f6; }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead tr {
+      background: #1e293b;
+    }
+
+    thead th {
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: #94a3b8;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      white-space: nowrap;
+      border-bottom: 1px solid #334155;
+    }
+
+    thead th.criterion {
+      color: #60a5fa;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #1e293b;
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover {
+      background: #162032;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    td {
+      padding: 10px 14px;
+      vertical-align: middle;
+    }
+
+    .name-cell {
+      font-weight: 600;
+      color: #e2e8f0;
+      white-space: nowrap;
+      min-width: 200px;
+    }
+
+    .phase-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .phase-1 { background: #1e3a5f; color: #60a5fa; }
+    .phase-2 { background: #1c2a1a; color: #4ade80; }
+
+    /* STAR RATING */
+    .stars {
+      display: flex;
+      gap: 3px;
+    }
+
+    .star {
+      font-size: 18px;
+      cursor: pointer;
+      color: #334155;
+      transition: color 0.15s;
+      user-select: none;
+    }
+
+    .star.filled { color: #f59e0b; }
+    .star:hover { color: #fbbf24; }
+
+    /* SCORE BADGE */
+    .score-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      min-width: 38px;
+      text-align: center;
+    }
+
+    .score-0 { background: #1e293b; color: #64748b; }
+    .score-1 { background: #450a0a; color: #fca5a5; }
+    .score-2 { background: #431407; color: #fdba74; }
+    .score-3 { background: #422006; color: #fde047; }
+    .score-4 { background: #052e16; color: #86efac; }
+    .score-5 { background: #172554; color: #93c5fd; }
+
+    /* NOTES */
+    .notes-input {
+      width: 100%;
+      min-width: 160px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      font-size: 12px;
+      padding: 6px 8px;
+      resize: vertical;
+      min-height: 36px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .notes-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: #111827;
+    }
+
+    /* AVERAGE ROW */
+    .avg-row td {
+      background: #1a2540;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+
+    /* SUMMARY TAB */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .summary-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+
+    .summary-card:hover {
+      border-color: #3b82f6;
+    }
+
+    .card-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+    }
+
+    .card-phase {
+      font-size: 11px;
+      margin-bottom: 14px;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .bar-label {
+      font-size: 11px;
+      color: #94a3b8;
+      width: 100px;
+      flex-shrink: 0;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 8px;
+      background: #0f172a;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+      transition: width 0.4s ease;
+    }
+
+    .bar-score {
+      font-size: 11px;
+      font-weight: 700;
+      color: #60a5fa;
+      width: 20px;
+      text-align: right;
+    }
+
+    .overall-score {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .overall-label {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .overall-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .overall-val span {
+      font-size: 12px;
+      font-weight: 400;
+      color: #64748b;
+    }
+
+    /* EXPORT BUTTON */
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #1d4ed8;
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: #2563eb; }
+
+    .btn-ghost {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+    }
+
+    .btn-ghost:hover { background: #334155; color: #e2e8f0; }
+
+    .section-label {
+      padding: 8px 14px;
+      background: #1a2540;
+      color: #60a5fa;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    @media print {
+      body { background: white; color: black; }
+      .tabs, .toolbar { display: none; }
+      .tab-content { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Presentation Evaluation Dashboard</h1>
+  <p>Session 1 — Technical Observation &nbsp;|&nbsp; Session 2 — Thinking & Communication Assessment</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('s1')">Session 1 — Technical</button>
+  <button class="tab-btn" onclick="switchTab('s2')">Session 2 — Thinking</button>
+  <button class="tab-btn" onclick="switchTab('summary')">Summary View</button>
+</div>
+
+<div class="container">
+
+  <!-- ===== SESSION 1 ===== -->
+  <div class="tab-content active" id="tab-s1">
+    <div class="toolbar">
+      <button class="btn btn-ghost" onclick="clearSession(1)">Clear All</button>
+      <button class="btn btn-primary" onclick="switchTab('s2')">Next: Session 2 →</button>
+    </div>
+    <div class="legend">
+      <span>Rating:</span>
+      <div class="legend-item"><div class="dot dot-1"></div> 1 – Poor</div>
+      <div class="legend-item"><div class="dot dot-2"></div> 2 – Below Avg</div>
+      <div class="legend-item"><div class="dot dot-3"></div> 3 – Average</div>
+      <div class="legend-item"><div class="dot dot-4"></div> 4 – Good</div>
+      <div class="legend-item"><div class="dot dot-5"></div> 5 – Excellent</div>
+    </div>
+    <div class="table-wrap">
+      <table id="table-s1">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Participant</th>
+            <th>Phase</th>
+            <th class="criterion">Technical Accuracy</th>
+            <th class="criterion">Explanation Clarity</th>
+            <th class="criterion">Problem Solving</th>
+            <th class="criterion">Demo / Examples</th>
+            <th class="criterion">Q&A Handling</th>
+            <th>Score</th>
+            <th style="min-width:180px;">Observations / Notes</th>
+          </tr>
+        </thead>
+        <tbody id="body-s1"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SESSION 2 ===== -->
+  <div class="tab-content" id="tab-s2">
+    <div class="toolbar">
+      <button class="btn btn-ghost" onclick="clearSession(2)">Clear All</button>
+      <button class="btn btn-primary" onclick="switchTab('summary')">View Summary →</button>
+    </div>
+    <div class="legend">
+      <span>Criteria (simplified):</span>
+      <div class="legend-item" title="Clarity of Thought"><b style="color:#60a5fa">CT</b> = Clear Thinking</div>
+      <div class="legend-item" title="Depth vs Breadth"><b style="color:#60a5fa">DW</b> = Deep vs Wide</div>
+      <div class="legend-item" title="Listing and Building"><b style="color:#60a5fa">LB</b> = List & Build</div>
+      <div class="legend-item" title="Business Linkage"><b style="color:#60a5fa">BC</b> = Biz Connect</div>
+      <div class="legend-item" title="Conduct with Conduit"><b style="color:#60a5fa">CC</b> = Flow & Conduct</div>
+      <div class="legend-item" title="Original Thinking Communication Style"><b style="color:#60a5fa">OT</b> = Own Ideas</div>
+    </div>
+    <div class="table-wrap">
+      <table id="table-s2">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Participant</th>
+            <th>Phase</th>
+            <th class="criterion" title="Clarity of Thought — How clearly do they express ideas?">CT — Clear Thinking</th>
+            <th class="criterion" title="Depth vs Breadth — Do they go deep or wide?">DW — Deep vs Wide</th>
+            <th class="criterion" title="Listing and Building — Can they list points and build on them?">LB — List & Build</th>
+            <th class="criterion" title="Business Linkage — Do they connect ideas to real business?">BC — Biz Connect</th>
+            <th class="criterion" title="Conduct with Conduit — How they channel and carry information">CC — Flow & Conduct</th>
+            <th class="criterion" title="Original Thinking & Communication Style — Is their voice unique?">OT — Own Ideas</th>
+            <th>Score</th>
+            <th style="min-width:180px;">Observations / Notes</th>
+          </tr>
+        </thead>
+        <tbody id="body-s2"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SUMMARY ===== -->
+  <div class="tab-content" id="tab-summary">
+    <div class="toolbar">
+      <button class="btn btn-ghost" onclick="window.print()">Print / Screenshot</button>
+      <button class="btn btn-primary" onclick="buildSummary()">Refresh Summary</button>
+    </div>
+    <div class="summary-grid" id="summary-grid"></div>
+  </div>
+
+</div>
+
+<script>
+  const PEOPLE = [
+    { id: 1,  name: "Mohammad Kashif Mohiuddin", phase: 1 },
+    { id: 2,  name: "Shahid",                    phase: 1 },
+    { id: 3,  name: "Hadeef",                    phase: 1 },
+    { id: 4,  name: "Baizid Yaldram",            phase: 2 },
+    { id: 5,  name: "Muhammad Hadif Amar Bin Razali", phase: 2 },
+    { id: 6,  name: "Cita Wafa Atiah",           phase: 2 },
+    { id: 7,  name: "Muhammad Mairaj",           phase: 2 },
+    { id: 8,  name: "Mohammad Shahid Akhtar",    phase: 2 },
+    { id: 9,  name: "Aurneela Ghosh Riddhi",     phase: 2 },
+  ];
+
+  const S1_CRITERIA = ["Technical Accuracy","Explanation Clarity","Problem Solving","Demo / Examples","Q&A Handling"];
+  const S2_CRITERIA = ["CT","DW","LB","BC","CC","OT"];
+  const S2_FULL     = ["Clear Thinking","Deep vs Wide","List & Build","Biz Connect","Flow & Conduct","Own Ideas"];
+
+  // State
+  const state = { s1: {}, s2: {} };
+  PEOPLE.forEach(p => {
+    state.s1[p.id] = { scores: Array(5).fill(0), notes: "" };
+    state.s2[p.id] = { scores: Array(6).fill(0), notes: "" };
+  });
+
+  function save() {
+    try { localStorage.setItem("evalState", JSON.stringify(state)); } catch(e){}
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem("evalState");
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (saved.s1) Object.assign(state.s1, saved.s1);
+      if (saved.s2) Object.assign(state.s2, saved.s2);
+    } catch(e){}
+  }
+
+  function starHTML(session, personId, criterionIdx, currentVal) {
+    let html = '<div class="stars">';
+    for (let i = 1; i <= 5; i++) {
+      const filled = i <= currentVal ? " filled" : "";
+      html += `<span class="star${filled}"
+        onclick="setScore(${session},'${personId}',${criterionIdx},${i})"
+        onmouseover="hoverStars(this,${i})"
+        onmouseout="resetStars(this,'${session}-${personId}-${criterionIdx}',${currentVal})"
+        data-key="${session}-${personId}-${criterionIdx}"
+        data-val="${i}">★</span>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function setScore(session, personId, criterionIdx, val) {
+    const pid = parseInt(personId);
+    state['s'+session][pid].scores[criterionIdx] = val;
+    save();
+    renderRow(session, pid);
+    updateScore(session, pid);
+    if (document.getElementById('tab-summary').classList.contains('active')) buildSummary();
+  }
+
+  function renderRow(session, pid) {
+    const s = state['s'+session][pid];
+    const criteria = session === 1 ? S1_CRITERIA : S2_CRITERIA;
+    // Re-render stars in the row
+    criteria.forEach((_, idx) => {
+      const container = document.getElementById(`stars-${session}-${pid}-${idx}`);
+      if (container) container.innerHTML = starHTML(session, pid, idx, s.scores[idx]);
+    });
+    updateScore(session, pid);
+  }
+
+  function updateScore(session, pid) {
+    const s = state['s'+session][pid];
+    const total = s.scores.reduce((a,b) => a+b, 0);
+    const max   = session === 1 ? 25 : 30;
+    const pct   = Math.round((total / max) * 100);
+    const el = document.getElementById(`score-${session}-${pid}`);
+    if (el) {
+      const stars = Math.round(total / s.scores.length);
+      el.className = `score-badge score-${stars}`;
+      el.textContent = `${pct}%`;
+    }
+  }
+
+  function hoverStars(el, val) {
+    const key = el.dataset.key;
+    document.querySelectorAll(`[data-key="${key}"]`).forEach(s => {
+      s.classList.toggle('filled', parseInt(s.dataset.val) <= val);
+    });
+  }
+
+  function resetStars(el, key, currentVal) {
+    document.querySelectorAll(`[data-key="${key}"]`).forEach(s => {
+      s.classList.toggle('filled', parseInt(s.dataset.val) <= currentVal);
+    });
+  }
+
+  function buildTable(session) {
+    const tbody = document.getElementById(`body-s${session}`);
+    tbody.innerHTML = "";
+    const criteria = session === 1 ? S1_CRITERIA : S2_CRITERIA;
+
+    PEOPLE.forEach((p, idx) => {
+      const s = state['s'+session][p.id];
+      const tr = document.createElement('tr');
+
+      let cells = `
+        <td style="color:#64748b;font-size:12px;">${idx+1}</td>
+        <td class="name-cell">${p.name}</td>
+        <td><span class="phase-badge phase-${p.phase}">Phase ${p.phase}</span></td>
+      `;
+
+      criteria.forEach((c, ci) => {
+        cells += `<td><div id="stars-${session}-${p.id}-${ci}">${starHTML(session, p.id, ci, s.scores[ci])}</div></td>`;
+      });
+
+      const total = s.scores.reduce((a,b)=>a+b,0);
+      const max   = session === 1 ? 25 : 30;
+      const pct   = Math.round((total/max)*100);
+      const stars = s.scores.length ? Math.round(total/s.scores.length) : 0;
+
+      cells += `<td><span id="score-${session}-${p.id}" class="score-badge score-${stars}">${pct}%</span></td>`;
+      cells += `<td><textarea class="notes-input" placeholder="Write observations here…"
+                  oninput="saveNotes(${session},${p.id},this.value)">${s.notes}</textarea></td>`;
+
+      tr.innerHTML = cells;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function saveNotes(session, pid, val) {
+    state['s'+session][pid].notes = val;
+    save();
+  }
+
+  function clearSession(session) {
+    if (!confirm(`Clear all Session ${session} data?`)) return;
+    PEOPLE.forEach(p => {
+      const len = session === 1 ? 5 : 6;
+      state['s'+session][p.id] = { scores: Array(len).fill(0), notes: "" };
+    });
+    save();
+    buildTable(session);
+  }
+
+  function buildSummary() {
+    const grid = document.getElementById('summary-grid');
+    grid.innerHTML = "";
+
+    PEOPLE.forEach(p => {
+      const s1 = state.s1[p.id];
+      const s2 = state.s2[p.id];
+      const s1total = s1.scores.reduce((a,b)=>a+b,0);
+      const s2total = s2.scores.reduce((a,b)=>a+b,0);
+      const overall = Math.round(((s1total/25) + (s2total/30)) / 2 * 100);
+
+      let barRows1 = S1_CRITERIA.map((c,i) => `
+        <div class="bar-row">
+          <div class="bar-label" title="${c}">${c.length > 14 ? c.substring(0,13)+'…' : c}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${s1.scores[i]*20}%"></div></div>
+          <div class="bar-score">${s1.scores[i]}</div>
+        </div>`).join('');
+
+      let barRows2 = S2_CRITERIA.map((c,i) => `
+        <div class="bar-row">
+          <div class="bar-label" title="${S2_FULL[i]}">${c} — ${S2_FULL[i]}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${s2.scores[i]*20}%;background:linear-gradient(90deg,#065f46,#10b981)"></div></div>
+          <div class="bar-score">${s2.scores[i]}</div>
+        </div>`).join('');
+
+      const card = document.createElement('div');
+      card.className = 'summary-card';
+      card.innerHTML = `
+        <div class="card-name">${p.name}</div>
+        <div class="card-phase phase-${p.phase}" style="margin-bottom:12px">
+          <span class="phase-badge phase-${p.phase}">Phase ${p.phase}</span>
+        </div>
+        <div style="font-size:11px;color:#60a5fa;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">
+          Session 1 — Technical
+        </div>
+        ${barRows1}
+        <div style="font-size:11px;color:#4ade80;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin:12px 0 8px">
+          Session 2 — Thinking
+        </div>
+        ${barRows2}
+        <div class="overall-score">
+          <div class="overall-label">Overall Score</div>
+          <div class="overall-val">${overall}%<span> / 100</span></div>
+        </div>
+        ${s1.notes || s2.notes ? `
+        <div style="margin-top:12px;padding:8px;background:#0f172a;border-radius:6px;font-size:11px;color:#94a3b8;border:1px solid #1e293b">
+          ${s1.notes ? `<b style="color:#60a5fa">S1:</b> ${s1.notes}<br>` : ''}
+          ${s2.notes ? `<b style="color:#4ade80">S2:</b> ${s2.notes}` : ''}
+        </div>` : ''}
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', ['s1','s2','summary'][i] === name);
+    });
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-'+name).classList.add('active');
+    if (name === 'summary') buildSummary();
+  }
+
+  // Init
+  load();
+  buildTable(1);
+  buildTable(2);
+</script>
+</body>
+</html>

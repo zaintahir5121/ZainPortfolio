@@ -201,6 +201,25 @@
       min-height: 16px;
     }
 
+    /* REASON INPUT */
+    .reason-input {
+      width: 100%;
+      background: #0b1120;
+      border: 1px solid #2d3f55;
+      border-radius: 8px;
+      color: #fde047;
+      font-size: 12px;
+      padding: 7px 10px;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .reason-input:focus {
+      outline: none;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245,158,11,0.15);
+    }
+    .reason-input::placeholder { color: #475569; }
+
     /* THOUGHT INPUT */
     .thought-input {
       width: 100%;
@@ -504,15 +523,15 @@ const S2_CRITERIA = [
   },
 ];
 
-const STAR_LABELS = ["", "Poor", "Below Average", "Average", "Good", "Excellent"];
+const STAR_LABELS = ["", "Very Poor (1)", "Poor (2)", "Fair (3)", "Good (4)", "Excellent (5)"];
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
 
 function emptyState() {
   const st = { s1:{}, s2:{} };
   PEOPLE.forEach(p => {
-    st.s1[p.id] = { scores: Array(5).fill(0), thoughts: Array(5).fill(""), notes: "" };
-    st.s2[p.id] = { scores: Array(6).fill(0), thoughts: Array(6).fill(""), notes: "" };
+    st.s1[p.id] = { scores: Array(5).fill(0), reasons: Array(5).fill(""), thoughts: Array(5).fill(""), notes: "" };
+    st.s2[p.id] = { scores: Array(6).fill(0), reasons: Array(6).fill(""), thoughts: Array(6).fill(""), notes: "" };
   });
   return st;
 }
@@ -539,12 +558,14 @@ function load() {
       if (saved.s1 && saved.s1[p.id]) {
         const sv = saved.s1[p.id];
         state.s1[p.id].scores   = sv.scores   || state.s1[p.id].scores;
+        state.s1[p.id].reasons  = sv.reasons  || state.s1[p.id].reasons;
         state.s1[p.id].thoughts = sv.thoughts  || state.s1[p.id].thoughts;
         state.s1[p.id].notes    = sv.notes     || "";
       }
       if (saved.s2 && saved.s2[p.id]) {
         const sv = saved.s2[p.id];
         state.s2[p.id].scores   = sv.scores   || state.s2[p.id].scores;
+        state.s2[p.id].reasons  = sv.reasons  || state.s2[p.id].reasons;
         state.s2[p.id].thoughts = sv.thoughts  || state.s2[p.id].thoughts;
         state.s2[p.id].notes    = sv.notes     || "";
       }
@@ -622,8 +643,16 @@ function renderPanel(session) {
         </div>
         <div class="criterion-desc">${c.desc}</div>
         <div class="stars" id="stars-s${session}-${pid}-${ci}">${stars}</div>
-        <div class="star-label" id="slabel-s${session}-${pid}-${ci}">${score > 0 ? STAR_LABELS[score] : 'Click to rate'}</div>
-        <div class="thought-label">Your thoughts on this</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div class="star-label" id="slabel-s${session}-${pid}-${ci}">${score > 0 ? STAR_LABELS[score] : 'Click to rate'}</div>
+        </div>
+        <div class="thought-label">Reason for score</div>
+        <input type="text" class="reason-input"
+          id="reason-s${session}-${pid}-${ci}"
+          placeholder="Why did you give this score?"
+          oninput="saveReason(${session},${pid},${ci},this.value)"
+          value="${(sdata.reasons && sdata.reasons[ci] ? sdata.reasons[ci] : '').replace(/"/g,'&quot;')}">
+        <div class="thought-label">Detailed observations</div>
         <textarea class="thought-input"
           id="thought-s${session}-${pid}-${ci}"
           placeholder="Write your observations, notes, or specific comments about ${c.name.toLowerCase()}…"
@@ -717,6 +746,11 @@ function saveThought(session, pid, ci, val) {
   save();
 }
 
+function saveReason(session, pid, ci, val) {
+  state[`s${session}`][pid].reasons[ci] = val;
+  save();
+}
+
 function saveNotes(session, pid, val) {
   state[`s${session}`][pid].notes = val;
   save();
@@ -725,7 +759,7 @@ function saveNotes(session, pid, val) {
 function clearPerson(session, pid) {
   if (!confirm("Clear all ratings and notes for this person in this session?")) return;
   const len = session === 1 ? 5 : 6;
-  state[`s${session}`][pid] = { scores: Array(len).fill(0), thoughts: Array(len).fill(""), notes: "" };
+  state[`s${session}`][pid] = { scores: Array(len).fill(0), reasons: Array(len).fill(""), thoughts: Array(len).fill(""), notes: "" };
   save();
   renderPanel(session);
 }
@@ -758,8 +792,18 @@ function buildSummary() {
       </div>`).join('');
 
     // Collect all thoughts
-    const s1thoughts = S1_CRITERIA.map((c,i) => s1.thoughts[i] ? `<b>${c.short}:</b> ${s1.thoughts[i]}` : '').filter(Boolean).join('<br>');
-    const s2thoughts = S2_CRITERIA.map((c,i) => s2.thoughts[i] ? `<b>${c.short}:</b> ${s2.thoughts[i]}` : '').filter(Boolean).join('<br>');
+    const s1thoughts = S1_CRITERIA.map((c,i) => {
+      const r = s1.reasons  && s1.reasons[i]  ? `<span style="color:#fde047">Reason: ${s1.reasons[i]}</span>` : '';
+      const t = s1.thoughts && s1.thoughts[i] ? s1.thoughts[i] : '';
+      if (!r && !t) return '';
+      return `<b>${c.short} — ${c.name}:</b> ${[r,t].filter(Boolean).join(' · ')}`;
+    }).filter(Boolean).join('<br>');
+    const s2thoughts = S2_CRITERIA.map((c,i) => {
+      const r = s2.reasons  && s2.reasons[i]  ? `<span style="color:#fde047">Reason: ${s2.reasons[i]}</span>` : '';
+      const t = s2.thoughts && s2.thoughts[i] ? s2.thoughts[i] : '';
+      if (!r && !t) return '';
+      return `<b>${c.short} — ${c.name}:</b> ${[r,t].filter(Boolean).join(' · ')}`;
+    }).filter(Boolean).join('<br>');
     const hasNotes = s1.notes || s2.notes || s1thoughts || s2thoughts;
 
     const card = document.createElement('div');

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Palm Reader | Zain Abbas Tahir</title>
+  <meta name="description" content="A fun, private, browser-based AI Palm Reader demo. Take or upload a photo of your palm and get an instant reading — no photos ever leave your device.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="palm-reader.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">ZAT<span class="logo-dot">.</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-a"><i class="fas fa-arrow-left"></i>&nbsp; Back to Portfolio</a></li>
+      </ul>
+      <div class="nav-right">
+        <button class="theme-btn" id="theme-btn" aria-label="Toggle theme">
+          <i class="fas fa-moon" id="theme-icon"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- HERO -->
+    <section class="pr-hero">
+      <div class="container">
+        <div class="pr-badge">
+          <i class="fas fa-lock"></i>
+          100% Private &mdash; your photo is analyzed on-device and never uploaded
+        </div>
+        <h1>Discover What Your <span class="grad-text">Palm</span> Reveals</h1>
+        <p class="pr-sub">Take a photo of your palm (or upload one) and get an instant, AI-styled reading of your heart, head, life &amp; fate lines. Built as a live demo of camera capture, canvas image analysis, and UI/UX &mdash; purely for fun.</p>
+      </div>
+    </section>
+
+    <!-- APP -->
+    <section class="pr-app-section">
+      <div class="container pr-app-grid">
+
+        <!-- CAPTURE CARD -->
+        <div class="pr-card" id="pr-capture-card">
+          <div class="pr-tabs" id="pr-tabs">
+            <button class="pr-tab active" data-mode="camera"><i class="fas fa-camera"></i> Use Camera</button>
+            <button class="pr-tab" data-mode="upload"><i class="fas fa-upload"></i> Upload Photo</button>
+          </div>
+
+          <div class="pr-stage" id="pr-stage">
+
+            <!-- CAMERA MODE -->
+            <div class="pr-camera-wrap" id="pr-camera-wrap">
+              <div class="pr-video-box">
+                <video id="pr-video" autoplay playsinline muted></video>
+                <div class="pr-hand-guide" id="pr-hand-guide">
+                  <i class="fas fa-hand-paper"></i>
+                  <span>Center your open palm inside the frame</span>
+                </div>
+                <p class="pr-cam-msg" id="pr-cam-msg"></p>
+              </div>
+              <div class="pr-cam-actions">
+                <button class="btn-ghost" id="pr-cam-start"><i class="fas fa-camera"></i> Start Camera</button>
+                <button class="btn-primary hidden" id="pr-cam-capture"><i class="fas fa-circle-dot"></i> Capture Photo</button>
+                <button class="btn-ghost hidden" id="pr-cam-switch" title="Switch camera"><i class="fas fa-rotate"></i></button>
+              </div>
+            </div>
+
+            <!-- UPLOAD MODE -->
+            <div class="pr-upload-wrap hidden" id="pr-upload-wrap">
+              <label class="pr-dropzone" id="pr-dropzone" for="pr-file-input">
+                <i class="fas fa-cloud-arrow-up"></i>
+                <p>Drag &amp; drop a palm photo here, or <span>browse files</span></p>
+                <small>JPG or PNG &middot; good lighting, palm facing the camera works best</small>
+              </label>
+              <input type="file" id="pr-file-input" accept="image/*" hidden>
+            </div>
+
+            <!-- PREVIEW -->
+            <div class="pr-preview-wrap hidden" id="pr-preview-wrap">
+              <div class="pr-preview-frame">
+                <img id="pr-preview-img" alt="Captured palm photo">
+                <div class="pr-scan-overlay hidden" id="pr-scan-overlay">
+                  <div class="pr-scan-line"></div>
+                  <div class="pr-scan-grid"></div>
+                </div>
+              </div>
+              <p class="pr-analyzing hidden" id="pr-analyzing"><i class="fas fa-circle-notch fa-spin"></i> Analyzing palm lines&hellip;</p>
+              <div class="pr-preview-actions" id="pr-preview-actions">
+                <button class="btn-ghost" id="pr-retake"><i class="fas fa-rotate-left"></i> Retake</button>
+                <button class="btn-primary" id="pr-analyze"><i class="fas fa-wand-magic-sparkles"></i> Read My Palm</button>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="pr-tips"><i class="fas fa-lightbulb"></i> Tip: use natural light, spread your fingers slightly, and fill most of the frame with your palm.</p>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="pr-card pr-results hidden" id="pr-results">
+          <div class="pr-results-head">
+            <span class="sec-tag">Your Reading</span>
+            <h2 id="pr-headline">Your Palm Reading</h2>
+            <p class="pr-overall" id="pr-overall"></p>
+          </div>
+
+          <div class="pr-lines" id="pr-lines"></div>
+
+          <div class="pr-results-actions">
+            <button class="btn-ghost" id="pr-again"><i class="fas fa-rotate-left"></i> Try Another Photo</button>
+            <button class="btn-primary" id="pr-share"><i class="fas fa-share-nodes"></i> Share Result</button>
+          </div>
+        </div>
+
+        <!-- EMPTY STATE (shown before first reading, next to capture card on desktop) -->
+        <div class="pr-card pr-empty" id="pr-empty">
+          <i class="fas fa-hand-sparkles"></i>
+          <h3>Your reading will appear here</h3>
+          <p>Capture or upload a clear photo of your open palm, then hit &ldquo;Read My Palm&rdquo; to see your heart, head, life &amp; fate line insights.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- DISCLAIMER -->
+    <section class="pr-disclaimer-section">
+      <div class="container">
+        <div class="pr-disclaimer">
+          <i class="fas fa-circle-info"></i>
+          <div>
+            <strong>For entertainment purposes only.</strong>
+            Palmistry has no scientific basis. This demo runs a deterministic, on-device analysis of your photo's pixels to generate a playful reading &mdash; it is not medical, psychological, or predictive advice, and nothing is uploaded or stored anywhere.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <canvas id="pr-work-canvas" class="pr-hidden-canvas"></canvas>
+
+  <footer class="pr-footer">
+    <div class="container">
+      <p>&copy; <span id="pr-year"></span> Zain Abbas Tahir &mdash; <a href="index.html">Back to full portfolio</a></p>
+    </div>
+  </footer>
+
+  <script src="palm-reader.js"></script>
+</body>
+</html>

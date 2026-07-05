@@ -1,0 +1,43 @@
+name: Generate OG image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "og/og-config.json"
+      - "scripts/generate-og-image.js"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Generate OG image
+        run: npm run generate:og
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- assets/og-image.jpg; then
+            echo "No changes to assets/og-image.jpg"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/og-image.jpg
+          git commit -m "Auto-regenerate OG image from og/og-config.json"
+          git push

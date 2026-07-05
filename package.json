@@ -1,0 +1,12 @@
+{
+  "name": "zainportfolio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Zain Abbas Tahir portfolio site",
+  "scripts": {
+    "generate:og": "node scripts/generate-og-image.js"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

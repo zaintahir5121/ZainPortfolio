@@ -1,0 +1,34 @@
+{
+  "brandMark": "ZAT",
+  "brandUrl": "zainabbastahir.com",
+  "eyebrow": "AI Tools, Shipped & Working",
+  "headline": {
+    "plain": "Building ",
+    "accent": "AI-Powered",
+    "rest": "Systems That Scale"
+  },
+  "subhead": "RAG chatbots, predictive analytics, face-recognition auth & enterprise document platforms — live, in production.",
+  "pills": ["RAG", "Azure OpenAI", "Azure ML", ".NET Core", "Angular"],
+  "cards": [
+    {
+      "tag": "AI Customer Support Bot",
+      "kind": "chat",
+      "aiMessage": "Hi! I can check orders, process refunds, or escalate to a human.",
+      "userMessage": "Where's my order #4471?"
+    },
+    {
+      "tag": "Predictive Analytics Engine",
+      "kind": "analytics",
+      "kpi1Value": "+31%",
+      "kpi1Label": "Forecast Accuracy",
+      "kpi2Value": "2.4k",
+      "kpi2Label": "Predictions/Day",
+      "bars": [38, 55, 44, 72, 60, 88, 68, 95]
+    },
+    {
+      "tag": "Face Recognition Login",
+      "kind": "scan",
+      "statusText": "Access Granted"
+    }
+  ]
+}

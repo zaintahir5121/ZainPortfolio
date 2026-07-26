@@ -225,6 +225,21 @@ body { background: var(--bg); color: var(--text); }
 }
 @keyframes blink { 50% { opacity: 0; } }
 
+/* Video card (hero intro video) */
+.video-card {
+  background: var(--code-bg); border-radius: 16px;
+  border: 1.5px solid var(--border); overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  margin-bottom: 1.25rem;
+}
+.video-embed {
+  position: relative; width: 100%; max-width: 320px;
+  aspect-ratio: 9 / 16; margin: 0 auto; background: #000;
+}
+.video-embed iframe {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+}
+
 .tech-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .tech-chips span {
   padding: 0.35rem 0.8rem; border-radius: 6px;

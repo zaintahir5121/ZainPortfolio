@@ -1,0 +1,143 @@
+name: Build & Deploy to IIS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_PATH: 'src/ZainPortfolio/ZainPortfolio.csproj'
+  PUBLISH_DIR: ${{ github.workspace }}/publish
+
+jobs:
+  # ---------------------------------------------------------------- build
+  build:
+    name: Build & publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+
+      # Add a test project and this step starts protecting the deploy automatically.
+      - name: Test
+        run: |
+          if ls **/*Tests*.csproj 1> /dev/null 2>&1; then
+            dotnet test --configuration Release --no-build --verbosity normal
+          else
+            echo "No test projects found — skipping."
+          fi
+
+      - name: Publish
+        run: >
+          dotnet publish ${{ env.PROJECT_PATH }}
+          --configuration Release
+          --no-build
+          --output ${{ env.PUBLISH_DIR }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: webapp
+          path: ${{ env.PUBLISH_DIR }}
+          retention-days: 14
+
+  # ---------------------------------------------------------------- deploy
+  # Runs only on main, never on pull requests.
+  deploy:
+    name: Deploy to IIS
+    runs-on: windows-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    environment: production
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: webapp
+          path: ./publish
+
+      # ------------------------------------------------------------------
+      # Choose ONE deployment method below and delete or comment out the rest.
+      # Required secrets are listed against each option.
+      # ------------------------------------------------------------------
+
+      # OPTION 1 — Web Deploy (MSDeploy). Needs the Web Deploy handler enabled on IIS.
+      # Secrets: IIS_SERVER_COMPUTER_NAME (e.g. myserver:8172), IIS_SERVER_USERNAME,
+      #          IIS_SERVER_PASSWORD, IIS_SITE_NAME
+      - name: Deploy via Web Deploy
+        if: vars.DEPLOY_METHOD == 'webdeploy'
+        run: |
+          "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" `
+            -verb:sync `
+            -source:contentPath="${{ github.workspace }}\publish" `
+            -dest:contentPath="${{ secrets.IIS_SITE_NAME }}",computerName="https://${{ secrets.IIS_SERVER_COMPUTER_NAME }}/msdeploy.axd?site=${{ secrets.IIS_SITE_NAME }}",userName="${{ secrets.IIS_SERVER_USERNAME }}",password="${{ secrets.IIS_SERVER_PASSWORD }}",authType="Basic" `
+            -allowUntrusted `
+            -enableRule:AppOffline `
+            -skip:objectName=filePath,absolutePath=".*appsettings\.Production\.json$" `
+            -skip:objectName=dirPath,absolutePath=".*wwwroot\\uploads.*"
+        shell: pwsh
+
+      # OPTION 2 — Publish profile (.PublishSettings downloaded from IIS)
+      # Secret: PUBLISH_PROFILE
+      - name: Deploy via publish profile
+        if: vars.DEPLOY_METHOD == 'publishprofile'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.IIS_SITE_NAME }}
+          publish-profile: ${{ secrets.PUBLISH_PROFILE }}
+          package: ./publish
+
+      # OPTION 3 — Self-hosted runner on the web server itself (simplest and most reliable).
+      # Change `runs-on` above to [self-hosted, windows] and use this step instead.
+      # Secrets: none. Set IIS_SITE_PATH as a repository variable.
+      - name: Deploy via self-hosted runner
+        if: vars.DEPLOY_METHOD == 'selfhosted'
+        run: |
+          $site = "${{ vars.IIS_SITE_NAME }}"
+          $path = "${{ vars.IIS_SITE_PATH }}"
+
+          Import-Module WebAdministration
+
+          Write-Host "Stopping app pool..."
+          Stop-WebAppPool -Name $site -ErrorAction SilentlyContinue
+          Start-Sleep -Seconds 3
+
+          Write-Host "Copying files (preserving uploads and production config)..."
+          robocopy ".\publish" $path /MIR /XD "uploads" "logs" /XF "appsettings.Production.json"
+          if ($LASTEXITCODE -ge 8) { throw "robocopy failed with code $LASTEXITCODE" }
+
+          Write-Host "Starting app pool..."
+          Start-WebAppPool -Name $site
+        shell: pwsh
+
+      - name: Smoke test
+        if: vars.SITE_URL != ''
+        run: |
+          Start-Sleep -Seconds 15
+          $r = Invoke-WebRequest -Uri "${{ vars.SITE_URL }}" -UseBasicParsing -TimeoutSec 30
+          if ($r.StatusCode -ne 200) { throw "Smoke test failed: HTTP $($r.StatusCode)" }
+          Write-Host "Site responded 200 OK"
+        shell: pwsh

@@ -31,6 +31,7 @@ builder.Services.AddSingleton<IHtmlSanitizerService, HtmlSanitizerService>();
 builder.Services.AddSingleton<ISeoService, SeoService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IChatbotService, ChatbotService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddResponseCompression();
 

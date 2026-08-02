@@ -258,7 +258,49 @@
 
 <button class="to-top" id="to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
 
+@if (s.EnableChatbot)
+{
+    <div class="chat-widget" id="chat-widget">
+        @Html.AntiForgeryToken()
+        <button class="chat-fab" id="chat-fab" aria-label="Open chat assistant" aria-expanded="false">
+            <i class="fas fa-robot chat-open-icon"></i>
+            <i class="fas fa-times chat-close-icon"></i>
+            <span class="chat-pulse"></span>
+        </button>
+        <div class="chat-window" id="chat-window" role="dialog" aria-label="Chat with the site assistant">
+            <div class="cw-header">
+                <div class="cw-avatar"><i class="fas fa-robot"></i></div>
+                <div class="cw-info">
+                    <strong>@s.OwnerName.Split(' ').First()'s Assistant</strong>
+                    <span class="cw-status"><span class="pulse-dot"></span> Online</span>
+                </div>
+                <button class="cw-close" id="cw-close" aria-label="Close chat"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cw-messages" id="cw-messages">
+                <div class="cw-msg bot">
+                    <div class="cw-bubble">Hi. I can answer questions about @(s.OwnerName.Split(' ').First())'s projects, experience, skills and availability — everything I know comes from this site.</div>
+                </div>
+                <div class="cw-quick-replies" id="cw-quick">
+                    <button type="button" class="cw-qr" data-q="What do you do?">What do you do?</button>
+                    <button type="button" class="cw-qr" data-q="Show me your AI projects">AI projects</button>
+                    <button type="button" class="cw-qr" data-q="What's your experience?">Experience</button>
+                    <button type="button" class="cw-qr" data-q="Are you available for work?">Availability</button>
+                    <button type="button" class="cw-qr" data-q="How can I contact you?">Contact</button>
+                </div>
+            </div>
+            <div class="cw-input-row">
+                <input type="text" id="cw-input" placeholder="Ask me anything..." autocomplete="off" maxlength="500" aria-label="Your question">
+                <button id="cw-send" aria-label="Send message"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+}
+
 <script src="~/js/site.js" asp-append-version="true"></script>
+@if (s.EnableChatbot)
+{
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

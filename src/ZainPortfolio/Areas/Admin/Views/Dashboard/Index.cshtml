@@ -1,0 +1,236 @@
+@{
+    ViewBag.Title = "Dashboard";
+    var a = (AnalyticsSummary)ViewBag.Summary;
+    var days = (int)ViewBag.Days;
+    var maxViews = a.DailyViews.Count > 0 ? Math.Max(1, a.DailyViews.Max(x => x.Value)) : 1;
+}
+
+@section Actions {
+    <a href="/admin?days=7" class="btn btn-s btn-sm @(days == 7 ? "btn-p" : "")">7d</a>
+    <a href="/admin?days=30" class="btn btn-s btn-sm @(days == 30 ? "btn-p" : "")">30d</a>
+    <a href="/admin?days=90" class="btn btn-s btn-sm @(days == 90 ? "btn-p" : "")">90d</a>
+}
+
+<!-- ---------------------------------------------- headline numbers -->
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="ico"><i class="fas fa-users"></i></div>
+        <div class="num">@a.VisitorsTotal.ToString("N0")</div>
+        <div class="lbl">Unique visitors (all time)</div>
+        <div class="sub"><b>@a.VisitorsToday</b> today &middot; <b>@a.VisitorsWeek</b> this week</div>
+    </div>
+    <div class="stat-card">
+        <div class="ico"><i class="fas fa-eye"></i></div>
+        <div class="num">@a.ViewsTotal.ToString("N0")</div>
+        <div class="lbl">Page views (all time)</div>
+        <div class="sub"><b>@a.ViewsToday</b> today &middot; <b>@a.ViewsMonth</b> last 30 days</div>
+    </div>
+    <div class="stat-card">
+        <div class="ico"><i class="fas fa-envelope-open-text"></i></div>
+        <div class="num">@a.SubscribersTotal.ToString("N0")</div>
+        <div class="lbl">Active subscribers</div>
+        <div class="sub"><b>+@a.SubscribersMonth</b> in the last 30 days</div>
+    </div>
+    <div class="stat-card">
+        <div class="ico"><i class="fas fa-inbox"></i></div>
+        <div class="num">@a.MessagesTotal.ToString("N0")</div>
+        <div class="lbl">Contact messages</div>
+        <div class="sub">@(a.MessagesUnread > 0 ? $"{a.MessagesUnread} unread" : "All read")</div>
+    </div>
+    <div class="stat-card">
+        <div class="ico"><i class="fas fa-diagram-project"></i></div>
+        <div class="num">@ViewBag.PublishedProjects</div>
+        <div class="lbl">Published projects</div>
+        <div class="sub">@ViewBag.ProjectCount total</div>
+    </div>
+    <div class="stat-card">
+        <div class="ico"><i class="fas fa-feather-pointed"></i></div>
+        <div class="num">@ViewBag.PublishedPosts</div>
+        <div class="lbl">Published posts</div>
+        <div class="sub">@ViewBag.PostCount total &middot; @ViewBag.MediaCount media files</div>
+    </div>
+</div>
+
+<!-- ---------------------------------------------- traffic chart -->
+<div class="card">
+    <div class="card-head">
+        <div>
+            <h2>Traffic — last @days days</h2>
+            <p>Page views per day. Bot traffic is excluded.</p>
+        </div>
+    </div>
+    @if (a.DailyViews.Any(x => x.Value > 0))
+    {
+        <div class="chart">
+            @foreach (var pt in a.DailyViews)
+            {
+                var h = (int)Math.Round(pt.Value / (double)maxViews * 100);
+                <div class="bar" style="height:@(Math.Max(h, 1))%">
+                    <span>@pt.Label — @pt.Value view@(pt.Value == 1 ? "" : "s")</span>
+                </div>
+            }
+        </div>
+        <div class="chart-x">
+            <span>@a.DailyViews.First().Label</span>
+            <span>@a.DailyViews.Last().Label</span>
+        </div>
+    }
+    else
+    {
+        <div class="empty">
+            <i class="fas fa-chart-simple"></i>
+            <p>No traffic recorded yet. Visits will appear here as soon as the site receives them.</p>
+        </div>
+    }
+</div>
+
+<div class="split">
+    <div>
+        <!-- ---------------------------------------------- top pages -->
+        <div class="card">
+            <div class="card-head"><h3>Top pages (30 days)</h3></div>
+            @if (a.TopPages.Any())
+            {
+                var maxPage = a.TopPages.Max(x => x.Value);
+                <div class="bar-list">
+                    @foreach (var p in a.TopPages)
+                    {
+                        <div class="bar-row">
+                            <div class="nm">@p.Label</div>
+                            <div class="vl">@p.Value</div>
+                            <div class="track"><div class="fill" style="width:@((int)(p.Value / (double)maxPage * 100))%"></div></div>
+                        </div>
+                    }
+                </div>
+            }
+            else { <div class="empty"><i class="fas fa-file-lines"></i><p>No page data yet.</p></div> }
+        </div>
+
+        <!-- ---------------------------------------------- content performance -->
+        <div class="card">
+            <div class="card-head"><h3>Most viewed content</h3></div>
+            <div class="form-grid">
+                <div>
+                    <div style="font-size:.78rem;color:var(--a-muted);font-weight:700;margin-bottom:.7rem;">PROJECTS</div>
+                    @if (a.TopProjects.Any())
+                    {
+                        var mp = a.TopProjects.Max(x => x.Value);
+                        <div class="bar-list">
+                            @foreach (var p in a.TopProjects)
+                            {
+                                <div class="bar-row">
+                                    <div class="nm">@p.Label</div><div class="vl">@p.Value</div>
+                                    <div class="track"><div class="fill" style="width:@((int)(p.Value / (double)mp * 100))%"></div></div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else { <p style="font-size:.8rem;color:var(--a-muted);">No views yet.</p> }
+                </div>
+                <div>
+                    <div style="font-size:.78rem;color:var(--a-muted);font-weight:700;margin-bottom:.7rem;">BLOG POSTS</div>
+                    @if (a.TopPosts.Any())
+                    {
+                        var mb = a.TopPosts.Max(x => x.Value);
+                        <div class="bar-list">
+                            @foreach (var p in a.TopPosts)
+                            {
+                                <div class="bar-row">
+                                    <div class="nm">@p.Label</div><div class="vl">@p.Value</div>
+                                    <div class="track"><div class="fill" style="width:@((int)(p.Value / (double)mb * 100))%"></div></div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else { <p style="font-size:.8rem;color:var(--a-muted);">No views yet.</p> }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sticky-side">
+        <!-- ---------------------------------------------- devices -->
+        <div class="card">
+            <div class="card-head"><h3>Devices</h3></div>
+            @if (a.Devices.Any())
+            {
+                var total = Math.Max(1, a.Devices.Sum(d => d.Value));
+                <div class="bar-list">
+                    @foreach (var d in a.Devices)
+                    {
+                        var pct = (int)Math.Round(d.Value / (double)total * 100);
+                        <div class="bar-row">
+                            <div class="nm" style="text-transform:capitalize;">
+                                <i class="fas fa-@(d.Label == "mobile" ? "mobile-screen" : d.Label == "tablet" ? "tablet-screen-button" : "desktop")"
+                                   style="margin-right:.4rem;color:var(--a-muted);"></i>@d.Label
+                            </div>
+                            <div class="vl">@pct%</div>
+                            <div class="track"><div class="fill" style="width:@pct%"></div></div>
+                        </div>
+                    }
+                </div>
+            }
+            else { <p style="font-size:.8rem;color:var(--a-muted);">No data yet.</p> }
+        </div>
+
+        <!-- ---------------------------------------------- referrers -->
+        <div class="card">
+            <div class="card-head"><h3>Top referrers</h3></div>
+            @if (a.TopReferrers.Any())
+            {
+                <div class="bar-list">
+                    @foreach (var r in a.TopReferrers)
+                    {
+                        <div class="bar-row" style="grid-template-columns:1fr auto;">
+                            <div class="nm">@r.Label</div><div class="vl">@r.Value</div>
+                        </div>
+                    }
+                </div>
+            }
+            else { <p style="font-size:.8rem;color:var(--a-muted);">Direct traffic only so far.</p> }
+        </div>
+
+        <!-- ---------------------------------------------- latest subscribers -->
+        <div class="card">
+            <div class="card-head">
+                <h3>Latest subscribers</h3>
+                <a href="/admin/subscribers" class="btn btn-s btn-sm">All</a>
+            </div>
+            @if (((List<Subscriber>)ViewBag.RecentSubscribers).Any())
+            {
+                foreach (var sub in (List<Subscriber>)ViewBag.RecentSubscribers)
+                {
+                    <div style="display:flex;justify-content:space-between;gap:.5rem;padding:.45rem 0;border-bottom:1px solid var(--a-border);font-size:.8rem;">
+                        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@sub.Email</span>
+                        <span style="color:var(--a-muted);white-space:nowrap;">@sub.SubscribedAt.ToString("dd MMM")</span>
+                    </div>
+                }
+            }
+            else { <p style="font-size:.8rem;color:var(--a-muted);">No subscribers yet.</p> }
+        </div>
+
+        <!-- ---------------------------------------------- recent messages -->
+        <div class="card">
+            <div class="card-head">
+                <h3>Recent messages</h3>
+                <a href="/admin/messages" class="btn btn-s btn-sm">All</a>
+            </div>
+            @if (((List<ContactMessage>)ViewBag.RecentMessages).Any())
+            {
+                foreach (var m in (List<ContactMessage>)ViewBag.RecentMessages)
+                {
+                    <div style="padding:.5rem 0;border-bottom:1px solid var(--a-border);">
+                        <div style="display:flex;justify-content:space-between;gap:.5rem;font-size:.82rem;">
+                            <strong>@m.Name</strong>
+                            @if (!m.IsRead) { <span class="chip chip-new">New</span> }
+                        </div>
+                        <div style="font-size:.75rem;color:var(--a-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            @(m.Subject ?? m.Message)
+                        </div>
+                    </div>
+                }
+            }
+            else { <p style="font-size:.8rem;color:var(--a-muted);">No messages yet.</p> }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,60 @@
+@{
+    Layout = null;
+    ViewBag.Title = "Sign in";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Sign in — CMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true">
+</head>
+<body>
+<div class="login-wrap">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="mark">ZAT</div>
+            <h1>Content Management</h1>
+            <p>Sign in to manage your portfolio</p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-err">
+                <i class="fas fa-circle-exclamation"></i>
+                <div>
+                    @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>@e.ErrorMessage</div>
+                    }
+                </div>
+            </div>
+        }
+
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl">
+            <div class="fg">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autofocus autocomplete="username">
+            </div>
+            <div class="fg">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-p" style="width:100%;justify-content:center;padding:.7rem;">
+                <i class="fas fa-right-to-bracket"></i> Sign In
+            </button>
+        </form>
+
+        <p style="text-align:center;margin-top:1.5rem;font-size:.8rem;color:var(--a-muted);">
+            <a href="/" style="color:var(--a-muted);"><i class="fas fa-arrow-left"></i> Back to site</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

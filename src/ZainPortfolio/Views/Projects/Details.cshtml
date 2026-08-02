@@ -1,0 +1,147 @@
+@model ProjectDetailViewModel
+@inject ISeoService Seo
+@{
+    var s = Model.Settings;
+    var p = Model.Project;
+    var baseUrl = Seo.BaseUrl(Context.Request, s);
+    ViewBag.Settings = s;
+    ViewBag.Meta = new PageMeta
+    {
+        Title = $"{p.Title} — Case Study | {s.OwnerName}",
+        Description = p.Summary ?? TextHelpers.Plain(p.Content, 160),
+        Keywords = p.Tags,
+        CanonicalPath = $"/projects/{p.Slug}",
+        ImageUrl = p.CoverImageUrl,
+        OgType = "article",
+        PublishedAt = p.CreatedAt,
+        ModifiedAt = p.UpdatedAt,
+        ArticleTags = p.TagList,
+        JsonLd = new List<string> { Seo.CreativeWorkSchema(p, s, baseUrl) },
+        Breadcrumbs = new List<(string, string)> { ("Home", "/"), ("Projects", "/projects"), (p.Title, $"/projects/{p.Slug}") }
+    };
+}
+
+<article>
+    <div class="article-hero">
+        <div class="container">
+            <nav class="crumbs" aria-label="Breadcrumb">
+                <a href="/">Home</a><span>/</span><a href="/projects">Projects</a><span>/</span><span>@p.Title</span>
+            </nav>
+
+            @if (p.TagList.Any())
+            {
+                <div class="pill-row">
+                    @foreach (var t in p.TagList) { <span class="pill">@t</span> }
+                </div>
+            }
+
+            <h1 class="article-title">@p.Title</h1>
+
+            @if (!string.IsNullOrWhiteSpace(p.Summary))
+            {
+                <p style="font-size:1.1rem;color:var(--muted);max-width:760px;">@p.Summary</p>
+            }
+
+            <div class="article-meta" style="margin-top:1.5rem;">
+                @if (p.ProjectCategory != null)
+                {
+                    <span><i class="fas fa-folder"></i> @p.ProjectCategory.Name</span>
+                }
+                <span><i class="far fa-eye"></i> @p.ViewCount views</span>
+                @if (!string.IsNullOrWhiteSpace(p.LiveUrl))
+                {
+                    <a href="@p.LiveUrl" target="_blank" rel="noopener" style="color:var(--primary);"><i class="fas fa-external-link-alt"></i> Live site</a>
+                }
+                @if (!string.IsNullOrWhiteSpace(p.RepoUrl))
+                {
+                    <a href="@p.RepoUrl" target="_blank" rel="noopener" style="color:var(--primary);"><i class="fab fa-github"></i> Source</a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="article-cover">
+            @if (!string.IsNullOrWhiteSpace(p.CoverImageUrl))
+            {
+                <img src="@p.CoverImageUrl" alt="@p.Title">
+            }
+            else
+            {
+                <div class="proj-img-bg" style="background:linear-gradient(135deg,@p.GradientFrom,@p.GradientTo)">
+                    <i class="@p.IconClass proj-img-icon" style="font-size:4rem;"></i>
+                </div>
+            }
+        </div>
+
+        <div class="prose">
+            @if (!string.IsNullOrWhiteSpace(p.Problem))
+            {
+                <div class="callout problem">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <div><strong>The problem</strong><p>@p.Problem</p></div>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(p.Solution))
+            {
+                <div class="callout solution">
+                    <i class="fas fa-circle-check"></i>
+                    <div><strong>The solution</strong><p>@p.Solution</p></div>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(p.VideoId))
+            {
+                <iframe src="https://www.youtube.com/embed/@p.VideoId" title="@p.Title" allowfullscreen loading="lazy"></iframe>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(p.Content))
+            {
+                @Html.Raw(p.Content)
+            }
+
+            @if (p.Images.Any())
+            {
+                <h2>Gallery</h2>
+                @foreach (var img in p.Images)
+                {
+                    <figure>
+                        <img src="@img.Url" alt="@(img.Caption ?? p.Title)" loading="lazy">
+                        @if (!string.IsNullOrWhiteSpace(img.Caption))
+                        {
+                            <figcaption style="text-align:center;color:var(--muted);font-size:.85rem;margin-top:-1rem;">@img.Caption</figcaption>
+                        }
+                    </figure>
+                }
+            }
+
+            @if (!string.IsNullOrWhiteSpace(p.Stat1Text) || !string.IsNullOrWhiteSpace(p.Stat2Text))
+            {
+                <h2>Outcome</h2>
+                <div class="pill-row">
+                    @if (!string.IsNullOrWhiteSpace(p.Stat1Text)) { <span class="pill"><i class="@p.Stat1Icon"></i> @p.Stat1Text</span> }
+                    @if (!string.IsNullOrWhiteSpace(p.Stat2Text)) { <span class="pill"><i class="@p.Stat2Icon"></i> @p.Stat2Text</span> }
+                </div>
+            }
+        </div>
+
+        <div style="max-width:780px;margin:3rem auto 0;text-align:center;">
+            <a href="/#contact" class="btn-primary">Discuss a similar project <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+
+    @if (Model.Related.Any())
+    {
+        <section class="section section-alt" style="margin-top:4rem;">
+            <div class="container">
+                <div class="sec-header"><h2 style="font-size:1.7rem;">Related <span class="grad-text">Projects</span></h2></div>
+                <div class="proj-grid">
+                    @foreach (var r in Model.Related)
+                    {
+                        <partial name="_ProjectCard" model="r" />
+                    }
+                </div>
+            </div>
+        </section>
+    }
+</article>

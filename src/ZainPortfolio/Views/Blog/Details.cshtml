@@ -1,0 +1,119 @@
+@model BlogDetailViewModel
+@inject ISeoService Seo
+@{
+    var s = Model.Settings;
+    var p = Model.Post;
+    var baseUrl = Seo.BaseUrl(Context.Request, s);
+    ViewBag.Settings = s;
+    ViewBag.Meta = new PageMeta
+    {
+        Title = p.MetaTitle ?? $"{p.Title} | {s.OwnerName}",
+        Description = p.MetaDescription ?? p.Excerpt,
+        Keywords = p.Tags,
+        CanonicalPath = $"/blog/{p.Slug}",
+        ImageUrl = p.CoverImageUrl,
+        OgType = "article",
+        PublishedAt = p.PublishedAt,
+        ModifiedAt = p.UpdatedAt,
+        ArticleSection = p.BlogCategory?.Name,
+        ArticleTags = p.TagList,
+        JsonLd = new List<string> { Seo.ArticleSchema(p, s, baseUrl) },
+        Breadcrumbs = new List<(string, string)> { ("Home", "/"), ("Blog", "/blog"), (p.Title, $"/blog/{p.Slug}") }
+    };
+}
+
+<article>
+    <div class="article-hero">
+        <div class="container">
+            <nav class="crumbs" aria-label="Breadcrumb">
+                <a href="/">Home</a><span>/</span><a href="/blog">Blog</a><span>/</span><span>@p.Title</span>
+            </nav>
+
+            @if (p.BlogCategory != null)
+            {
+                <a href="/blog?category=@p.BlogCategory.Slug" class="post-cat">@p.BlogCategory.Name</a>
+            }
+
+            <h1 class="article-title">@p.Title</h1>
+
+            @if (!string.IsNullOrWhiteSpace(p.Excerpt))
+            {
+                <p style="font-size:1.1rem;color:var(--muted);max-width:760px;">@p.Excerpt</p>
+            }
+
+            <div class="article-meta" style="margin-top:1.5rem;">
+                <span><i class="far fa-user"></i> @p.AuthorName</span>
+                <span><i class="far fa-calendar"></i> @p.PublishedAt.ToString("dd MMMM yyyy")</span>
+                <span><i class="far fa-clock"></i> @p.ReadMinutes min read</span>
+                <span><i class="far fa-eye"></i> @p.ViewCount views</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        @if (!string.IsNullOrWhiteSpace(p.CoverImageUrl))
+        {
+            <div class="article-cover"><img src="@p.CoverImageUrl" alt="@p.Title"></div>
+        }
+
+        <div class="prose">
+            @if (!string.IsNullOrWhiteSpace(p.VideoId))
+            {
+                <iframe src="https://www.youtube.com/embed/@p.VideoId" title="@p.Title" allowfullscreen loading="lazy"></iframe>
+            }
+            @Html.Raw(p.Content)
+
+            @if (p.TagList.Any())
+            {
+                <div class="pill-row" style="margin-top:2.5rem;">
+                    @foreach (var t in p.TagList)
+                    {
+                        <a href="/blog?tag=@Uri.EscapeDataString(t)" class="pill pill-muted">#@t</a>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (s.EnableNewsletter)
+        {
+            <div class="newsletter" style="max-width:780px;margin:3rem auto 0;">
+                <h3>Found this useful?</h3>
+                <p>Get new articles on AI architecture and engineering leadership as they're published.</p>
+                <form class="sub-form" data-subscribe data-source="article">
+                    @Html.AntiForgeryToken()
+                    <input type="email" name="email" placeholder="you@@company.com" required aria-label="Email address">
+                    <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <button type="submit">Subscribe</button>
+                </form>
+                <div class="sub-msg" role="status"></div>
+            </div>
+        }
+
+        <nav style="max-width:780px;margin:3rem auto 0;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            @if (Model.Previous != null)
+            {
+                <a href="/blog/@Model.Previous.Slug" class="btn-ghost"><i class="fas fa-arrow-left"></i> Previous</a>
+            }
+            else { <span></span> }
+            @if (Model.Next != null)
+            {
+                <a href="/blog/@Model.Next.Slug" class="btn-ghost">Next <i class="fas fa-arrow-right"></i></a>
+            }
+        </nav>
+    </div>
+
+    @if (Model.Related.Any())
+    {
+        <section class="section section-alt" style="margin-top:4rem;">
+            <div class="container">
+                <div class="sec-header"><h2 style="font-size:1.7rem;">Related <span class="grad-text">Reading</span></h2></div>
+                <div class="blog-grid">
+                    @foreach (var r in Model.Related)
+                    {
+                        <partial name="_PostCard" model="r" />
+                    }
+                </div>
+            </div>
+        </section>
+    }
+</article>

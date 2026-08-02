@@ -1,0 +1,28 @@
+@model Experience
+@{ ViewBag.Title = Model.Id == 0 ? "New Experience" : "Edit Experience"; }
+@section Actions { <a href="/admin/structure" class="btn btn-s btn-sm"><i class="fas fa-arrow-left"></i> Back</a> }
+<form method="post" action="/admin/structure/experience" style="max-width:760px;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="card">
+        <div class="form-grid">
+            <div class="fg"><label asp-for="Role">Role *</label><input asp-for="Role" required maxlength="160"></div>
+            <div class="fg"><label asp-for="Company">Company *</label><input asp-for="Company" required maxlength="160"></div>
+            <div class="fg"><label asp-for="Location">Location</label><input asp-for="Location" maxlength="160"></div>
+            <div class="fg"><label asp-for="DateRange">Date range</label><input asp-for="DateRange" placeholder="Nov 2025 – Present"></div>
+        </div>
+        <div class="fg full">
+            <label asp-for="Bullets">Responsibilities</label>
+            <textarea asp-for="Bullets" rows="7" placeholder="One bullet per line"></textarea>
+            <div class="hint">One achievement per line. Lead with the outcome where you can.</div>
+        </div>
+        <div class="fg"><label asp-for="Tags">Tags</label><input asp-for="Tags" placeholder="RAG, Azure, .NET Core"></div>
+        <div class="form-grid">
+            <div class="fg"><label asp-for="SortOrder">Sort order</label><input asp-for="SortOrder" type="number"></div>
+            <div class="check" style="align-self:end;padding-bottom:1rem;">
+                <input asp-for="IsCurrent" type="checkbox"><label asp-for="IsCurrent">Current role</label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-p"><i class="fas fa-save"></i> Save experience</button>
+    </div>
+</form>

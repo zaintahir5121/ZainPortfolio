@@ -1,0 +1,28 @@
+@model string
+@{
+    var field = ViewData["FieldName"] as string ?? "Content";
+    var editorId = "editor-" + field.ToLowerInvariant();
+}
+<div class="editor-toolbar" data-for="@editorId">
+    <button type="button" data-cmd="formatBlock" data-val="h2" title="Heading 2"><b>H2</b></button>
+    <button type="button" data-cmd="formatBlock" data-val="h3" title="Heading 3"><b>H3</b></button>
+    <button type="button" data-cmd="formatBlock" data-val="p" title="Paragraph">¶</button>
+    <span class="sep"></span>
+    <button type="button" data-cmd="bold" title="Bold"><i class="fas fa-bold"></i></button>
+    <button type="button" data-cmd="italic" title="Italic"><i class="fas fa-italic"></i></button>
+    <button type="button" data-cmd="underline" title="Underline"><i class="fas fa-underline"></i></button>
+    <span class="sep"></span>
+    <button type="button" data-cmd="insertUnorderedList" title="Bullet list"><i class="fas fa-list-ul"></i></button>
+    <button type="button" data-cmd="insertOrderedList" title="Numbered list"><i class="fas fa-list-ol"></i></button>
+    <button type="button" data-cmd="formatBlock" data-val="blockquote" title="Quote"><i class="fas fa-quote-left"></i></button>
+    <span class="sep"></span>
+    <button type="button" data-action="link" title="Insert link"><i class="fas fa-link"></i></button>
+    <button type="button" data-action="image" title="Insert image from library"><i class="fas fa-image"></i></button>
+    <button type="button" data-action="upload" title="Upload &amp; insert image"><i class="fas fa-upload"></i></button>
+    <button type="button" data-action="video" title="Embed YouTube video"><i class="fab fa-youtube"></i></button>
+    <span class="sep"></span>
+    <button type="button" data-cmd="removeFormat" title="Clear formatting"><i class="fas fa-eraser"></i></button>
+    <button type="button" data-action="html" title="Edit raw HTML"><i class="fas fa-code"></i></button>
+</div>
+<div class="rich-editor" id="@editorId" contenteditable="true" data-target="@field">@Html.Raw(Model)</div>
+<textarea name="@field" id="input-@editorId" style="display:none;">@Model</textarea>

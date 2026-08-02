@@ -1,0 +1,264 @@
+@inject ISiteSettingsService SettingsService
+@inject ISeoService Seo
+@{
+    var s = ViewBag.Settings as SiteSetting ?? await SettingsService.GetAsync();
+    var meta = ViewBag.Meta as PageMeta ?? new PageMeta { Title = s.SiteName };
+    var baseUrl = Seo.BaseUrl(Context.Request, s);
+    var canonical = baseUrl + (meta.CanonicalPath ?? Context.Request.Path.Value ?? "/");
+    canonical = canonical.TrimEnd('/');
+    if (string.IsNullOrEmpty(canonical)) canonical = baseUrl;
+
+    var title = string.IsNullOrWhiteSpace(meta.Title) ? (s.MetaTitle ?? s.SiteName) : meta.Title;
+    var description = meta.Description ?? s.MetaDescription;
+    var ogImage = meta.ImageUrl ?? s.OgImageUrl ?? s.ProfileImageUrl;
+    if (!string.IsNullOrWhiteSpace(ogImage) && !ogImage.StartsWith("http"))
+        ogImage = baseUrl + "/" + ogImage.TrimStart('/');
+
+    var primaryRgb = TextHelpers.ToRgb(s.PrimaryColor);
+    var accentRgb = TextHelpers.ToRgb(s.AccentColor);
+}
+<!DOCTYPE html>
+<html lang="@s.ContentLanguage" data-theme="@s.DefaultTheme">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@title</title>
+    <meta name="description" content="@description">
+    @if (!string.IsNullOrWhiteSpace(meta.Keywords ?? s.MetaKeywords))
+    {
+        <meta name="keywords" content="@(meta.Keywords ?? s.MetaKeywords)">
+    }
+    <link rel="canonical" href="@canonical">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="author" content="@s.OwnerName">
+
+    @* ---- Regional targeting: Malaysia ---- *@
+    <meta name="geo.region" content="@s.GeoRegion">
+    <meta name="geo.placename" content="@s.GeoPlacename">
+    <meta name="geo.position" content="@s.GeoPosition">
+    <meta name="ICBM" content="@s.GeoPosition.Replace(';', ',')">
+    <meta http-equiv="content-language" content="@s.ContentLanguage">
+    <link rel="alternate" hreflang="en-my" href="@canonical">
+    <link rel="alternate" hreflang="x-default" href="@canonical">
+
+    @* ---- Open Graph ---- *@
+    <meta property="og:type" content="@meta.OgType">
+    <meta property="og:site_name" content="@s.SiteName">
+    <meta property="og:title" content="@title">
+    <meta property="og:description" content="@description">
+    <meta property="og:url" content="@canonical">
+    <meta property="og:locale" content="en_MY">
+    @if (!string.IsNullOrWhiteSpace(ogImage))
+    {
+        <meta property="og:image" content="@ogImage">
+        <meta property="og:image:alt" content="@s.OwnerName — @s.Tagline">
+    }
+    @if (meta.OgType == "article" && meta.PublishedAt.HasValue)
+    {
+        <meta property="article:published_time" content="@meta.PublishedAt.Value.ToString("o")">
+        <meta property="article:modified_time" content="@(meta.ModifiedAt ?? meta.PublishedAt)?.ToString("o")">
+        <meta property="article:author" content="@s.OwnerName">
+        @if (!string.IsNullOrWhiteSpace(meta.ArticleSection))
+        {
+            <meta property="article:section" content="@meta.ArticleSection">
+        }
+        @foreach (var tag in meta.ArticleTags)
+        {
+            <meta property="article:tag" content="@tag">
+        }
+    }
+
+    @* ---- Twitter ---- *@
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@title">
+    <meta name="twitter:description" content="@description">
+    @if (!string.IsNullOrWhiteSpace(ogImage))
+    {
+        <meta name="twitter:image" content="@ogImage">
+    }
+    @if (!string.IsNullOrWhiteSpace(s.TwitterHandle))
+    {
+        <meta name="twitter:creator" content="@s.TwitterHandle">
+    }
+
+    @if (!string.IsNullOrWhiteSpace(s.GoogleSiteVerification))
+    {
+        <meta name="google-site-verification" content="@s.GoogleSiteVerification">
+    }
+    @if (!string.IsNullOrWhiteSpace(s.BingSiteVerification))
+    {
+        <meta name="msvalidate.01" content="@s.BingSiteVerification">
+    }
+
+    @if (!string.IsNullOrWhiteSpace(s.FaviconUrl))
+    {
+        <link rel="icon" href="@s.FaviconUrl">
+    }
+    else
+    {
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 font-weight=%22bold%22 fill=%22@(Uri.EscapeDataString(s.PrimaryColor))%22>Z</text></svg>">
+    }
+
+    <link rel="alternate" type="application/rss+xml" title="@s.SiteName — Blog" href="@baseUrl/rss.xml">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=@(s.HeadingFont.Replace(" ", "+")):wght@@300;400;500;600;700;800&family=JetBrains+Mono:wght@@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+
+    @* ---- Theme variables driven entirely from the database ---- *@
+    <style>
+        :root {
+            --primary: @s.PrimaryColor;
+            --primary-rgb: @primaryRgb;
+            --primary-dark: @TextHelpers.Shade(s.PrimaryColor, -0.2);
+            --primary-light: @TextHelpers.Shade(s.PrimaryColor, 0.25);
+            --primary-glow: rgba(@primaryRgb, 0.15);
+            --secondary: @s.SecondaryColor;
+            --accent: @s.AccentColor;
+            --accent-rgb: @accentRgb;
+            --grad: linear-gradient(135deg, @s.PrimaryColor, @s.SecondaryColor);
+            --radius: @s.CornerRadius;
+            --font-head: '@s.HeadingFont', system-ui, sans-serif;
+            --font-body: '@s.BodyFont', system-ui, sans-serif;
+        }
+        [data-theme="dark"] { --bg: @s.DarkBgColor; }
+        [data-theme="light"] { --bg: @s.LightBgColor; }
+    </style>
+
+    @* ---- Structured data ---- *@
+    <script type="application/ld+json">@Html.Raw(Seo.PersonSchema(s, baseUrl))</script>
+    <script type="application/ld+json">@Html.Raw(Seo.WebSiteSchema(s, baseUrl))</script>
+    @foreach (var block in meta.JsonLd)
+    {
+        <script type="application/ld+json">@Html.Raw(block)</script>
+    }
+    @if (meta.Breadcrumbs.Any())
+    {
+        <script type="application/ld+json">@Html.Raw(Seo.BreadcrumbSchema(meta.Breadcrumbs, baseUrl))</script>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(s.GoogleAnalyticsId))
+    {
+        <script async src="https://www.googletagmanager.com/gtag/js?id=@s.GoogleAnalyticsId"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '@s.GoogleAnalyticsId');
+        </script>
+    }
+    @await RenderSectionAsync("Head", required: false)
+</head>
+<body>
+<div id="scroll-progress"></div>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="/" class="logo">
+            @if (!string.IsNullOrWhiteSpace(s.LogoImageUrl))
+            {
+                <img src="@s.LogoImageUrl" alt="@s.SiteName" class="logo-img">
+            }
+            else
+            {
+                @s.LogoText<span class="logo-dot">.</span>
+            }
+        </a>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="/#home" class="nav-a">Home</a></li>
+            <li><a href="/#about" class="nav-a">About</a></li>
+            <li><a href="/#skills" class="nav-a">Skills</a></li>
+            <li><a href="/#experience" class="nav-a">Experience</a></li>
+            @if (s.EnableProjects)
+            {
+                <li><a href="/projects" class="nav-a">Projects</a></li>
+            }
+            @if (s.EnableBlog)
+            {
+                <li><a href="/blog" class="nav-a">Blog</a></li>
+            }
+            <li><a href="/#contact" class="nav-a">Contact</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="theme-btn" id="theme-btn" aria-label="Toggle colour theme">
+                <i class="fas fa-moon" id="theme-icon"></i>
+            </button>
+            <a href="mailto:@s.Email" class="nav-hire">Hire Me</a>
+            <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main id="main">
+    @RenderBody()
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <span class="logo">@s.LogoText<span class="logo-dot">.</span></span>
+                <p>@s.Tagline</p>
+                <p class="footer-loc"><i class="fas fa-location-dot"></i> @s.Location</p>
+            </div>
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <a href="/">Home</a>
+                @if (s.EnableProjects) { <a href="/projects">Projects</a> }
+                @if (s.EnableBlog) { <a href="/blog">Blog</a> }
+                <a href="/#contact">Contact</a>
+            </div>
+            <div class="footer-col">
+                <h4>Connect</h4>
+                @if (!string.IsNullOrWhiteSpace(s.LinkedInUrl)) { <a href="@s.LinkedInUrl" target="_blank" rel="noopener">LinkedIn</a> }
+                @if (!string.IsNullOrWhiteSpace(s.GitHubUrl)) { <a href="@s.GitHubUrl" target="_blank" rel="noopener">GitHub</a> }
+                @if (!string.IsNullOrWhiteSpace(s.YouTubeUrl)) { <a href="@s.YouTubeUrl" target="_blank" rel="noopener">YouTube</a> }
+                <a href="/rss.xml">RSS Feed</a>
+            </div>
+            @if (s.EnableNewsletter)
+            {
+                <div class="footer-col footer-sub">
+                    <h4>Stay in the loop</h4>
+                    <p>New writing on AI architecture, Azure and engineering leadership.</p>
+                    <form class="sub-form" data-subscribe data-source="footer">
+                        @Html.AntiForgeryToken()
+                        <input type="email" name="email" placeholder="you@@company.com" required aria-label="Email address">
+                        <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                    <div class="sub-msg" role="status"></div>
+                </div>
+            }
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; @DateTime.UtcNow.Year @s.OwnerName. @s.FooterText</p>
+            <div class="footer-links">
+                @if (!string.IsNullOrWhiteSpace(s.LinkedInUrl)) { <a href="@s.LinkedInUrl" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a> }
+                @if (!string.IsNullOrWhiteSpace(s.GitHubUrl)) { <a href="@s.GitHubUrl" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a> }
+                @if (!string.IsNullOrWhiteSpace(s.YouTubeUrl)) { <a href="@s.YouTubeUrl" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a> }
+                <a href="mailto:@s.Email" aria-label="Email"><i class="fas fa-envelope"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+@if (s.EnableWhatsAppFloat && !string.IsNullOrWhiteSpace(s.WhatsAppNumber))
+{
+    <a href="https://wa.me/@s.WhatsAppNumber?text=Hi%20@Uri.EscapeDataString(s.OwnerName)%2C%20I%20saw%20your%20portfolio%20and%20would%20love%20to%20connect!"
+       target="_blank" rel="noopener" class="wa-float" aria-label="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i><span class="wa-tooltip">Chat on WhatsApp</span>
+    </a>
+}
+
+<button class="to-top" id="to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

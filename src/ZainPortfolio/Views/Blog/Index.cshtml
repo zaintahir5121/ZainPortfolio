@@ -1,0 +1,125 @@
+@model BlogListViewModel
+@{
+    var s = Model.Settings;
+    var title = "Blog | AI Architecture, Azure & Engineering Leadership — " + s.OwnerName;
+    if (!string.IsNullOrWhiteSpace(Model.CurrentCategory))
+    {
+        var cat = Model.Categories.FirstOrDefault(c => c.Slug == Model.CurrentCategory);
+        if (cat != null) title = $"{cat.Name} Articles | {s.OwnerName}";
+    }
+    ViewBag.Settings = s;
+    ViewBag.Meta = new PageMeta
+    {
+        Title = title,
+        Description = "Practical writing on RAG and LLM architecture, Azure cloud design, .NET engineering and leading engineering teams — from a technical lead based in Kuala Lumpur.",
+        Keywords = "RAG architecture blog, Azure OpenAI tutorial Malaysia, LLM engineering blog, engineering leadership writing",
+        CanonicalPath = "/blog",
+        Breadcrumbs = new List<(string, string)> { ("Home", "/"), ("Blog", "/blog") }
+    };
+}
+
+<section class="section" style="padding-top:8.5rem;">
+    <div class="container">
+        <div class="sec-header">
+            <span class="sec-tag">Insights</span>
+            <h2>Notes On <span class="grad-text">Building AI Systems</span></h2>
+            <p class="sec-desc">What actually works in production — architecture, trade-offs and the mistakes worth avoiding.</p>
+        </div>
+
+        <form method="get" class="blog-toolbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="search" name="q" value="@Model.Query" placeholder="Search articles...">
+            </div>
+            <div class="proj-filters" style="margin:0;">
+                <a href="/blog" class="pf-btn @(string.IsNullOrEmpty(Model.CurrentCategory) ? "active" : "")">All</a>
+                @foreach (var c in Model.Categories)
+                {
+                    <a href="/blog?category=@c.Slug" class="pf-btn @(Model.CurrentCategory == c.Slug ? "active" : "")">@c.Name</a>
+                }
+            </div>
+        </form>
+
+        @if (Model.Featured != null)
+        {
+            var f = Model.Featured;
+            <div class="featured-post reveal">
+                <a href="/blog/@f.Slug" class="post-cover">
+                    @if (!string.IsNullOrWhiteSpace(f.CoverImageUrl))
+                    {
+                        <img src="@f.CoverImageUrl" alt="@f.Title">
+                    }
+                    else
+                    {
+                        <div class="post-cover-fallback"><i class="fas fa-star"></i></div>
+                    }
+                </a>
+                <div class="fp-body">
+                    <span class="featured-badge"><i class="fas fa-star"></i> Featured</span>
+                    @if (f.BlogCategory != null) { <div class="post-cat">@f.BlogCategory.Name</div> }
+                    <h2><a href="/blog/@f.Slug">@f.Title</a></h2>
+                    <p style="color:var(--muted);margin-bottom:1.2rem;">@f.Excerpt</p>
+                    <div class="post-meta">
+                        <span><i class="far fa-calendar"></i>@f.PublishedAt.ToString("dd MMM yyyy")</span>
+                        <span><i class="far fa-clock"></i>@f.ReadMinutes min read</span>
+                    </div>
+                    <a href="/blog/@f.Slug" class="proj-more" style="margin-top:1rem;">Read article <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        }
+
+        @if (Model.PopularTags.Any())
+        {
+            <div class="pill-row" style="justify-content:center;margin-bottom:2rem;">
+                @foreach (var t in Model.PopularTags)
+                {
+                    <a href="/blog?tag=@Uri.EscapeDataString(t)" class="pill @(Model.CurrentTag == t ? "" : "pill-muted")">#@t</a>
+                }
+            </div>
+        }
+
+        @if (Model.Posts.Any())
+        {
+            <div class="blog-grid">
+                @foreach (var post in Model.Posts)
+                {
+                    <partial name="_PostCard" model="post" />
+                }
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="pagination" aria-label="Pagination">
+                    @for (var i = 1; i <= Model.TotalPages; i++)
+                    {
+                        if (i == Model.Page) { <span class="current">@i</span> }
+                        else { <a href="/blog?page=@i&category=@Model.CurrentCategory&tag=@Model.CurrentTag&q=@Model.Query">@i</a> }
+                    }
+                </nav>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-feather-pointed"></i>
+                <p>No articles found for that filter.</p>
+                <a href="/blog" class="btn-ghost" style="margin-top:1rem;">View all articles</a>
+            </div>
+        }
+
+        @if (s.EnableNewsletter)
+        {
+            <div class="newsletter reveal" style="margin-top:4rem;">
+                <h3>Never miss a post</h3>
+                <p>New writing on AI architecture and engineering leadership, straight to your inbox.</p>
+                <form class="sub-form" data-subscribe data-source="blog">
+                    @Html.AntiForgeryToken()
+                    <input type="email" name="email" placeholder="you@@company.com" required aria-label="Email address">
+                    <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <button type="submit">Subscribe</button>
+                </form>
+                <div class="sub-msg" role="status"></div>
+            </div>
+        }
+    </div>
+</section>

@@ -4,6 +4,11 @@
     var s = Model.Settings;
     var p = Model.Post;
     var baseUrl = Seo.BaseUrl(Context.Request, s);
+    var (bodyHtml, toc) = TextHelpers.BuildToc(p.Content);
+    var postUrl = $"{baseUrl}/blog/{p.Slug}";
+    // Only claim an update when it is materially later than publication, otherwise
+    // "Updated" on a day-old post reads as padding rather than a freshness signal.
+    var wasUpdated = (p.UpdatedAt - p.PublishedAt).TotalHours > 24;
     ViewBag.Settings = s;
     ViewBag.Meta = new PageMeta
     {
@@ -43,7 +48,11 @@
 
             <div class="article-meta" style="margin-top:1.5rem;">
                 <span><i class="far fa-user"></i> @p.AuthorName</span>
-                <span><i class="far fa-calendar"></i> @p.PublishedAt.ToString("dd MMMM yyyy")</span>
+                <span><i class="far fa-calendar"></i> <time datetime="@p.PublishedAt.ToString("yyyy-MM-dd")">@p.PublishedAt.ToString("dd MMMM yyyy")</time></span>
+                @if (wasUpdated)
+                {
+                    <span><i class="fas fa-rotate"></i> Updated <time datetime="@p.UpdatedAt.ToString("yyyy-MM-dd")">@p.UpdatedAt.ToString("dd MMMM yyyy")</time></span>
+                }
                 <span><i class="far fa-clock"></i> @p.ReadMinutes min read</span>
                 <span><i class="far fa-eye"></i> @p.ViewCount views</span>
             </div>
@@ -56,12 +65,25 @@
             <div class="article-cover"><img src="@p.CoverImageUrl" alt="@p.Title"></div>
         }
 
+        @if (toc.Count >= 3)
+        {
+            <nav class="toc" aria-labelledby="toc-heading">
+                <h2 id="toc-heading"><i class="fas fa-list-ul"></i> On this page</h2>
+                <ol>
+                    @foreach (var entry in toc)
+                    {
+                        <li class="toc-l@entry.Level"><a href="#@entry.Id">@entry.Text</a></li>
+                    }
+                </ol>
+            </nav>
+        }
+
         <div class="prose">
             @if (!string.IsNullOrWhiteSpace(p.VideoId))
             {
                 <iframe src="https://www.youtube.com/embed/@p.VideoId" title="@p.Title" allowfullscreen loading="lazy"></iframe>
             }
-            @Html.Raw(p.Content)
+            @Html.Raw(bodyHtml)
 
             @if (p.TagList.Any())
             {
@@ -73,6 +95,46 @@
                 </div>
             }
         </div>
+
+        <div class="share-row">
+            <span class="share-label">Share</span>
+            <a class="share-btn" rel="noopener nofollow" target="_blank"
+               href="https://www.linkedin.com/sharing/share-offsite/?url=@Uri.EscapeDataString(postUrl)"
+               aria-label="Share on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a class="share-btn" rel="noopener nofollow" target="_blank"
+               href="https://twitter.com/intent/tweet?url=@Uri.EscapeDataString(postUrl)&text=@Uri.EscapeDataString(p.Title)"
+               aria-label="Share on X"><i class="fab fa-x-twitter"></i></a>
+            <a class="share-btn" rel="noopener nofollow" target="_blank"
+               href="https://api.whatsapp.com/send?text=@Uri.EscapeDataString(p.Title + " " + postUrl)"
+               aria-label="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <button type="button" class="share-btn" data-copy-link="@postUrl"
+                    aria-label="Copy link"><i class="far fa-copy"></i></button>
+        </div>
+
+        @* Author box — a visible, consistent byline is a direct E-E-A-T signal. *@
+        <aside class="author-box">
+            @if (!string.IsNullOrWhiteSpace(s.ProfileImageUrl))
+            {
+                <img src="@s.ProfileImageUrl" alt="@s.OwnerName" loading="lazy" width="72" height="72">
+            }
+            <div>
+                <span class="author-kicker">Written by</span>
+                <h3>@p.AuthorName</h3>
+                <p>@s.Tagline</p>
+                <div class="author-links">
+                    <a href="/#about">About</a>
+                    @if (!string.IsNullOrWhiteSpace(s.LinkedInUrl))
+                    {
+                        <a href="@s.LinkedInUrl" rel="noopener me" target="_blank">LinkedIn</a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(s.GitHubUrl))
+                    {
+                        <a href="@s.GitHubUrl" rel="noopener me" target="_blank">GitHub</a>
+                    }
+                    <a href="/#contact">Work with me</a>
+                </div>
+            </div>
+        </aside>
 
         @if (s.EnableNewsletter)
         {

@@ -250,4 +250,61 @@ public static class TextHelpers
         string.IsNullOrWhiteSpace(value)
             ? Array.Empty<string>()
             : value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    private static readonly Regex HeadingRx =
+        new(@"<h([23])(?![^>]*\bid=)([^>]*)>(.*?)</h\1>",
+            RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+
+    /// <summary>
+    /// Gives every H2/H3 in post content a stable id and returns the heading list.
+    /// Anchored headings are what let Google build "jump to section" links in the
+    /// result, and they make long posts linkable section by section.
+    /// </summary>
+    public static (string Html, List<TocEntry> Toc) BuildToc(string? html)
+    {
+        var toc = new List<TocEntry>();
+        if (string.IsNullOrWhiteSpace(html)) return (html ?? string.Empty, toc);
+
+        var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var rendered = HeadingRx.Replace(html, m =>
+        {
+            var level = int.Parse(m.Groups[1].Value);
+            var attrs = m.Groups[2].Value;
+            var inner = m.Groups[3].Value;
+            var text = Plain(inner);
+            if (string.IsNullOrWhiteSpace(text)) return m.Value;
+
+            var id = Slugify(text);
+            // Two sections can legitimately share a title — keep the ids unique.
+            var candidate = id;
+            for (var i = 2; !used.Add(candidate); i++) candidate = $"{id}-{i}";
+
+            toc.Add(new TocEntry(candidate, text, level));
+            return $"<h{level}{attrs} id=\"{candidate}\">{inner}</h{level}>";
+        });
+
+        return (rendered, toc);
+    }
+
+    /// <summary>
+    /// ISO-8601 with an explicit UTC designator. Timestamps come back from the
+    /// database with Kind=Unspecified, and "o" on an unspecified DateTime emits no
+    /// offset at all — which crawlers read as an ambiguous local time.
+    /// </summary>
+    public static string Iso(DateTime? value) =>
+        value.HasValue
+            ? DateTime.SpecifyKind(value.Value, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ")
+            : string.Empty;
+
+    public static string Slugify(string value)
+    {
+        var slug = System.Net.WebUtility.HtmlDecode(value).ToLowerInvariant();
+        slug = Regex.Replace(slug, @"[^a-z0-9\s-]", "");
+        slug = Regex.Replace(slug, @"[\s-]+", "-").Trim('-');
+        if (slug.Length > 60) slug = slug[..60].TrimEnd('-');
+        return string.IsNullOrEmpty(slug) ? "section" : slug;
+    }
 }
+
+public record TocEntry(string Id, string Text, int Level);

@@ -94,7 +94,7 @@ public class AnalyticsService : IAnalyticsService
 
             _db.PageViews.Add(new PageView
             {
-                Path = Truncate(ctx.Request.Path.Value ?? "/", 400),
+                Path = Truncate(ctx.Request.Path.Value ?? "/", 400) ?? "/",
                 PageType = pageType,
                 EntityId = entityId,
                 Title = Truncate(title, 300),

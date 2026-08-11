@@ -67,6 +67,23 @@ public class SeoController : Controller
             var cats = await _db.BlogCategories.AsNoTracking().Select(c => c.Slug).ToListAsync();
             foreach (var c in cats)
                 Add($"blog?category={c}", null, "weekly", "0.5");
+
+            // Tag pages are real long-tail landing pages, but a tag with a single
+            // post is a thin duplicate of that post — only submit tags that
+            // actually aggregate something.
+            var tagLists = await _db.BlogPosts.AsNoTracking()
+                .Where(p => p.IsPublished && p.Tags != null)
+                .Select(p => p.Tags!).ToListAsync();
+
+            var tags = tagLists
+                .SelectMany(TextHelpers.Csv)
+                .GroupBy(t => t, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() >= 2)
+                .Select(g => g.Key)
+                .OrderBy(t => t);
+
+            foreach (var t in tags)
+                Add($"blog?tag={Uri.EscapeDataString(t)}", null, "weekly", "0.4");
         }
 
         var xml = new StringBuilder();

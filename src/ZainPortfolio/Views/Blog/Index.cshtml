@@ -1,20 +1,67 @@
 @model BlogListViewModel
 @{
     var s = Model.Settings;
+
+    var isSearch = !string.IsNullOrWhiteSpace(Model.Query);
+    var cat = string.IsNullOrWhiteSpace(Model.CurrentCategory)
+        ? null
+        : Model.Categories.FirstOrDefault(c => c.Slug == Model.CurrentCategory);
+
     var title = "Blog | AI Architecture, Azure & Engineering Leadership — " + s.OwnerName;
-    if (!string.IsNullOrWhiteSpace(Model.CurrentCategory))
+    var description = "Practical writing on RAG and LLM architecture, Azure cloud design, .NET engineering and leading engineering teams — from a technical lead based in Kuala Lumpur.";
+    var keywords = "RAG architecture blog, Azure OpenAI tutorial Malaysia, LLM engineering blog, engineering leadership writing";
+    var crumbs = new List<(string, string)> { ("Home", "/"), ("Blog", "/blog") };
+
+    // Each filter is a real landing page and gets its own title, description and
+    // self-referencing canonical. Collapsing them all onto /blog throws away the
+    // long-tail rankings they are there to win.
+    if (cat != null)
     {
-        var cat = Model.Categories.FirstOrDefault(c => c.Slug == Model.CurrentCategory);
-        if (cat != null) title = $"{cat.Name} Articles | {s.OwnerName}";
+        title = $"{cat.Name} Articles | {s.OwnerName}";
+        if (!string.IsNullOrWhiteSpace(cat.Description)) description = cat.Description;
+        keywords = $"{cat.Name}, {keywords}";
+        crumbs.Add((cat.Name, $"/blog?category={cat.Slug}"));
     }
+    else if (!string.IsNullOrWhiteSpace(Model.CurrentTag))
+    {
+        title = $"{Model.CurrentTag} — Articles & Guides | {s.OwnerName}";
+        description = $"Every article tagged \"{Model.CurrentTag}\" — practical notes on architecture, delivery and engineering leadership from Kuala Lumpur.";
+        keywords = $"{Model.CurrentTag}, {keywords}";
+        crumbs.Add((Model.CurrentTag!, $"/blog?tag={Uri.EscapeDataString(Model.CurrentTag!)}"));
+    }
+    else if (isSearch)
+    {
+        title = $"Search: {Model.Query} | {s.OwnerName}";
+    }
+
+    // Build the canonical for this exact permutation, preserving filter + page.
+    var qs = new List<string>();
+    if (cat != null) qs.Add("category=" + cat.Slug);
+    if (!string.IsNullOrWhiteSpace(Model.CurrentTag)) qs.Add("tag=" + Uri.EscapeDataString(Model.CurrentTag!));
+    string PageUrl(int p)
+    {
+        var parts = new List<string>(qs);
+        if (p > 1) parts.Add("page=" + p);
+        return "/blog" + (parts.Count > 0 ? "?" + string.Join("&", parts) : "");
+    }
+
+    if (Model.Page > 1) title = $"{title} — Page {Model.Page}";
+
     ViewBag.Settings = s;
     ViewBag.Meta = new PageMeta
     {
         Title = title,
-        Description = "Practical writing on RAG and LLM architecture, Azure cloud design, .NET engineering and leading engineering teams — from a technical lead based in Kuala Lumpur.",
-        Keywords = "RAG architecture blog, Azure OpenAI tutorial Malaysia, LLM engineering blog, engineering leadership writing",
-        CanonicalPath = "/blog",
-        Breadcrumbs = new List<(string, string)> { ("Home", "/"), ("Blog", "/blog") }
+        Description = description,
+        Keywords = keywords,
+        // Search results are thin, infinite and duplicate the real pages — they
+        // stay crawlable so links flow, but must never be indexed themselves.
+        Robots = isSearch
+            ? "noindex, follow"
+            : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        CanonicalPath = isSearch ? "/blog" : PageUrl(Model.Page),
+        PrevUrl = !isSearch && Model.Page > 1 ? PageUrl(Model.Page - 1) : null,
+        NextUrl = !isSearch && Model.Page < Model.TotalPages ? PageUrl(Model.Page + 1) : null,
+        Breadcrumbs = crumbs
     };
 }
 

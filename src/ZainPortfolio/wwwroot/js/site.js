@@ -201,4 +201,36 @@
       });
     }, { passive: true });
   }
+
+  /* Copy-link button on articles. */
+  document.querySelectorAll('[data-copy-link]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var url = btn.getAttribute('data-copy-link');
+      var done = function () {
+        var icon = btn.querySelector('i');
+        var previous = icon ? icon.className : null;
+        btn.classList.add('copied');
+        if (icon) icon.className = 'fas fa-check';
+        setTimeout(function () {
+          btn.classList.remove('copied');
+          if (icon && previous) icon.className = previous;
+        }, 1600);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(done).catch(function () {});
+      } else {
+        // http:// origins and older browsers have no clipboard API.
+        var field = document.createElement('textarea');
+        field.value = url;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        try { document.execCommand('copy'); done(); } catch (e) { /* nothing to do */ }
+        document.body.removeChild(field);
+      }
+    });
+  });
+
 })();

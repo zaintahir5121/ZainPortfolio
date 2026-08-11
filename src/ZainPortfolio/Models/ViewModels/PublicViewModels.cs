@@ -12,6 +12,15 @@ public class PageMeta
     public DateTime? ModifiedAt { get; set; }
     public string? ArticleSection { get; set; }
     public IEnumerable<string> ArticleTags { get; set; } = Array.Empty<string>();
+    /// <summary>
+    /// Overrides the default index directive. Search-result and other thin
+    /// permutation pages must be kept out of the index or they cannibalise the
+    /// real landing pages.
+    /// </summary>
+    public string Robots { get; set; } = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+    /// <summary>Absolute-or-relative URLs for paginated sequences.</summary>
+    public string? PrevUrl { get; set; }
+    public string? NextUrl { get; set; }
     /// <summary>Extra JSON-LD blocks rendered into the head.</summary>
     public List<string> JsonLd { get; set; } = new();
     public List<(string Name, string Url)> Breadcrumbs { get; set; } = new();

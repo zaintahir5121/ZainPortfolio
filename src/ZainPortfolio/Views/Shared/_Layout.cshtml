@@ -29,7 +29,15 @@
         <meta name="keywords" content="@(meta.Keywords ?? s.MetaKeywords)">
     }
     <link rel="canonical" href="@canonical">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="robots" content="@meta.Robots">
+    @if (!string.IsNullOrWhiteSpace(meta.PrevUrl))
+    {
+        <link rel="prev" href="@(meta.PrevUrl!.StartsWith("http") ? meta.PrevUrl : baseUrl + meta.PrevUrl)">
+    }
+    @if (!string.IsNullOrWhiteSpace(meta.NextUrl))
+    {
+        <link rel="next" href="@(meta.NextUrl!.StartsWith("http") ? meta.NextUrl : baseUrl + meta.NextUrl)">
+    }
     <meta name="author" content="@s.OwnerName">
 
     @* ---- Regional targeting: Malaysia ---- *@
@@ -55,8 +63,8 @@
     }
     @if (meta.OgType == "article" && meta.PublishedAt.HasValue)
     {
-        <meta property="article:published_time" content="@meta.PublishedAt.Value.ToString("o")">
-        <meta property="article:modified_time" content="@(meta.ModifiedAt ?? meta.PublishedAt)?.ToString("o")">
+        <meta property="article:published_time" content="@TextHelpers.Iso(meta.PublishedAt)">
+        <meta property="article:modified_time" content="@TextHelpers.Iso(meta.ModifiedAt ?? meta.PublishedAt)">
         <meta property="article:author" content="@s.OwnerName">
         @if (!string.IsNullOrWhiteSpace(meta.ArticleSection))
         {

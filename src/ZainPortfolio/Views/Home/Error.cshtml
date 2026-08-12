@@ -1,0 +1,21 @@
+@{
+    var code = ViewBag.StatusCode as int? ?? 500;
+    ViewBag.Meta = new PageMeta { Title = $"{code} — Page not found" };
+}
+<section class="section" style="min-height:70vh;display:grid;place-items:center;padding-top:9rem;">
+    <div class="container" style="text-align:center;">
+        <h1 style="font-size:clamp(4rem,14vw,9rem);line-height:1;" class="grad-text">@code</h1>
+        <h2 style="margin:1rem 0;">
+            @(code == 404 ? "This page doesn't exist" : "Something went wrong")
+        </h2>
+        <p style="color:var(--muted);max-width:460px;margin:0 auto 2rem;">
+            @(code == 404
+                ? "The page you're looking for may have moved or never existed."
+                : "An unexpected error occurred. Please try again shortly.")
+        </p>
+        <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;">
+            <a href="/" class="btn-primary"><i class="fas fa-home"></i> Back home</a>
+            <a href="/projects" class="btn-ghost">Browse projects</a>
+        </div>
+    </div>
+</section>

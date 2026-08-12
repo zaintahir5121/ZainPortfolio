@@ -1,0 +1,66 @@
+@model List<MediaAsset>
+@{
+    ViewBag.Title = "Media Library";
+    var totalMb = Math.Round((long)ViewBag.TotalSize / 1024.0 / 1024.0, 1);
+    string Kind(string k) => ViewBag.Kind as string == k ? "btn-p" : "btn-s";
+}
+<div class="card">
+    <div class="card-head">
+        <div><h2>Upload files</h2><p>Images, video and PDF up to 64 MB each. Files land in /wwwroot/uploads.</p></div>
+        <div style="display:flex;gap:.4rem;">
+            <a href="/admin/media" class="btn @Kind("all") btn-sm">All</a>
+            <a href="/admin/media?kind=image" class="btn @Kind("image") btn-sm">Images</a>
+            <a href="/admin/media?kind=video" class="btn @Kind("video") btn-sm">Video</a>
+            <a href="/admin/media?kind=document" class="btn @Kind("document") btn-sm">Docs</a>
+        </div>
+    </div>
+    <form method="post" action="/admin/media/upload" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="form-grid">
+            <div class="fg">
+                <label>Choose files</label>
+                <input type="file" name="files" multiple accept="image/*,video/*,.pdf"
+                       style="width:100%;padding:.55rem;border-radius:9px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);">
+            </div>
+            <div class="fg">
+                <label>Alt text (optional)</label>
+                <input type="text" name="altText" placeholder="Describes the image for accessibility and SEO">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-p"><i class="fas fa-upload"></i> Upload</button>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <div><h2>@Model.Count file(s)</h2><p>@totalMb MB used in total</p></div>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="media-grid">
+            @foreach (var m in Model)
+            {
+                <div class="media-item">
+                    <div class="media-thumb">
+                        @if (m.Kind == "image") { <img src="@m.Url" alt="@m.AltText" loading="lazy"> }
+                        else if (m.Kind == "video") { <i class="fas fa-film"></i> }
+                        else { <i class="fas fa-file-pdf"></i> }
+                    </div>
+                    <div class="media-info">
+                        <div class="nm" title="@m.OriginalName">@m.OriginalName</div>
+                        <div class="mt">@Math.Round(m.SizeBytes / 1024.0, 0) KB &middot; @m.UploadedAt.ToString("dd MMM")</div>
+                    </div>
+                    <div class="media-actions">
+                        <button type="button" onclick="navigator.clipboard.writeText(location.origin + '@m.Url'); this.textContent='Copied';">Copy URL</button>
+                        <a href="@m.Url" target="_blank">Open</a>
+                        <form method="post" action="/admin/media/@m.Id/delete" onsubmit="return confirm('Delete @m.OriginalName?');" style="flex:1;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" style="width:100%;color:#fca5a5;">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else { <div class="empty"><i class="fas fa-photo-film"></i><p>No files uploaded yet.</p></div> }
+</div>

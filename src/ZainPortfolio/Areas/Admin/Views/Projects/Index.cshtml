@@ -1,0 +1,51 @@
+@model List<Project>
+@{ ViewBag.Title = "Projects"; }
+@section Actions { <a href="/admin/projects/create" class="btn btn-p btn-sm"><i class="fas fa-plus"></i> New Project</a> }
+<div class="card">
+    <form method="get" class="card-head">
+        <div><h2>@Model.Count project(s)</h2><p>Drag order is controlled by the Sort field on each project.</p></div>
+        <div style="display:flex;gap:.5rem;">
+            <input type="search" name="q" value="@ViewBag.Query" placeholder="Search..."
+                   style="padding:.5rem .85rem;border-radius:9px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);">
+            <button type="submit" class="btn btn-s"><i class="fas fa-search"></i></button>
+        </div>
+    </form>
+    @if (Model.Any())
+    {
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th style="width:46px;"></th><th>Title</th><th>Category</th><th>Status</th><th>Views</th><th>Sort</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>
+                            <div style="width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,@p.GradientFrom,@p.GradientTo);">
+                                <i class="@p.IconClass" style="font-size:.8rem;color:#fff;"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <strong>@p.Title</strong>
+                            @if (p.IsFeatured) { <span class="chip chip-feat">Featured</span> }
+                            <div style="font-size:.72rem;color:var(--a-muted);">/projects/@p.Slug</div>
+                        </td>
+                        <td style="color:var(--a-muted);">@(p.ProjectCategory?.Name ?? "—")</td>
+                        <td><span class="chip @(p.IsPublished ? "chip-on" : "chip-off")">@(p.IsPublished ? "Live" : "Draft")</span></td>
+                        <td style="color:var(--a-muted);">@p.ViewCount</td>
+                        <td style="color:var(--a-muted);">@p.SortOrder</td>
+                        <td><div class="t-actions">
+                            <a href="/projects/@p.Slug" target="_blank" class="btn btn-s btn-sm"><i class="fas fa-eye"></i></a>
+                            <a href="/admin/projects/@p.Id" class="btn btn-s btn-sm"><i class="fas fa-pen"></i></a>
+                            <form method="post" action="/admin/projects/@p.Id/publish">@Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-s btn-sm" title="Toggle publish"><i class="fas fa-power-off"></i></button></form>
+                            <form method="post" action="/admin/projects/@p.Id/delete" onsubmit="return confirm('Delete @p.Title?');">@Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-d btn-sm"><i class="fas fa-trash"></i></button></form>
+                        </div></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else { <div class="empty"><i class="fas fa-diagram-project"></i><p>No projects yet.</p><a href="/admin/projects/create" class="btn btn-p" style="margin-top:1rem;">Create the first one</a></div> }
+</div>

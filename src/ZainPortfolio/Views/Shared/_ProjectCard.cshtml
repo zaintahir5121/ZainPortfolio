@@ -1,0 +1,50 @@
+@model Project
+<article class="proj-card reveal" data-cat="@(Model.FilterKeys ?? "")">
+    <div class="proj-img">
+        @if (!string.IsNullOrWhiteSpace(Model.CoverImageUrl))
+        {
+            <img src="@Model.CoverImageUrl" alt="@Model.Title" loading="lazy">
+        }
+        else
+        {
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,@Model.GradientFrom,@Model.GradientTo)">
+                <i class="@Model.IconClass proj-img-icon"></i>
+            </div>
+        }
+        <div class="proj-overlay">
+            <a href="/projects/@Model.Slug" aria-label="View @Model.Title case study"><i class="fas fa-arrow-right"></i></a>
+            @if (!string.IsNullOrWhiteSpace(Model.LiveUrl))
+            {
+                <a href="@Model.LiveUrl" target="_blank" rel="noopener" aria-label="Live site"><i class="fas fa-external-link-alt"></i></a>
+            }
+        </div>
+    </div>
+    <div class="proj-body">
+        @if (Model.TagList.Any())
+        {
+            <div class="proj-tags">
+                @foreach (var t in Model.TagList.Take(4)) { <span>@t</span> }
+            </div>
+        }
+        <h3><a href="/projects/@Model.Slug">@Model.Title</a></h3>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Problem))
+        {
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i>@Model.Problem</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Solution))
+        {
+            <p class="proj-solution"><i class="fas fa-circle-check"></i>@Model.Solution</p>
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.Summary) && string.IsNullOrWhiteSpace(Model.Problem))
+        {
+            <p class="proj-problem">@Model.Summary</p>
+        }
+
+        <div class="proj-stats">
+            @if (!string.IsNullOrWhiteSpace(Model.Stat1Text)) { <span><i class="@Model.Stat1Icon"></i>@Model.Stat1Text</span> }
+            @if (!string.IsNullOrWhiteSpace(Model.Stat2Text)) { <span><i class="@Model.Stat2Icon"></i>@Model.Stat2Text</span> }
+        </div>
+        <a href="/projects/@Model.Slug" class="proj-more">Read case study <i class="fas fa-arrow-right"></i></a>
+    </div>
+</article>

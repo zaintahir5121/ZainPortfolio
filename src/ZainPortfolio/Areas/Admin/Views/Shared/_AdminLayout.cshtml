@@ -1,0 +1,98 @@
+@inject ISiteSettingsService SettingsService
+@{
+    var s = await SettingsService.GetAsync();
+    var ctrl = (ViewContext.RouteData.Values["controller"] ?? "").ToString();
+    var act = (ViewContext.RouteData.Values["action"] ?? "").ToString();
+    string On(string c, string? a = null) =>
+        ctrl!.Equals(c, StringComparison.OrdinalIgnoreCase) &&
+        (a == null || act!.Equals(a, StringComparison.OrdinalIgnoreCase)) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>@ViewBag.Title — CMS | @s.SiteName</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true">
+</head>
+<body>
+<div class="admin-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="side-brand">
+            <div class="mark">@(s.LogoText.Length > 2 ? s.LogoText[..2] : s.LogoText)</div>
+            <div>
+                <strong>@s.SiteName</strong>
+                <span>Content Management</span>
+            </div>
+        </div>
+
+        <div class="side-label">Overview</div>
+        <a href="/admin" class="side-link @On("Dashboard","Index")"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="/admin/subscribers" class="side-link @On("Dashboard","Subscribers")"><i class="fas fa-envelope-open-text"></i> Subscribers</a>
+        <a href="/admin/messages" class="side-link @On("Dashboard","Messages")">
+            <i class="fas fa-inbox"></i> Messages
+            @if (ViewBag.UnreadGlobal is int u && u > 0) { <span class="badge">@u</span> }
+        </a>
+
+        <div class="side-label">Content</div>
+        <a href="/admin/projects" class="side-link @On("Projects")"><i class="fas fa-diagram-project"></i> Projects</a>
+        <a href="/admin/blog" class="side-link @On("Blog")"><i class="fas fa-feather-pointed"></i> Blog Posts</a>
+        <a href="/admin/media" class="side-link @On("Media")"><i class="fas fa-photo-film"></i> Media Library</a>
+        <a href="/admin/structure" class="side-link @On("Structure")"><i class="fas fa-sitemap"></i> Skills &amp; Experience</a>
+
+        <div class="side-label">Configuration</div>
+        <a href="/admin/settings" class="side-link @On("Settings")"><i class="fas fa-palette"></i> Site &amp; Theme</a>
+        <a href="/admin/account/password" class="side-link @On("Account","ChangePassword")"><i class="fas fa-key"></i> Password</a>
+
+        <div class="side-label">Site</div>
+        <a href="/" target="_blank" class="side-link"><i class="fas fa-arrow-up-right-from-square"></i> View Site</a>
+        <a href="/sitemap.xml" target="_blank" class="side-link"><i class="fas fa-map"></i> Sitemap</a>
+        <form method="post" action="/admin/account/logout">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="side-link" style="width:100%;text-align:left;">
+                <i class="fas fa-right-from-bracket"></i> Sign Out
+            </button>
+        </form>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:.8rem;">
+                <button class="mobile-toggle" id="sb-toggle" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+                <h1>@ViewBag.Title</h1>
+            </div>
+            <div class="topbar-actions">
+                @await RenderSectionAsync("Actions", required: false)
+                <span style="font-size:.82rem;color:var(--a-muted);">@User.FindFirst("DisplayName")?.Value</span>
+            </div>
+        </header>
+
+        <div class="content">
+            @if (TempData["Success"] is string ok)
+            {
+                <div class="alert alert-ok"><i class="fas fa-circle-check"></i><div>@ok</div></div>
+            }
+            @if (TempData["Error"] is string err)
+            {
+                <div class="alert alert-err"><i class="fas fa-circle-exclamation"></i><div>@err</div></div>
+            }
+            @if (TempData["Warning"] is string warn)
+            {
+                <div class="alert alert-warn"><i class="fas fa-triangle-exclamation"></i><div>@warn</div></div>
+            }
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('sb-toggle')?.addEventListener('click', function () {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

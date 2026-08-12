@@ -45,7 +45,14 @@
       'sk.desc': 'A comprehensive toolkit built over 13+ years of professional development',
       'sk.g1': 'AI &amp; Analytics', 'sk.g2': 'Cloud &amp; Infrastructure',
       'sk.g3': 'Development &amp; Architecture', 'sk.g4': 'DevOps &amp; Automation',
-      'sk.yrs': 'yrs', 'sk.legend': 'Each badge shows hands-on years with that technology',
+      'sk.g5': 'Agentic AI &amp; MCP', 'sk.g6': 'LLMOps &amp; AI Governance',
+      'sk.g7': 'Enterprise Architecture', 'sk.g8': 'Delivery &amp; Governance',
+      'ms.badge': 'Microsoft AI Stack',
+      'ms.desc': 'The platform I build enterprise AI on day to day.',
+      'ms.f': 'Unified data platform', 'ms.af': 'Model catalogue &amp; deployment',
+      'ms.cp': 'Custom copilots &amp; agents', 'ms.ao': 'GPT models inside the tenant',
+      'ms.sk': '.NET agent orchestration', 'ms.as': 'Vector &amp; hybrid retrieval',
+      'sk.yrs': 'yrs', 'sk.yr': 'yr', 'sk.legend': 'Each badge shows hands-on years with that technology',
 
       /* ---- experience ---- */
       'exp.tag': 'Career Journey', 'exp.h2': 'Professional <span class="grad-text">Experience</span>',
@@ -177,7 +184,14 @@
       'sk.desc': 'Ein umfassendes Werkzeugset, aufgebaut in über 13 Jahren Berufspraxis',
       'sk.g1': 'KI &amp; Analytik', 'sk.g2': 'Cloud &amp; Infrastruktur',
       'sk.g3': 'Entwicklung &amp; Architektur', 'sk.g4': 'DevOps &amp; Automatisierung',
-      'sk.yrs': 'J.', 'sk.legend': 'Jedes Abzeichen zeigt die Praxisjahre mit dieser Technologie',
+      'sk.g5': 'Agentische KI &amp; MCP', 'sk.g6': 'LLMOps &amp; KI-Governance',
+      'sk.g7': 'Unternehmensarchitektur', 'sk.g8': 'Lieferung &amp; Governance',
+      'ms.badge': 'Microsoft-KI-Stack',
+      'ms.desc': 'Die Plattform, auf der ich t\u00e4glich Unternehmens-KI baue.',
+      'ms.f': 'Einheitliche Datenplattform', 'ms.af': 'Modellkatalog &amp; Bereitstellung',
+      'ms.cp': 'Eigene Copilots &amp; Agenten', 'ms.ao': 'GPT-Modelle im eigenen Tenant',
+      'ms.sk': '.NET-Agenten-Orchestrierung', 'ms.as': 'Vektor- &amp; Hybridsuche',
+      'sk.yrs': 'J.', 'sk.yr': 'J.', 'sk.legend': 'Jedes Abzeichen zeigt die Praxisjahre mit dieser Technologie',
 
       'exp.tag': 'Werdegang', 'exp.h2': 'Beruflicher <span class="grad-text">Werdegang</span>',
       'exp.desc': 'Über ein Jahrzehnt Aufbau und Führung von Entwicklungsteams',
@@ -300,7 +314,14 @@
       'sk.desc': 'Himpunan kemahiran menyeluruh yang dibina lebih 13 tahun dalam kerjaya profesional',
       'sk.g1': 'AI &amp; Analitik', 'sk.g2': 'Awan &amp; Infrastruktur',
       'sk.g3': 'Pembangunan &amp; Seni Bina', 'sk.g4': 'DevOps &amp; Automasi',
-      'sk.yrs': 'thn', 'sk.legend': 'Setiap lencana menunjukkan tahun pengalaman langsung dengan teknologi itu',
+      'sk.g5': 'AI Agentik &amp; MCP', 'sk.g6': 'LLMOps &amp; Tadbir Urus AI',
+      'sk.g7': 'Seni Bina Perusahaan', 'sk.g8': 'Penyampaian &amp; Tadbir Urus',
+      'ms.badge': 'Timbunan AI Microsoft',
+      'ms.desc': 'Platform yang saya gunakan membina AI perusahaan setiap hari.',
+      'ms.f': 'Platform data bersepadu', 'ms.af': 'Katalog &amp; penggunaan model',
+      'ms.cp': 'Copilot &amp; ejen tersuai', 'ms.ao': 'Model GPT dalam penyewa sendiri',
+      'ms.sk': 'Orkestrasi ejen .NET', 'ms.as': 'Perolehan vektor &amp; hibrid',
+      'sk.yrs': 'thn', 'sk.yr': 'thn', 'sk.legend': 'Setiap lencana menunjukkan tahun pengalaman langsung dengan teknologi itu',
 
       'exp.tag': 'Perjalanan Kerjaya', 'exp.h2': '<span class="grad-text">Pengalaman</span> Profesional',
       'exp.desc': 'Lebih sedekad membina dan memimpin pasukan kejuruteraan',
@@ -447,10 +468,12 @@
       });
     });
 
-    // Years badges keep their number but swap the unit word.
-    var unit = pick(current, 'sk.yrs');
+    // Years badges keep their number but swap the unit word, singular included.
+    var many = pick(current, 'sk.yrs');
+    var one = pick(current, 'sk.yr');
     scope.querySelectorAll('.sk-years').forEach(function (el) {
-      el.textContent = el.getAttribute('data-years') + ' ' + unit;
+      var n = el.getAttribute('data-years');
+      el.textContent = n + ' ' + (n === '1' ? one : many);
     });
   }
 

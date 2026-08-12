@@ -278,3 +278,59 @@
   }, { threshold: 0.3 });
   io.observe(grid);
 })();
+
+/* ---------------------------------------------------------------------------
+   Spend calculator. Deliberately simple and legible arithmetic — the point is
+   to show where the money goes, not to quote anyone a price.
+--------------------------------------------------------------------------- */
+(function () {
+  'use strict';
+
+  var q = document.getElementById('c-q');
+  if (!q) return;
+  var t = document.getElementById('c-t');
+  var team = document.getElementById('c-team');
+
+  // Published list prices per 1M tokens, blended input/output.
+  var PREMIUM = 7.5;
+  var SMALL = 0.45;
+
+  // What a gateway actually buys you, and roughly what each lever is worth.
+  var ROUTED_TO_SMALL = 0.62;   // simple queries a small model handles fine
+  var CACHE_HIT = 0.18;         // repeated questions served without a call
+  var PROMPT_TRIM = 0.12;       // bloat removed by a shared prompt library
+
+  function money(n) {
+    if (n >= 1000000) return '$' + (n / 1000000).toFixed(2) + 'M';
+    if (n >= 1000) return '$' + Math.round(n / 1000) + 'k';
+    return '$' + Math.round(n);
+  }
+
+  function render() {
+    var queries = +q.value, tokens = +t.value, teams = +team.value;
+
+    document.getElementById('c-q-o').textContent = queries.toLocaleString('en-US');
+    document.getElementById('c-t-o').textContent = tokens.toLocaleString('en-US');
+    document.getElementById('c-team-o').textContent = teams;
+
+    var monthlyTokens = (queries * tokens * 30) / 1000000;
+
+    // Ungoverned: premium model for everything, plus the duplicated effort of
+    // each team solving the same problems in isolation.
+    var before = monthlyTokens * PREMIUM * (1 + (teams - 1) * 0.03);
+
+    // Governed: fewer calls, cheaper calls, smaller calls.
+    var billable = monthlyTokens * (1 - CACHE_HIT) * (1 - PROMPT_TRIM);
+    var after = billable * (ROUTED_TO_SMALL * SMALL + (1 - ROUTED_TO_SMALL) * PREMIUM);
+
+    document.getElementById('c-before').textContent = money(before);
+    document.getElementById('c-after').textContent = money(after);
+    document.getElementById('c-save').textContent =
+      Math.round(((before - after) / before) * 100) + '%';
+  }
+
+  [q, t, team].forEach(function (el) {
+    el.addEventListener('input', render);
+  });
+  render();
+})();

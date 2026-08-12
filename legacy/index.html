@@ -19,6 +19,7 @@
       <a href="#home" class="logo">ZAT<span class="logo-dot">.</span></a>
       <ul class="nav-links" id="nav-links">
         <li><a href="#home" class="nav-a active" data-i18n="nav.home">Home</a></li>
+        <li><a href="#value" class="nav-a" data-i18n="nav.value">Approach</a></li>
         <li><a href="#about" class="nav-a" data-i18n="nav.about">About</a></li>
         <li><a href="#skills" class="nav-a" data-i18n="nav.skills">Skills</a></li>
         <li><a href="#experience" class="nav-a" data-i18n="nav.exp">Experience</a></li>
@@ -110,6 +111,107 @@
       </div>
     </div>
     <div class="scroll-hint"><i class="fas fa-chevron-down"></i></div>
+  </section>
+
+
+  <!-- VALUE: video + problem/solution + live demo -->
+  <section class="section" id="value">
+    <div class="container">
+      <div class="sec-header">
+        <span class="sec-tag" data-i18n="vl.tag">What I Actually Do</span>
+        <h2 data-i18n-html="vl.h2">From <span class="grad-text">AI Chaos</span> to a Governed Platform</h2>
+        <p class="sec-desc" data-i18n="vl.desc">Sixty seconds on who I am, the problem I keep being hired to fix, and a calculator you can drive yourself.</p>
+      </div>
+
+      <div class="vl-top">
+        <div class="vl-video">
+          <div class="vl-video-frame">
+            <iframe src="https://www.youtube.com/embed/DNv6xTIlyIg?rel=0&amp;playsinline=1"
+                    title="Zain Abbas Tahir — Introduction"
+                    frameborder="0" loading="lazy"
+                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          </div>
+          <span class="vl-video-cap" data-i18n="vl.vcap">60-second introduction</span>
+        </div>
+
+        <div class="vl-ps">
+          <div class="vl-card vl-problem">
+            <div class="vl-card-head">
+              <i class="fas fa-triangle-exclamation"></i>
+              <h3 data-i18n="vl.pt">The problem</h3>
+            </div>
+            <ul>
+              <li data-i18n="vl.p1">Every team wires its own model calls, with its own keys and its own prompts.</li>
+              <li data-i18n="vl.p2">Nobody can say what AI actually costs until the invoice lands.</li>
+              <li data-i18n="vl.p3">When Legal asks why the model said something, there is no answer.</li>
+              <li data-i18n="vl.p4">Swapping model providers means refactoring every service at once.</li>
+            </ul>
+          </div>
+
+          <div class="vl-card vl-solution">
+            <div class="vl-card-head">
+              <i class="fas fa-circle-check"></i>
+              <h3 data-i18n="vl.st">What I build instead</h3>
+            </div>
+            <ul>
+              <li data-i18n="vl.s1">One gateway every AI call passes through, adoptable in under a day per team.</li>
+              <li data-i18n="vl.s2">Spend capped and reported per team, visible before the invoice.</li>
+              <li data-i18n="vl.s3">Every prompt, retrieval and answer traced and replayable for audit.</li>
+              <li data-i18n="vl.s4">Changing provider becomes a configuration change, not a rewrite.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc">
+        <div class="calc-head">
+          <span class="calc-badge"><i class="fas fa-sliders"></i> <span data-i18n="vl.ctag">Live demo</span></span>
+          <h3 data-i18n="vl.ch">What would governance save you?</h3>
+          <p data-i18n="vl.cd">Move the sliders. The figures recalculate as you drag.</p>
+        </div>
+
+        <div class="calc-body">
+          <div class="calc-inputs">
+            <label class="calc-row">
+              <span class="calc-lbl" data-i18n="vl.cq">Queries per day</span>
+              <input type="range" id="c-q" min="1000" max="500000" step="1000" value="50000">
+              <output id="c-q-o">50,000</output>
+            </label>
+            <label class="calc-row">
+              <span class="calc-lbl" data-i18n="vl.ct">Average tokens per query</span>
+              <input type="range" id="c-t" min="500" max="8000" step="100" value="2500">
+              <output id="c-t-o">2,500</output>
+            </label>
+            <label class="calc-row">
+              <span class="calc-lbl" data-i18n="vl.cteam">Teams calling models</span>
+              <input type="range" id="c-team" min="1" max="20" step="1" value="4">
+              <output id="c-team-o">4</output>
+            </label>
+          </div>
+
+          <div class="calc-out">
+            <div class="calc-fig calc-before">
+              <span class="calc-fig-l" data-i18n="vl.cbefore">Ungoverned</span>
+              <span class="calc-fig-v" id="c-before">$0</span>
+              <span class="calc-fig-s" data-i18n="vl.cmo">per month</span>
+            </div>
+            <div class="calc-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="calc-fig calc-after">
+              <span class="calc-fig-l" data-i18n="vl.cafter">Through the gateway</span>
+              <span class="calc-fig-v" id="c-after">$0</span>
+              <span class="calc-fig-s" data-i18n="vl.cmo">per month</span>
+            </div>
+            <div class="calc-save">
+              <span class="calc-save-v" id="c-save">0%</span>
+              <span class="calc-save-l" data-i18n="vl.csave">saved</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="calc-note" data-i18n="vl.cnote">Illustrative only, using published list prices. Savings come from routing simple queries to smaller models, caching repeats and trimming prompt bloat — the three levers a gateway makes possible.</p>
+      </div>
+    </div>
   </section>
 
   <!-- ABOUT -->

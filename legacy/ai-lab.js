@@ -334,3 +334,59 @@
   });
   render();
 })();
+
+/* ---------------------------------------------------------------------------
+   YouTube embeds refuse to play from file:// — the origin is null, so the
+   player reports "Video unavailable" / error 153. When the page is opened
+   directly from disk, swap each iframe for a clickable poster that opens the
+   video on YouTube instead of showing a dead frame.
+--------------------------------------------------------------------------- */
+(function () {
+  'use strict';
+
+  if (location.protocol !== 'file:') return;
+
+  document.querySelectorAll('.yt-embed').forEach(function (host) {
+    var id = host.getAttribute('data-yt');
+    if (!id) return;
+
+    var frame = host.querySelector('iframe');
+    if (frame) frame.remove();
+
+    var link = document.createElement('a');
+    link.href = 'https://www.youtube.com/watch?v=' + id;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.className = 'yt-poster';
+    link.setAttribute('aria-label', host.getAttribute('data-title') || 'Watch on YouTube');
+    link.style.backgroundImage = "url('https://img.youtube.com/vi/" + id + "/hqdefault.jpg')";
+    link.innerHTML =
+      '<span class="yt-play"><i class="fas fa-play"></i></span>' +
+      '<span class="yt-note">Opens on YouTube &mdash; embedded playback needs a web server</span>';
+    host.appendChild(link);
+  });
+})();
+
+/* ---------------------------------------------------------------------------
+   Any gallery image that has not been downloaded yet degrades to a labelled
+   placeholder, so a missing file never renders as a broken-image icon.
+--------------------------------------------------------------------------- */
+(function () {
+  'use strict';
+
+  document.querySelectorAll('.ac-shot-img').forEach(function (box) {
+    var img = box.querySelector('img');
+    if (!img) return;
+
+    function placeholder() {
+      box.classList.add('is-missing');
+      box.innerHTML =
+        '<span class="ac-ph"><i class="fas fa-image"></i>' +
+        '<span>' + (box.getAttribute('data-fallback') || '') + '</span></span>';
+    }
+
+    img.addEventListener('error', placeholder);
+    // A cached failure fires no error event, so check the decoded size too.
+    if (img.complete && img.naturalWidth === 0) placeholder();
+  });
+})();

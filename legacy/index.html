@@ -23,6 +23,7 @@
         <li><a href="#skills" class="nav-a" data-i18n="nav.skills">Skills</a></li>
         <li><a href="#experience" class="nav-a" data-i18n="nav.exp">Experience</a></li>
         <li><a href="#ai-lab" class="nav-a" data-i18n="nav.ai">AI Lab</a></li>
+        <li><a href="#impact" class="nav-a" data-i18n="nav.impact">Impact</a></li>
         <li><a href="#projects" class="nav-a" data-i18n="nav.projects">Projects</a></li>
         <li><a href="#contact" class="nav-a" data-i18n="nav.contact">Contact</a></li>
       </ul>
@@ -492,6 +493,103 @@
         </div>
 
         <div id="ai-answer"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- IMPACT -->
+  <section class="section section-alt" id="impact">
+    <div class="container">
+      <div class="sec-header">
+        <span class="sec-tag" data-i18n="imp.tag">Measured Outcomes</span>
+        <h2 data-i18n-html="imp.h2">Results, Not <span class="grad-text">Résumé Lines</span></h2>
+        <p class="sec-desc" data-i18n="imp.desc">Every number below comes from a system that shipped and stayed in production.</p>
+      </div>
+      <div class="imp-grid">
+          <div class="imp-card">
+            <span class="imp-v" data-target="70%">70%</span>
+            <span class="imp-l" data-i18n="imp.m1l">Metric</span>
+          </div>
+          <div class="imp-card">
+            <span class="imp-v" data-target="80%">80%</span>
+            <span class="imp-l" data-i18n="imp.m2l">Metric</span>
+          </div>
+          <div class="imp-card">
+            <span class="imp-v" data-target="40+">40+</span>
+            <span class="imp-l" data-i18n="imp.m3l">Metric</span>
+          </div>
+          <div class="imp-card">
+            <span class="imp-v" data-target="28">28</span>
+            <span class="imp-l" data-i18n="imp.m4l">Metric</span>
+          </div>
+          <div class="imp-card">
+            <span class="imp-v" data-target="6">6</span>
+            <span class="imp-l" data-i18n="imp.m5l">Metric</span>
+          </div>
+          <div class="imp-card">
+            <span class="imp-v" data-target="13+">13+</span>
+            <span class="imp-l" data-i18n="imp.m6l">Metric</span>
+          </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI ARCHITECTURE -->
+  <section class="section" id="architecture">
+    <canvas class="neural-bg" id="neural-bg" aria-hidden="true"></canvas>
+    <div class="container">
+      <div class="sec-header">
+        <span class="sec-tag" data-i18n="arc.tag">Systems Thinking</span>
+        <h2 data-i18n-html="arc.h2">The <span class="grad-text">Enterprise AI Stack</span> I Build</h2>
+        <p class="sec-desc" data-i18n="arc.desc">Five layers, one governed platform. Select a layer to see what sits inside it and why it matters.</p>
+      </div>
+      <div class="arc-wrap">
+        <div class="arc-stack" id="arc-stack">
+          <button type="button" class="arc-layer" data-layer="1">
+            <span class="arc-ico"><i class="fas fa-desktop"></i></span>
+            <span class="arc-body">
+              <span class="arc-name" data-i18n="arc.l1">Layer</span>
+              <span class="arc-comp" data-i18n="arc.l1c">Components</span>
+            </span>
+            <span class="arc-chev"><i class="fas fa-chevron-right"></i></span>
+          </button>
+          <button type="button" class="arc-layer" data-layer="2">
+            <span class="arc-ico"><i class="fas fa-diagram-project"></i></span>
+            <span class="arc-body">
+              <span class="arc-name" data-i18n="arc.l2">Layer</span>
+              <span class="arc-comp" data-i18n="arc.l2c">Components</span>
+            </span>
+            <span class="arc-chev"><i class="fas fa-chevron-right"></i></span>
+          </button>
+          <button type="button" class="arc-layer" data-layer="3">
+            <span class="arc-ico"><i class="fas fa-shield-halved"></i></span>
+            <span class="arc-body">
+              <span class="arc-name" data-i18n="arc.l3">Layer</span>
+              <span class="arc-comp" data-i18n="arc.l3c">Components</span>
+            </span>
+            <span class="arc-chev"><i class="fas fa-chevron-right"></i></span>
+          </button>
+          <button type="button" class="arc-layer" data-layer="4">
+            <span class="arc-ico"><i class="fas fa-database"></i></span>
+            <span class="arc-body">
+              <span class="arc-name" data-i18n="arc.l4">Layer</span>
+              <span class="arc-comp" data-i18n="arc.l4c">Components</span>
+            </span>
+            <span class="arc-chev"><i class="fas fa-chevron-right"></i></span>
+          </button>
+          <button type="button" class="arc-layer" data-layer="5">
+            <span class="arc-ico"><i class="fas fa-chart-line"></i></span>
+            <span class="arc-body">
+              <span class="arc-name" data-i18n="arc.l5">Layer</span>
+              <span class="arc-comp" data-i18n="arc.l5c">Components</span>
+            </span>
+            <span class="arc-chev"><i class="fas fa-chevron-right"></i></span>
+          </button>
+        </div>
+        <aside class="arc-detail is-hint" id="arc-detail">
+          <p data-i18n="arc.hint">Select a layer to see what it contains</p>
+        </aside>
       </div>
     </div>
   </section>
@@ -998,6 +1096,49 @@
         <h2 data-i18n-html="ct.h2">Let's Build Something <span class="grad-text">Amazing</span></h2>
         <p class="sec-desc" data-i18n="ct.desc">Have a project in mind or want to explore collaboration opportunities?</p>
       </div>
+
+      <div class="rec-card">
+        <div class="rec-head">
+          <span class="rec-badge"><span class="pulse-dot"></span> <span data-i18n="rec.open">Open to opportunities</span></span>
+          <h3 data-i18n="rec.h3">Recruiter Snapshot</h3>
+        </div>
+        <div class="rec-rows">
+            <div class="rec-row">
+              <i class="fas fa-map-location-dot"></i>
+              <span class="rec-k" data-i18n="rec.loc">Label</span>
+              <span class="rec-v" data-i18n="rec.locv">Value</span>
+            </div>
+            <div class="rec-row">
+              <i class="fas fa-bullseye"></i>
+              <span class="rec-k" data-i18n="rec.focus">Label</span>
+              <span class="rec-v" data-i18n="rec.focusv">Value</span>
+            </div>
+            <div class="rec-row">
+              <i class="fas fa-language"></i>
+              <span class="rec-k" data-i18n="rec.lang">Label</span>
+              <span class="rec-v" data-i18n="rec.langv">Value</span>
+            </div>
+            <div class="rec-row">
+              <i class="fas fa-laptop-code"></i>
+              <span class="rec-k" data-i18n="rec.setup">Label</span>
+              <span class="rec-v" data-i18n="rec.setupv">Value</span>
+            </div>
+            <div class="rec-row">
+              <i class="fas fa-bolt"></i>
+              <span class="rec-k" data-i18n="rec.resp">Label</span>
+              <span class="rec-v" data-i18n="rec.respv">Value</span>
+            </div>
+        </div>
+        <div class="rec-actions">
+          <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="btn-primary">
+            <i class="fab fa-linkedin-in"></i> <span data-i18n="rec.cv">View Full Profile</span>
+          </a>
+          <a href="https://calendly.com/zainabbastahir/30min" target="_blank" class="btn-ghost">
+            <i class="fas fa-calendar-check"></i> <span data-i18n="rec.book">Book 30 Minutes</span>
+          </a>
+        </div>
+      </div>
+
       <div class="contact-grid">
         <div class="contact-info">
           <h3 data-i18n="ct.info">Contact Information</h3>

@@ -133,3 +133,148 @@
     if (open && !running) showStage(+open.getAttribute('data-stage'));
   });
 })();
+
+/* ---------------------------------------------------------------------------
+   Architecture explorer — click a layer, read what lives in it.
+--------------------------------------------------------------------------- */
+(function () {
+  'use strict';
+
+  var stack = document.getElementById('arc-stack');
+  if (!stack) return;
+  var detail = document.getElementById('arc-detail');
+  var layers = Array.prototype.slice.call(stack.querySelectorAll('.arc-layer'));
+
+  function open(n) {
+    layers.forEach(function (l) {
+      l.classList.toggle('active', +l.getAttribute('data-layer') === n);
+    });
+    detail.classList.remove('is-hint');
+    detail.innerHTML =
+      '<span class="arc-detail-kicker" data-i18n="arc.l' + n + 'c">…</span>' +
+      '<h4 data-i18n-html="arc.l' + n + '">…</h4>' +
+      '<p data-i18n="arc.l' + n + 'd">…</p>';
+    if (window.ZatI18n) window.ZatI18n.translate(detail);
+  }
+
+  layers.forEach(function (l) {
+    l.addEventListener('click', function () { open(+l.getAttribute('data-layer')); });
+  });
+
+  document.addEventListener('languagechange', function () {
+    var cur = stack.querySelector('.arc-layer.active');
+    if (cur) open(+cur.getAttribute('data-layer'));
+  });
+})();
+
+/* ---------------------------------------------------------------------------
+   Neural-network backdrop. Decorative only, so it is skipped entirely when the
+   visitor has asked for reduced motion.
+--------------------------------------------------------------------------- */
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('neural-bg');
+  if (!canvas) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    canvas.style.display = 'none';
+    return;
+  }
+
+  var ctx = canvas.getContext('2d');
+  var nodes = [], raf = null, w = 0, h = 0;
+  var LINK = 150;
+
+  function size() {
+    var host = canvas.parentElement;
+    w = canvas.width = host.offsetWidth;
+    h = canvas.height = host.offsetHeight;
+    var count = Math.min(46, Math.max(16, Math.round((w * h) / 26000)));
+    nodes = [];
+    for (var i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.28, vy: (Math.random() - 0.5) * 0.28,
+        r: 1.4 + Math.random() * 1.8
+      });
+    }
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, w, h);
+
+    for (var i = 0; i < nodes.length; i++) {
+      var a = nodes[i];
+      a.x += a.vx; a.y += a.vy;
+      if (a.x < 0 || a.x > w) a.vx *= -1;
+      if (a.y < 0 || a.y > h) a.vy *= -1;
+
+      for (var j = i + 1; j < nodes.length; j++) {
+        var b = nodes[j];
+        var dx = a.x - b.x, dy = a.y - b.y;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < LINK) {
+          ctx.strokeStyle = 'rgba(124, 108, 240, ' + (0.16 * (1 - d / LINK)).toFixed(3) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+
+      ctx.fillStyle = 'rgba(124, 108, 240, 0.5)';
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  // Only animate while the section is on screen — no cost when scrolled away.
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting && !raf) { size(); frame(); }
+      else if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = null; }
+    });
+  }, { threshold: 0.01 });
+  io.observe(canvas.parentElement);
+
+  var resizeT;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(function () { if (raf) size(); }, 200);
+  });
+})();
+
+/* ---------------------------------------------------------------------------
+   Impact counters — count up once, when the band first scrolls into view.
+--------------------------------------------------------------------------- */
+(function () {
+  'use strict';
+
+  var grid = document.querySelector('.imp-grid');
+  if (!grid) return;
+
+  function run(el) {
+    var raw = el.getAttribute('data-target') || el.textContent;
+    var num = parseFloat(raw.replace(/[^0-9.]/g, ''));
+    if (isNaN(num)) return;
+    var suffix = raw.replace(/[0-9.]/g, '');   // keeps % and +
+    var steps = 34, i = 0;
+    var tick = setInterval(function () {
+      i++;
+      el.textContent = Math.round((num * i) / steps) + suffix;
+      if (i >= steps) { clearInterval(tick); el.textContent = raw; }
+    }, 26);
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      grid.querySelectorAll('.imp-v').forEach(run);
+      io.disconnect();
+    });
+  }, { threshold: 0.3 });
+  io.observe(grid);
+})();

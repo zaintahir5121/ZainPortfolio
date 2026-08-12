@@ -82,7 +82,41 @@
       'ct.name': 'Full Name', 'ct.emailL': 'Email Address', 'ct.subj': 'Subject', 'ct.msg': 'Message',
       'ct.send': 'Send Message',
       'ct.phName': 'John Doe', 'ct.phEmail': 'john@example.com',
-      'ct.phSubj': 'Project Inquiry', 'ct.phMsg': 'Tell me about your project...'
+      'ct.phSubj': 'Project Inquiry', 'ct.phMsg': 'Tell me about your project...',
+      /* ---- impact ---- */
+      'imp.tag': 'Measured Outcomes',
+      'imp.h2': 'Results, Not <span class="grad-text">R\u00e9sum\u00e9 Lines</span>',
+      'imp.desc': 'Every number below comes from a system that shipped and stayed in production.',
+      'imp.m1l': 'Faster compliance review', 'imp.m2l': 'Less reporting effort',
+      'imp.m3l': 'Engineers led', 'imp.m4l': 'Projects delivered',
+      'imp.m5l': 'Teams under my lead', 'imp.m6l': 'Years in engineering',
+
+      /* ---- architecture ---- */
+      'arc.tag': 'Systems Thinking',
+      'arc.h2': 'The <span class="grad-text">Enterprise AI Stack</span> I Build',
+      'arc.desc': 'Five layers, one governed platform. Select a layer to see what sits inside it and why it matters.',
+      'arc.hint': 'Select a layer to see what it contains',
+      'arc.l1': 'Experience Layer', 'arc.l1c': 'Web \u00b7 Teams \u00b7 Voice \u00b7 API',
+      'arc.l1d': 'Where people actually meet the system. One conversation contract across every surface, so a new channel is a client of the platform rather than another rewrite.',
+      'arc.l2': 'Orchestration &amp; Agents', 'arc.l2c': 'Planners \u00b7 Tools \u00b7 Workflows \u00b7 Human-in-the-loop',
+      'arc.l2d': 'Agents decompose a goal, call approved tools and hand control back to a human at defined checkpoints. Autonomy is bounded by policy, never by hope.',
+      'arc.l3': 'AI Gateway', 'arc.l3c': 'Routing \u00b7 Guardrails \u00b7 Quotas \u00b7 Cost control',
+      'arc.l3d': 'Every call goes through one gateway. It picks the cheapest model that meets the quality bar, enforces guardrails, caps spend per team and gives one place to swap providers.',
+      'arc.l4': 'Knowledge &amp; Retrieval', 'arc.l4c': 'Chunking \u00b7 Embeddings \u00b7 Vector search \u00b7 Permission filter',
+      'arc.l4d': 'The RAG core. Permissions are applied at retrieval, before the model sees anything \u2014 so the model can never leak what the user was not entitled to read.',
+      'arc.l5': 'Governance &amp; Observability', 'arc.l5c': 'Audit trail \u00b7 Evals \u00b7 Tracing \u00b7 Drift alerts',
+      'arc.l5d': 'Every prompt, retrieval and answer is traced and replayable. Automated evals run on each change, so quality regressions are caught before users meet them.',
+
+      /* ---- recruiter ---- */
+      'rec.h3': 'Recruiter Snapshot', 'rec.open': 'Open to opportunities',
+      'rec.loc': 'Based in', 'rec.locv': 'Kuala Lumpur, Malaysia \u00b7 open to relocation',
+      'rec.focus': 'Focus', 'rec.focusv': 'AI \u00b7 Cloud architecture \u00b7 Engineering leadership',
+      'rec.lang': 'Languages', 'rec.langv': 'English \u00b7 Urdu \u00b7 Malay (working)',
+      'rec.setup': 'Work setup', 'rec.setupv': 'On-site \u00b7 Hybrid \u00b7 Remote',
+      'rec.resp': 'Reply time', 'rec.respv': 'Within 24 hours',
+      'rec.cv': 'View Full Profile', 'rec.book': 'Book 30 Minutes',
+      'nav.impact': 'Impact',
+
     },
 
     de: {
@@ -150,7 +184,38 @@
       'ct.name': 'Vollständiger Name', 'ct.emailL': 'E-Mail-Adresse', 'ct.subj': 'Betreff', 'ct.msg': 'Nachricht',
       'ct.send': 'Nachricht senden',
       'ct.phName': 'Max Mustermann', 'ct.phEmail': 'max@beispiel.de',
-      'ct.phSubj': 'Projektanfrage', 'ct.phMsg': 'Erzählen Sie mir von Ihrem Projekt …'
+      'ct.phSubj': 'Projektanfrage', 'ct.phMsg': 'Erzählen Sie mir von Ihrem Projekt …',
+      'imp.tag': 'Messbare Ergebnisse',
+      'imp.h2': 'Ergebnisse statt <span class="grad-text">Lebenslauf-Zeilen</span>',
+      'imp.desc': 'Jede Zahl unten stammt aus einem System, das ausgeliefert wurde und im Betrieb geblieben ist.',
+      'imp.m1l': 'Schnellere Compliance-Pr\u00fcfung', 'imp.m2l': 'Weniger Reporting-Aufwand',
+      'imp.m3l': 'Gef\u00fchrte Entwickler', 'imp.m4l': 'Gelieferte Projekte',
+      'imp.m5l': 'Teams unter meiner F\u00fchrung', 'imp.m6l': 'Jahre in der Entwicklung',
+
+      'arc.tag': 'Architektonisches Denken',
+      'arc.h2': 'Der <span class="grad-text">Enterprise-KI-Stack</span>, den ich baue',
+      'arc.desc': 'F\u00fcnf Schichten, eine kontrollierte Plattform. W\u00e4hlen Sie eine Schicht, um zu sehen, was darin steckt und warum es z\u00e4hlt.',
+      'arc.hint': 'W\u00e4hlen Sie eine Schicht, um ihren Inhalt zu sehen',
+      'arc.l1': 'Erlebnisschicht', 'arc.l1c': 'Web \u00b7 Teams \u00b7 Sprache \u00b7 API',
+      'arc.l1d': 'Hier begegnen Menschen dem System. Ein einheitlicher Dialogvertrag \u00fcber alle Kan\u00e4le \u2014 ein neuer Kanal ist damit nur ein Client der Plattform und kein weiteres Neuschreiben.',
+      'arc.l2': 'Orchestrierung &amp; Agenten', 'arc.l2c': 'Planer \u00b7 Werkzeuge \u00b7 Abl\u00e4ufe \u00b7 Mensch im Prozess',
+      'arc.l2d': 'Agenten zerlegen ein Ziel, rufen freigegebene Werkzeuge auf und geben an definierten Punkten an den Menschen zur\u00fcck. Autonomie wird durch Richtlinien begrenzt, nicht durch Hoffnung.',
+      'arc.l3': 'KI-Gateway', 'arc.l3c': 'Routing \u00b7 Leitplanken \u00b7 Kontingente \u00b7 Kostensteuerung',
+      'arc.l3d': 'Jeder Aufruf l\u00e4uft \u00fcber ein Gateway. Es w\u00e4hlt das g\u00fcnstigste Modell, das die Qualit\u00e4t h\u00e4lt, erzwingt Leitplanken, deckelt Ausgaben je Team und macht Anbieterwechsel zur Einstellung.',
+      'arc.l4': 'Wissen &amp; Retrieval', 'arc.l4c': 'Chunking \u00b7 Embeddings \u00b7 Vektorsuche \u00b7 Berechtigungsfilter',
+      'arc.l4d': 'Der RAG-Kern. Berechtigungen greifen beim Abruf, bevor das Modell irgendetwas sieht \u2014 so kann es niemals preisgeben, was der Nutzer gar nicht lesen durfte.',
+      'arc.l5': 'Governance &amp; Observability', 'arc.l5c': 'Pr\u00fcfpfad \u00b7 Evaluationen \u00b7 Tracing \u00b7 Drift-Alarme',
+      'arc.l5d': 'Jeder Prompt, jeder Abruf und jede Antwort ist nachvollziehbar und wiederholbar. Automatische Evaluationen laufen bei jeder \u00c4nderung \u2014 Qualit\u00e4tsr\u00fcckschritte fallen vor den Nutzern auf.',
+
+      'rec.h3': '\u00dcberblick f\u00fcr Recruiter', 'rec.open': 'Offen f\u00fcr Angebote',
+      'rec.loc': 'Standort', 'rec.locv': 'Kuala Lumpur, Malaysia \u00b7 umzugsbereit',
+      'rec.focus': 'Schwerpunkt', 'rec.focusv': 'KI \u00b7 Cloud-Architektur \u00b7 Technische F\u00fchrung',
+      'rec.lang': 'Sprachen', 'rec.langv': 'Englisch \u00b7 Urdu \u00b7 Malaiisch (Grundlagen)',
+      'rec.setup': 'Arbeitsmodell', 'rec.setupv': 'Vor Ort \u00b7 Hybrid \u00b7 Remote',
+      'rec.resp': 'Antwortzeit', 'rec.respv': 'Innerhalb von 24 Stunden',
+      'rec.cv': 'Vollst\u00e4ndiges Profil', 'rec.book': '30 Minuten buchen',
+      'nav.impact': 'Wirkung',
+
     },
 
     ms: {
@@ -218,7 +283,38 @@
       'ct.name': 'Nama Penuh', 'ct.emailL': 'Alamat E-mel', 'ct.subj': 'Subjek', 'ct.msg': 'Mesej',
       'ct.send': 'Hantar Mesej',
       'ct.phName': 'Ahmad bin Ali', 'ct.phEmail': 'ahmad@contoh.com',
-      'ct.phSubj': 'Pertanyaan Projek', 'ct.phMsg': 'Ceritakan tentang projek anda...'
+      'ct.phSubj': 'Pertanyaan Projek', 'ct.phMsg': 'Ceritakan tentang projek anda...',
+      'imp.tag': 'Hasil Yang Diukur',
+      'imp.h2': 'Hasil, Bukan <span class="grad-text">Baris Resume</span>',
+      'imp.desc': 'Setiap nombor di bawah datang daripada sistem yang benar-benar dihantar dan kekal dalam produksi.',
+      'imp.m1l': 'Semakan pematuhan lebih pantas', 'imp.m2l': 'Usaha pelaporan berkurang',
+      'imp.m3l': 'Jurutera dipimpin', 'imp.m4l': 'Projek disiapkan',
+      'imp.m5l': 'Pasukan di bawah pimpinan', 'imp.m6l': 'Tahun dalam kejuruteraan',
+
+      'arc.tag': 'Pemikiran Sistem',
+      'arc.h2': '<span class="grad-text">Timbunan AI Perusahaan</span> Yang Saya Bina',
+      'arc.desc': 'Lima lapisan, satu platform bertadbir. Pilih satu lapisan untuk melihat isinya dan mengapa ia penting.',
+      'arc.hint': 'Pilih satu lapisan untuk melihat kandungannya',
+      'arc.l1': 'Lapisan Pengalaman', 'arc.l1c': 'Web \u00b7 Teams \u00b7 Suara \u00b7 API',
+      'arc.l1d': 'Di sinilah pengguna benar-benar bertemu sistem. Satu kontrak perbualan merentas semua saluran, jadi saluran baharu hanyalah klien platform dan bukan penulisan semula.',
+      'arc.l2': 'Orkestrasi &amp; Ejen', 'arc.l2c': 'Perancang \u00b7 Alat \u00b7 Aliran kerja \u00b7 Manusia dalam gelung',
+      'arc.l2d': 'Ejen memecahkan matlamat, memanggil alat yang diluluskan dan menyerahkan kembali kawalan kepada manusia pada titik yang ditetapkan. Autonomi dibatasi oleh polisi, bukan harapan.',
+      'arc.l3': 'Get Laluan AI', 'arc.l3c': 'Penghalaan \u00b7 Pagar keselamatan \u00b7 Kuota \u00b7 Kawalan kos',
+      'arc.l3d': 'Setiap panggilan melalui satu get laluan. Ia memilih model termurah yang memenuhi mutu, menguatkuasakan pagar keselamatan, mengehadkan perbelanjaan setiap pasukan dan memudahkan penukaran pembekal.',
+      'arc.l4': 'Pengetahuan &amp; Perolehan', 'arc.l4c': 'Pembahagian \u00b7 Benaman \u00b7 Carian vektor \u00b7 Penapis kebenaran',
+      'arc.l4d': 'Teras RAG. Kebenaran dikenakan semasa perolehan, sebelum model melihat apa-apa \u2014 jadi model tidak mungkin membocorkan apa yang pengguna tiada hak membacanya.',
+      'arc.l5': 'Tadbir Urus &amp; Pemerhatian', 'arc.l5c': 'Jejak audit \u00b7 Penilaian \u00b7 Pengesanan \u00b7 Amaran hanyutan',
+      'arc.l5d': 'Setiap gesaan, perolehan dan jawapan dijejak dan boleh dimainkan semula. Penilaian automatik berjalan pada setiap perubahan, jadi kemerosotan mutu ditangkap sebelum pengguna menemuinya.',
+
+      'rec.h3': 'Ringkasan Untuk Perekrut', 'rec.open': 'Terbuka untuk peluang',
+      'rec.loc': 'Berpangkalan di', 'rec.locv': 'Kuala Lumpur, Malaysia \u00b7 sedia berpindah',
+      'rec.focus': 'Fokus', 'rec.focusv': 'AI \u00b7 Seni bina awan \u00b7 Kepimpinan kejuruteraan',
+      'rec.lang': 'Bahasa', 'rec.langv': 'Inggeris \u00b7 Urdu \u00b7 Melayu (asas)',
+      'rec.setup': 'Cara bekerja', 'rec.setupv': 'Di pejabat \u00b7 Hibrid \u00b7 Jarak jauh',
+      'rec.resp': 'Masa balasan', 'rec.respv': 'Dalam masa 24 jam',
+      'rec.cv': 'Lihat Profil Penuh', 'rec.book': 'Tempah 30 Minit',
+      'nav.impact': 'Impak',
+
     }
   };
 
@@ -241,6 +337,17 @@
     return table[key] !== undefined ? table[key] : DICT.en[key];
   }
 
+  var decoder = document.createElement('textarea');
+
+  /* Dictionary values are written as HTML source, so they carry entities like
+     &amp;. textContent does not decode those, which would print the entity
+     verbatim — decode before assigning to a text node. */
+  function decode(value) {
+    if (value.indexOf('&') === -1) return value;
+    decoder.innerHTML = value;
+    return decoder.value;
+  }
+
   /* Translates one subtree. Fires no events, so callers that rebuild markup in
      response to a language change can use it without re-entering apply(). */
   function translate(root) {
@@ -248,7 +355,7 @@
 
     scope.querySelectorAll('[data-i18n]').forEach(function (el) {
       var v = pick(current, el.getAttribute('data-i18n'));
-      if (v !== undefined) el.textContent = v;
+      if (v !== undefined) el.textContent = decode(v);
     });
 
     scope.querySelectorAll('[data-i18n-html]').forEach(function (el) {
@@ -262,7 +369,7 @@
         var bits = pair.split(':');
         if (bits.length !== 2) return;
         var v = pick(current, bits[1].trim());
-        if (v !== undefined) el.setAttribute(bits[0].trim(), v);
+        if (v !== undefined) el.setAttribute(bits[0].trim(), decode(v));
       });
     });
 

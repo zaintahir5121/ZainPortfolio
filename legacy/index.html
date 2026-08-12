@@ -18,18 +18,20 @@
     <div class="nav-inner">
       <a href="#home" class="logo">ZAT<span class="logo-dot">.</span></a>
       <ul class="nav-links" id="nav-links">
-        <li><a href="#home" class="nav-a active">Home</a></li>
-        <li><a href="#about" class="nav-a">About</a></li>
-        <li><a href="#skills" class="nav-a">Skills</a></li>
-        <li><a href="#experience" class="nav-a">Experience</a></li>
-        <li><a href="#projects" class="nav-a">Projects</a></li>
-        <li><a href="#contact" class="nav-a">Contact</a></li>
+        <li><a href="#home" class="nav-a active" data-i18n="nav.home">Home</a></li>
+        <li><a href="#about" class="nav-a" data-i18n="nav.about">About</a></li>
+        <li><a href="#skills" class="nav-a" data-i18n="nav.skills">Skills</a></li>
+        <li><a href="#experience" class="nav-a" data-i18n="nav.exp">Experience</a></li>
+        <li><a href="#ai-lab" class="nav-a" data-i18n="nav.ai">AI Lab</a></li>
+        <li><a href="#projects" class="nav-a" data-i18n="nav.projects">Projects</a></li>
+        <li><a href="#contact" class="nav-a" data-i18n="nav.contact">Contact</a></li>
       </ul>
       <div class="nav-right">
+        <div class="lang-switch" id="lang-switch" role="group" aria-label="Language"></div>
         <button class="theme-btn" id="theme-btn" aria-label="Toggle theme">
           <i class="fas fa-moon" id="theme-icon"></i>
         </button>
-        <a href="mailto:zain.tahir512@gmail.com" class="nav-hire">Hire Me</a>
+        <a href="mailto:zain.tahir512@gmail.com" class="nav-hire" data-i18n="nav.hire">Hire Me</a>
         <button class="hamburger" id="hamburger" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
@@ -46,31 +48,31 @@
       <div class="hero-text">
         <div class="hero-badge">
           <span class="pulse-dot"></span>
-          Available for new opportunities
+          <span data-i18n="hero.badge">Available for new opportunities</span>
         </div>
         <div class="hero-roles">
-          <span>AI Technical Lead</span>
+          <span data-i18n="hero.r1">AI Technical Lead</span>
           <span class="sep">·</span>
-          <span>Cloud Architect</span>
+          <span data-i18n="hero.r2">Cloud Architect</span>
           <span class="sep">·</span>
-          <span>Delivery Manager</span>
+          <span data-i18n="hero.r3">Delivery Manager</span>
         </div>
-        <h1 class="hero-h1">
+        <h1 class="hero-h1" data-i18n-html="hero.h1">
           Building <span class="grad-text">AI-Powered</span><br>Systems That Scale
         </h1>
-        <p class="hero-p">
+        <p class="hero-p" data-i18n-html="hero.p">
           13+ years designing enterprise-grade solutions with <strong>RAG</strong>, <strong>LLMs</strong>,
           <strong>Azure Cloud</strong>, <strong>.NET Core</strong> &amp; <strong>Angular</strong> —
           turning complex data into actionable intelligence.
         </p>
         <div class="hero-stats">
-          <div class="stat"><span class="stat-n" data-count="13">0</span><sup>+</sup><small>Years Exp.</small></div>
-          <div class="stat"><span class="stat-n" data-count="50">0</span><sup>+</sup><small>Projects</small></div>
-          <div class="stat"><span class="stat-n" data-count="20">0</span><sup>+</sup><small>Enterprise</small></div>
+          <div class="stat"><span class="stat-n" data-count="13">0</span><sup>+</sup><small data-i18n="hero.s1">Years Exp.</small></div>
+          <div class="stat"><span class="stat-n" data-count="50">0</span><sup>+</sup><small data-i18n="hero.s2">Projects</small></div>
+          <div class="stat"><span class="stat-n" data-count="20">0</span><sup>+</sup><small data-i18n="hero.s3">Enterprise</small></div>
         </div>
         <div class="hero-actions">
-          <a href="#projects" class="btn-primary">View Work <i class="fas fa-arrow-right"></i></a>
-          <a href="#contact" class="btn-ghost">Let's Talk <i class="fas fa-paper-plane"></i></a>
+          <a href="#projects" class="btn-primary"><span data-i18n="hero.cta1">View Work</span> <i class="fas fa-arrow-right"></i></a>
+          <a href="#contact" class="btn-ghost"><span data-i18n="hero.cta2">Let's Talk</span> <i class="fas fa-paper-plane"></i></a>
         </div>
         <div class="hero-socials">
           <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -115,8 +117,8 @@
   <section class="section" id="about">
     <div class="container">
       <div class="sec-header">
-        <span class="sec-tag">About Me</span>
-        <h2>Turning Data Into <span class="grad-text">Intelligence</span></h2>
+        <span class="sec-tag" data-i18n="about.tag">About Me</span>
+        <h2 data-i18n-html="about.h2">Turning Data Into <span class="grad-text">Intelligence</span></h2>
       </div>
       <div class="about-grid">
         <div class="about-img-wrap">
@@ -125,14 +127,14 @@
           </div>
           <div class="exp-badge">
             <span class="exp-n">13+</span>
-            <span class="exp-l">Years of<br>Excellence</span>
+            <span class="exp-l" data-i18n-html="about.years">Years of<br>Excellence</span>
           </div>
           <a href="https://www.linkedin.com/in/zainabbastahir/" target="_blank" class="li-badge">
-            <i class="fab fa-linkedin"></i> LinkedIn Profile
+            <i class="fab fa-linkedin"></i> <span data-i18n="about.li">LinkedIn Profile</span>
           </a>
         </div>
         <div class="about-content">
-          <p class="about-lead">
+          <p class="about-lead" data-i18n-html="about.lead">
             I build <strong>intelligent, scalable, and predictive systems</strong> — designing advanced AI architectures
             using RAG, LLMs, Predictive AI, Sentiment Analysis, and AI Foundry platforms.
           </p>
@@ -145,29 +147,29 @@
             <div class="about-card">
               <i class="fas fa-brain"></i>
               <div>
-                <strong>AI &amp; LLM Expert</strong>
-                <p>RAG, LLMs, Predictive AI, Sentiment Analysis &amp; AI Foundry</p>
+                <strong data-i18n-html="about.c1t">AI &amp; LLM Expert</strong>
+                <p data-i18n-html="about.c1d">RAG, LLMs, Predictive AI, Sentiment Analysis &amp; AI Foundry</p>
               </div>
             </div>
             <div class="about-card">
               <i class="fas fa-cloud"></i>
               <div>
-                <strong>Azure Architect</strong>
-                <p>Data Fabric, Service Bus, Data Factory, Copilot Studio</p>
+                <strong data-i18n="about.c2t">Azure Architect</strong>
+                <p data-i18n="about.c2d">Data Fabric, Service Bus, Data Factory, Copilot Studio</p>
               </div>
             </div>
             <div class="about-card">
               <i class="fas fa-project-diagram"></i>
               <div>
-                <strong>Delivery Manager</strong>
-                <p>End-to-end software delivery &amp; technical leadership</p>
+                <strong data-i18n="about.c3t">Delivery Manager</strong>
+                <p data-i18n-html="about.c3d">End-to-end software delivery &amp; technical leadership</p>
               </div>
             </div>
             <div class="about-card">
               <i class="fas fa-rocket"></i>
               <div>
-                <strong>DevOps &amp; Automation</strong>
-                <p>CI/CD, IaC (ARM, Terraform, Bicep), GitHub Codespaces</p>
+                <strong data-i18n-html="about.c4t">DevOps &amp; Automation</strong>
+                <p data-i18n="about.c4d">CI/CD, IaC (ARM, Terraform, Bicep), GitHub Codespaces</p>
               </div>
             </div>
           </div>
@@ -190,61 +192,62 @@
   <section class="section section-alt" id="skills">
     <div class="container">
       <div class="sec-header">
-        <span class="sec-tag">Technical Expertise</span>
-        <h2>Technologies I <span class="grad-text">Master</span></h2>
-        <p class="sec-desc">A comprehensive toolkit built over 13+ years of professional development</p>
+        <span class="sec-tag" data-i18n="sk.tag">Technical Expertise</span>
+        <h2 data-i18n-html="sk.h2">Technologies I <span class="grad-text">Master</span></h2>
+        <p class="sec-desc" data-i18n="sk.desc">A comprehensive toolkit built over 13+ years of professional development</p>
       </div>
       <div class="skills-wrap">
 
         <div class="skill-group">
-          <div class="sg-head"><i class="fas fa-brain"></i><h3>AI &amp; Analytics</h3></div>
+          <div class="sg-head"><i class="fas fa-brain"></i><h3 data-i18n-html="sk.g1">AI &amp; Analytics</h3></div>
           <div class="sg-grid">
-            <div class="sk-card" data-pct="95"><span>RAG</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="92"><span>LLMs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="90"><span>Predictive AI</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="88"><span>Sentiment Analysis</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="90"><span>AI Foundry</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="92"><span>Copilot Studio</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="95"><span class="sk-name">RAG</span><span class="sk-years" data-years="3">3 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="92"><span class="sk-name">LLMs</span><span class="sk-years" data-years="4">4 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="90"><span class="sk-name">Predictive AI</span><span class="sk-years" data-years="6">6 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="88"><span class="sk-name">Sentiment Analysis</span><span class="sk-years" data-years="5">5 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="90"><span class="sk-name">AI Foundry</span><span class="sk-years" data-years="2">2 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="92"><span class="sk-name">Copilot Studio</span><span class="sk-years" data-years="2">2 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
           </div>
         </div>
 
         <div class="skill-group">
-          <div class="sg-head"><i class="fas fa-cloud"></i><h3>Cloud &amp; Infrastructure</h3></div>
+          <div class="sg-head"><i class="fas fa-cloud"></i><h3 data-i18n-html="sk.g2">Cloud &amp; Infrastructure</h3></div>
           <div class="sg-grid">
-            <div class="sk-card" data-pct="95"><span>Microsoft Azure</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="92"><span>Azure Service Bus</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="90"><span>Data Factory</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="88"><span>Kubernetes</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="90"><span>Key Vault</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="88"><span>AD &amp; RBAC</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="95"><span class="sk-name">Microsoft Azure</span><span class="sk-years" data-years="9">9 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="92"><span class="sk-name">Azure Service Bus</span><span class="sk-years" data-years="7">7 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="90"><span class="sk-name">Data Factory</span><span class="sk-years" data-years="6">6 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="88"><span class="sk-name">Kubernetes</span><span class="sk-years" data-years="5">5 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="90"><span class="sk-name">Key Vault</span><span class="sk-years" data-years="6">6 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="88"><span class="sk-name">AD &amp; RBAC</span><span class="sk-years" data-years="8">8 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
           </div>
         </div>
 
         <div class="skill-group">
-          <div class="sg-head"><i class="fas fa-code"></i><h3>Development &amp; Architecture</h3></div>
+          <div class="sg-head"><i class="fas fa-code"></i><h3 data-i18n-html="sk.g3">Development &amp; Architecture</h3></div>
           <div class="sg-grid">
-            <div class="sk-card" data-pct="95"><span>.NET / .NET Core</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="92"><span>Angular 17+</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="88"><span>Blazor</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="85"><span>React</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="93"><span>Microservices</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="90"><span>CQRS / Event-Driven</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="95"><span class="sk-name">.NET / .NET Core</span><span class="sk-years" data-years="13">13 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="92"><span class="sk-name">Angular 17+</span><span class="sk-years" data-years="8">8 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="88"><span class="sk-name">Blazor</span><span class="sk-years" data-years="4">4 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="85"><span class="sk-name">React</span><span class="sk-years" data-years="5">5 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="93"><span class="sk-name">Microservices</span><span class="sk-years" data-years="8">8 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="90"><span class="sk-name">CQRS / Event-Driven</span><span class="sk-years" data-years="7">7 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
           </div>
         </div>
 
         <div class="skill-group">
-          <div class="sg-head"><i class="fas fa-rocket"></i><h3>DevOps &amp; Automation</h3></div>
+          <div class="sg-head"><i class="fas fa-rocket"></i><h3 data-i18n-html="sk.g4">DevOps &amp; Automation</h3></div>
           <div class="sg-grid">
-            <div class="sk-card" data-pct="93"><span>CI/CD Pipelines</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="92"><span>Azure DevOps</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="88"><span>Terraform</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="90"><span>Docker</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="90"><span>TDD</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
-            <div class="sk-card" data-pct="85"><span>ARM / Bicep</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="93"><span class="sk-name">CI/CD Pipelines</span><span class="sk-years" data-years="9">9 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="92"><span class="sk-name">Azure DevOps</span><span class="sk-years" data-years="8">8 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="88"><span class="sk-name">Terraform</span><span class="sk-years" data-years="5">5 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="90"><span class="sk-name">Docker</span><span class="sk-years" data-years="7">7 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="90"><span class="sk-name">TDD</span><span class="sk-years" data-years="10">10 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
+            <div class="sk-card" data-pct="85"><span class="sk-name">ARM / Bicep</span><span class="sk-years" data-years="5">5 yrs</span><div class="sk-bar"><div class="sk-fill"></div></div></div>
           </div>
         </div>
 
       </div>
+      <p class="sk-legend" data-i18n="sk.legend">Each badge shows hands-on years with that technology</p>
     </div>
   </section>
 
@@ -410,20 +413,103 @@
     </div>
   </section>
 
+
+  <!-- AI LAB -->
+  <section class="section" id="ai-lab">
+    <div class="container">
+      <div class="sec-header">
+        <span class="sec-tag" data-i18n="ai.tag">Interactive</span>
+        <h2 data-i18n-html="ai.h2">See How I Build <span class="grad-text">AI Systems</span></h2>
+        <p class="sec-desc" data-i18n="ai.desc">Click any stage to walk through a production RAG pipeline — the same architecture behind the platforms below.</p>
+      </div>
+
+      <div class="ai-lab-wrap">
+        <div class="ai-demo">
+          <div class="ai-demo-row">
+            <span class="ai-demo-label" data-i18n="ai.try">Try a question:</span>
+            <input type="text" class="ai-input" id="ai-input"
+                   placeholder="Ask something, e.g. &quot;What is our refund policy?&quot;"
+                   data-i18n-attr="placeholder:ai.ph" maxlength="120">
+            <button type="button" class="ai-run" id="ai-run">
+              <i class="fas fa-play"></i> <span data-i18n="ai.run">Run Pipeline</span>
+            </button>
+            <button type="button" class="ai-reset" id="ai-reset">
+              <i class="fas fa-rotate-left"></i> <span data-i18n="ai.reset">Reset</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="ai-pipe" id="ai-pipe">
+          <button type="button" class="ai-stage" data-stage="1">
+            <span class="ai-stage-n">01</span>
+            <span class="ai-stage-ico"><i class="fas fa-search"></i></span>
+            <span class="ai-stage-name" data-i18n="ai.st1">Stage</span>
+          </button>
+          <button type="button" class="ai-stage" data-stage="2">
+            <span class="ai-stage-n">02</span>
+            <span class="ai-stage-ico"><i class="fas fa-project-diagram"></i></span>
+            <span class="ai-stage-name" data-i18n="ai.st2">Stage</span>
+          </button>
+          <button type="button" class="ai-stage" data-stage="3">
+            <span class="ai-stage-n">03</span>
+            <span class="ai-stage-ico"><i class="fas fa-database"></i></span>
+            <span class="ai-stage-name" data-i18n="ai.st3">Stage</span>
+          </button>
+          <button type="button" class="ai-stage" data-stage="4">
+            <span class="ai-stage-n">04</span>
+            <span class="ai-stage-ico"><i class="fas fa-sort-amount-down"></i></span>
+            <span class="ai-stage-name" data-i18n="ai.st4">Stage</span>
+          </button>
+          <button type="button" class="ai-stage" data-stage="5">
+            <span class="ai-stage-n">05</span>
+            <span class="ai-stage-ico"><i class="fas fa-robot"></i></span>
+            <span class="ai-stage-name" data-i18n="ai.st5">Stage</span>
+          </button>
+          <button type="button" class="ai-stage" data-stage="6">
+            <span class="ai-stage-n">06</span>
+            <span class="ai-stage-ico"><i class="fas fa-shield-halved"></i></span>
+            <span class="ai-stage-name" data-i18n="ai.st6">Stage</span>
+          </button>
+        </div>
+
+        <div class="ai-detail is-hint" id="ai-detail">
+          <p data-i18n="ai.hint">Click a stage above to see what it does</p>
+        </div>
+
+        <div class="ai-metrics">
+          <div class="ai-metric">
+            <span class="ai-metric-v" id="ai-m1">—</span>
+            <span class="ai-metric-l" data-i18n="ai.m1">Latency</span>
+          </div>
+          <div class="ai-metric">
+            <span class="ai-metric-v" id="ai-m2">—</span>
+            <span class="ai-metric-l" data-i18n="ai.m2">Grounding</span>
+          </div>
+          <div class="ai-metric">
+            <span class="ai-metric-v" id="ai-m3">—</span>
+            <span class="ai-metric-l" data-i18n="ai.m3">Cost / query</span>
+          </div>
+        </div>
+
+        <div id="ai-answer"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- PROJECTS -->
   <section class="section section-alt" id="projects">
     <div class="container">
       <div class="sec-header">
-        <span class="sec-tag">Featured Work</span>
-        <h2>Projects That <span class="grad-text">Deliver Results</span></h2>
-        <p class="sec-desc">Real solutions built for real business challenges across AI, Cloud &amp; Enterprise domains</p>
+        <span class="sec-tag" data-i18n="pj.tag">Featured Work</span>
+        <h2 data-i18n-html="pj.h2">Projects That <span class="grad-text">Deliver Results</span></h2>
+        <p class="sec-desc" data-i18n-html="pj.desc">Real solutions built for real business challenges across AI, Cloud &amp; Enterprise domains</p>
       </div>
       <div class="proj-filters">
-        <button class="pf-btn active" data-f="all">All</button>
-        <button class="pf-btn" data-f="ai">AI / ML</button>
-        <button class="pf-btn" data-f="cloud">Cloud</button>
-        <button class="pf-btn" data-f="web">Web Apps</button>
-        <button class="pf-btn" data-f="desktop">Desktop</button>
+        <button class="pf-btn active" data-f="all" data-i18n="pj.f1">All</button>
+        <button class="pf-btn" data-f="ai" data-i18n="pj.f2">AI / ML</button>
+        <button class="pf-btn" data-f="cloud" data-i18n="pj.f3">Cloud</button>
+        <button class="pf-btn" data-f="web" data-i18n="pj.f4">Web Apps</button>
+        <button class="pf-btn" data-f="desktop" data-i18n="pj.f5">Desktop</button>
       </div>
       <div class="proj-grid" id="proj-grid">
 
@@ -435,9 +521,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Azure OpenAI</span><span>RAG</span><span>LLMs</span><span>.NET Core</span></div>
-            <h3>AI Compliance Review Platform</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Manual compliance reviews were slow, error-prone and impossible to scale across hundreds of policy documents.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an LLM-powered platform that auto-reads documents, flags regulatory gaps and generates structured audit reports — cutting review time by 70%.</p>
+            <h3 data-i18n="p1.t">AI Compliance Review Platform</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p1.p">Manual compliance reviews were slow, error-prone and impossible to scale across hundreds of policy documents.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p1.s">Built an LLM-powered platform that auto-reads documents, flags regulatory gaps and generates structured audit reports — cutting review time by 70%.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-file-contract"></i> Audit Ready</span>
               <span><i class="fas fa-robot"></i> LLM Powered</span>
@@ -453,9 +539,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Azure OpenAI</span><span>LLMs</span><span>Cosmos DB</span></div>
-            <h3>AI Spot Report Generator</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Operations teams spent hours manually compiling data into reports, delaying decisions and wasting analyst time.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Delivered an LLM engine that ingests live operational data and auto-generates structured spot reports — reducing effort by 80%.</p>
+            <h3 data-i18n="p2.t">AI Spot Report Generator</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p2.p">Operations teams spent hours manually compiling data into reports, delaying decisions and wasting analyst time.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p2.s">Delivered an LLM engine that ingests live operational data and auto-generates structured spot reports — reducing effort by 80%.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-bolt"></i> 80% Faster</span>
               <span><i class="fas fa-chart-bar"></i> Auto Reports</span>
@@ -471,9 +557,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>RAG</span><span>AI Search</span><span>Azure OpenAI</span><span>Angular</span></div>
-            <h3>Document Chat Using AI</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Employees wasted hours searching through thousands of documents to find answers buried in PDFs, Word files and reports.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built a RAG-powered chat UI so users simply ask a question and get exact answers from the document library in seconds.</p>
+            <h3 data-i18n="p3.t">Document Chat Using AI</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p3.p">Employees wasted hours searching through thousands of documents to find answers buried in PDFs, Word files and reports.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p3.s">Built a RAG-powered chat UI so users simply ask a question and get exact answers from the document library in seconds.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-magnifying-glass"></i> Semantic Search</span>
               <span><i class="fas fa-file-arrow-up"></i> Multi-format</span>
@@ -489,9 +575,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Agentic AI</span><span>Copilot Studio</span><span>Azure OpenAI</span></div>
-            <h3>Agentic AI – Internal Ecosystem Bot</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Repetitive internal workflows (approvals, lookups, handoffs) required constant human coordination across multiple systems.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Designed a multi-agent AI system that autonomously plans tasks, calls tools and completes cross-system workflows — freeing teams for high-value work.</p>
+            <h3 data-i18n="p4.t">Agentic AI – Internal Ecosystem Bot</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p4.p">Repetitive internal workflows (approvals, lookups, handoffs) required constant human coordination across multiple systems.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p4.s">Designed a multi-agent AI system that autonomously plans tasks, calls tools and completes cross-system workflows — freeing teams for high-value work.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-gears"></i> Multi-Agent</span>
               <span><i class="fas fa-sitemap"></i> Orchestrated</span>
@@ -507,9 +593,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Azure ML</span><span>App Insights</span><span>Power BI</span></div>
-            <h3>AI Based Performance Optimization</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Teams only discovered performance bottlenecks after users complained — reactive firefighting was costly and damaging to SLAs.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an ML monitoring platform that proactively detects degradation patterns and auto-recommends or applies fixes before users are impacted.</p>
+            <h3 data-i18n="p5.t">AI Based Performance Optimization</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p5.p">Teams only discovered performance bottlenecks after users complained — reactive firefighting was costly and damaging to SLAs.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p5.s">Built an ML monitoring platform that proactively detects degradation patterns and auto-recommends or applies fixes before users are impacted.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-chart-line"></i> Auto-Optimize</span>
               <span><i class="fas fa-eye"></i> Real-time</span>
@@ -525,9 +611,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Azure OpenAI</span><span>LLMs</span><span>CRM APIs</span><span>Angular</span></div>
-            <h3>AI Sales &amp; Lead Generator</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Sales teams spent 60% of their time on unqualified leads and generic outreach, resulting in low conversion and wasted effort.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Engineered an AI pipeline that scores prospects, crafts personalised outreach via LLMs and feeds qualified leads directly into the CRM.</p>
+            <h3 data-i18n="p6.t">AI Sales &amp; Lead Generator</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p6.p">Sales teams spent 60% of their time on unqualified leads and generic outreach, resulting in low conversion and wasted effort.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p6.s">Engineered an AI pipeline that scores prospects, crafts personalised outreach via LLMs and feeds qualified leads directly into the CRM.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-user-plus"></i> Lead Scoring</span>
               <span><i class="fas fa-envelope-open"></i> Auto Outreach</span>
@@ -543,9 +629,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>RAG</span><span>Azure OpenAI</span><span>LLMs</span></div>
-            <h3>AI Customer Support Bot</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Support teams were overwhelmed with repetitive queries, causing long wait times and high operational cost.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Deployed a RAG + LLM chatbot that handles 70% of queries autonomously, with full context awareness and 24/7 availability.</p>
+            <h3 data-i18n="p7.t">AI Customer Support Bot</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p7.p">Support teams were overwhelmed with repetitive queries, causing long wait times and high operational cost.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p7.s">Deployed a RAG + LLM chatbot that handles 70% of queries autonomously, with full context awareness and 24/7 availability.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-robot"></i> AI Powered</span>
               <span><i class="fas fa-comments"></i> 24/7 Support</span>
@@ -561,9 +647,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Azure ML</span><span>Data Factory</span><span>Power BI</span></div>
-            <h3>Predictive Analytics Engine</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Business decisions were made on gut feeling — lack of forecasting led to inventory mismatches and missed revenue opportunities.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an Azure ML platform that forecasts demand, predicts churn and surfaces customer behaviour patterns in real-time Power BI dashboards.</p>
+            <h3 data-i18n="p8.t">Predictive Analytics Engine</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p8.p">Business decisions were made on gut feeling — lack of forecasting led to inventory mismatches and missed revenue opportunities.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p8.s">Built an Azure ML platform that forecasts demand, predicts churn and surfaces customer behaviour patterns in real-time Power BI dashboards.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-chart-line"></i> Forecasting</span>
               <span><i class="fas fa-brain"></i> ML Models</span>
@@ -579,9 +665,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>AI/ML</span><span>Python</span><span>.NET</span></div>
-            <h3>Face Recognition Login</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Password-based logins were a security liability — brute-force attacks, credential sharing and resets created constant risk and friction.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Delivered a facial recognition + liveness detection system for passwordless, phish-proof enterprise authentication.</p>
+            <h3 data-i18n="p9.t">Face Recognition Login</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p9.p">Password-based logins were a security liability — brute-force attacks, credential sharing and resets created constant risk and friction.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p9.s">Delivered a facial recognition + liveness detection system for passwordless, phish-proof enterprise authentication.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-eye"></i> Face Detection</span>
               <span><i class="fas fa-lock"></i> Secure Auth</span>
@@ -597,9 +683,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Azure AI</span><span>Microservices</span><span>.NET Core</span></div>
-            <h3>AI Route Optimization System</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> DHL's manual route planning failed to account for real-time traffic and capacity — drivers followed suboptimal routes, increasing cost and delays.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Architected an AI system that ingests live data and dynamically re-optimises delivery routes — cutting fuel costs and improving on-time delivery.</p>
+            <h3 data-i18n="p10.t">AI Route Optimization System</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p10.p">DHL's manual route planning failed to account for real-time traffic and capacity — drivers followed suboptimal routes, increasing cost and delays.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p10.s">Architected an AI system that ingests live data and dynamically re-optimises delivery routes — cutting fuel costs and improving on-time delivery.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-location-dot"></i> Smart Routing</span>
               <span><i class="fas fa-truck"></i> Logistics</span>
@@ -615,9 +701,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>NLP</span><span>Python</span><span>Power BI</span><span>Azure</span></div>
-            <h3>Sentiment Analysis Dashboard</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Customer feedback was scattered across emails, reviews and social media — no way to spot trends or act on dissatisfaction quickly.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an NLP pipeline that ingests multi-channel feedback and surfaces real-time sentiment trends in Power BI for immediate action.</p>
+            <h3 data-i18n="p11.t">Sentiment Analysis Dashboard</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p11.p">Customer feedback was scattered across emails, reviews and social media — no way to spot trends or act on dissatisfaction quickly.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p11.s">Built an NLP pipeline that ingests multi-channel feedback and surfaces real-time sentiment trends in Power BI for immediate action.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-smile-beam"></i> NLP Powered</span>
               <span><i class="fas fa-chart-pie"></i> Real-time</span>
@@ -633,8 +719,8 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>.NET Core</span><span>Azure</span><span>Angular</span></div>
-            <h3>Document Management System</h3>
-            <p>Enterprise-grade multi-tenant DMS with role-based access, PDF viewing, email &amp; WhatsApp sharing and audit trails.</p>
+            <h3 data-i18n="p12.t">Document Management System</h3>
+            <p data-i18n="p12.d">Enterprise-grade multi-tenant DMS with role-based access, PDF viewing, email &amp; WhatsApp sharing and audit trails.</p>
             <div class="proj-stats">
               <span><i class="fas fa-users"></i> Multi-tenant</span>
               <span><i class="fas fa-shield-alt"></i> Secure</span>
@@ -650,8 +736,8 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>.NET Core</span><span>MVC</span><span>Analytics</span></div>
-            <h3>URL Shortener &amp; Analytics</h3>
-            <p>Custom URL shortening service with click tracking, analytics dashboard, geographic insights and AdSense integration.</p>
+            <h3 data-i18n="p13.t">URL Shortener &amp; Analytics</h3>
+            <p data-i18n="p13.d">Custom URL shortening service with click tracking, analytics dashboard, geographic insights and AdSense integration.</p>
             <div class="proj-stats">
               <span><i class="fas fa-link"></i> Short URLs</span>
               <span><i class="fas fa-chart-bar"></i> Click Stats</span>
@@ -667,9 +753,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>NLP</span><span>Python</span><span>Deep Learning</span></div>
-            <h3>Automated Language Translator</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Language barriers blocked effective communication between global teams and users across regions.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Designed an NLP-based automated translation engine supporting multi-language pairs with context-aware accuracy.</p>
+            <h3 data-i18n="p14.t">Automated Language Translator</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p14.p">Language barriers blocked effective communication between global teams and users across regions.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p14.s">Designed an NLP-based automated translation engine supporting multi-language pairs with context-aware accuracy.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-globe"></i> Multi-language</span>
               <span><i class="fas fa-bolt"></i> Real-time</span>
@@ -685,9 +771,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Computer Vision</span><span>Python</span><span>TensorFlow</span></div>
-            <h3>Image-to-Video &amp; Text Classifier</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Unstructured visual and textual content was impossible to categorise at scale without massive manual effort.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built a deep learning pipeline that classifies images, converts image sequences to video summaries and categorises text content automatically.</p>
+            <h3 data-i18n="p15.t">Image-to-Video &amp; Text Classifier</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p15.p">Unstructured visual and textual content was impossible to categorise at scale without massive manual effort.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p15.s">Built a deep learning pipeline that classifies images, converts image sequences to video summaries and categorises text content automatically.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-image"></i> Vision AI</span>
               <span><i class="fas fa-tags"></i> Auto-classify</span>
@@ -703,9 +789,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Transfer Learning</span><span>CNN</span><span>Python</span></div>
-            <h3>AI Food Detector &amp; Classifier</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Training food recognition models from scratch required huge labelled datasets and significant compute resources.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Applied transfer learning on pre-trained CNN models to build a high-accuracy food detection and classification system with minimal training data.</p>
+            <h3 data-i18n="p16.t">AI Food Detector &amp; Classifier</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p16.p">Training food recognition models from scratch required huge labelled datasets and significant compute resources.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p16.s">Applied transfer learning on pre-trained CNN models to build a high-accuracy food detection and classification system with minimal training data.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-brain"></i> Transfer Learning</span>
               <span><i class="fas fa-camera"></i> Image Recognition</span>
@@ -721,9 +807,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>ML</span><span>Python</span><span>Healthcare AI</span></div>
-            <h3>Human Disease Predictor</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Clinicians lacked tools to identify high-risk patients early — diseases were often caught too late from fragmented medical histories.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Developed an ML model that analyses patient medical history to predict disease likelihood, enabling early intervention and preventive care.</p>
+            <h3 data-i18n="p17.t">Human Disease Predictor</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p17.p">Clinicians lacked tools to identify high-risk patients early — diseases were often caught too late from fragmented medical histories.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p17.s">Developed an ML model that analyses patient medical history to predict disease likelihood, enabling early intervention and preventive care.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-stethoscope"></i> Healthcare AI</span>
               <span><i class="fas fa-chart-line"></i> Predictive</span>
@@ -739,9 +825,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Blockchain</span><span>AI</span><span>Python</span></div>
-            <h3>Blockchain &amp; AI Integration</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> AI models lacked transparency and tamper-proof audit trails — enterprises couldn't trust or verify AI-driven decisions.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Investigated and implemented a framework combining blockchain's immutable ledger with AI decision logging to create verifiable, trustworthy AI pipelines.</p>
+            <h3 data-i18n="p18.t">Blockchain &amp; AI Integration</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p18.p">AI models lacked transparency and tamper-proof audit trails — enterprises couldn't trust or verify AI-driven decisions.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p18.s">Investigated and implemented a framework combining blockchain's immutable ledger with AI decision logging to create verifiable, trustworthy AI pipelines.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-link"></i> Immutable Audit</span>
               <span><i class="fas fa-shield-halved"></i> Trustworthy AI</span>
@@ -757,9 +843,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Graph Analytics</span><span>Python</span><span>ML</span></div>
-            <h3>Association Platform Framework</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Hidden relationships between items, users and behaviours were invisible — businesses missed cross-sell and pattern opportunities.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built an association analysis framework using graph-based algorithms to surface item relationships, behavioural patterns and recommendation signals.</p>
+            <h3 data-i18n="p19.t">Association Platform Framework</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p19.p">Hidden relationships between items, users and behaviours were invisible — businesses missed cross-sell and pattern opportunities.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p19.s">Built an association analysis framework using graph-based algorithms to surface item relationships, behavioural patterns and recommendation signals.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-project-diagram"></i> Graph Analysis</span>
               <span><i class="fas fa-lightbulb"></i> Insights</span>
@@ -775,9 +861,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>Azure Data Factory</span><span>Python</span><span>SQL</span></div>
-            <h3>Data Processing &amp; Cleansing Pipeline</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Dirty, inconsistent data across systems caused downstream analytics failures and unreliable business reports.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Built automated ETL pipelines with validation, deduplication and cleansing rules — ensuring analytics and ML models always run on trusted, verified data.</p>
+            <h3 data-i18n="p20.t">Data Processing &amp; Cleansing Pipeline</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p20.p">Dirty, inconsistent data across systems caused downstream analytics failures and unreliable business reports.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p20.s">Built automated ETL pipelines with validation, deduplication and cleansing rules — ensuring analytics and ML models always run on trusted, verified data.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-filter"></i> Auto Cleanse</span>
               <span><i class="fas fa-check-double"></i> Verified Data</span>
@@ -793,9 +879,9 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>ML</span><span>Azure Monitor</span><span>Python</span><span>.NET</span></div>
-            <h3>Automated Anomaly Detection</h3>
-            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> Fraudulent transactions, system failures and security breaches went unnoticed until significant damage had already occurred.</p>
-            <p class="proj-solution"><i class="fas fa-circle-check"></i> Developed an ML-driven anomaly detection system with continuous monitoring, auto-alerting and self-improving accuracy over time.</p>
+            <h3 data-i18n="p21.t">Automated Anomaly Detection</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p21.p">Fraudulent transactions, system failures and security breaches went unnoticed until significant damage had already occurred.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p21.s">Developed an ML-driven anomaly detection system with continuous monitoring, auto-alerting and self-improving accuracy over time.</span></p>
             <div class="proj-stats">
               <span><i class="fas fa-bell"></i> Real-time Alerts</span>
               <span><i class="fas fa-shield-halved"></i> Auto-detect</span>
@@ -811,12 +897,92 @@
           </div>
           <div class="proj-body">
             <div class="proj-tags"><span>C#</span><span>WinForms</span><span>SQL Server</span></div>
-            <h3>Point of Sale Software</h3>
-            <p>Complete POS system with inventory management, barcode support, debt tracking, and detailed sales reporting.</p>
+            <h3 data-i18n="p22.t">Point of Sale Software</h3>
+            <p data-i18n="p22.d">Complete POS system with inventory management, barcode support, debt tracking, and detailed sales reporting.</p>
             <div class="proj-stats">
               <span><i class="fas fa-barcode"></i> Barcode Ready</span>
               <span><i class="fas fa-chart-line"></i> Analytics</span>
             </div>
+          </div>
+        </div>
+
+
+        <!-- Multilingual Voice Assistant -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#7c3aed,#2563eb)"><i class="fas fa-comments proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Azure Speech</span><span>RAG</span><span>LLMs</span></div>
+            <h3 data-i18n="p23.t">Multilingual Voice Assistant</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p23.p">Frontline staff across three countries could not use the internal knowledge tools, which existed only in English.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p23.s">Built a speech-to-speech assistant handling English, Malay and German — transcribes, answers from the same RAG index and replies in the caller’s own language.</span></p>
+          </div>
+        </div>
+        <!-- Invoice Extraction Engine -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#0d9488,#0891b2)"><i class="fas fa-file-invoice-dollar proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Document AI</span><span>.NET Core</span><span>Azure</span></div>
+            <h3 data-i18n="p24.t">Invoice Extraction Engine</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p24.p">Finance keyed thousands of supplier invoices by hand each month, with typos surfacing only at reconciliation.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p24.s">Delivered a vision + LLM pipeline that reads any invoice layout, extracts line items to structured JSON and flags mismatches before posting — 92% straight-through processing.</span></p>
+          </div>
+        </div>
+        <!-- Adaptive Learning Platform -->
+        <div class="proj-card reveal tilt-card" data-cat="ai">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#db2777,#7c3aed)"><i class="fas fa-graduation-cap proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Python</span><span>ML</span><span>Angular</span></div>
+            <h3 data-i18n="p25.t">Adaptive Learning Platform</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p25.p">Every learner got the same fixed course, so strong students were bored and struggling ones quietly fell behind.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p25.s">Built a recommendation engine that scores each answer, models the learner and re-sequences the next module in real time — lifting completion rates by 38%.</span></p>
+          </div>
+        </div>
+        <!-- Real-Time IoT Telemetry Hub -->
+        <div class="proj-card reveal tilt-card" data-cat="cloud web">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#ea580c,#dc2626)"><i class="fas fa-tower-broadcast proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Event Hubs</span><span>Service Bus</span><span>Azure</span></div>
+            <h3 data-i18n="p26.t">Real-Time IoT Telemetry Hub</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p26.p">Sensor data from thousands of field devices arrived in bursts that overwhelmed the legacy nightly batch job.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p26.s">Architected an event-driven ingestion hub on Azure Event Hubs and Service Bus, streaming to time-series storage with live dashboards and sub-second alerting.</span></p>
+          </div>
+        </div>
+        <!-- Contract Risk Analyser -->
+        <div class="proj-card reveal tilt-card" data-cat="ai cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#0891b2,#22c55e)"><i class="fas fa-scale-balanced proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Azure OpenAI</span><span>RAG</span><span>.NET Core</span></div>
+            <h3 data-i18n="p27.t">Contract Risk Analyser</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p27.p">Legal review of vendor contracts took days per document, and risky clauses were still missed under deadline pressure.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p27.s">Built an LLM analyser that compares each clause against the approved playbook, scores deviation risk and drafts redline suggestions for the lawyer to accept or reject.</span></p>
+          </div>
+        </div>
+        <!-- Delivery Portfolio Dashboard -->
+        <div class="proj-card reveal tilt-card" data-cat="web cloud">
+          <div class="proj-img">
+            <div class="proj-img-bg" style="background:linear-gradient(135deg,#4f46e5,#0891b2)"><i class="fas fa-chart-gantt proj-img-icon"></i></div>
+            <div class="proj-overlay"><a href="https://zainabbastahir.com" target="_blank"><i class="fas fa-external-link-alt"></i></a></div>
+          </div>
+          <div class="proj-body">
+            <div class="proj-tags"><span>Azure DevOps API</span><span>Angular</span><span>Power BI</span></div>
+            <h3 data-i18n="p28.t">Delivery Portfolio Dashboard</h3>
+            <p class="proj-problem"><i class="fas fa-triangle-exclamation"></i> <span data-i18n="p28.p">Leadership had no single view of delivery health — status came from slide decks assembled by hand every fortnight.</span></p>
+            <p class="proj-solution"><i class="fas fa-circle-check"></i> <span data-i18n="p28.s">Built a portfolio dashboard pulling live data from Azure DevOps and Git, surfacing throughput, risk and dependency clashes across six teams without anyone updating a spreadsheet.</span></p>
           </div>
         </div>
 
@@ -828,39 +994,39 @@
   <section class="section" id="contact">
     <div class="container">
       <div class="sec-header">
-        <span class="sec-tag">Get In Touch</span>
-        <h2>Let's Build Something <span class="grad-text">Amazing</span></h2>
-        <p class="sec-desc">Have a project in mind or want to explore collaboration opportunities?</p>
+        <span class="sec-tag" data-i18n="ct.tag">Get In Touch</span>
+        <h2 data-i18n-html="ct.h2">Let's Build Something <span class="grad-text">Amazing</span></h2>
+        <p class="sec-desc" data-i18n="ct.desc">Have a project in mind or want to explore collaboration opportunities?</p>
       </div>
       <div class="contact-grid">
         <div class="contact-info">
-          <h3>Contact Information</h3>
+          <h3 data-i18n="ct.info">Contact Information</h3>
           <div class="ci-item">
             <div class="ci-icon"><i class="fas fa-envelope"></i></div>
             <div>
-              <strong>Email</strong>
+              <strong data-i18n="ct.email">Email</strong>
               <a href="mailto:zain.tahir512@gmail.com">zain.tahir512@gmail.com</a>
             </div>
           </div>
           <div class="ci-item">
             <div class="ci-icon"><i class="fas fa-map-marker-alt"></i></div>
             <div>
-              <strong>Location</strong>
+              <strong data-i18n="ct.loc">Location</strong>
               <span>Islamabad, Pakistan</span>
             </div>
           </div>
           <div class="ci-item">
             <div class="ci-icon" style="color:#25d366;box-shadow:0 0 15px rgba(37,211,102,0.2)"><i class="fab fa-whatsapp"></i></div>
             <div>
-              <strong>WhatsApp</strong>
+              <strong data-i18n="ct.wa">WhatsApp</strong>
               <a href="https://wa.me/60103635921" target="_blank">+60-103635921</a>
             </div>
           </div>
           <div class="ci-item">
             <div class="ci-icon"><i class="fas fa-calendar-check"></i></div>
             <div>
-              <strong>Availability</strong>
-              <span>Open to remote &amp; freelance work</span>
+              <strong data-i18n="ct.avail">Availability</strong>
+              <span data-i18n-html="ct.availv">Open to remote &amp; freelance work</span>
             </div>
           </div>
           <div class="ci-socials">
@@ -871,30 +1037,30 @@
             <a href="https://wa.me/60103635921" target="_blank" class="ci-soc" style="background:rgba(37,211,102,0.1);border-color:rgba(37,211,102,0.3);color:#25d366"><i class="fab fa-whatsapp"></i></a>
           </div>
           <a href="https://calendly.com/zainabbastahir/30min" target="_blank" class="btn-primary" style="display:inline-flex;margin-top:1.5rem;">
-            <i class="fas fa-video"></i> Schedule a Meeting
+            <i class="fas fa-video"></i> <span data-i18n="ct.meet">Schedule a Meeting</span>
           </a>
         </div>
         <form class="contact-form" id="contact-form">
           <div class="cf-row">
             <div class="cf-group">
-              <label for="cf-name">Full Name</label>
-              <input type="text" id="cf-name" placeholder="John Doe" required>
+              <label for="cf-name" data-i18n="ct.name">Full Name</label>
+              <input type="text" id="cf-name" placeholder="John Doe" data-i18n-attr="placeholder:ct.phName" required>
             </div>
             <div class="cf-group">
-              <label for="cf-email">Email Address</label>
-              <input type="email" id="cf-email" placeholder="john@example.com" required>
+              <label for="cf-email" data-i18n="ct.emailL">Email Address</label>
+              <input type="email" id="cf-email" placeholder="john@example.com" data-i18n-attr="placeholder:ct.phEmail" required>
             </div>
           </div>
           <div class="cf-group">
-            <label for="cf-subject">Subject</label>
-            <input type="text" id="cf-subject" placeholder="Project Inquiry">
+            <label for="cf-subject" data-i18n="ct.subj">Subject</label>
+            <input type="text" id="cf-subject" placeholder="Project Inquiry" data-i18n-attr="placeholder:ct.phSubj">
           </div>
           <div class="cf-group">
-            <label for="cf-msg">Message</label>
-            <textarea id="cf-msg" rows="5" placeholder="Tell me about your project..." required></textarea>
+            <label for="cf-msg" data-i18n="ct.msg">Message</label>
+            <textarea id="cf-msg" rows="5" placeholder="Tell me about your project..." data-i18n-attr="placeholder:ct.phMsg" required></textarea>
           </div>
           <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
-            Send Message <i class="fas fa-paper-plane"></i>
+            <span data-i18n="ct.send">Send Message</span> <i class="fas fa-paper-plane"></i>
           </button>
           <div id="cf-status" class="cf-status"></div>
         </form>
@@ -957,6 +1123,9 @@
     </div>
   </div>
 
+  <script src="i18n-projects.js"></script>
+  <script src="i18n.js"></script>
+  <script src="ai-lab.js"></script>
   <script src="script.js"></script>
   <script src="chatbot.js"></script>
 </body>

@@ -1,0 +1,28 @@
+# Build output
+bin/
+obj/
+publish/
+*.user
+*.suo
+
+# Local development database
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+logs/
+*.log
+
+# Uploaded media — keep the folder, ignore the files
+src/ZainPortfolio/wwwroot/uploads/*
+!src/ZainPortfolio/wwwroot/uploads/.gitignore
+
+# Secrets — never commit these
+appsettings.Production.json
+appsettings.Local.json
+
+# Tooling
+.vs/
+.vscode/
+node_modules/

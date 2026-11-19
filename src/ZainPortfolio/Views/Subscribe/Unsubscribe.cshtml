@@ -1,0 +1,19 @@
+@{
+    var found = ViewBag.Found as bool? ?? false;
+    ViewBag.Meta = new PageMeta { Title = "Unsubscribed" };
+}
+<section class="section" style="min-height:70vh;display:grid;place-items:center;padding-top:9rem;">
+    <div class="container" style="text-align:center;max-width:520px;">
+        <i class="fas @(found ? "fa-circle-check" : "fa-circle-question")"
+           style="font-size:3rem;color:var(--primary);margin-bottom:1.25rem;"></i>
+        <h1 style="font-size:1.8rem;margin-bottom:.8rem;">
+            @(found ? "You've been unsubscribed" : "Subscription not found")
+        </h1>
+        <p style="color:var(--muted);margin-bottom:2rem;">
+            @(found
+                ? "You won't receive any further emails. You can resubscribe at any time from the site."
+                : "That unsubscribe link is no longer valid — you may already have been removed.")
+        </p>
+        <a href="/" class="btn-primary"><i class="fas fa-home"></i> Back home</a>
+    </div>
+</section>

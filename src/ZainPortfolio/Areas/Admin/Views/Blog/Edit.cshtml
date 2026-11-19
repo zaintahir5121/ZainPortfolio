@@ -1,0 +1,104 @@
+@model BlogPost
+@{
+    var isNew = Model.Id == 0;
+    ViewBag.Title = isNew ? "New Post" : "Edit Post";
+}
+@section Actions {
+    <a href="/admin/blog" class="btn btn-s btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+    @if (!isNew) { <a href="/blog/@Model.Slug" target="_blank" class="btn btn-s btn-sm"><i class="fas fa-eye"></i> Preview</a> }
+}
+<form method="post" action="/admin/blog/save">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="split">
+        <div>
+            <div class="card">
+                <div class="fg">
+                    <label asp-for="Title">Post title *</label>
+                    <input asp-for="Title" id="Title" required maxlength="250" placeholder="Why Every AI Feature Should Go Through One Gateway">
+                </div>
+                <div class="fg">
+                    <label asp-for="Slug">URL slug</label>
+                    <input asp-for="Slug" id="Slug" maxlength="270" placeholder="auto-generated from the title">
+                </div>
+                <div class="fg">
+                    <label asp-for="Excerpt">Excerpt</label>
+                    <textarea asp-for="Excerpt" rows="2" maxlength="600" placeholder="Leave blank to generate from the first lines of the article."></textarea>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head"><h2>Article</h2><p>Use the toolbar to add headings, lists, images and video.</p></div>
+                @{ ViewData["FieldName"] = "Content"; }
+                <partial name="_RichEditor" model="@Model.Content" />
+            </div>
+
+            <div class="card">
+                <div class="card-head"><h2>SEO</h2><p>Leave blank to fall back to the title and excerpt.</p></div>
+                <div class="fg">
+                    <label asp-for="MetaTitle">Meta title</label>
+                    <input asp-for="MetaTitle" maxlength="200" placeholder="Target a long-tail phrase, e.g. 'RAG architecture guide Malaysia'">
+                </div>
+                <div class="fg">
+                    <label asp-for="MetaDescription">Meta description</label>
+                    <textarea asp-for="MetaDescription" rows="2" maxlength="300" placeholder="150–160 characters that make someone click."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky-side">
+            <div class="card">
+                <div class="card-head"><h3>Publish</h3></div>
+                <div class="check"><input asp-for="IsPublished" type="checkbox"><label asp-for="IsPublished">Published</label></div>
+                <div class="check"><input asp-for="IsFeatured" type="checkbox"><label asp-for="IsFeatured">Feature at top of blog</label></div>
+                <div class="fg" style="margin-top:.8rem;">
+                    <label asp-for="PublishedAt">Publish date</label>
+                    <input asp-for="PublishedAt" type="datetime-local" value="@Model.PublishedAt.ToString("yyyy-MM-ddTHH:mm")">
+                </div>
+                <button type="submit" class="btn btn-p" style="width:100%;justify-content:center;">
+                    <i class="fas fa-save"></i> @(isNew ? "Create post" : "Save changes")
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-head"><h3>Media</h3></div>
+                <div class="fg">
+                    <label asp-for="CoverImageUrl">Cover image</label>
+                    <input asp-for="CoverImageUrl" id="CoverImageUrl" placeholder="/uploads/...">
+                    <button type="button" class="btn btn-s btn-sm" style="margin-top:.4rem;" data-pick-for="CoverImageUrl" data-pick-kind="image">
+                        <i class="fas fa-images"></i> Choose from library
+                    </button>
+                </div>
+                <div class="fg">
+                    <label asp-for="VideoId">YouTube video</label>
+                    <input asp-for="VideoId" placeholder="URL or video ID">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head"><h3>Classification</h3></div>
+                <div class="fg">
+                    <label asp-for="BlogCategoryId">Category</label>
+                    <select asp-for="BlogCategoryId" asp-items="ViewBag.Categories as SelectList">
+                        <option value="">— none —</option>
+                    </select>
+                </div>
+                <div class="fg">
+                    <label asp-for="Tags">Tags</label>
+                    <input asp-for="Tags" placeholder="RAG, Architecture, Azure">
+                    <div class="hint">Comma separated.</div>
+                </div>
+                <div class="fg">
+                    <label asp-for="ReadMinutes">Read time (minutes)</label>
+                    <input asp-for="ReadMinutes" type="number" min="1" max="90">
+                    <div class="hint">Set 0 to calculate automatically.</div>
+                </div>
+                <div class="fg">
+                    <label asp-for="AuthorName">Author</label>
+                    <input asp-for="AuthorName">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts { <script src="~/js/admin-editor.js" asp-append-version="true"></script> }

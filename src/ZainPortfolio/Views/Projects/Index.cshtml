@@ -1,0 +1,77 @@
+@model ProjectListViewModel
+@{
+    var s = Model.Settings;
+    ViewBag.Settings = s;
+    ViewBag.Meta = new PageMeta
+    {
+        Title = $"Projects & Case Studies | {s.OwnerName} — AI & Cloud Architecture Malaysia",
+        Description = "Real AI, RAG, LLM and Azure cloud projects delivered for enterprise clients — each with the business problem, the solution architecture, and the measured outcome.",
+        Keywords = "AI case studies Malaysia, RAG implementation examples, Azure architecture portfolio Kuala Lumpur, LLM project examples",
+        CanonicalPath = "/projects",
+        Breadcrumbs = new List<(string, string)> { ("Home", "/"), ("Projects", "/projects") }
+    };
+}
+
+<section class="section" style="padding-top:8.5rem;">
+    <div class="container">
+        <div class="sec-header">
+            <span class="sec-tag">Featured Work</span>
+            <h2>Projects That <span class="grad-text">Deliver Results</span></h2>
+            <p class="sec-desc">@Model.TotalCount projects across AI, cloud and enterprise — each written up as a problem, a solution and a measured outcome.</p>
+        </div>
+
+        <form method="get" class="blog-toolbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="search" name="q" value="@Model.Query" placeholder="Search projects, tech or outcomes...">
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.Query))
+            {
+                <a href="/projects" class="btn-ghost" style="padding:.6rem 1.1rem;">Clear</a>
+            }
+        </form>
+
+        <div class="proj-filters">
+            <a href="/projects" class="pf-btn @(Model.CurrentCategory == "all" ? "active" : "")">All</a>
+            @foreach (var c in Model.Categories)
+            {
+                <a href="/projects?category=@c.Slug" class="pf-btn @(Model.CurrentCategory == c.Slug ? "active" : "")">@c.Name</a>
+            }
+        </div>
+
+        @if (Model.Projects.Any())
+        {
+            <div class="proj-grid">
+                @foreach (var p in Model.Projects)
+                {
+                    <partial name="_ProjectCard" model="p" />
+                }
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="pagination" aria-label="Pagination">
+                    @for (var i = 1; i <= Model.TotalPages; i++)
+                    {
+                        if (i == Model.Page)
+                        {
+                            <span class="current">@i</span>
+                        }
+                        else
+                        {
+                            <a href="/projects?page=@i&category=@Model.CurrentCategory&q=@Model.Query">@i</a>
+                        }
+                    }
+                </nav>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <p>No projects match that search yet.</p>
+                <a href="/projects" class="btn-ghost" style="margin-top:1rem;">View all projects</a>
+            </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,227 @@
+@model SiteSetting
+@{
+    ViewBag.Title = "Site & Theme Settings";
+    var tab = ViewBag.Tab as string ?? "brand";
+    string Show(string t) => tab == t ? "" : "display:none;";
+    string On(string t) => tab == t ? "active" : "";
+}
+
+<div class="tabs">
+    <a href="/admin/settings?tab=brand" class="tab @On("brand")"><i class="fas fa-signature"></i> Brand</a>
+    <a href="/admin/settings?tab=theme" class="tab @On("theme")"><i class="fas fa-palette"></i> Theme</a>
+    <a href="/admin/settings?tab=hero" class="tab @On("hero")"><i class="fas fa-star"></i> Hero</a>
+    <a href="/admin/settings?tab=about" class="tab @On("about")"><i class="fas fa-user"></i> About</a>
+    <a href="/admin/settings?tab=contact" class="tab @On("contact")"><i class="fas fa-address-book"></i> Contact</a>
+    <a href="/admin/settings?tab=seo" class="tab @On("seo")"><i class="fas fa-magnifying-glass-chart"></i> SEO</a>
+    <a href="/admin/settings?tab=features" class="tab @On("features")"><i class="fas fa-toggle-on"></i> Features</a>
+</div>
+
+<form method="post" action="/admin/settings?tab=@tab">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    @* keep every field posted regardless of visible tab *@
+    <div style="max-width:900px;">
+
+        <!-- ------------------------------------------------ BRAND -->
+        <div class="card" style="@Show("brand")">
+            <div class="card-head"><h2>Brand identity</h2><p>Name, logo and footer text used across the site.</p></div>
+            <div class="form-grid">
+                <div class="fg"><label asp-for="SiteName">Site name</label><input asp-for="SiteName"></div>
+                <div class="fg"><label asp-for="OwnerName">Your name</label><input asp-for="OwnerName"></div>
+                <div class="fg full"><label asp-for="Tagline">Tagline</label><input asp-for="Tagline"></div>
+                <div class="fg"><label asp-for="LogoText">Logo text</label><input asp-for="LogoText" maxlength="30">
+                    <div class="hint">Used when no logo image is set.</div></div>
+                <div class="fg">
+                    <label asp-for="LogoImageUrl">Logo image</label>
+                    <input asp-for="LogoImageUrl" id="LogoImageUrl" placeholder="/uploads/logo.png">
+                    <button type="button" class="btn btn-s btn-sm" style="margin-top:.4rem;" data-pick-for="LogoImageUrl"><i class="fas fa-images"></i> Choose</button>
+                </div>
+                <div class="fg">
+                    <label asp-for="FaviconUrl">Favicon</label>
+                    <input asp-for="FaviconUrl" id="FaviconUrl" placeholder="/uploads/favicon.png">
+                    <button type="button" class="btn btn-s btn-sm" style="margin-top:.4rem;" data-pick-for="FaviconUrl"><i class="fas fa-images"></i> Choose</button>
+                </div>
+                <div class="fg full"><label asp-for="FooterText">Footer text</label><input asp-for="FooterText"></div>
+            </div>
+        </div>
+
+        <!-- ------------------------------------------------ THEME -->
+        <div class="card" style="@Show("theme")">
+            <div class="card-head"><h2>Colours &amp; typography</h2><p>These drive the CSS variables the whole public site is built on.</p></div>
+            <div class="form-grid">
+                <div class="fg"><label asp-for="PrimaryColor">Primary colour</label><input asp-for="PrimaryColor" type="color"></div>
+                <div class="fg"><label asp-for="SecondaryColor">Secondary (gradient end)</label><input asp-for="SecondaryColor" type="color"></div>
+                <div class="fg"><label asp-for="AccentColor">Accent</label><input asp-for="AccentColor" type="color"></div>
+                <div class="fg"><label asp-for="DarkBgColor">Dark background</label><input asp-for="DarkBgColor" type="color"></div>
+                <div class="fg"><label asp-for="LightBgColor">Light background</label><input asp-for="LightBgColor" type="color"></div>
+                <div class="fg">
+                    <label asp-for="DefaultTheme">Default theme</label>
+                    <select asp-for="DefaultTheme"><option value="dark">Dark</option><option value="light">Light</option></select>
+                </div>
+                <div class="fg">
+                    <label asp-for="HeadingFont">Heading font</label>
+                    <select asp-for="HeadingFont">
+                        <option>Inter</option><option>Poppins</option><option>Manrope</option>
+                        <option>Space Grotesk</option><option>Plus Jakarta Sans</option><option>Outfit</option>
+                    </select>
+                    <div class="hint">Loaded from Google Fonts automatically.</div>
+                </div>
+                <div class="fg">
+                    <label asp-for="CornerRadius">Corner radius</label>
+                    <select asp-for="CornerRadius">
+                        <option value="8px">Small (8px)</option><option value="12px">Medium (12px)</option>
+                        <option value="16px">Large (16px)</option><option value="22px">Extra large (22px)</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:1rem;padding:1rem;border-radius:10px;background:var(--a-panel-2);">
+                <div style="font-size:.78rem;color:var(--a-muted);margin-bottom:.6rem;">LIVE PREVIEW</div>
+                <div id="theme-preview" style="height:52px;border-radius:10px;"></div>
+            </div>
+        </div>
+
+        <!-- ------------------------------------------------ HERO -->
+        <div class="card" style="@Show("hero")">
+            <div class="card-head"><h2>Hero section</h2></div>
+            <div class="form-grid">
+                <div class="fg full"><label asp-for="HeroBadge">Availability badge</label><input asp-for="HeroBadge"></div>
+                <div class="fg"><label asp-for="HeroHeadingLine1">Heading line 1</label><input asp-for="HeroHeadingLine1"></div>
+                <div class="fg"><label asp-for="HeroHeadingHighlight">Highlighted words</label><input asp-for="HeroHeadingHighlight">
+                    <div class="hint">Must appear inside line 1 to be gradient-coloured.</div></div>
+                <div class="fg full"><label asp-for="HeroHeadingLine2">Heading line 2</label><input asp-for="HeroHeadingLine2"></div>
+                <div class="fg full"><label asp-for="HeroSubheading">Subheading</label><textarea asp-for="HeroSubheading" rows="3"></textarea></div>
+                <div class="fg full"><label asp-for="TypewriterRoles">Typewriter roles</label><input asp-for="TypewriterRoles">
+                    <div class="hint">Comma separated — these cycle in the animated line.</div></div>
+                <div class="fg"><label asp-for="IntroVideoId">Intro video (YouTube)</label><input asp-for="IntroVideoId" placeholder="Video ID or full URL"></div>
+                <div class="check" style="align-self:end;padding-bottom:1rem;">
+                    <input asp-for="IntroVideoAutoplay" type="checkbox"><label asp-for="IntroVideoAutoplay">Autoplay muted on load</label>
+                </div>
+                <div class="fg"><label asp-for="StatYears">Stat 1 value</label><input asp-for="StatYears" type="number"></div>
+                <div class="fg"><label asp-for="StatYearsLabel">Stat 1 label</label><input asp-for="StatYearsLabel"></div>
+                <div class="fg"><label asp-for="StatProjects">Stat 2 value</label><input asp-for="StatProjects" type="number"></div>
+                <div class="fg"><label asp-for="StatProjectsLabel">Stat 2 label</label><input asp-for="StatProjectsLabel"></div>
+                <div class="fg"><label asp-for="StatEnterprise">Stat 3 value</label><input asp-for="StatEnterprise" type="number"></div>
+                <div class="fg"><label asp-for="StatEnterpriseLabel">Stat 3 label</label><input asp-for="StatEnterpriseLabel"></div>
+            </div>
+        </div>
+
+        <!-- ------------------------------------------------ ABOUT -->
+        <div class="card" style="@Show("about")">
+            <div class="card-head"><h2>About section</h2></div>
+            <div class="form-grid">
+                <div class="fg"><label asp-for="AboutTitle">Section title</label><input asp-for="AboutTitle"></div>
+                <div class="fg"><label asp-for="AboutTitleHighlight">Highlighted word</label><input asp-for="AboutTitleHighlight"></div>
+                <div class="fg full"><label asp-for="AboutLead">Lead paragraph</label><textarea asp-for="AboutLead" rows="3"></textarea></div>
+                <div class="fg full"><label asp-for="AboutBody">Body paragraph</label><textarea asp-for="AboutBody" rows="4"></textarea></div>
+                <div class="fg full">
+                    <label asp-for="ProfileImageUrl">Profile photo</label>
+                    <input asp-for="ProfileImageUrl" id="ProfileImageUrl">
+                    <button type="button" class="btn btn-s btn-sm" style="margin-top:.4rem;" data-pick-for="ProfileImageUrl"><i class="fas fa-images"></i> Choose from library</button>
+                    <div class="hint">Upload your photo in the Media Library first for a permanent, non-expiring URL.</div>
+                </div>
+                <div class="fg full"><label asp-for="AboutTags">Service tags</label><textarea asp-for="AboutTags" rows="3"></textarea>
+                    <div class="hint">Comma separated.</div></div>
+            </div>
+        </div>
+
+        <!-- ------------------------------------------------ CONTACT -->
+        <div class="card" style="@Show("contact")">
+            <div class="card-head"><h2>Contact &amp; social</h2></div>
+            <div class="form-grid">
+                <div class="fg"><label asp-for="Email">Email</label><input asp-for="Email" type="email"></div>
+                <div class="fg"><label asp-for="Phone">Phone (display)</label><input asp-for="Phone"></div>
+                <div class="fg"><label asp-for="WhatsAppNumber">WhatsApp number</label><input asp-for="WhatsAppNumber" placeholder="60103635921">
+                    <div class="hint">Digits only, including country code.</div></div>
+                <div class="fg"><label asp-for="Location">Location</label><input asp-for="Location"></div>
+                <div class="fg full"><label asp-for="Availability">Availability</label><input asp-for="Availability"></div>
+                <div class="fg"><label asp-for="LinkedInUrl">LinkedIn</label><input asp-for="LinkedInUrl" type="url"></div>
+                <div class="fg"><label asp-for="GitHubUrl">GitHub</label><input asp-for="GitHubUrl" type="url"></div>
+                <div class="fg"><label asp-for="YouTubeUrl">YouTube</label><input asp-for="YouTubeUrl" type="url"></div>
+                <div class="fg"><label asp-for="UpworkUrl">Upwork</label><input asp-for="UpworkUrl" type="url"></div>
+                <div class="fg"><label asp-for="TwitterUrl">X / Twitter</label><input asp-for="TwitterUrl" type="url"></div>
+                <div class="fg"><label asp-for="CalendlyUrl">Calendly</label><input asp-for="CalendlyUrl" type="url"></div>
+            </div>
+        </div>
+
+        <!-- ------------------------------------------------ SEO -->
+        <div class="card" style="@Show("seo")">
+            <div class="card-head">
+                <h2>Search engine optimisation</h2>
+                <p>Regional signals are pre-set for Malaysia. Target long-tail phrases — they are far easier to rank for.</p>
+            </div>
+            <div class="form-grid">
+                <div class="fg full">
+                    <label asp-for="CanonicalBaseUrl">Canonical base URL *</label>
+                    <input asp-for="CanonicalBaseUrl" type="url" placeholder="https://zainabbastahir.com">
+                    <div class="hint">Required for correct sitemap, canonical and Open Graph URLs. No trailing slash.</div>
+                </div>
+                <div class="fg full"><label asp-for="MetaTitle">Home page title</label><input asp-for="MetaTitle" maxlength="70">
+                    <div class="hint">Aim for under 60 characters. Include the location.</div></div>
+                <div class="fg full"><label asp-for="MetaDescription">Meta description</label><textarea asp-for="MetaDescription" rows="3" maxlength="300"></textarea>
+                    <div class="hint">150–160 characters that earn the click.</div></div>
+                <div class="fg full"><label asp-for="MetaKeywords">Target keywords</label><textarea asp-for="MetaKeywords" rows="4" maxlength="500"></textarea>
+                    <div class="hint">Long-tail beats generic: "RAG implementation consultant Malaysia" will rank; "AI consultant" will not.</div></div>
+                <div class="fg">
+                    <label asp-for="OgImageUrl">Social share image</label>
+                    <input asp-for="OgImageUrl" id="OgImageUrl">
+                    <button type="button" class="btn btn-s btn-sm" style="margin-top:.4rem;" data-pick-for="OgImageUrl"><i class="fas fa-images"></i> Choose</button>
+                    <div class="hint">1200 × 630 px works best.</div>
+                </div>
+                <div class="fg"><label asp-for="TwitterHandle">X / Twitter handle</label><input asp-for="TwitterHandle" placeholder="@@yourhandle"></div>
+                <div class="fg"><label asp-for="GoogleAnalyticsId">Google Analytics ID</label><input asp-for="GoogleAnalyticsId" placeholder="G-XXXXXXXXXX"></div>
+                <div class="fg"><label asp-for="GoogleSiteVerification">Google verification</label><input asp-for="GoogleSiteVerification"></div>
+                <div class="fg"><label asp-for="BingSiteVerification">Bing verification</label><input asp-for="BingSiteVerification"></div>
+                <div class="fg"><label asp-for="ContentLanguage">Content language</label><input asp-for="ContentLanguage" placeholder="en-MY"></div>
+                <div class="fg"><label asp-for="GeoRegion">Geo region</label><input asp-for="GeoRegion" placeholder="MY-14">
+                    <div class="hint">MY-14 = Kuala Lumpur.</div></div>
+                <div class="fg"><label asp-for="GeoPlacename">Geo place name</label><input asp-for="GeoPlacename"></div>
+                <div class="fg"><label asp-for="GeoPosition">Geo position</label><input asp-for="GeoPosition" placeholder="3.139003;101.686855"></div>
+                <div class="fg full"><label asp-for="ServiceArea">Service area</label><input asp-for="ServiceArea" placeholder="Malaysia, Singapore, Southeast Asia">
+                    <div class="hint">Comma separated. Feeds the ProfessionalService structured data.</div></div>
+            </div>
+            <div class="alert alert-ok" style="margin-top:1rem;">
+                <i class="fas fa-circle-info"></i>
+                <div>
+                    <strong>Already handled automatically:</strong> XML sitemap at <code>/sitemap.xml</code>,
+                    <code>/robots.txt</code>, RSS at <code>/rss.xml</code>, canonical tags, Open Graph, Twitter cards,
+                    hreflang, and Person / WebSite / ProfessionalService / BlogPosting / Breadcrumb / FAQ structured data.
+                </div>
+            </div>
+        </div>
+
+        <!-- ------------------------------------------------ FEATURES -->
+        <div class="card" style="@Show("features")">
+            <div class="card-head"><h2>Feature switches</h2><p>Turn sections of the public site on or off.</p></div>
+            <div class="check"><input asp-for="EnableProjects" type="checkbox"><label asp-for="EnableProjects">Projects section &amp; /projects pages</label></div>
+            <div class="check"><input asp-for="EnableBlog" type="checkbox"><label asp-for="EnableBlog">Blog &amp; /blog pages</label></div>
+            <div class="check"><input asp-for="EnableNewsletter" type="checkbox"><label asp-for="EnableNewsletter">Newsletter subscription forms</label></div>
+            <div class="check"><input asp-for="EnableContactForm" type="checkbox"><label asp-for="EnableContactForm">Contact form</label></div>
+            <div class="check"><input asp-for="EnableWhatsAppFloat" type="checkbox"><label asp-for="EnableWhatsAppFloat">Floating WhatsApp button</label></div>
+            <div class="check"><input asp-for="EnableAnalytics" type="checkbox"><label asp-for="EnableAnalytics">Built-in visitor analytics</label></div>
+            <div class="check"><input asp-for="EnableChatbot" type="checkbox"><label asp-for="EnableChatbot">AI assistant widget</label></div>
+            <div class="check"><input asp-for="EnableParticles" type="checkbox"><label asp-for="EnableParticles">Animated hero background</label></div>
+        </div>
+
+        <div style="position:sticky;bottom:0;padding:1rem 0;background:linear-gradient(transparent,var(--a-bg) 30%);">
+            <button type="submit" class="btn btn-p"><i class="fas fa-save"></i> Save settings</button>
+            <a href="/" target="_blank" class="btn btn-s"><i class="fas fa-eye"></i> View site</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/admin-editor.js" asp-append-version="true"></script>
+    <script>
+        (function () {
+            var p = document.getElementById('PrimaryColor');
+            var s = document.getElementById('SecondaryColor');
+            var box = document.getElementById('theme-preview');
+            if (!p || !s || !box) return;
+            function paint() { box.style.background = 'linear-gradient(135deg,' + p.value + ',' + s.value + ')'; }
+            p.addEventListener('input', paint);
+            s.addEventListener('input', paint);
+            paint();
+        })();
+    </script>
+}

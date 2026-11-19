@@ -1,0 +1,147 @@
+@{
+    ViewBag.Title = "Skills, Experience & Categories";
+    var projCats = (List<ProjectCategory>)ViewBag.ProjectCategories;
+    var blogCats = (List<BlogCategory>)ViewBag.BlogCategories;
+    var skillCats = (List<SkillCategory>)ViewBag.SkillCategories;
+    var exps = (List<Experience>)ViewBag.Experiences;
+}
+
+<div class="split">
+    <div>
+        <!-- ---------------------------------------------- experience -->
+        <div class="card">
+            <div class="card-head">
+                <div><h2>Work experience</h2><p>Renders the timeline on the home page.</p></div>
+                <a href="/admin/structure/experience/0" class="btn btn-p btn-sm"><i class="fas fa-plus"></i> Add</a>
+            </div>
+            @if (exps.Any())
+            {
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Role</th><th>Company</th><th>Dates</th><th>Sort</th><th></th></tr></thead>
+                        <tbody>
+                        @foreach (var e in exps)
+                        {
+                            <tr>
+                                <td><strong>@e.Role</strong> @if (e.IsCurrent) { <span class="chip chip-on">Current</span> }</td>
+                                <td style="color:var(--a-muted);">@e.Company</td>
+                                <td style="color:var(--a-muted);">@e.DateRange</td>
+                                <td style="color:var(--a-muted);">@e.SortOrder</td>
+                                <td><div class="t-actions">
+                                    <a href="/admin/structure/experience/@e.Id" class="btn btn-s btn-sm"><i class="fas fa-pen"></i></a>
+                                    <form method="post" action="/admin/structure/experience/@e.Id/delete" onsubmit="return confirm('Delete this role?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-d btn-sm"><i class="fas fa-trash"></i></button></form>
+                                </div></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else { <div class="empty"><i class="fas fa-briefcase"></i><p>No experience entries yet.</p></div> }
+        </div>
+
+        <!-- ---------------------------------------------- skills -->
+        <div class="card">
+            <div class="card-head"><div><h2>Skills</h2><p>Grouped into categories with proficiency bars.</p></div></div>
+
+            <form method="post" action="/admin/structure/skill-category" style="margin-bottom:1.25rem;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="0">
+                <div class="form-grid" style="grid-template-columns:2fr 1.4fr .7fr auto;align-items:end;">
+                    <div class="fg" style="margin:0;"><label>New category</label><input type="text" name="name" placeholder="AI & Analytics" required></div>
+                    <div class="fg" style="margin:0;"><label>Icon</label><input type="text" name="iconClass" value="fas fa-brain"></div>
+                    <div class="fg" style="margin:0;"><label>Sort</label><input type="number" name="sortOrder" value="0"></div>
+                    <button type="submit" class="btn btn-p"><i class="fas fa-plus"></i></button>
+                </div>
+            </form>
+
+            @foreach (var cat in skillCats)
+            {
+                <div class="card" style="background:var(--a-panel-2);">
+                    <div class="card-head" style="margin-bottom:.8rem;">
+                        <h3><i class="@cat.IconClass" style="margin-right:.4rem;color:#a5b4fc;"></i>@cat.Name</h3>
+                        <form method="post" action="/admin/structure/skill-category/@cat.Id/delete" onsubmit="return confirm('Delete @cat.Name and all its skills?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-d btn-sm"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+
+                    @foreach (var sk in cat.Skills)
+                    {
+                        <form method="post" action="/admin/structure/skill" style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@sk.Id">
+                            <input type="hidden" name="skillCategoryId" value="@cat.Id">
+                            <input type="text" name="name" value="@sk.Name" style="flex:2;padding:.4rem .7rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.82rem;">
+                            <input type="number" name="percentage" value="@sk.Percentage" min="0" max="100" style="width:74px;padding:.4rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.82rem;">
+                            <input type="number" name="sortOrder" value="@sk.SortOrder" style="width:62px;padding:.4rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.82rem;">
+                            <button type="submit" class="btn btn-s btn-sm"><i class="fas fa-check"></i></button>
+                            <button type="submit" formaction="/admin/structure/skill/@sk.Id/delete" class="btn btn-d btn-sm" onclick="return confirm('Delete @sk.Name?');"><i class="fas fa-trash"></i></button>
+                        </form>
+                    }
+
+                    <form method="post" action="/admin/structure/skill" style="display:flex;gap:.5rem;align-items:center;margin-top:.7rem;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="0">
+                        <input type="hidden" name="skillCategoryId" value="@cat.Id">
+                        <input type="text" name="name" placeholder="Add a skill..." required style="flex:2;padding:.4rem .7rem;border-radius:7px;background:var(--a-bg);border:1px dashed var(--a-border);color:var(--a-text);font-size:.82rem;">
+                        <input type="number" name="percentage" value="85" min="0" max="100" style="width:74px;padding:.4rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.82rem;">
+                        <input type="number" name="sortOrder" value="@(cat.Skills.Count)" style="width:62px;padding:.4rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.82rem;">
+                        <button type="submit" class="btn btn-p btn-sm"><i class="fas fa-plus"></i></button>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="sticky-side">
+        <!-- ---------------------------------------------- project categories -->
+        <div class="card">
+            <div class="card-head"><h3>Project categories</h3></div>
+            @foreach (var c in projCats)
+            {
+                <form method="post" action="/admin/structure/project-category" style="display:flex;gap:.4rem;margin-bottom:.4rem;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@c.Id">
+                    <input type="text" name="name" value="@c.Name" style="flex:1;padding:.4rem .6rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.8rem;">
+                    <input type="number" name="sortOrder" value="@c.SortOrder" style="width:56px;padding:.4rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.8rem;">
+                    <button type="submit" class="btn btn-s btn-sm"><i class="fas fa-check"></i></button>
+                    <button type="submit" formaction="/admin/structure/project-category/@c.Id/delete" class="btn btn-d btn-sm" onclick="return confirm('Delete?');"><i class="fas fa-trash"></i></button>
+                </form>
+            }
+            <form method="post" action="/admin/structure/project-category" style="display:flex;gap:.4rem;margin-top:.7rem;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="0">
+                <input type="text" name="name" placeholder="New category" required style="flex:1;padding:.4rem .6rem;border-radius:7px;background:var(--a-bg);border:1px dashed var(--a-border);color:var(--a-text);font-size:.8rem;">
+                <input type="number" name="sortOrder" value="@(projCats.Count + 1)" style="width:56px;padding:.4rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.8rem;">
+                <button type="submit" class="btn btn-p btn-sm"><i class="fas fa-plus"></i></button>
+            </form>
+        </div>
+
+        <!-- ---------------------------------------------- blog categories -->
+        <div class="card">
+            <div class="card-head"><h3>Blog categories</h3></div>
+            @foreach (var c in blogCats)
+            {
+                <form method="post" action="/admin/structure/blog-category" style="display:flex;gap:.4rem;margin-bottom:.4rem;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@c.Id">
+                    <input type="hidden" name="description" value="@c.Description">
+                    <input type="text" name="name" value="@c.Name" style="flex:1;padding:.4rem .6rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.8rem;">
+                    <input type="number" name="sortOrder" value="@c.SortOrder" style="width:56px;padding:.4rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.8rem;">
+                    <button type="submit" class="btn btn-s btn-sm"><i class="fas fa-check"></i></button>
+                    <button type="submit" formaction="/admin/structure/blog-category/@c.Id/delete" class="btn btn-d btn-sm" onclick="return confirm('Delete?');"><i class="fas fa-trash"></i></button>
+                </form>
+            }
+            <form method="post" action="/admin/structure/blog-category" style="display:flex;gap:.4rem;margin-top:.7rem;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="0">
+                <input type="text" name="name" placeholder="New category" required style="flex:1;padding:.4rem .6rem;border-radius:7px;background:var(--a-bg);border:1px dashed var(--a-border);color:var(--a-text);font-size:.8rem;">
+                <input type="number" name="sortOrder" value="@(blogCats.Count + 1)" style="width:56px;padding:.4rem;border-radius:7px;background:var(--a-bg);border:1px solid var(--a-border);color:var(--a-text);font-size:.8rem;">
+                <button type="submit" class="btn btn-p btn-sm"><i class="fas fa-plus"></i></button>
+            </form>
+        </div>
+    </div>
+</div>

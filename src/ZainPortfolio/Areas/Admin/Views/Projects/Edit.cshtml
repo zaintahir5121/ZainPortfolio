@@ -1,0 +1,148 @@
+@model Project
+@{
+    var isNew = Model.Id == 0;
+    ViewBag.Title = isNew ? "New Project" : "Edit Project";
+}
+@section Actions {
+    <a href="/admin/projects" class="btn btn-s btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+    @if (!isNew) { <a href="/projects/@Model.Slug" target="_blank" class="btn btn-s btn-sm"><i class="fas fa-eye"></i> Preview</a> }
+}
+<form method="post" action="/admin/projects/save">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="split">
+        <div>
+            <div class="card">
+                <div class="card-head"><h2>Content</h2></div>
+                <div class="fg">
+                    <label asp-for="Title">Project title *</label>
+                    <input asp-for="Title" id="Title" required maxlength="200" placeholder="AI Compliance Review Platform">
+                </div>
+                <div class="fg">
+                    <label asp-for="Slug">URL slug</label>
+                    <input asp-for="Slug" id="Slug" maxlength="220" placeholder="auto-generated from the title">
+                    <div class="hint">Leave blank to generate automatically. Changing this breaks existing links.</div>
+                </div>
+                <div class="fg">
+                    <label asp-for="Summary">Short summary</label>
+                    <textarea asp-for="Summary" rows="2" maxlength="500" placeholder="One or two lines shown on the card and in search results."></textarea>
+                </div>
+                <div class="fg">
+                    <label asp-for="Problem">The problem</label>
+                    <textarea asp-for="Problem" rows="3" maxlength="1500" placeholder="What was broken or costly before this project?"></textarea>
+                    <div class="hint">Shown as an amber callout on the card and detail page.</div>
+                </div>
+                <div class="fg">
+                    <label asp-for="Solution">The solution</label>
+                    <textarea asp-for="Solution" rows="3" maxlength="1500" placeholder="What you built and the measured outcome."></textarea>
+                    <div class="hint">Shown as a green callout. Include a number wherever you can.</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head"><h2>Full case study</h2><p>Rich text — headings, lists, images and video embeds.</p></div>
+                @{ ViewData["FieldName"] = "Content"; }
+                <partial name="_RichEditor" model="@Model.Content" />
+            </div>
+
+            @if (!isNew)
+            {
+                <div class="card">
+                    <div class="card-head"><h2>Gallery</h2></div>
+                    @if (Model.Images.Any())
+                    {
+                        <div class="media-grid" style="margin-bottom:1rem;">
+                            @foreach (var img in Model.Images)
+                            {
+                                <div class="media-item">
+                                    <div class="media-thumb"><img src="@img.Url" alt=""></div>
+                                    <div class="media-info"><div class="nm">@(img.Caption ?? "No caption")</div></div>
+                                    <div class="media-actions">
+                                        <form method="post" action="/admin/projects/images/@img.Id/delete">@Html.AntiForgeryToken()
+                                            <button type="submit" style="width:100%;color:#fca5a5;">Remove</button></form>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="sticky-side">
+            <div class="card">
+                <div class="card-head"><h3>Publish</h3></div>
+                <div class="check"><input asp-for="IsPublished" type="checkbox"><label asp-for="IsPublished">Published (visible on the site)</label></div>
+                <div class="check"><input asp-for="IsFeatured" type="checkbox"><label asp-for="IsFeatured">Featured on the home page</label></div>
+                <div class="fg" style="margin-top:.8rem;">
+                    <label asp-for="SortOrder">Sort order</label>
+                    <input asp-for="SortOrder" type="number">
+                </div>
+                <button type="submit" class="btn btn-p" style="width:100%;justify-content:center;">
+                    <i class="fas fa-save"></i> @(isNew ? "Create project" : "Save changes")
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-head"><h3>Appearance</h3></div>
+                <div class="fg">
+                    <label asp-for="CoverImageUrl">Cover image</label>
+                    <input asp-for="CoverImageUrl" id="CoverImageUrl" placeholder="/uploads/... or full URL">
+                    <button type="button" class="btn btn-s btn-sm" style="margin-top:.4rem;" data-pick-for="CoverImageUrl" data-pick-kind="image">
+                        <i class="fas fa-images"></i> Choose from library
+                    </button>
+                    <div class="hint">Leave blank to use the gradient tile below instead.</div>
+                </div>
+                <div class="fg">
+                    <label asp-for="IconClass">Icon (Font Awesome class)</label>
+                    <input asp-for="IconClass" placeholder="fas fa-shield-halved">
+                </div>
+                <div class="form-grid">
+                    <div class="fg"><label asp-for="GradientFrom">Gradient from</label><input asp-for="GradientFrom" type="color"></div>
+                    <div class="fg"><label asp-for="GradientTo">Gradient to</label><input asp-for="GradientTo" type="color"></div>
+                </div>
+                <div class="fg">
+                    <label asp-for="VideoId">YouTube video</label>
+                    <input asp-for="VideoId" placeholder="URL or video ID">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head"><h3>Classification</h3></div>
+                <div class="fg">
+                    <label asp-for="ProjectCategoryId">Category</label>
+                    <select asp-for="ProjectCategoryId" asp-items="ViewBag.Categories as SelectList">
+                        <option value="">— none —</option>
+                    </select>
+                </div>
+                <div class="fg">
+                    <label asp-for="FilterKeys">Filter keys</label>
+                    <input asp-for="FilterKeys" placeholder="ai cloud">
+                    <div class="hint">Space separated. Drives the filter buttons, e.g. "ai cloud".</div>
+                </div>
+                <div class="fg">
+                    <label asp-for="Tags">Tech tags</label>
+                    <input asp-for="Tags" placeholder="Azure OpenAI, RAG, LLMs, .NET Core">
+                    <div class="hint">Comma separated.</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head"><h3>Outcome badges</h3></div>
+                <div class="form-grid">
+                    <div class="fg"><label asp-for="Stat1Icon">Icon 1</label><input asp-for="Stat1Icon" placeholder="fas fa-bolt"></div>
+                    <div class="fg"><label asp-for="Stat1Text">Text 1</label><input asp-for="Stat1Text" placeholder="80% Faster"></div>
+                    <div class="fg"><label asp-for="Stat2Icon">Icon 2</label><input asp-for="Stat2Icon" placeholder="fas fa-robot"></div>
+                    <div class="fg"><label asp-for="Stat2Text">Text 2</label><input asp-for="Stat2Text" placeholder="LLM Powered"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head"><h3>Links</h3></div>
+                <div class="fg"><label asp-for="LiveUrl">Live URL</label><input asp-for="LiveUrl" type="url" placeholder="https://"></div>
+                <div class="fg"><label asp-for="RepoUrl">Repository URL</label><input asp-for="RepoUrl" type="url" placeholder="https://github.com/..."></div>
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts { <script src="~/js/admin-editor.js" asp-append-version="true"></script> }

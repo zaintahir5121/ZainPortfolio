@@ -1,0 +1,29 @@
+@model BlogPost
+<article class="post-card reveal">
+    <a href="/blog/@Model.Slug" class="post-cover" aria-label="@Model.Title">
+        @if (!string.IsNullOrWhiteSpace(Model.CoverImageUrl))
+        {
+            <img src="@Model.CoverImageUrl" alt="@Model.Title" loading="lazy">
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.VideoId))
+        {
+            <img src="https://img.youtube.com/vi/@Model.VideoId/hqdefault.jpg" alt="@Model.Title" loading="lazy">
+        }
+        else
+        {
+            <div class="post-cover-fallback"><i class="fas fa-feather-pointed"></i></div>
+        }
+    </a>
+    <div class="post-body">
+        @if (Model.BlogCategory != null)
+        {
+            <div class="post-cat">@Model.BlogCategory.Name</div>
+        }
+        <h3><a href="/blog/@Model.Slug">@Model.Title</a></h3>
+        <p class="post-excerpt">@Model.Excerpt</p>
+        <div class="post-meta">
+            <span><i class="far fa-calendar"></i>@Model.PublishedAt.ToString("dd MMM yyyy")</span>
+            <span><i class="far fa-clock"></i>@Model.ReadMinutes min</span>
+        </div>
+    </div>
+</article>

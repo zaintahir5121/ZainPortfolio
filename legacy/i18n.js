@@ -124,6 +124,23 @@
       'rec.cv': 'View Full Profile', 'rec.book': 'Book 30 Minutes',
       'nav.impact': 'Impact',
       'nav.ach': 'Awards',
+      /* ---- lead capture ---- */
+      'ld.ph': 'you@company.com',
+      'ld.calcH': 'Want the full breakdown?',
+      'ld.calcP': 'I will send you where each percentage point of that saving comes from, worked against the numbers you just chose.',
+      'ld.calcBtn': 'Send my breakdown',
+      'ld.privacy': 'One email with the breakdown. No list, no forwarding, unsubscribe in a click.',
+      'ld.subH': 'Notes on building AI that survives production',
+      'ld.subP': 'Occasional writing on architecture, governance and leading engineering teams. No cadence promises, nothing recycled.',
+      'ld.subBtn': 'Subscribe',
+      'ld.sending': 'Sending\u2026',
+      'ld.badEmail': 'Please enter a valid email address.',
+      'ld.failed': 'That did not go through. ',
+      'ld.emailInstead': 'Email it to me directly instead.',
+      'ld.contactOk': 'Thank you \u2014 your message reached me. I reply within 24 hours.',
+      'ld.subOk': 'You are on the list \u2014 thank you.',
+      'ld.calcOk': 'Sent. Your breakdown is on its way.',
+
       'ac.tag': 'Recognition',
       'ac.h2': 'Milestones &amp; <span class="grad-text">Recognition</span>',
       'ac.desc': 'Work that shipped, teams that built it, and the moments worth keeping.',
@@ -293,6 +310,22 @@
       'rec.cv': 'Vollst\u00e4ndiges Profil', 'rec.book': '30 Minuten buchen',
       'nav.impact': 'Wirkung',
       'nav.ach': 'Auszeichnungen',
+      'ld.ph': 'sie@firma.de',
+      'ld.calcH': 'M\u00f6chten Sie die vollst\u00e4ndige Aufschl\u00fcsselung?',
+      'ld.calcP': 'Ich schicke Ihnen, woher jeder Prozentpunkt dieser Ersparnis kommt \u2014 gerechnet mit genau den Zahlen, die Sie eben gew\u00e4hlt haben.',
+      'ld.calcBtn': 'Aufschl\u00fcsselung senden',
+      'ld.privacy': 'Eine E-Mail mit der Aufschl\u00fcsselung. Keine Liste, keine Weitergabe, Abmeldung mit einem Klick.',
+      'ld.subH': 'Notizen \u00fcber KI, die den Produktivbetrieb \u00fcbersteht',
+      'ld.subP': 'Gelegentliche Texte \u00fcber Architektur, Governance und die F\u00fchrung von Entwicklungsteams. Kein Rhythmusversprechen, nichts Aufgew\u00e4rmtes.',
+      'ld.subBtn': 'Abonnieren',
+      'ld.sending': 'Wird gesendet\u2026',
+      'ld.badEmail': 'Bitte geben Sie eine g\u00fcltige E-Mail-Adresse ein.',
+      'ld.failed': 'Das hat nicht geklappt. ',
+      'ld.emailInstead': 'Schicken Sie es mir stattdessen direkt per E-Mail.',
+      'ld.contactOk': 'Danke \u2014 Ihre Nachricht ist angekommen. Ich antworte innerhalb von 24 Stunden.',
+      'ld.subOk': 'Sie stehen auf der Liste \u2014 vielen Dank.',
+      'ld.calcOk': 'Gesendet. Ihre Aufschl\u00fcsselung ist unterwegs.',
+
       'ac.tag': 'Anerkennung',
       'ac.h2': 'Meilensteine &amp; <span class="grad-text">Auszeichnungen</span>',
       'ac.desc': 'Systeme, die live gingen, Teams, die sie gebaut haben, und die Momente, die bleiben.',
@@ -460,6 +493,22 @@
       'rec.cv': 'Lihat Profil Penuh', 'rec.book': 'Tempah 30 Minit',
       'nav.impact': 'Impak',
       'nav.ach': 'Anugerah',
+      'ld.ph': 'anda@syarikat.com',
+      'ld.calcH': 'Mahukan pecahan penuhnya?',
+      'ld.calcP': 'Saya akan hantar dari mana datangnya setiap mata peratus penjimatan itu, dikira berdasarkan angka yang baru anda pilih.',
+      'ld.calcBtn': 'Hantar pecahan saya',
+      'ld.privacy': 'Satu e-mel dengan pecahannya. Tiada senarai, tiada perkongsian, berhenti langgan dengan satu klik.',
+      'ld.subH': 'Nota tentang membina AI yang bertahan dalam produksi',
+      'ld.subP': 'Tulisan sesekali tentang seni bina, tadbir urus dan memimpin pasukan kejuruteraan. Tiada janji jadual, tiada kitar semula.',
+      'ld.subBtn': 'Langgan',
+      'ld.sending': 'Menghantar\u2026',
+      'ld.badEmail': 'Sila masukkan alamat e-mel yang sah.',
+      'ld.failed': 'Penghantaran gagal. ',
+      'ld.emailInstead': 'E-melkan terus kepada saya sebaliknya.',
+      'ld.contactOk': 'Terima kasih \u2014 mesej anda sampai kepada saya. Saya membalas dalam masa 24 jam.',
+      'ld.subOk': 'Anda sudah dalam senarai \u2014 terima kasih.',
+      'ld.calcOk': 'Dihantar. Pecahan anda sedang dalam perjalanan.',
+
       'ac.tag': 'Pengiktirafan',
       'ac.h2': 'Pencapaian &amp; <span class="grad-text">Pengiktirafan</span>',
       'ac.desc': 'Sistem yang dihantar, pasukan yang membinanya, dan detik yang bermakna.',
@@ -661,6 +710,12 @@
   window.ZatI18n = {
     apply: apply,
     translate: translate,
+    /** Reads one string in the active language — used by scripts that build
+        markup at runtime rather than translating existing nodes. */
+    get: function (key) {
+      var v = pick(current, key);
+      return v === undefined ? '' : decode(v);
+    },
     get lang() { return current; }
   };
 })();

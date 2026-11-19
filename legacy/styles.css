@@ -1225,3 +1225,74 @@ body { background: var(--bg); color: var(--text); }
   .ac-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 520px) { .ac-grid { grid-template-columns: 1fr; } }
+
+/* ===========================
+   LEAD CAPTURE
+=========================== */
+
+/* Honeypot. Must be reachable by a bot parsing the DOM but invisible and
+   unfocusable for a person — display:none is skipped by some bots. */
+.hp {
+  position: absolute !important; left: -9999px !important;
+  width: 1px; height: 1px; opacity: 0; pointer-events: none;
+}
+
+.lead-status {
+  margin-top: 0.7rem; font-size: 0.85rem; font-weight: 500; line-height: 1.5;
+  min-height: 1.2em;
+}
+.lead-status.is-ok { color: #22c55e; }
+.lead-status.is-error { color: #ef4444; }
+.lead-status.is-error a { color: #ef4444; text-decoration: underline; }
+.lead-status.is-error a:hover { color: var(--text); }
+
+/* ---- calculator capture ---- */
+.calc-lead {
+  margin-top: 1.5rem; padding: 1.4rem 1.5rem;
+  background: var(--bg); border: 1.5px solid rgba(124, 108, 240, 0.35);
+  border-radius: 14px;
+}
+.calc-lead-copy h4 { font-size: 1.02rem; margin: 0 0 0.35rem; color: var(--text); }
+.calc-lead-copy p { font-size: 0.86rem; color: var(--muted); line-height: 1.6; margin: 0 0 1rem; }
+.calc-lead-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.calc-lead-row input[type=email] {
+  flex: 1 1 240px; min-width: 0;
+  padding: 0.72rem 0.95rem; border-radius: 9px;
+  background: var(--card); border: 1.5px solid var(--border);
+  color: var(--text); font-size: 0.9rem; font-family: inherit;
+}
+.calc-lead-row input[type=email]:focus { outline: none; border-color: var(--primary); }
+.calc-lead-row .btn-primary { flex-shrink: 0; }
+.calc-lead-note { font-size: 0.74rem; color: var(--muted); opacity: 0.8; margin: 0.8rem 0 0; }
+
+/* ---- footer newsletter ---- */
+.footer-sub {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+  align-items: center; padding-bottom: 2rem; margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.footer-sub-copy h4 { font-size: 1.05rem; margin: 0 0 0.35rem; color: var(--text); }
+.footer-sub-copy p { font-size: 0.86rem; color: var(--muted); line-height: 1.6; margin: 0; }
+.footer-sub-form { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.footer-sub-form input[type=email] {
+  flex: 1 1 200px; min-width: 0;
+  padding: 0.7rem 0.95rem; border-radius: 9px;
+  background: var(--card); border: 1.5px solid var(--border);
+  color: var(--text); font-size: 0.9rem; font-family: inherit;
+}
+.footer-sub-form input[type=email]:focus { outline: none; border-color: var(--primary); }
+.footer-sub-form button {
+  padding: 0.7rem 1.3rem; border-radius: 9px; border: none; cursor: pointer;
+  background: var(--grad); color: #fff; font-size: 0.88rem; font-weight: 600;
+  transition: opacity 0.2s; flex-shrink: 0;
+}
+.footer-sub-form button:hover { opacity: 0.88; }
+.footer-sub-form button:disabled { opacity: 0.55; cursor: not-allowed; }
+.footer-sub-form .lead-status { flex-basis: 100%; margin-top: 0.35rem; }
+
+@media (max-width: 820px) {
+  .footer-sub { grid-template-columns: 1fr; gap: 1.25rem; }
+}
+@media (max-width: 520px) {
+  .calc-lead-row .btn-primary, .footer-sub-form button { width: 100%; justify-content: center; }
+}

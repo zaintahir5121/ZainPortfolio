@@ -139,19 +139,5 @@ document.querySelectorAll('.pf-btn').forEach(btn => {
   });
 });
 
-/* ===== CONTACT FORM ===== */
-document.getElementById('contact-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const status = document.getElementById('cf-status');
-  const btn = this.querySelector('button[type=submit]');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-  setTimeout(() => {
-    status.textContent = 'Thanks! Your message has been sent. I\'ll get back to you soon.';
-    status.className = 'cf-status ok';
-    this.reset();
-    btn.disabled = false;
-    btn.innerHTML = 'Send Message <i class="fas fa-paper-plane"></i>';
-    setTimeout(() => { status.textContent = ''; status.className = 'cf-status'; }, 5000);
-  }, 1200);
-});
+/* Contact form submission lives in lead.js — it posts to the form
+   service and only reports success when a send actually succeeded. */

@@ -210,6 +210,25 @@
           </div>
         </div>
 
+
+        <form class="calc-lead" id="calc-lead" novalidate>
+          <div class="calc-lead-copy">
+            <h4 data-i18n="ld.calcH">Want the full breakdown?</h4>
+            <p data-i18n="ld.calcP">I will send you where each percentage point of that saving comes from, worked against the numbers you just chose.</p>
+          </div>
+          <div class="calc-lead-row">
+            <input type="email" name="email" required
+                   placeholder="you@company.com"
+                   data-i18n-attr="placeholder:ld.ph" aria-label="Email address">
+            <input type="text" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <button type="submit" class="btn-primary">
+              <span data-i18n="ld.calcBtn">Send my breakdown</span> <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+          <div class="lead-status" role="status"></div>
+          <p class="calc-lead-note" data-i18n="ld.privacy">One email with the breakdown. No list, no forwarding, unsubscribe in a click.</p>
+        </form>
+
         <p class="calc-note" data-i18n="vl.cnote">Illustrative only, using published list prices. Savings come from routing simple queries to smaller models, caching repeats and trimming prompt bloat — the three levers a gateway makes possible.</p>
       </div>
     </div>
@@ -1564,7 +1583,8 @@
           <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
             <span data-i18n="ct.send">Send Message</span> <i class="fas fa-paper-plane"></i>
           </button>
-          <div id="cf-status" class="cf-status"></div>
+          <input type="text" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div id="cf-status" class="lead-status" role="status"></div>
         </form>
       </div>
     </div>
@@ -1573,6 +1593,20 @@
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
+      <div class="footer-sub">
+        <div class="footer-sub-copy">
+          <h4 data-i18n="ld.subH">Notes on building AI that survives production</h4>
+          <p data-i18n="ld.subP">Occasional writing on architecture, governance and leading engineering teams. No cadence promises, nothing recycled.</p>
+        </div>
+        <form class="footer-sub-form" data-lead="newsletter" data-source="footer" novalidate>
+          <input type="email" name="email" required placeholder="you@company.com"
+                 data-i18n-attr="placeholder:ld.ph" aria-label="Email address">
+          <input type="text" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button type="submit"><span data-i18n="ld.subBtn">Subscribe</span></button>
+          <div class="lead-status" role="status"></div>
+        </form>
+      </div>
+
       <div class="footer-inner">
         <span class="logo">ZAT<span class="logo-dot">.</span></span>
         <p>&copy; 2025 Zain Abbas Tahir. All rights reserved.</p>
@@ -1629,6 +1663,7 @@
   <script src="i18n.js"></script>
   <script src="ai-lab.js"></script>
   <script src="script.js"></script>
+  <script src="lead.js"></script>
   <script src="chatbot.js"></script>
 </body>
 </html>
